@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+@theme {
+  /* Gold accent scale */
+  --color-gold-50: #fbf8f0;
+  --color-gold-100: #f5edd8;
+  --color-gold-200: #ebd9af;
+  --color-gold-300: #dfbf7f;
+  --color-gold-400: #d4af37;
+  --color-gold-500: #c5a059;
+  --color-gold-600: #a9823f;
+  --color-gold-700: #886330;
+  --color-gold-800: #6a4a25;
+  --color-gold-900: #493116;
+
+  /* Obsidian ground tones */
+  --color-obsidian-950: #080807;
+  --color-obsidian-900: #0e0e0c;
+  --color-obsidian-850: #131310;
+  --color-obsidian-800: #181815;
+  --color-obsidian-750: #1f1f1a;
+  --color-obsidian-700: #272722;
+
+  /* Stone hairlines */
+  --color-stone-border: #26241f;
+  --color-stone-borderLight: #38342c;
+  --color-stone-muted: #787265;
+
+  /* Parchment text tones */
+  --color-parchment-50: #fdfbf7;
+  --color-parchment-100: #f8f4ec;
+  --color-parchment-200: #eee6d6;
+  --color-parchment-300: #dfd4bf;
+  --color-parchment-muted: #a89f8f;
+  --color-parchment-dim: #6b6559;
+
+  /* Typography */
+  --font-serif-monument: var(--font-eb-garamond), serif;
+  --font-cinzel: var(--font-cinzel), serif;
+  --font-sans: var(--font-inter), sans-serif;
+  --font-mono: var(--font-space-grotesk), monospace;
+
+  /* Letter spacing */
+  --tracking-monumental: 0.24em;
+  --tracking-regal: 0.18em;
+  --tracking-technical: 0.14em;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-obsidian-950);
+    color: var(--color-parchment-200);
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--color-gold-500);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .gold-gradient-text {
+    background: linear-gradient(135deg, #f5edd8 0%, #dfbf7f 40%, #c5a059 70%, #9e7d47 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .gold-divider-glow {
+    background: linear-gradient(90deg, transparent 0%, rgba(197, 160, 89, 0.7) 50%, transparent 100%);
+  }
+
+  .fine-grid {
+    background-size: 32px 32px;
+    background-image:
+      linear-gradient(to right, rgba(197, 160, 89, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(197, 160, 89, 0.035) 1px, transparent 1px);
+  }
+
+  .medallion-pedestal {
+    box-shadow:
+      0 0 60px -10px rgba(197, 160, 89, 0.22),
+      0 25px 50px -12px rgba(0, 0, 0, 0.85);
+  }
+
+  .card-border-glow {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .card-border-glow:hover {
+    border-color: rgba(197, 160, 89, 0.55);
+    box-shadow:
+      0 12px 30px -10px rgba(0, 0, 0, 0.8),
+      0 0 20px 0 rgba(197, 160, 89, 0.12);
+  }
+}

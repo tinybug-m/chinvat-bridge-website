@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth antialiased" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Chinvat Bridge — AI, Automation, Software &amp; SEO</title>
+    <meta
+        content="UK-based technology consultancy helping businesses solve practical operational and digital problems using AI, automation, custom software, and technical SEO."
+        name="description" />
+    <!-- Google Fonts: Cinzel, EB Garamond & Inter -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&amp;family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Inter:wght@300;400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "gold": {
+                            50: "#fbf8f0",
+                            100: "#f5edd8",
+                            200: "#ebd9af",
+                            300: "#dfbf7f",
+                            400: "#d4af37",
+                            500: "#c5a059",
+                            600: "#a9823f",
+                            700: "#886330",
+                            800: "#6a4a25",
+                            900: "#493116"
+                        },
+                        "obsidian": {
+                            950: "#080807",
+                            900: "#0e0e0c",
+                            850: "#131310",
+                            800: "#181815",
+                            750: "#1f1f1a",
+                            700: "#272722"
+                        },
+                        "stone": {
+                            border: "#26241f",
+                            borderLight: "#38342c",
+                            muted: "#787265"
+                        },
+                        "parchment": {
+                            50: "#fdfbf7",
+                            100: "#f8f4ec",
+                            200: "#eee6d6",
+                            300: "#dfd4bf",
+                            muted: "#a89f8f",
+                            dim: "#6b6559"
+                        }
+                    },
+                    fontFamily: {
+                        "serif-monument": ["EB Garamond", "serif"],
+                        "cinzel": ["Cinzel", "serif"],
+                        "sans": ["Inter", "sans-serif"],
+                        "mono": ["Space Grotesk", "monospace"]
+                    },
+                    letterSpacing: {
+                        "monumental": "0.24em",
+                        "regal": "0.18em",
+                        "technical": "0.14em"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .medallion-pedestal {
+            box-shadow: 0 0 60px -10px rgba(197, 160, 89, 0.22), 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #f5edd8 0%, #dfbf7f 40%, #c5a059 70%, #9e7d47 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gold-divider-glow {
+            background: linear-gradient(90deg, transparent 0%, rgba(197, 160, 89, 0.7) 50%, transparent 100%);
+        }
+
+        .fine-grid {
+            background-size: 32px 32px;
+            background-image:
+                linear-gradient(to right, rgba(197, 160, 89, 0.035) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(197, 160, 89, 0.035) 1px, transparent 1px);
+        }
+
+        .card-border-glow {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card-border-glow:hover {
+            border-color: rgba(197, 160, 89, 0.55);
+            box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.8), 0 0 20px 0 rgba(197, 160, 89, 0.12);
+        }
+
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid #c5a059;
+            outline-offset: 3px;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-obsidian-950 text-parchment-200 font-sans antialiased selection:bg-gold-500 selection:text-obsidian-950 min-h-screen flex flex-col">
+    <!-- 00 PRESTIGE TOP NAVIGATION BAR -->
+    <header
+        class="sticky top-0 z-50 bg-obsidian-950/90 backdrop-blur-xl border-b border-stone-border/80 transition-all">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
+            <!-- Brand Lockup -->
+            <a aria-label="Chinvat Bridge Home" class="flex items-center gap-3.5 group focus-visible:outline-none"
+                href="#">
+                <div
+                    class="relative w-10 h-10 rounded-full p-0.5 border border-gold-500/60 bg-obsidian-900 group-hover:border-gold-400 transition-all duration-300 overflow-hidden shadow-inner flex items-center justify-center">
+                    <img alt="Chinvat Emblem"
+                        class="w-full h-full object-cover rounded-full scale-105 group-hover:scale-110 transition-transform duration-500"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuilw3gPHigk1DMTnQSgVE_BwSJIRu4cfpA4QvjvlN-6KzAsbBaPQrM0UUwJsxC3Wst9B66lTc8hwhZUXLOYvgY7mFngwApw6zSgzmSUf_XBhhO1ewSROGimXAXW8iOC7xtdaCF9gd-WsWgs-Iqav3AvVHnM6AQtohypmiViXZANI90m2YVDWoyMs4zkuaY4M0nVTywdSHOtJtu-42c6acWb-lqBMkezEfOhu21H3yj52ON7v4kyrHZLFJ1EQyjgUWoA" />
+                </div>
+                <div class="flex flex-col text-left">
+                    <span
+                        class="font-cinzel text-base tracking-[0.24em] text-parchment-100 font-semibold uppercase leading-tight group-hover:text-gold-300 transition-colors">
+                        CHINVAT
+                    </span>
+                    <span class="font-mono text-[9px] tracking-[0.36em] text-gold-500 uppercase font-medium">
+                        BRIDGE
+                    </span>
+                </div>
+            </a>
+            <!-- Desktop Navigation Links -->
+            <nav aria-label="Main Navigation"
+                class="hidden lg:flex items-center space-x-9 text-[11px] font-mono tracking-technical uppercase text-parchment-muted">
+                <a class="hover:text-gold-300 transition-colors" href="#services">SERVICES</a>
+                <a class="hover:text-gold-300 transition-colors" href="#approach">APPROACH</a>
+                <a class="hover:text-gold-300 transition-colors" href="#insights">INSIGHTS</a>
+                <a class="hover:text-gold-300 transition-colors" href="#about">ABOUT</a>
+            </nav>
+            <!-- Trailing Action & Mobile Menu Toggle -->
+            <div class="flex items-center gap-4">
+                <a class="hidden sm:inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-sm bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 text-obsidian-950 font-mono text-[11px] font-semibold tracking-monumental hover:brightness-110 shadow-lg shadow-gold-500/10 transition-all border border-gold-300/40"
+                    href="#contact">
+                    <span>START A CONVERSATION</span>
+                    <span aria-hidden="true" class="material-symbols-outlined text-[15px]">arrow_forward</span>
+                </a>
+                <!-- Mobile Hamburger Button -->
+                <button aria-controls="mobile-nav" aria-expanded="false" aria-label="Toggle navigation menu"
+                    class="lg:hidden p-2 text-parchment-200 hover:text-gold-400 rounded focus:outline-none focus:ring-1 focus:ring-gold-500"
+                    id="mobile-menu-btn" type="button">
+                    <span class="material-symbols-outlined text-2xl" id="menu-icon">menu</span>
+                </button>
+            </div>
+        </div>
+        <!-- Responsive Mobile Menu Tray -->
+        <div class="hidden lg:hidden border-b border-stone-border bg-obsidian-900/98 px-6 py-6 transition-all"
+            id="mobile-nav">
+            <nav class="flex flex-col space-y-4 font-mono text-xs tracking-technical uppercase text-parchment-200">
+                <a class="py-2 hover:text-gold-400 transition-colors mobile-link" href="#services">SERVICES</a>
+                <a class="py-2 hover:text-gold-400 transition-colors mobile-link" href="#approach">APPROACH</a>
+                <a class="py-2 hover:text-gold-400 transition-colors mobile-link" href="#insights">INSIGHTS</a>
+                <a class="py-2 hover:text-gold-400 transition-colors mobile-link" href="#about">ABOUT</a>
+                <div class="pt-3 border-t border-stone-border">
+                    <a class="inline-flex w-full items-center justify-center gap-2 px-5 py-3 rounded-sm bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 text-obsidian-950 font-mono text-xs font-semibold tracking-monumental mobile-link shadow-md"
+                        href="#contact">
+                        <span>START A CONVERSATION</span>
+                        <span aria-hidden="true" class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <main class="flex-grow">
+        <!-- 01 HERO SECTION -->
+        <section class="relative border-b border-stone-border bg-obsidian-900 fine-grid overflow-hidden py-16 lg:py-24">
+            <div class="max-w-7xl mx-auto px-6 lg:px-12 relative">
+                <!-- Top Geolocation & Status Bar -->
+                <div
+                    class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-stone-border/80 pb-4 mb-12 text-[11px] font-mono tracking-technical text-parchment-dim gap-3">
+                    <div class="flex items-center space-x-2.5">
+                        <span aria-hidden="true"
+                            class="inline-block w-2 h-2 rounded-full bg-gold-400 animate-pulse"></span>
+                        <span class="text-gold-400 font-medium">UK BASED // WORKING GLOBALLY</span>
+                    </div>
+                    <div class="flex items-center space-x-4 text-[10px]">
+                        <span class="text-gold-500/90 font-semibold tracking-widest">AI • AUTOMATION • SOFTWARE •
+                            SEO</span>
+                    </div>
+                </div>
+                <!-- Hero Content Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
+                    <!-- Left Column -->
+                    <div class="lg:col-span-7 space-y-7">
+                        <div
+                            class="inline-flex items-center gap-2.5 px-3 py-1 rounded-full border border-gold-500/30 bg-obsidian-850/90 text-gold-300 text-[10px] font-mono tracking-technical uppercase">
+                            <span aria-hidden="true" class="w-1.5 h-1.5 rounded-full bg-gold-400"></span>
+                            <span>AI • AUTOMATION • SOFTWARE • SEO</span>
+                        </div>
+                        <div class="space-y-4">
+                            <h1
+                                class="font-serif-monument text-4xl sm:text-6xl lg:text-[68px] text-parchment-50 font-normal tracking-tight uppercase leading-[1.06]">
+                                BUILD A <span class="italic font-light gold-gradient-text">BETTER WAY</span> FORWARD.
+                            </h1>
+                            <p
+                                class="font-serif-monument text-lg sm:text-xl text-parchment-muted max-w-xl leading-relaxed">
+                                Chinvat Bridge helps businesses use AI, automation and modern software to reduce manual
+                                work, improve digital performance and build better ways of working.
+                            </p>
+                        </div>
+                        <!-- 3 Clear Mini-Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 py-2 max-w-2xl">
+                            <div class="p-3.5 bg-obsidian-850/80 border border-stone-border rounded-sm">
+                                <span
+                                    class="block font-mono text-[9px] text-gold-500 tracking-technical uppercase font-medium mb-1">AI
+                                    &amp; AUTOMATION</span>
+                                <span
+                                    class="font-serif-monument text-sm text-parchment-100 font-normal block leading-snug">Practical
+                                    ways to use AI.</span>
+                            </div>
+                            <div class="p-3.5 bg-obsidian-850/80 border border-stone-border rounded-sm">
+                                <span
+                                    class="block font-mono text-[9px] text-gold-500 tracking-technical uppercase font-medium mb-1">SOFTWARE</span>
+                                <span
+                                    class="font-serif-monument text-sm text-parchment-100 font-normal block leading-snug">Tools
+                                    built around your business.</span>
+                            </div>
+                            <div class="p-3.5 bg-obsidian-850/80 border border-stone-border rounded-sm">
+                                <span
+                                    class="block font-mono text-[9px] text-gold-500 tracking-technical uppercase font-medium mb-1">SEO</span>
+                                <span
+                                    class="font-serif-monument text-sm text-parchment-100 font-normal block leading-snug">Help
+                                    the right customers find you.</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-4 pt-2">
+                            <a class="inline-flex items-center gap-3 bg-gold-500 text-obsidian-950 font-mono text-xs tracking-monumental px-7 py-3.5 font-semibold hover:bg-gold-400 transition-all rounded-sm shadow-md"
+                                href="#contact">
+                                <span>START A CONVERSATION</span>
+                                <span aria-hidden="true"
+                                    class="material-symbols-outlined text-sm font-bold">arrow_forward</span>
+                            </a>
+                            <a class="inline-flex items-center gap-2 border border-stone-borderLight text-parchment-200 font-mono text-xs tracking-monumental px-6 py-3.5 bg-obsidian-850/80 hover:border-gold-500/70 hover:text-gold-300 transition-all rounded-sm"
+                                href="#services">
+                                <span>EXPLORE OUR SERVICES</span>
+                                <span aria-hidden="true" class="material-symbols-outlined text-sm">unfold_more</span>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Right Column: Framed Medallion -->
+                    <div class="lg:col-span-5 flex flex-col items-center">
+                        <div
+                            class="relative w-full max-w-sm sm:max-w-md aspect-square p-4 rounded-full border border-gold-500/30 bg-obsidian-900/90 medallion-pedestal flex items-center justify-center">
+                            <div aria-hidden="true"
+                                class="absolute inset-2 rounded-full border border-gold-500/15 border-dashed pointer-events-none">
+                            </div>
+                            <div aria-hidden="true"
+                                class="absolute inset-5 rounded-full border border-stone-borderLight pointer-events-none">
+                            </div>
+                            <div aria-hidden="true"
+                                class="absolute inset-7 rounded-full border border-gold-500/20 pointer-events-none">
+                            </div>
+                            <div
+                                class="relative w-full h-full rounded-full overflow-hidden border-2 border-gold-500/80 shadow-2xl bg-black group">
+                                <img alt="Chinvat Bridge medallion emblem depicting a classical architectural bridge crossing toward the sun"
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYsbnlmiICzc8OXr5rj3gQsgErjqliX9zWb6qjIDwoWAnqGOVQ8YYZ2pLBXK7aONCpLcwlYP7jc6sQLQhDzUiR2exuyhWuPEyebuxHDY1joDpZRepeW3166lKaICD71YsJMRpcl_rM3hPhBV5IRKiw64KVOGYQtuu4KHqKv3NXdkwKmJ03Gh_lOIVisJykwC30GDhxp8joJsmm91plyR6B0o82q7hQyz6XpzJaI7ZtXlJe-0iX7jYqlbCDpLYCf3O_PA" />
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-obsidian-950/40 via-transparent to-transparent pointer-events-none">
+                                </div>
+                            </div>
+                            <div
+                                class="absolute -top-2.5 bg-obsidian-950 px-2.5 py-0.5 border border-gold-500/40 text-[9px] font-mono text-gold-400 tracking-technical uppercase rounded-xs shadow">
+                                THE BRIDGE CONCEPT
+                            </div>
+                            <div
+                                class="absolute -bottom-2.5 bg-obsidian-950 px-2.5 py-0.5 border border-gold-500/40 text-[9px] font-mono text-gold-400 tracking-technical uppercase rounded-xs shadow">
+                                BRIDGING TODAY &amp; TOMORROW
+                            </div>
+                        </div>
+                        <div class="mt-6 text-center space-y-1">
+                            <span
+                                class="font-cinzel text-xs tracking-regal text-gold-300 uppercase block font-semibold">BRIDGING
+                                TODAY &amp; TOMORROW</span>
+                            <p class="font-mono text-[10px] text-parchment-dim tracking-technical max-w-xs mx-auto">
+                                From manual constraints to reliable, modern digital systems.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 02 PHILOSOPHY SECTION (#about) -->
+        <section class="border-b border-stone-border bg-obsidian-950 py-20 relative" id="about">
+            <div class="max-w-5xl mx-auto px-6 lg:px-12">
+                <div class="relative border border-stone-border bg-obsidian-900/60 p-8 sm:p-14 rounded-sm">
+                    <!-- Classical Tablet Corner Accents -->
+                    <div aria-hidden="true"
+                        class="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-gold-500/60"></div>
+                    <div aria-hidden="true"
+                        class="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-gold-500/60"></div>
+                    <div aria-hidden="true"
+                        class="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-gold-500/60"></div>
+                    <div aria-hidden="true"
+                        class="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-gold-500/60"></div>
+                    <div class="text-center space-y-6 max-w-3xl mx-auto">
+                        <div class="flex items-center justify-center gap-3 text-gold-500">
+                            <span aria-hidden="true" class="h-px w-12 bg-gold-500/40"></span>
+                            <span class="font-mono text-[10px] tracking-technical uppercase">§ 02.00 // THE
+                                PHILOSOPHY</span>
+                            <span aria-hidden="true" class="h-px w-12 bg-gold-500/40"></span>
+                        </div>
+                        <h2
+                            class="font-serif-monument text-3xl sm:text-4xl text-parchment-50 font-normal uppercase tracking-tight">
+                            THE RIGHT TECHNOLOGY <br /><span class="italic text-gold-300">CONNECTS THE PIECES.</span>
+                        </h2>
+                        <blockquote
+                            class="font-serif-monument text-xl sm:text-2xl text-parchment-100 italic leading-relaxed font-light py-2">
+                            “Most businesses don't need more software. They need their people, processes and systems to
+                            work better together.”
+                        </blockquote>
+                        <p class="font-serif-monument text-sm text-parchment-muted max-w-2xl mx-auto leading-relaxed">
+                            Chinvat Bridge helps identify where technology can remove friction, automate repetitive work
+                            and create better digital experiences.
+                        </p>
+                        <div aria-hidden="true" class="w-24 h-px gold-divider-glow mx-auto"></div>
+                        <div class="max-w-2xl mx-auto text-left pt-3">
+                            <div class="p-6 bg-obsidian-950/70 border border-stone-border rounded-sm">
+                                <span
+                                    class="font-mono text-[9px] text-gold-500 tracking-technical uppercase block mb-1.5 font-semibold">THE
+                                    NAME &amp; ORIGIN</span>
+                                <p class="font-serif-monument text-sm text-parchment-muted leading-relaxed">
+                                    Chinvat Bridge is inspired by the ancient Persian concept of a bridge — a passage
+                                    between one state and another. For us, it represents the transition from how a
+                                    business works today to how it could work tomorrow.
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            class="pt-4 flex flex-wrap items-center justify-center gap-6 font-mono text-[10px] tracking-technical text-parchment-dim uppercase">
+                            <span>STRATEGY</span>
+                            <span aria-hidden="true" class="text-gold-500">•</span>
+                            <span>ENGINEERING</span>
+                            <span aria-hidden="true" class="text-gold-500">•</span>
+                            <span>AUTOMATION</span>
+                            <span aria-hidden="true" class="text-gold-500">•</span>
+                            <span class="text-gold-400 font-semibold">MEASURABLE OUTCOMES</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 03 FOUR CORE SERVICES (#services) -->
+        <section class="border-b border-stone-border bg-obsidian-900 py-20" id="services">
+            <div class="max-w-7xl mx-auto px-6 lg:px-12">
+                <div
+                    class="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-stone-border pb-6 mb-12 gap-4">
+                    <div>
+                        <span class="font-mono text-[10px] tracking-technical text-gold-500 uppercase block mb-1.5">§
+                            03.00 // THE CORE DISCIPLINES</span>
+                        <h2 class="font-serif-monument text-3xl sm:text-5xl text-parchment-50 uppercase font-normal">
+                            WHAT WE DO</h2>
+                    </div>
+                    <p class="font-serif-monument text-sm text-parchment-muted max-w-sm">
+                        Practical technology solutions built around real business problems.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Service 1 -->
+                    <div
+                        class="bg-obsidian-850 p-6 flex flex-col justify-between border border-stone-border rounded-sm card-border-glow group">
+                        <div>
+                            <div class="flex items-center justify-between pb-4 border-b border-stone-border/80 mb-4">
+                                <span class="font-cinzel text-lg text-gold-400 font-semibold">I.</span>
+                                <span aria-hidden="true"
+                                    class="material-symbols-outlined text-gold-500 group-hover:scale-110 transition-transform">neurology</span>
+                            </div>
+                            <h3
+                                class="font-serif-monument text-xl text-parchment-100 uppercase group-hover:text-gold-300 transition-colors">
+                                AI &amp; Automation Integration
+                            </h3>
+                            <span
+                                class="font-mono text-[9px] text-gold-500 tracking-technical uppercase block mt-1 mb-3">AI
+                                That Serves the Business</span>
+                            <p class="font-serif-monument text-sm text-parchment-muted leading-relaxed">
+                                We help businesses identify practical AI opportunities, evaluate the right tools and
+                                models, and integrate AI into workflows where it creates measurable value.
+                            </p>
+                            <div class="flex flex-wrap gap-1.5 pt-4">
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-gold-400/90">AI
+                                    Strategy</span>
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-parchment-dim">LLM
+                                    Applications</span>
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-parchment-dim">Automated
+                                    Workflows</span>
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-parchment-dim">Internal
+                                    AI Tools</span>
+                            </div>
+                        </div>
+                        <div
+                            class="pt-5 mt-5 border-t border-stone-border/70 flex items-center justify-between font-mono text-[10px]">
+                            <span
+                                class="text-gold-500 bg-gold-500/10 px-2 py-0.5 border border-gold-500/30 rounded-xs">PRACTICAL
+                                ADOPTION</span>
+                            <span aria-hidden="true"
+                                class="material-symbols-outlined text-sm text-parchment-dim group-hover:text-gold-400">arrow_outward</span>
+                        </div>
+                    </div>
+                    <!-- Service 2 -->
+                    <div
+                        class="bg-obsidian-850 p-6 flex flex-col justify-between border border-stone-border rounded-sm card-border-glow group">
+                        <div>
+                            <div class="flex items-center justify-between pb-4 border-b border-stone-border/80 mb-4">
+                                <span class="font-cinzel text-lg text-gold-400 font-semibold">II.</span>
+                                <span aria-hidden="true"
+                                    class="material-symbols-outlined text-gold-500 group-hover:scale-110 transition-transform">all_inclusive</span>
+                            </div>
+                            <h3
+                                class="font-serif-monument text-xl text-parchment-100 uppercase group-hover:text-gold-300 transition-colors">
+                                Automation &amp; Workflows
+                            </h3>
+                            <span
+                                class="font-mono text-[9px] text-gold-500 tracking-technical uppercase block mt-1 mb-3">Less
+                                Manual Work</span>
+                            <p class="font-serif-monument text-sm text-parchment-muted leading-relaxed">
+                                We design and build automated workflows that connect your tools, reduce repetitive tasks
+                                and help your team spend more time on higher-value work.
+                            </p>
+                            <div class="flex flex-wrap gap-1.5 pt-4">
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-gold-400/90">Workflow
+                                    Automation</span>
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-parchment-dim">API
+                                    Integrations</span>
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-parchment-dim">Process
+                                    Orchestration</span>
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-parchment-dim">System-to-System</span>
+                            </div>
+                        </div>
+                        <div
+                            class="pt-5 mt-5 border-t border-stone-border/70 flex items-center justify-between font-mono text-[10px]">
+                            <span
+                                class="text-gold-500 bg-gold-500/10 px-2 py-0.5 border border-gold-500/30 rounded-xs">REDUCE
+                                MANUAL WORK</span>
+                            <span aria-hidden="true"
+                                class="material-symbols-outlined text-sm text-parchment-dim group-hover:text-gold-400">arrow_outward</span>
+                        </div>
+                    </div>
+                    <!-- Service 3 -->
+                    <div
+                        class="bg-obsidian-850 p-6 flex flex-col justify-between border border-stone-border rounded-sm card-border-glow group">
+                        <div>
+                            <div class="flex items-center justify-between pb-4 border-b border-stone-border/80 mb-4">
+                                <span class="font-cinzel text-lg text-gold-400 font-semibold">III.</span>
+                                <span aria-hidden="true"
+                                    class="material-symbols-outlined text-gold-500 group-hover:scale-110 transition-transform">code_blocks</span>
+                            </div>
+                            <h3
+                                class="font-serif-monument text-xl text-parchment-100 uppercase group-hover:text-gold-300 transition-colors">
+                                Software &amp; Web
+                            </h3>
+                            <span
+                                class="font-mono text-[9px] text-gold-500 tracking-technical uppercase block mt-1 mb-3">Software
+                                Built Around You</span>
+                            <p class="font-serif-monument text-sm text-parchment-muted leading-relaxed">
+                                We build custom websites, web applications, internal tools and digital products around
+                                the way your business actually operates.
+                            </p>
+                            <div class="flex flex-wrap gap-1.5 pt-4">
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-gold-400/90">Custom
+                                    Web Apps</span>
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-parchment-dim">Internal
+                                    Tools</span>
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-parchment-dim">Client
+                                    Portals</span>
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-parchment-dim">Dashboards
+                                    &amp; Systems</span>
+                            </div>
+                        </div>
+                        <div
+                            class="pt-5 mt-5 border-t border-stone-border/70 flex items-center justify-between font-mono text-[10px]">
+                            <span
+                                class="text-gold-500 bg-gold-500/10 px-2 py-0.5 border border-gold-500/30 rounded-xs">BUILT
+                                AROUND YOU</span>
+                            <span aria-hidden="true"
+                                class="material-symbols-outlined text-sm text-parchment-dim group-hover:text-gold-400">arrow_outward</span>
+                        </div>
+                    </div>
+                    <!-- Service 4 -->
+                    <div
+                        class="bg-obsidian-850 p-6 flex flex-col justify-between border border-stone-border rounded-sm card-border-glow group">
+                        <div>
+                            <div class="flex items-center justify-between pb-4 border-b border-stone-border/80 mb-4">
+                                <span class="font-cinzel text-lg text-gold-400 font-semibold">IV.</span>
+                                <span aria-hidden="true"
+                                    class="material-symbols-outlined text-gold-500 group-hover:scale-110 transition-transform">trending_up</span>
+                            </div>
+                            <h3
+                                class="font-serif-monument text-xl text-parchment-100 uppercase group-hover:text-gold-300 transition-colors">
+                                SEO &amp; Digital Growth
+                            </h3>
+                            <span
+                                class="font-mono text-[9px] text-gold-500 tracking-technical uppercase block mt-1 mb-3">Be
+                                Found by the Right People</span>
+                            <p class="font-serif-monument text-sm text-parchment-muted leading-relaxed">
+                                We improve the technical foundations, structure and digital experience of your website
+                                so that search engines and customers can understand your business more clearly.
+                            </p>
+                            <div class="flex flex-wrap gap-1.5 pt-4">
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-gold-400/90">Technical
+                                    SEO</span>
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-parchment-dim">Site
+                                    Architecture</span>
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-parchment-dim">Structured
+                                    Data</span>
+                                <span
+                                    class="px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono text-parchment-dim">Performance
+                                    Audits</span>
+                            </div>
+                        </div>
+                        <div
+                            class="pt-5 mt-5 border-t border-stone-border/70 flex items-center justify-between font-mono text-[10px]">
+                            <span
+                                class="text-gold-500 bg-gold-500/10 px-2 py-0.5 border border-gold-500/30 rounded-xs">IMPROVE
+                                VISIBILITY</span>
+                            <span aria-hidden="true"
+                                class="material-symbols-outlined text-sm text-parchment-dim group-hover:text-gold-400">arrow_outward</span>
+                        </div>
+                    </div>
+                    <!-- Secondary capabilities bar -->
+                    <div
+                        class="col-span-1 md:col-span-2 lg:col-span-4 p-4 bg-obsidian-950/80 border border-stone-border rounded-sm flex flex-col md:flex-row items-center justify-between text-xs font-mono tracking-technical text-parchment-dim gap-3">
+                        <div class="flex items-center gap-2">
+                            <span aria-hidden="true" class="w-1.5 h-1.5 rounded-full bg-gold-400"></span>
+                            <span class="text-gold-400 font-semibold uppercase">SUPPORTING CAPABILITIES:</span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3 text-parchment-200">
+                            <span>Digital Strategy</span>
+                            <span aria-hidden="true" class="text-gold-500">•</span>
+                            <span>Data Integration</span>
+                            <span aria-hidden="true" class="text-gold-500">•</span>
+                            <span>Analytics &amp; BI</span>
+                            <span aria-hidden="true" class="text-gold-500">•</span>
+                            <span>Technical Architecture</span>
+                        </div>
+                    </div>
+                    <!-- Conversion helper card -->
+                    <div
+                        class="col-span-1 md:col-span-2 lg:col-span-4 p-6 sm:p-8 bg-gradient-to-r from-obsidian-850 via-obsidian-900 to-obsidian-850 border border-gold-500/40 rounded-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 card-border-glow">
+                        <div class="space-y-1.5 max-w-2xl">
+                            <div
+                                class="flex items-center gap-2 font-mono text-[10px] text-gold-400 tracking-technical uppercase font-semibold">
+                                <span aria-hidden="true" class="material-symbols-outlined text-sm">help_outline</span>
+                                <span>NOT SURE WHERE TO START?</span>
+                            </div>
+                            <h4 class="font-serif-monument text-xl sm:text-2xl text-parchment-50 uppercase">Every
+                                business has different constraints and opportunities.</h4>
+                            <p class="font-serif-monument text-sm text-parchment-muted leading-relaxed">
+                                Tell us what you're trying to improve, automate or build. We'll help you work out the
+                                most practical place to start.
+                            </p>
+                        </div>
+                        <div>
+                            <a class="inline-flex items-center gap-2.5 px-6 py-3 bg-gold-500 text-obsidian-950 font-mono text-xs font-semibold tracking-monumental hover:bg-gold-400 transition-all rounded-xs shadow-md"
+                                href="#contact">
+                                <span>START A CONVERSATION</span>
+                                <span aria-hidden="true"
+                                    class="material-symbols-outlined text-sm font-bold">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 04 TRANSITION SECTION ("From Today to What's Next" - #approach) -->
+        <section class="border-b border-stone-border bg-obsidian-950 py-20 relative" id="approach">
+            <div class="max-w-7xl mx-auto px-6 lg:px-12">
+                <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
+                    <span class="font-mono text-[10px] tracking-technical text-gold-500 uppercase">§ 04.00 // THE
+                        TRANSITION</span>
+                    <h2 class="font-serif-monument text-3xl sm:text-5xl text-parchment-50 uppercase font-normal">FROM
+                        TODAY TO WHAT'S NEXT.</h2>
+                    <p class="font-serif-monument text-sm text-parchment-muted">
+                        Technology creates the most value when it solves a real constraint. We help identify the gap,
+                        design the right solution and build it.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch">
+                    <!-- Current State -->
+                    <div
+                        class="border border-red-950/60 bg-obsidian-900/90 rounded-sm p-6 sm:p-8 flex flex-col justify-between relative">
+                        <div aria-hidden="true" class="absolute top-0 left-0 right-0 h-1 bg-red-900/70"></div>
+                        <div>
+                            <div class="flex items-center justify-between pb-4 border-b border-stone-border mb-6">
+                                <div class="flex items-center gap-2.5">
+                                    <span aria-hidden="true" class="w-2 h-2 rounded-full bg-red-500"></span>
+                                    <span
+                                        class="font-mono text-[11px] text-red-400 tracking-technical uppercase font-medium">CURRENT
+                                        STATE</span>
+                                </div>
+                                <span class="font-mono text-[10px] text-parchment-dim uppercase">STATUS:
+                                    CONSTRAINED</span>
+                            </div>
+                            <h3 class="font-serif-monument text-2xl text-parchment-100 uppercase mb-2">TODAY</h3>
+                            <p class="font-serif-monument text-sm text-parchment-muted mb-6">
+                                Operations held back by friction, manual overhead, and disconnected digital tools.
+                            </p>
+                            <div class="space-y-2.5 font-mono text-xs">
+                                <div
+                                    class="p-3 bg-obsidian-950/80 border border-stone-border/80 flex items-center justify-between rounded-xs">
+                                    <span class="text-parchment-dim">Repetitive manual work</span>
+                                    <span class="text-red-400 font-semibold">High Human Overhead</span>
+                                </div>
+                                <div
+                                    class="p-3 bg-obsidian-950/80 border border-stone-border/80 flex items-center justify-between rounded-xs">
+                                    <span class="text-parchment-dim">Disconnected tools</span>
+                                    <span class="text-red-400 font-semibold">Fragmented Data</span>
+                                </div>
+                                <div
+                                    class="p-3 bg-obsidian-950/80 border border-stone-border/80 flex items-center justify-between rounded-xs">
+                                    <span class="text-parchment-dim">Poor search visibility</span>
+                                    <span class="text-red-400 font-semibold">Lost Inbound Demand</span>
+                                </div>
+                                <div
+                                    class="p-3 bg-obsidian-950/80 border border-stone-border/80 flex items-center justify-between rounded-xs">
+                                    <span class="text-parchment-dim">Outdated processes</span>
+                                    <span class="text-red-400 font-semibold">Slow Iteration Speed</span>
+                                </div>
+                                <div
+                                    class="p-3 bg-obsidian-950/80 border border-stone-border/80 flex items-center justify-between rounded-xs">
+                                    <span class="text-parchment-dim">Too much operational friction</span>
+                                    <span class="text-red-400 font-semibold">Compounding Cost</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="pt-6 mt-6 border-t border-stone-border flex items-center justify-between text-[10px] font-mono text-parchment-dim">
+                            <span>CHALLENGE: OPERATIONAL DRAG</span>
+                            <span aria-hidden="true"
+                                class="material-symbols-outlined text-red-400 text-sm">arrow_downward</span>
+                        </div>
+                    </div>
+                    <!-- Future State -->
+                    <div
+                        class="border-2 border-gold-500/70 bg-obsidian-900 rounded-sm p-6 sm:p-8 flex flex-col justify-between relative shadow-xl shadow-gold-500/5">
+                        <div aria-hidden="true"
+                            class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-gold-600 via-gold-400 to-gold-600">
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between pb-4 border-b border-stone-border mb-6">
+                                <div class="flex items-center gap-2.5">
+                                    <span aria-hidden="true"
+                                        class="w-2 h-2 rounded-full bg-gold-400 animate-pulse"></span>
+                                    <span
+                                        class="font-mono text-[11px] text-gold-300 tracking-technical uppercase font-medium">FUTURE
+                                        DIRECTION</span>
+                                </div>
+                                <span class="font-mono text-[10px] text-gold-500 font-semibold uppercase">DIRECTION:
+                                    BETTER SYSTEMS</span>
+                            </div>
+                            <h3 class="font-serif-monument text-2xl text-parchment-50 uppercase mb-2">WHAT'S NEXT</h3>
+                            <p class="font-serif-monument text-sm text-parchment-200 mb-6">
+                                Automated workflows, connected systems, stronger organic visibility, and software built
+                                around the business.
+                            </p>
+                            <div class="space-y-2.5 font-mono text-xs">
+                                <div
+                                    class="p-3 bg-obsidian-850 border border-gold-500/30 flex items-center justify-between rounded-xs">
+                                    <span class="text-parchment-300">Automated workflows</span>
+                                    <span class="text-gold-300 font-semibold">Reliable &amp; Fast</span>
+                                </div>
+                                <div
+                                    class="p-3 bg-obsidian-850 border border-gold-500/30 flex items-center justify-between rounded-xs">
+                                    <span class="text-parchment-300">Connected systems</span>
+                                    <span class="text-gold-300 font-semibold">Single Source of Truth</span>
+                                </div>
+                                <div
+                                    class="p-3 bg-obsidian-850 border border-gold-500/30 flex items-center justify-between rounded-xs">
+                                    <span class="text-parchment-300">Stronger organic visibility</span>
+                                    <span class="text-gold-300 font-semibold">Consistent Inbound Trust</span>
+                                </div>
+                                <div
+                                    class="p-3 bg-obsidian-850 border border-gold-500/30 flex items-center justify-between rounded-xs">
+                                    <span class="text-parchment-300">Better digital experiences</span>
+                                    <span class="text-gold-300 font-semibold">Clear Conversion</span>
+                                </div>
+                                <div
+                                    class="p-3 bg-obsidian-850 border border-gold-500/30 flex items-center justify-between rounded-xs">
+                                    <span class="text-parchment-300">Software built around the business</span>
+                                    <span class="text-gold-300 font-semibold">Enduring Advantage</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="pt-6 mt-6 border-t border-gold-500/30 flex items-center justify-between text-[10px] font-mono text-gold-400">
+                            <span>THE GOAL ISN'T MORE TECHNOLOGY. IT'S A BETTER BUSINESS.</span>
+                            <span aria-hidden="true"
+                                class="material-symbols-outlined text-gold-400 text-sm">verified</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 05 PROCESS SECTION -->
+        <section class="border-b border-stone-border bg-obsidian-950 py-20 relative">
+            <div class="max-w-7xl mx-auto px-6 lg:px-12">
+                <div
+                    class="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-stone-border pb-6 mb-12 gap-4">
+                    <div>
+                        <span class="font-mono text-[10px] tracking-technical text-gold-500 uppercase block mb-1.5">THE
+                            METHOD</span>
+                        <h2 class="font-serif-monument text-3xl sm:text-5xl text-parchment-50 uppercase font-normal">A
+                            CLEAR, DISCIPLINED PROCESS</h2>
+                    </div>
+                    <p class="font-serif-monument text-sm text-parchment-muted max-w-sm">
+                        No unnecessary complexity. No technology for technology's sake.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="p-6 bg-obsidian-900 border border-stone-border rounded-sm">
+                        <span class="font-cinzel text-lg text-gold-400 font-semibold block mb-2">I. DISCOVER</span>
+                        <p class="font-serif-monument text-sm text-parchment-muted leading-relaxed">
+                            We understand your business, your existing systems and the problems worth solving.
+                        </p>
+                    </div>
+                    <div class="p-6 bg-obsidian-900 border border-stone-border rounded-sm">
+                        <span class="font-cinzel text-lg text-gold-400 font-semibold block mb-2">II. DEFINE</span>
+                        <p class="font-serif-monument text-sm text-parchment-muted leading-relaxed">
+                            We identify the highest-impact opportunities and define a practical path forward.
+                        </p>
+                    </div>
+                    <div class="p-6 bg-obsidian-900 border border-stone-border rounded-sm">
+                        <span class="font-cinzel text-lg text-gold-400 font-semibold block mb-2">III. BUILD</span>
+                        <p class="font-serif-monument text-sm text-parchment-muted leading-relaxed">
+                            We design, develop and integrate the solution with care and engineering rigor.
+                        </p>
+                    </div>
+                    <div class="p-6 bg-obsidian-900 border border-stone-border rounded-sm">
+                        <span class="font-cinzel text-lg text-gold-400 font-semibold block mb-2">IV. IMPROVE</span>
+                        <p class="font-serif-monument text-sm text-parchment-muted leading-relaxed">
+                            We measure what works, refine the system and help you build on it sustainably.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 06 CAPABILITIES SECTION -->
+        <section class="border-b border-stone-border bg-obsidian-900 py-20" id="machines">
+            <div class="max-w-7xl mx-auto px-6 lg:px-12">
+                <div
+                    class="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-stone-border pb-6 mb-12 gap-4">
+                    <div>
+                        <span class="font-mono text-[10px] tracking-technical text-gold-500 uppercase block mb-1.5">§
+                            05.00 // THE CAPABILITIES</span>
+                        <h2 class="font-serif-monument text-3xl sm:text-5xl text-parchment-50 uppercase font-normal">
+                            ANCIENT PRINCIPLES. <br /><span class="italic text-gold-300">MODERN MACHINES.</span>
+                        </h2>
+                    </div>
+                    <p class="font-serif-monument text-sm text-parchment-muted max-w-sm">
+                        Modern businesses have more tools than ever. The challenge is knowing which ones actually create
+                        value.
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <div
+                        class="p-4 bg-obsidian-850 border border-stone-border rounded-sm hover:border-gold-500/60 transition-colors">
+                        <span class="font-mono text-[9px] text-gold-500 block mb-1 font-semibold">01 // AI</span>
+                        <h4 class="font-mono text-sm text-parchment-100 font-semibold mb-1">LLMs &amp; Models</h4>
+                        <p class="font-serif-monument text-xs text-parchment-dim leading-snug">
+                            Large language models, AI integrations, knowledge systems and intelligent workflows.
+                        </p>
+                    </div>
+                    <div
+                        class="p-4 bg-obsidian-850 border border-stone-border rounded-sm hover:border-gold-500/60 transition-colors">
+                        <span class="font-mono text-[9px] text-gold-500 block mb-1 font-semibold">02 //
+                            AUTOMATION</span>
+                        <h4 class="font-mono text-sm text-parchment-100 font-semibold mb-1">Workflows &amp; APIs</h4>
+                        <p class="font-serif-monument text-xs text-parchment-dim leading-snug">
+                            Workflow automation, API integrations and business process orchestration.
+                        </p>
+                    </div>
+                    <div
+                        class="p-4 bg-obsidian-850 border border-stone-border rounded-sm hover:border-gold-500/60 transition-colors">
+                        <span class="font-mono text-[9px] text-gold-500 block mb-1 font-semibold">03 // SOFTWARE</span>
+                        <h4 class="font-mono text-sm text-parchment-100 font-semibold mb-1">Custom Apps</h4>
+                        <p class="font-serif-monument text-xs text-parchment-dim leading-snug">
+                            Modern web applications, internal tools and custom digital products.
+                        </p>
+                    </div>
+                    <div
+                        class="p-4 bg-obsidian-850 border border-stone-border rounded-sm hover:border-gold-500/60 transition-colors">
+                        <span class="font-mono text-[9px] text-gold-500 block mb-1 font-semibold">04 // DATA</span>
+                        <h4 class="font-mono text-sm text-parchment-100 font-semibold mb-1">Pipelines &amp; BI</h4>
+                        <p class="font-serif-monument text-xs text-parchment-dim leading-snug">
+                            Data integration, structured information and actionable business intelligence.
+                        </p>
+                    </div>
+                    <div
+                        class="p-4 bg-obsidian-850 border border-stone-border rounded-sm hover:border-gold-500/60 transition-colors">
+                        <span class="font-mono text-[9px] text-gold-500 block mb-1 font-semibold">05 // WEB</span>
+                        <h4 class="font-mono text-sm text-parchment-100 font-semibold mb-1">Digital Platforms</h4>
+                        <p class="font-serif-monument text-xs text-parchment-dim leading-snug">
+                            Websites and digital experiences designed for performance, usability and growth.
+                        </p>
+                    </div>
+                    <div
+                        class="p-4 bg-obsidian-850 border border-stone-border rounded-sm hover:border-gold-500/60 transition-colors">
+                        <span class="font-mono text-[9px] text-gold-500 block mb-1 font-semibold">06 // SEO</span>
+                        <h4 class="font-mono text-sm text-parchment-100 font-semibold mb-1">Technical SEO</h4>
+                        <p class="font-serif-monument text-xs text-parchment-dim leading-snug">
+                            Technical SEO, site architecture, content structure and search visibility.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 07 INSIGHTS SECTION (#insights) -->
+        <section class="border-b border-stone-border bg-obsidian-950 py-20" id="insights">
+            <div class="max-w-7xl mx-auto px-6 lg:px-12">
+                <div
+                    class="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-stone-border pb-6 mb-10 gap-4">
+                    <div>
+                        <span
+                            class="font-mono text-[10px] tracking-technical text-gold-500 uppercase block mb-1.5">INSIGHTS</span>
+                        <h2 class="font-serif-monument text-3xl sm:text-5xl text-parchment-50 uppercase font-normal">
+                            IDEAS &amp; OBSERVATIONS</h2>
+                        <p class="font-serif-monument text-sm text-parchment-muted pt-1">
+                            Practical thinking about AI, software, automation and digital growth.
+                        </p>
+                    </div>
+                    <span
+                        class="font-mono text-[10px] text-gold-400 tracking-technical uppercase font-medium bg-obsidian-900 border border-stone-border px-3 py-1 rounded-xs">
+                        FORTHCOMING TOPICS // EDITORIAL INQUIRIES
+                    </span>
+                </div>
+                <div class="divide-y divide-stone-border border-t border-b border-stone-border">
+                    <!-- Article 01 -->
+                    <div
+                        class="py-6 flex flex-col md:flex-row md:items-center justify-between group hover:bg-obsidian-900/60 px-4 transition-colors">
+                        <div class="flex items-start md:items-center gap-6">
+                            <span class="font-mono text-xs text-gold-500 font-semibold">01</span>
+                            <div>
+                                <h3
+                                    class="font-serif-monument text-lg sm:text-xl text-parchment-100 group-hover:text-gold-300 transition-colors">
+                                    Where AI Can Actually Save Your Business Time
+                                </h3>
+                                <span
+                                    class="font-mono text-[10px] text-parchment-dim tracking-technical uppercase">CATEGORY:
+                                    AI &amp; WORKFLOWS</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-3 md:mt-0 font-mono text-[10px] tracking-technical">
+                            <span
+                                class="px-2.5 py-1 rounded-xs bg-obsidian-900 border border-stone-borderLight text-parchment-dim">PLANNED
+                                BRIEFING</span>
+                            <span aria-hidden="true"
+                                class="material-symbols-outlined text-gold-500/70 text-sm">article</span>
+                        </div>
+                    </div>
+                    <!-- Article 02 -->
+                    <div
+                        class="py-6 flex flex-col md:flex-row md:items-center justify-between group hover:bg-obsidian-900/60 px-4 transition-colors">
+                        <div class="flex items-start md:items-center gap-6">
+                            <span class="font-mono text-xs text-gold-500 font-semibold">02</span>
+                            <div>
+                                <h3
+                                    class="font-serif-monument text-lg sm:text-xl text-parchment-100 group-hover:text-gold-300 transition-colors">
+                                    What Should You Automate First?
+                                </h3>
+                                <span
+                                    class="font-mono text-[10px] text-parchment-dim tracking-technical uppercase">CATEGORY:
+                                    PROCESS AUTOMATION</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-3 md:mt-0 font-mono text-[10px] tracking-technical">
+                            <span
+                                class="px-2.5 py-1 rounded-xs bg-obsidian-900 border border-stone-borderLight text-parchment-dim">TOPIC
+                                IN DEVELOPMENT</span>
+                            <span aria-hidden="true"
+                                class="material-symbols-outlined text-gold-500/70 text-sm">article</span>
+                        </div>
+                    </div>
+                    <!-- Article 03 -->
+                    <div
+                        class="py-6 flex flex-col md:flex-row md:items-center justify-between group hover:bg-obsidian-900/60 px-4 transition-colors">
+                        <div class="flex items-start md:items-center gap-6">
+                            <span class="font-mono text-xs text-gold-500 font-semibold">03</span>
+                            <div>
+                                <h3
+                                    class="font-serif-monument text-lg sm:text-xl text-parchment-100 group-hover:text-gold-300 transition-colors">
+                                    Why Your Website Isn't Bringing You Enough Customers
+                                </h3>
+                                <span
+                                    class="font-mono text-[10px] text-parchment-dim tracking-technical uppercase">CATEGORY:
+                                    SEO &amp; DISCOVERY</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-3 md:mt-0 font-mono text-[10px] tracking-technical">
+                            <span
+                                class="px-2.5 py-1 rounded-xs bg-obsidian-900 border border-stone-borderLight text-parchment-dim">PLANNED
+                                BRIEFING</span>
+                            <span aria-hidden="true"
+                                class="material-symbols-outlined text-gold-500/70 text-sm">article</span>
+                        </div>
+                    </div>
+                    <!-- Article 04 -->
+                    <div
+                        class="py-6 flex flex-col md:flex-row md:items-center justify-between group hover:bg-obsidian-900/60 px-4 transition-colors">
+                        <div class="flex items-start md:items-center gap-6">
+                            <span class="font-mono text-xs text-gold-500 font-semibold">04</span>
+                            <div>
+                                <h3
+                                    class="font-serif-monument text-lg sm:text-xl text-parchment-100 group-hover:text-gold-300 transition-colors">
+                                    When Should a Business Build Custom Software?
+                                </h3>
+                                <span
+                                    class="font-mono text-[10px] text-parchment-dim tracking-technical uppercase">CATEGORY:
+                                    SOFTWARE STRATEGY</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-3 md:mt-0 font-mono text-[10px] tracking-technical">
+                            <span
+                                class="px-2.5 py-1 rounded-xs bg-obsidian-900 border border-stone-borderLight text-parchment-dim">TOPIC
+                                IN DEVELOPMENT</span>
+                            <span aria-hidden="true"
+                                class="material-symbols-outlined text-gold-500/70 text-sm">article</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 08 MONUMENTAL PORTAL / CONTACT (#contact) -->
+        <section class="border-b border-stone-border bg-obsidian-900 py-24 relative" id="contact">
+            <div class="max-w-4xl mx-auto px-6">
+                <div
+                    class="border-2 border-gold-500/70 bg-obsidian-850 p-10 sm:p-14 text-center space-y-8 relative overflow-hidden shadow-2xl rounded-sm">
+                    <div aria-hidden="true" class="absolute top-3 left-3 w-3 h-3 border-t-2 border-l-2 border-gold-400">
+                    </div>
+                    <div aria-hidden="true"
+                        class="absolute top-3 right-3 w-3 h-3 border-t-2 border-r-2 border-gold-400"></div>
+                    <div aria-hidden="true"
+                        class="absolute bottom-3 left-3 w-3 h-3 border-b-2 border-l-2 border-gold-400"></div>
+                    <div aria-hidden="true"
+                        class="absolute bottom-3 right-3 w-3 h-3 border-b-2 border-r-2 border-gold-400"></div>
+                    <div
+                        class="w-16 h-16 rounded-full mx-auto p-1 border-2 border-gold-500 bg-obsidian-950 shadow-lg shadow-gold-500/20 overflow-hidden flex items-center justify-center">
+                        <img alt="Chinvat Emblem Seal" class="w-full h-full object-cover rounded-full"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTjbmpNbqIh7LL3VVtDQhJhX9C3LoAXU26jwcSXEgyWgukUmtT1hdzMVJ-S2x8fdRrQt55Tn07MP7bOu5BA7C0dt6Lljl26JXoENyo_j04t9kH_4sn2KIj-z9oJgqvV3cXSFTPP_a-JUVdz9iPzrKo21SKL5KfL1JkHKTT7sjP4yQ4SSzVMKIPYklPGQMTNzMZfU_l8VXymW_CT6IRPyj5cETEMRL15hRSXgarXxdBDFLY-nY0QUpicZUlHlLm3tQHiA" />
+                    </div>
+                    <div class="space-y-2">
+                        <span
+                            class="font-mono text-[10px] tracking-technical text-gold-400 uppercase block font-semibold">START
+                            THE CONVERSATION</span>
+                        <h2 class="font-serif-monument text-4xl sm:text-6xl text-parchment-50 uppercase tracking-tight">
+                            CROSS THE BRIDGE.</h2>
+                        <div aria-hidden="true" class="w-16 h-px gold-divider-glow mx-auto my-3"></div>
+                    </div>
+                    <p
+                        class="font-serif-monument text-base sm:text-lg text-parchment-200 max-w-lg mx-auto leading-relaxed">
+                        Have a business problem worth solving? Tell us what's slowing your business down, where you're
+                        trying to grow, or what you'd like to build. We'll help you identify the most practical next
+                        step.
+                    </p>
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+                        <a class="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 text-obsidian-950 font-mono text-xs tracking-monumental px-8 py-4 font-bold hover:brightness-110 transition-all rounded-xs shadow-lg shadow-gold-500/20"
+                            href="mailto:inquiries@chinvatbridge.co.uk?subject=Consulting%20Inquiry">
+                            <span>START A CONVERSATION</span>
+                            <span aria-hidden="true" class="material-symbols-outlined text-sm font-bold">mail</span>
+                        </a>
+                        <a class="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-stone-borderLight text-parchment-100 font-mono text-xs tracking-technical px-6 py-4 bg-obsidian-900 hover:border-gold-500/70 hover:text-gold-300 transition-all rounded-xs"
+                            href="mailto:inquiries@chinvatbridge.co.uk?subject=Project%20Discussion">
+                            <span>TELL US ABOUT YOUR PROJECT</span>
+                            <span aria-hidden="true"
+                                class="material-symbols-outlined text-gold-400 text-sm">arrow_forward</span>
+                        </a>
+                    </div>
+                    <div class="pt-2">
+                        <a class="font-mono text-xs text-gold-300 hover:text-gold-400 transition-colors"
+                            href="mailto:inquiries@chinvatbridge.co.uk">
+                            inquiries@chinvatbridge.co.uk
+                        </a>
+                    </div>
+                    <div
+                        class="pt-6 border-t border-stone-border/80 flex flex-wrap justify-between items-center text-[10px] font-mono text-parchment-dim tracking-technical gap-2">
+                        <span>UK BASED // WORKING GLOBALLY</span>
+                        <span>CHINVAT BRIDGE</span>
+                        <span class="text-gold-400 font-semibold">TECHNOLOGY CONSULTANCY</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- 09 MONOLITHIC FOOTER -->
+    <footer class="bg-obsidian-950 border-t border-stone-border text-parchment-muted">
+        <div class="max-w-7xl mx-auto py-14 px-6 lg:px-12">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-10 pb-10 border-b border-stone-border">
+                <!-- Brand Description -->
+                <div class="md:col-span-5 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-8 h-8 rounded-full border border-gold-500 p-0.5 overflow-hidden flex items-center justify-center">
+                            <img alt="Chinvat Bridge Emblem" class="w-full h-full object-cover rounded-full"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYWiU9nChz09RmVlYXCZdEwDK-2Q5mIUWf2aTI0ArPiV3LM3-A5gVmniVKXgStCcBFIi5SJ3T5WJB97yD761itYHBjRfPJB2njHlzmxi3y5-jL9JBLeo2eCMTVlO99wZBHNcrRvpuDYQVuFwzkAAr0afZxoP0CcbCHmlYeR38uv-GcwZ4Y8859bGlCzusvBuH2nXGFCWC8Bej2k35st541uHfNwf_tQN_hdANXn2xNgFhge_pacvMBA-mcs-10BvqyVw" />
+                        </div>
+                        <div class="flex flex-col">
+                            <span
+                                class="font-cinzel text-sm tracking-[0.2em] text-parchment-100 font-semibold uppercase">CHINVAT</span>
+                            <span class="font-mono text-[9px] tracking-[0.3em] text-gold-500 uppercase">BRIDGE</span>
+                        </div>
+                    </div>
+                    <p class="font-serif-monument text-sm text-parchment-muted max-w-sm leading-relaxed">
+                        Chinvat Bridge is a UK-based technology consultancy helping businesses use AI, automation,
+                        software and SEO to work better and grow.
+                    </p>
+                </div>
+                <!-- Disciplines Links -->
+                <div class="md:col-span-4 space-y-2.5 font-mono text-[11px] tracking-technical">
+                    <span class="text-gold-400 uppercase block font-semibold">DISCIPLINES</span>
+                    <div class="grid grid-cols-2 gap-2 text-parchment-dim">
+                        <a class="hover:text-gold-300 transition-colors" href="#services">AI &amp; Automation</a>
+                        <a class="hover:text-gold-300 transition-colors" href="#services">Workflows</a>
+                        <a class="hover:text-gold-300 transition-colors" href="#services">Software &amp; Web</a>
+                        <a class="hover:text-gold-300 transition-colors" href="#services">SEO &amp; Growth</a>
+                    </div>
+                </div>
+                <!-- Direct Contact -->
+                <div class="md:col-span-3 space-y-2 font-mono text-[11px] tracking-technical">
+                    <span class="text-gold-400 uppercase block font-semibold">CHINVAT BRIDGE</span>
+                    <p class="text-parchment-dim text-xs leading-relaxed">
+                        UK Based • Working Globally<br />
+                        <a class="text-parchment-200 hover:text-gold-300 underline-offset-2 hover:underline"
+                            href="mailto:inquiries@chinvatbridge.co.uk">
+                            inquiries@chinvatbridge.co.uk
+                        </a>
+                    </p>
+                    <div class="pt-2">
+                        <a class="inline-block px-2.5 py-0.5 bg-obsidian-900 border border-gold-500/40 text-[9px] text-gold-300 hover:text-gold-400 transition-colors"
+                            href="#contact">
+                            START A CONVERSATION
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Legal & Fast Navigation -->
+            <div
+                class="pt-8 flex flex-col sm:flex-row justify-between items-center text-[10px] font-mono tracking-technical text-parchment-dim gap-4">
+                <div>© MMXXVI CHINVAT BRIDGE LTD. ALL RIGHTS RESERVED.</div>
+                <div class="flex items-center space-x-6">
+                    <a class="hover:text-gold-300 transition-colors" href="#services">SERVICES</a>
+                    <span aria-hidden="true" class="text-stone-border">•</span>
+                    <a class="hover:text-gold-300 transition-colors" href="#approach">APPROACH</a>
+                    <span aria-hidden="true" class="text-stone-border">•</span>
+                    <a class="hover:text-gold-300 transition-colors" href="#insights">INSIGHTS</a>
+                    <span aria-hidden="true" class="text-stone-border">•</span>
+                    <a class="hover:text-gold-300 transition-colors" href="#about">ABOUT</a>
+                    <span aria-hidden="true" class="text-stone-border">•</span>
+                    <a class="text-gold-400 hover:underline" href="#contact">CONTACT</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Functional Mobile Navigation Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const mobileNav = document.getElementById('mobile-nav');
+            const menuIcon = document.getElementById('menu-icon');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+
+            function toggleMenu() {
+                const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
+                menuBtn.setAttribute('aria-expanded', !isExpanded);
+                mobileNav.classList.toggle('hidden');
+                menuIcon.textContent = isExpanded ? 'menu' : 'close';
+            }
+
+            if (menuBtn && mobileNav) {
+                menuBtn.addEventListener('click', toggleMenu);
+
+                mobileLinks.forEach(function (link) {
+                    link.addEventListener('click', function () {
+                        if (!mobileNav.classList.contains('hidden')) {
+                            toggleMenu();
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
