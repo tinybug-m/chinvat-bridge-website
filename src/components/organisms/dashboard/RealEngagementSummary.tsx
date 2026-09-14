@@ -30,9 +30,9 @@ export function RealEngagementSummary({ companyName, website, planId, status }: 
         <span className="font-mono text-[10px] text-gold-500 uppercase tracking-technical block mb-1.5">
           Client Workspace
         </span>
-        <h1 className="font-serif-monument text-3xl text-parchment-50 uppercase tracking-tight">
+        <h2 className="font-serif-monument text-3xl text-parchment-50 uppercase tracking-tight">
           Your Engagement
-        </h1>
+        </h2>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-stone-border">
         {metrics.map((metric) => (

@@ -30,6 +30,7 @@ export default async function DashboardPage() {
     <SiteShell>
       <div className="bg-obsidian-950 py-12 lg:py-16">
         <Container className="space-y-8">
+          <h1 className="sr-only">Client Dashboard</h1>
           <div className="flex justify-end">
             <form action={signOut}>
               <button
