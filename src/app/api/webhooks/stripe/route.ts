@@ -74,11 +74,11 @@ export async function POST(request: Request) {
   }
 
   const rawBody = await request.text();
-  const stripe = getStripeClient();
 
   let event: Stripe.Event;
 
   try {
+    const stripe = getStripeClient();
     event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Invalid signature.";

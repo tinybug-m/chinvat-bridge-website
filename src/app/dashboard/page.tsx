@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { CheckoutShell } from "@/components/templates/CheckoutShell";
+import { SiteShell } from "@/components/templates/SiteShell";
 import { Container } from "@/components/atoms/Container";
 import { Bay } from "@/components/molecules/Bay";
 import { ComingSoonNotice } from "@/components/molecules/ComingSoonNotice";
@@ -27,7 +27,7 @@ export default async function DashboardPage() {
   const { data: customer } = await supabase.from("customers").select("*").eq("id", user.id).maybeSingle();
 
   return (
-    <CheckoutShell>
+    <SiteShell>
       <div className="bg-obsidian-950 py-12 lg:py-16">
         <Container className="space-y-8">
           <div className="flex justify-end">
@@ -75,6 +75,6 @@ export default async function DashboardPage() {
           )}
         </Container>
       </div>
-    </CheckoutShell>
+    </SiteShell>
   );
 }
