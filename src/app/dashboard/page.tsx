@@ -5,6 +5,7 @@ import { Container } from "@/components/atoms/Container";
 import { Bay } from "@/components/molecules/Bay";
 import { ComingSoonNotice } from "@/components/molecules/ComingSoonNotice";
 import { RealEngagementSummary } from "@/components/organisms/dashboard/RealEngagementSummary";
+import { RealProjectProgress } from "@/components/organisms/dashboard/RealProjectProgress";
 import { AdvisoryChannel } from "@/components/organisms/dashboard/AdvisoryChannel";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/actions/auth";
@@ -58,12 +59,7 @@ export default async function DashboardPage() {
               />
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <div className="lg:col-span-8 space-y-8">
-                  <Bay numeral="I." title="Project Progress">
-                    <ComingSoonNotice>
-                      Your consultant is setting up your account — progress tracking will appear here once
-                      onboarding begins.
-                    </ComingSoonNotice>
-                  </Bay>
+                  <RealProjectProgress planId={customer.plan_id} />
                 </div>
                 <div className="lg:col-span-4 space-y-8">
                   <Bay numeral="II." title="Reports &amp; Archive">
