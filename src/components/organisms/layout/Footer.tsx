@@ -4,9 +4,9 @@ import { BulletRow } from "@/components/molecules/BulletRow";
 import { Container } from "@/components/atoms/Container";
 import { EmailLink } from "@/components/atoms/EmailLink";
 import { toRomanNumeral } from "@/lib/roman-numeral";
-import { DISCIPLINE_LINKS, LEGAL_NAV_LINKS, type FooterLink } from "@/data/footer";
+import { DISCIPLINE_LINKS, SECTION_NAV_LINKS, type FooterLink } from "@/data/footer";
 
-const FOOTER_NAV_ITEMS: FooterLink[] = [...LEGAL_NAV_LINKS, { label: "Contact", href: "/#contact" }];
+const FOOTER_NAV_ITEMS: FooterLink[] = [...SECTION_NAV_LINKS, { label: "Contact", href: "/#contact" }];
 
 export function Footer() {
   const copyrightYear = toRomanNumeral(new Date().getFullYear());

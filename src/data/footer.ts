@@ -10,7 +10,7 @@ export const DISCIPLINE_LINKS: FooterLink[] = [
   { label: "SEO & Growth", href: "/#services" },
 ];
 
-export const LEGAL_NAV_LINKS: FooterLink[] = [
+export const SECTION_NAV_LINKS: FooterLink[] = [
   { label: "Services", href: "/#services" },
   { label: "Approach", href: "/#approach" },
   { label: "Insights", href: "/#insights" },
