@@ -9,7 +9,19 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function LoginPage() {
+const ERROR_MESSAGES: Record<string, string> = {
+  auth_failed: "That sign-in link didn't work — it may have expired. Please try again.",
+  google_auth_failed: "We couldn't start Google sign-in just now. Please try again.",
+};
+
+interface LoginPageProps {
+  searchParams: Promise<{ error?: string }>;
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const { error } = await searchParams;
+  const errorMessage = error ? (ERROR_MESSAGES[error] ?? "Something went wrong. Please try again.") : null;
+
   return (
     <CheckoutShell>
       <Container size="4xl" wide={false} className="py-16 lg:py-24">
@@ -23,6 +35,11 @@ export default function LoginPage() {
               Enter the email you subscribed with — we&rsquo;ll send you a secure sign-in link.
             </p>
           </div>
+          {errorMessage ? (
+            <p role="alert" className="mb-6 text-center font-serif-monument text-sm text-red-400">
+              {errorMessage}
+            </p>
+          ) : null}
           <LoginForm />
         </CornerFrame>
       </Container>

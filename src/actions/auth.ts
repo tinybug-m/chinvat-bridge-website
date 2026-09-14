@@ -44,6 +44,23 @@ export async function sendMagicLink(_prevState: SendMagicLinkResult | null, form
   return { status: "sent", message: `Check ${email} for a sign-in link.` };
 }
 
+export async function signInWithGoogle(): Promise<void> {
+  const origin = await getSiteOrigin();
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: `${origin}/auth/callback?next=/dashboard` },
+  });
+
+  if (error || !data.url) {
+    console.error("signInWithOAuth failed:", error);
+    redirect("/login?error=google_auth_failed");
+  }
+
+  redirect(data.url);
+}
+
 export async function signOut(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
