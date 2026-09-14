@@ -79,6 +79,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en-GB"
+      data-scroll-behavior="smooth"
       className={`${cinzel.variable} ${ebGaramond.variable} ${inter.variable} ${spaceGrotesk.variable} scroll-smooth antialiased h-full`}
     >
       <body className="min-h-full flex flex-col bg-obsidian-950 text-parchment-200 font-sans selection:bg-gold-500 selection:text-obsidian-950">

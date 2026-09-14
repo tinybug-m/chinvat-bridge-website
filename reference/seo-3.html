@@ -1,0 +1,440 @@
+<!DOCTYPE html><html class="h-full" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>CHINVAT BRIDGE // CLIENT ENGAGEMENT SANCTUM</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Fonts: EB Garamond & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "inverse-on-surface": "#f5f0e7",
+            "background": "#0a0a09",
+            "on-secondary-fixed-variant": "#5c4211",
+            "tertiary": "#000000",
+            "on-tertiary-container": "#be6e5b",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-fixed-variant": "#743324",
+            "tertiary-fixed-dim": "#ffb4a3",
+            "primary-fixed": "#e6e2de",
+            "surface-container-high": "#1a1917",
+            "surface": "#0e0d0c",
+            "outline-variant": "#2b2823",
+            "surface-container": "#141311",
+            "primary-container": "#1c1b19",
+            "secondary-fixed": "#ffdeac",
+            "tertiary-fixed": "#ffdad2",
+            "tertiary-container": "#3b0901",
+            "surface-tint": "#605e5b",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed": "#3b0901",
+            "inverse-primary": "#cac6c2",
+            "on-primary-fixed-variant": "#484644",
+            "surface-bright": "#1f1d1a",
+            "on-secondary": "#ffffff",
+            "surface-container-low": "#11100f",
+            "outline": "#7a776f",
+            "on-primary": "#ffffff",
+            "error-container": "#ffdad6",
+            "on-primary-fixed": "#1c1b19",
+            "error": "#ba1a1a",
+            "surface-dim": "#080807",
+            "on-error": "#ffffff",
+            "primary-fixed-dim": "#cac6c2",
+            "on-secondary-fixed": "#281900",
+            "on-primary-container": "#868380",
+            "inverse-surface": "#f5f0e7",
+            "on-surface-variant": "#a69f92",
+            "secondary-container": "#362610",
+            "secondary-fixed-dim": "#e7c184",
+            "surface-variant": "#1c1a17",
+            "on-secondary-container": "#ffd799",
+            "on-background": "#ece5d8",
+            "on-surface": "#ece5d8",
+            "surface-container-lowest": "#060605",
+            "surface-container-highest": "#24221e",
+            "secondary": "#9E7D47",
+            "primary": "#dcd5c8"
+          },
+          borderRadius: {
+            "DEFAULT": "0px",
+            "lg": "0px",
+            "xl": "0px",
+            "full": "0px"
+          },
+          spacing: {
+            "frieze-xl": "2rem",
+            "colonnade-2xl": "3rem",
+            "frieze-2xs": "0.25rem",
+            "colonnade-gutter": "2rem",
+            "frieze-sm": "0.75rem",
+            "colonnade-5xl": "8rem",
+            "colonnade-margin": "4rem",
+            "colonnade-4xl": "6rem",
+            "frieze-md": "1rem",
+            "colonnade-3xl": "4rem",
+            "frieze-lg": "1.5rem",
+            "hairline": "1px",
+            "frieze-xs": "0.5rem"
+          },
+          fontFamily: {
+            "body-lg": ["Inter", "sans-serif"],
+            "monument-xl": ["EB Garamond", "serif"],
+            "title-sm": ["Inter", "sans-serif"],
+            "headline-sm": ["EB Garamond", "serif"],
+            "label-technical": ["Inter", "monospace"],
+            "headline-lg": ["EB Garamond", "serif"],
+            "body-sm": ["Inter", "sans-serif"],
+            "title-lg": ["Inter", "sans-serif"],
+            "headline-md": ["EB Garamond", "serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "headline-lg-mobile": ["EB Garamond", "serif"],
+            "monument-xl-mobile": ["EB Garamond", "serif"],
+            "label-inscription": ["EB Garamond", "serif"]
+          },
+          fontSize: {
+            "body-lg": ["17px", { lineHeight: "28px", letterSpacing: "-0.005em", fontWeight: "400" }],
+            "monument-xl": ["64px", { lineHeight: "72px", letterSpacing: "-0.015em", fontWeight: "400" }],
+            "title-sm": ["14px", { lineHeight: "20px", letterSpacing: "0.04em", fontWeight: "600" }],
+            "headline-sm": ["22px", { lineHeight: "30px", letterSpacing: "0.02em", fontWeight: "600" }],
+            "label-technical": ["11px", { lineHeight: "16px", letterSpacing: "0.12em", fontWeight: "600" }],
+            "headline-lg": ["44px", { lineHeight: "52px", letterSpacing: "-0.01em", fontWeight: "500" }],
+            "body-sm": ["13px", { lineHeight: "20px", letterSpacing: "0.01em", fontWeight: "400" }],
+            "title-lg": ["18px", { lineHeight: "26px", letterSpacing: "0.01em", fontWeight: "600" }],
+            "headline-md": ["30px", { lineHeight: "38px", letterSpacing: "0.01em", fontWeight: "500" }],
+            "body-md": ["15px", { lineHeight: "24px", letterSpacing: "0em", fontWeight: "400" }],
+            "headline-lg-mobile": ["32px", { lineHeight: "40px", letterSpacing: "0em", fontWeight: "500" }],
+            "monument-xl-mobile": ["40px", { lineHeight: "48px", letterSpacing: "-0.01em", fontWeight: "400" }],
+            "label-inscription": ["13px", { lineHeight: "16px", letterSpacing: "0.18em", fontWeight: "600" }]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased selection:bg-secondary selection:text-background">
+<!-- TOP NAV BAR (Shared Components JSON Anchor) -->
+
+<!-- MAIN VIEWPORT CANVAS -->
+<main class="flex-1 w-full max-w-[1360px] mx-auto px-colonnade-margin py-colonnade-gutter space-y-colonnade-gutter">
+<!-- HERO & ARCHITECTURAL ENGAGEMENT SUMMARY BAR -->
+<section class="border border-outline-variant bg-surface-container relative">
+<div class="absolute top-0 left-0 w-2 h-2 border-t border-l border-secondary"></div>
+<div class="absolute top-0 right-0 w-2 h-2 border-t border-r border-secondary"></div>
+<div class="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-secondary"></div>
+<div class="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-secondary"></div>
+<!-- Header Plinth -->
+<div class="px-colonnade-gutter py-frieze-lg border-b border-outline-variant flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<div class="flex items-center space-x-3 mb-2">
+<span class="font-label-inscription text-label-inscription text-secondary tracking-widest uppercase">§ IV // CONSTITUENT WORKSPACE</span>
+<span class="w-1 h-1 bg-secondary inline-block"></span>
+<span class="font-label-technical text-label-technical text-on-surface-variant uppercase tracking-wider">REF. 04-SEO-ST</span>
+</div>
+<h1 class="font-monument-xl text-headline-lg text-primary tracking-tight font-normal">CLIENT ENGAGEMENT SANCTUM</h1>
+</div>
+<div class="flex items-center space-x-3">
+<span class="font-label-technical text-label-technical text-on-surface-variant uppercase">TELEMETRY:</span>
+<div class="flex items-center space-x-2 px-3 py-1 bg-surface border border-secondary">
+<span class="w-2 h-2 bg-secondary rounded-none"></span>
+<span class="font-label-technical text-label-technical text-secondary uppercase font-semibold">SOVEREIGN PROTOCOL SYNCHRONIZED</span>
+</div>
+</div>
+</div>
+<!-- Tabular Metadata Colonnade -->
+<div class="grid grid-cols-1 md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-outline-variant text-left">
+<!-- Metric 1 -->
+<div class="p-frieze-md bg-surface-container-low">
+<span class="font-label-technical text-label-technical text-on-surface-variant uppercase block mb-1">ACTIVE SERVICE</span>
+<div class="flex items-center space-x-2">
+<span class="inline-block px-2 py-0.5 border border-secondary bg-surface text-secondary font-label-technical text-label-technical font-semibold">SEO GROWTH — £499/MO</span>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="p-frieze-md bg-surface-container-low">
+<span class="font-label-technical text-label-technical text-on-surface-variant uppercase block mb-1">DOMICILE ASSET</span>
+<span class="font-title-sm text-title-sm text-primary font-medium tracking-tight">sterling-tech.co.uk</span>
+</div>
+<!-- Metric 3 -->
+<div class="p-frieze-md bg-surface-container-low">
+<span class="font-label-technical text-label-technical text-on-surface-variant uppercase block mb-1">ALLOCATION STATUS</span>
+<span class="font-label-technical text-label-technical text-primary font-semibold tracking-wider">[ACTIVE // TIER II — £499/MO]</span>
+</div>
+<!-- Metric 4 -->
+<div class="p-frieze-md bg-surface-container-low">
+<span class="font-label-technical text-label-technical text-on-surface-variant uppercase block mb-1">NEXT RECKONING / BILLING</span>
+<span class="font-title-sm text-title-sm text-secondary font-semibold">24 OCT 2026</span>
+</div>
+<!-- Metric 5 -->
+<div class="p-frieze-md bg-surface-container-low">
+<span class="font-label-technical text-label-technical text-on-surface-variant uppercase block mb-1">DESIGNATED PRACTICE LEAD</span>
+<span class="font-title-sm text-title-sm text-primary font-medium truncate block">Sr. Technical SEO Consultant</span>
+</div>
+</div>
+</section>
+<!-- SECTION BAYS: GRID ARCHITECTURE -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-colonnade-gutter items-start">
+<!-- LEFT ARCHITECTURAL WING: DELIVERABLE PROGRESS & CURRENT SPRINT (8 Cols) -->
+<div class="lg:col-span-8 space-y-colonnade-gutter">
+<!-- BAY 1: DELIVERABLE PROGRESS (Monthly Reckoning) -->
+<div class="border border-outline-variant bg-surface-container">
+<!-- Architrave -->
+<div class="px-frieze-lg py-frieze-md border-b border-outline-variant flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<span class="font-label-inscription text-label-inscription text-secondary">I.</span>
+<h2 class="font-headline-sm text-headline-sm text-primary font-medium uppercase tracking-wider">MONTHLY CYCLE PROGRESS</h2>
+</div>
+<span class="font-label-technical text-label-technical text-on-surface-variant uppercase">CYCLE: SEP 2026</span>
+</div>
+<div class="p-frieze-lg space-y-frieze-lg">
+<!-- Progress Item 1: Content Assets -->
+<div class="space-y-2">
+<div class="flex justify-between items-end"><span class="font-label-technical text-label-technical text-primary uppercase tracking-wider">CONTENT ASSETS: 6 / 15 COMPLETED</span><span class="font-label-technical text-label-technical text-secondary font-semibold">40.0% EXECUTION</span></div>
+<!-- Stepped Stone Progress Bar -->
+<div class="grid grid-cols-5 md:grid-cols-5 gap-1.5 h-2 w-full"><div class="grid grid-cols-3 gap-1.5 col-span-1"><div class="bg-secondary"></div><div class="bg-secondary"></div><div class="bg-secondary"></div></div><div class="grid grid-cols-3 gap-1.5 col-span-1"><div class="bg-secondary"></div><div class="bg-secondary"></div><div class="bg-secondary"></div></div><div class="grid grid-cols-3 gap-1.5 col-span-1"><div class="bg-surface-variant border border-outline-variant"></div><div class="bg-surface-variant border border-outline-variant"></div><div class="bg-surface-variant border border-outline-variant"></div></div><div class="grid grid-cols-3 gap-1.5 col-span-1"><div class="bg-surface-variant border border-outline-variant"></div><div class="bg-surface-variant border border-outline-variant"></div><div class="bg-surface-variant border border-outline-variant"></div></div><div class="grid grid-cols-3 gap-1.5 col-span-1"><div class="bg-surface-variant border border-outline-variant"></div><div class="bg-surface-variant border border-outline-variant"></div><div class="bg-surface-variant border border-outline-variant"></div></div></div>
+<div class="flex justify-between text-on-surface-variant font-label-technical text-label-technical"><span class="">Published: 6 Topical Authority Guides</span><span class="">In Editorial Pipeline: 9 Drafts (15/mo Allocation)</span></div>
+</div>
+<div class="h-hairline w-full bg-outline-variant"></div>
+<!-- Progress Item 2: Technical SEO -->
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="font-label-technical text-label-technical text-primary uppercase tracking-wider">TECHNICAL SEO: IN PROGRESS</span>
+<span class="font-label-technical text-label-technical text-secondary font-semibold">80% AUDIT CLEARANCE</span>
+</div>
+<!-- Stepped Stone Progress Bar (5 Steps for Core Targets) -->
+<div class="grid grid-cols-5 gap-1.5 h-2 w-full">
+<div class="bg-secondary"></div>
+<div class="bg-secondary"></div>
+<div class="bg-secondary"></div>
+<div class="bg-secondary"></div>
+<div class="bg-surface-variant border border-outline-variant"></div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Deep architectural crawl complete. Schema graph deployment underway; 4 of 5 Core Web Vital targets cleared across industrial catalogues.
+              </p>
+</div>
+<div class="h-hairline w-full bg-outline-variant"></div>
+<!-- Progress Item 3: Digital PR -->
+<div class="space-y-2"><div class="flex justify-between items-end"><span class="font-label-technical text-label-technical text-primary uppercase tracking-wider">OUTREACH &amp; CITATIONS: 1 ACTIVE CAMPAIGN (TIER II)</span><span class="font-label-technical text-label-technical text-secondary font-semibold">100% DEPLOYED</span></div><div class="grid grid-cols-4 gap-1.5 h-2 w-full"><div class="bg-secondary"></div><div class="bg-secondary"></div><div class="bg-secondary"></div><div class="bg-secondary"></div></div><div class="flex justify-between text-on-surface-variant font-label-technical text-label-technical"><span class="">Anchored Campaign: High-Authority Engineering &amp; Robotics Outreach</span><span class="">1 Active Campaign Stream // 2 Placements In Final Press Review</span></div></div>
+</div>
+<!-- Bay Footer -->
+<div class="px-frieze-lg py-frieze-xs bg-surface border-t border-outline-variant flex justify-between items-center text-on-surface-variant font-label-technical text-label-technical">
+<span class="">AUDITED BY AUTOMATED TELEMETRY ENGINE</span>
+<span class="">LAST CYCLE RUN: 21 SEP 2026 // 04:00 BST</span>
+</div>
+</div>
+<!-- BAY 2: CURRENT SPRINT & ARCHITECTURAL LOG -->
+<div class="border border-outline-variant bg-surface-container">
+<!-- Architrave -->
+<div class="px-frieze-lg py-frieze-md border-b border-outline-variant flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<span class="font-label-inscription text-label-inscription text-secondary">II.</span>
+<h2 class="font-headline-sm text-headline-sm text-primary font-medium uppercase tracking-wider">CURRENT SPRINT &amp; ARCHITECTURAL LOG</h2>
+</div>
+<span class="font-label-technical text-label-technical text-secondary uppercase font-semibold">SPRINT 26.09</span>
+</div>
+<!-- Data Colonnade Table -->
+<div class="overflow-x-auto">
+<table class="w-full border-collapse text-left">
+<thead>
+<tr class="border-b border-outline-variant bg-surface">
+<th class="py-3 px-frieze-lg font-label-technical text-label-technical text-secondary uppercase">DELIVERABLE ARTIFACT</th>
+<th class="py-3 px-frieze-md font-label-technical text-label-technical text-secondary uppercase">STATUS STATE</th>
+<th class="py-3 px-frieze-md font-label-technical text-label-technical text-secondary uppercase">TEMPORAL COORD</th>
+<th class="py-3 px-frieze-lg font-label-technical text-label-technical text-secondary uppercase text-right">ACTION</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant font-body-sm text-body-sm text-on-background">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="py-4 px-frieze-lg font-medium text-primary">
+<div class="font-title-sm text-title-sm">Dynamic Schema Markup Implementation</div>
+<div class="font-label-technical text-label-technical text-on-surface-variant mt-0.5">JSON-LD Industrial Equipment Hierarchies</div>
+</td>
+<td class="py-4 px-frieze-md">
+<span class="inline-flex items-center px-2 py-0.5 border border-secondary text-secondary font-label-technical text-label-technical font-semibold">
+                      COMPLETE
+                    </span>
+</td>
+<td class="py-4 px-frieze-md font-label-technical text-label-technical text-on-surface-variant">
+                    18 SEP 2026
+                  </td>
+<td class="py-4 px-frieze-lg text-right">
+<a class="font-label-technical text-label-technical text-secondary hover:text-primary transition-colors underline decoration-secondary" href="#">INSPECT LOG</a>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="py-4 px-frieze-lg font-medium text-primary">
+<div class="font-title-sm text-title-sm">Commercial Intent Content Brief: Industrial Automation</div>
+<div class="font-label-technical text-label-technical text-on-surface-variant mt-0.5">2,400 Words // High-Intent Keyword Targeting</div>
+</td>
+<td class="py-4 px-frieze-md">
+<span class="inline-flex items-center px-2 py-0.5 border border-outline text-primary font-label-technical text-label-technical">
+                      IN REVIEW
+                    </span>
+</td>
+<td class="py-4 px-frieze-md font-label-technical text-label-technical text-on-surface-variant">
+                    20 SEP 2026
+                  </td>
+<td class="py-4 px-frieze-lg text-right">
+<a class="font-label-technical text-label-technical text-secondary hover:text-primary transition-colors underline decoration-secondary" href="#">VIEW PROOF</a>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="py-4 px-frieze-lg font-medium text-primary">
+<div class="font-title-sm text-title-sm">Core Web Vitals LCP Optimization</div>
+<div class="font-label-technical text-label-technical text-on-surface-variant mt-0.5">Asset Pipeline Compression &amp; Server Caching Rules</div>
+</td>
+<td class="py-4 px-frieze-md">
+<span class="inline-flex items-center px-2 py-0.5 border border-secondary text-secondary font-label-technical text-label-technical">
+                      IN PROGRESS
+                    </span>
+</td>
+<td class="py-4 px-frieze-md font-label-technical text-label-technical text-on-surface-variant">
+                    DUE: 23 SEP 2026
+                  </td>
+<td class="py-4 px-frieze-lg text-right">
+<span class="font-label-technical text-label-technical text-outline">STAGED</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="py-4 px-frieze-lg font-medium text-primary">
+<div class="font-title-sm text-title-sm">Monthly Technical SEO Dossier &amp; Reckoning</div>
+<div class="font-label-technical text-label-technical text-on-surface-variant mt-0.5">Comprehensive Executive Digest &amp; Competitive Shift</div>
+</td>
+<td class="py-4 px-frieze-md">
+<span class="inline-flex items-center px-2 py-0.5 border border-outline-variant text-on-surface-variant font-label-technical text-label-technical">
+                      SCHEDULED
+                    </span>
+</td>
+<td class="py-4 px-frieze-md font-label-technical text-label-technical text-on-surface-variant">
+                    DUE: 24 SEP 2026
+                  </td>
+<td class="py-4 px-frieze-lg text-right">
+<span class="font-label-technical text-label-technical text-outline">QUEUED</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Bay Footer -->
+<div class="p-frieze-md bg-surface border-t border-outline-variant flex justify-between items-center">
+<span class="font-label-technical text-label-technical text-on-surface-variant">CANONICAL SPRINT WORKSTREAM // CHINVAT CONSULAR DIRECTIVE</span>
+<span class="font-label-technical text-label-technical text-secondary font-semibold">ALL SYSTEM COMMITMENTS ACTIVE</span>
+</div>
+</div>
+</div>
+<!-- RIGHT ARCHITECTURAL WING: REPORTS & DEDICATED CHANNEL (4 Cols) -->
+<div class="lg:col-span-4 space-y-colonnade-gutter">
+<!-- BAY 3: REPORTS & ARCHIVE -->
+<div class="border border-outline-variant bg-surface-container">
+<!-- Architrave -->
+<div class="px-frieze-lg py-frieze-md border-b border-outline-variant flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<span class="font-label-inscription text-label-inscription text-secondary">III.</span>
+<h2 class="font-headline-sm text-headline-sm text-primary font-medium uppercase tracking-wider">REPORTS &amp; ARCHIVE</h2>
+</div>
+<span class="material-symbols-outlined text-secondary text-[18px]">folder_special</span>
+</div>
+<div class="p-frieze-lg space-y-frieze-md">
+<!-- Latest Dossier Card -->
+<div class="p-frieze-md bg-surface-container-high border border-secondary relative">
+<div class="flex justify-between items-start mb-2">
+<span class="font-label-technical text-label-technical text-secondary uppercase font-semibold">LATEST ISSUED REPORT</span>
+<span class="font-label-technical text-label-technical text-on-surface-variant">24 SEP 2026</span>
+</div>
+<h3 class="font-monument-xl text-headline-sm text-primary font-normal mb-1">EXECUTIVE SEO DOSSIER // Q3</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">
+                Full-funnel search visibility audit, crawl health indexing, and organic conversion impact for Sterling Tech.
+              </p>
+<!-- Primary Sovereign Action Button -->
+<button class="w-full bg-background hover:bg-surface-bright border border-secondary text-primary font-label-technical text-label-technical tracking-widest uppercase py-3 px-4 flex items-center justify-center space-x-2 transition-all">
+<span class="">VIEW EXECUTIVE DOSSIER (PDF)</span>
+<span class="material-symbols-outlined text-[16px] text-secondary">download</span>
+</button>
+</div>
+<!-- Historical Audits Archive List -->
+<div class="space-y-2 pt-2">
+<span class="font-label-technical text-label-technical text-on-surface-variant uppercase tracking-wider block">HISTORICAL ARCHIVES</span>
+<div class="border border-outline-variant bg-surface p-3 flex justify-between items-center hover:border-secondary transition-colors cursor-pointer group">
+<div>
+<div class="font-title-sm text-title-sm text-primary group-hover:text-secondary transition-colors">Initial Baseline Technical Crawl</div>
+<div class="font-label-technical text-label-technical text-on-surface-variant">AUGUST 2026 // AUDIT IDENTIFIER #01</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary text-[18px]">arrow_forward</span>
+</div>
+<div class="border border-outline-variant bg-surface p-3 flex justify-between items-center hover:border-secondary transition-colors cursor-pointer group">
+<div>
+<div class="font-title-sm text-title-sm text-primary group-hover:text-secondary transition-colors">Competitor Keyword Landscape</div>
+<div class="font-label-technical text-label-technical text-on-surface-variant">JULY 2026 // BENCHMARK MATRIX</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary text-[18px]">arrow_forward</span>
+</div>
+</div>
+</div>
+<div class="px-frieze-lg py-frieze-xs bg-surface border-t border-outline-variant text-right">
+<a class="font-label-technical text-label-technical text-secondary hover:underline uppercase tracking-wider" href="#">FULL PROTOCOL ARCHIVE →</a>
+</div>
+</div>
+<!-- BAY 4: DEDICATED SUPPORT & ADVISORY CHANNEL -->
+<div class="border border-outline-variant bg-surface-container">
+<!-- Architrave -->
+<div class="px-frieze-lg py-frieze-md border-b border-outline-variant flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<span class="font-label-inscription text-label-inscription text-secondary">IV.</span>
+<h2 class="font-headline-sm text-headline-sm text-primary font-medium uppercase tracking-wider">ADVISORY CHANNEL</h2>
+</div>
+<span class="material-symbols-outlined text-secondary text-[18px]">lock</span>
+</div>
+<div class="p-frieze-lg space-y-frieze-md">
+<div class="border-l-2 border-secondary pl-3"><div class="flex items-center justify-between"><span class="font-label-technical text-label-technical text-secondary uppercase font-semibold block">PRIORITY ADVISORY ACCESS</span><span class="inline-flex items-center px-2 py-0.5 border border-secondary text-secondary font-label-technical text-label-technical font-semibold">GROWTH TIER</span></div><p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Direct priority channel to your designated senior technical SEO practice lead and systems architect.</p></div>
+<!-- Slack Integration Indicator -->
+<div class="p-3 bg-surface border border-outline-variant flex items-center space-x-3">
+<div class="w-2 h-2 bg-secondary"></div>
+<div>
+<span class="font-label-technical text-label-technical text-primary font-semibold block">PRIVATE CHANNEL ACTIVE</span>
+<span class="font-label-technical text-label-technical text-on-surface-variant block">#chinvat-sterling (Encrypted Slack)</span>
+</div>
+</div>
+<!-- Action Pedestals -->
+<div class="space-y-2 pt-2">
+<button class="w-full bg-surface border border-secondary text-secondary hover:bg-secondary hover:text-background font-label-technical text-label-technical tracking-widest uppercase py-3 px-4 flex items-center justify-center space-x-2 transition-all">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span class="">SCHEDULE STRATEGY CALL</span>
+</button>
+<a class="w-full bg-surface-container-high border border-outline-variant text-on-background hover:border-secondary hover:text-secondary font-label-technical text-label-technical tracking-widest uppercase py-3 px-4 flex items-center justify-center space-x-2 transition-all text-center" href="mailto:inquiries@chinvatbridge.co.uk">
+<span class="material-symbols-outlined text-[16px]">mail</span>
+<span class="">EMAIL PRACTICE LEAD</span>
+</a>
+</div>
+<div class="text-center pt-2">
+<span class="font-label-technical text-label-technical text-on-surface-variant">DIRECT: inquiries@chinvatbridge.co.uk</span>
+</div>
+</div>
+<div class="px-frieze-lg py-frieze-xs bg-surface border-t border-outline-variant text-center font-label-technical text-label-technical text-on-surface-variant">
+            SLA: RESPONSE WITHIN 120 MINUTES
+          </div>
+</div>
+</div>
+</div>
+</main>
+<!-- FOOTER (Shared Components JSON Anchor) -->
+
+
+
+
+
+
+
+</body></html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Customer Details // Chinvat Bridge Sovereign Protocol</title>
+<!-- Google Fonts: EB Garamond & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS with Forms and Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-on-surface": "#f5f0e7",
+            "background": "#fef9f0",
+            "on-secondary-fixed-variant": "#5c4211",
+            "tertiary": "#000000",
+            "on-tertiary-container": "#be6e5b",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-fixed-variant": "#743324",
+            "tertiary-fixed-dim": "#ffb4a3",
+            "primary-fixed": "#e6e2de",
+            "surface-container-high": "#ece8df",
+            "surface": "#fef9f0",
+            "outline-variant": "#cbc6bd",
+            "surface-container": "#f2ede4",
+            "primary-container": "#1c1b19",
+            "secondary-fixed": "#ffdeac",
+            "tertiary-fixed": "#ffdad2",
+            "tertiary-container": "#3b0901",
+            "surface-tint": "#605e5b",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed": "#3b0901",
+            "inverse-primary": "#cac6c2",
+            "on-primary-fixed-variant": "#484644",
+            "surface-bright": "#fef9f0",
+            "on-secondary": "#ffffff",
+            "surface-container-low": "#f8f3ea",
+            "outline": "#7a776f",
+            "on-primary": "#ffffff",
+            "error-container": "#ffdad6",
+            "on-primary-fixed": "#1c1b19",
+            "error": "#ba1a1a",
+            "surface-dim": "#ded9d1",
+            "on-error": "#ffffff",
+            "primary-fixed-dim": "#cac6c2",
+            "on-secondary-fixed": "#281900",
+            "on-primary-container": "#868380",
+            "inverse-surface": "#32302a",
+            "on-surface-variant": "#494740",
+            "secondary-container": "#ffd799",
+            "secondary-fixed-dim": "#e7c184",
+            "surface-variant": "#e7e2d9",
+            "on-secondary-container": "#795c29",
+            "on-background": "#1d1c16",
+            "on-surface": "#1d1c16",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-highest": "#e7e2d9",
+            "secondary": "#775927",
+            "primary": "#000000"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "frieze-xl": "2rem",
+            "colonnade-2xl": "3rem",
+            "frieze-2xs": "0.25rem",
+            "colonnade-gutter": "2rem",
+            "frieze-sm": "0.75rem",
+            "colonnade-5xl": "8rem",
+            "colonnade-margin": "4rem",
+            "colonnade-4xl": "6rem",
+            "frieze-md": "1rem",
+            "colonnade-3xl": "4rem",
+            "frieze-lg": "1.5rem",
+            "hairline": "1px",
+            "frieze-xs": "0.5rem"
+          },
+          "fontFamily": {
+            "body-lg": ["Inter"],
+            "monument-xl": ["EB Garamond"],
+            "title-sm": ["Inter"],
+            "headline-sm": ["EB Garamond"],
+            "label-technical": ["Inter"],
+            "headline-lg": ["EB Garamond"],
+            "body-sm": ["Inter"],
+            "title-lg": ["Inter"],
+            "headline-md": ["EB Garamond"],
+            "body-md": ["Inter"],
+            "headline-lg-mobile": ["EB Garamond"],
+            "monument-xl-mobile": ["EB Garamond"],
+            "label-inscription": ["EB Garamond"]
+          },
+          "fontSize": {
+            "body-lg": ["17px", { "lineHeight": "28px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "monument-xl": ["64px", { "lineHeight": "72px", "letterSpacing": "-0.015em", "fontWeight": "400" }],
+            "title-sm": ["14px", { "lineHeight": "20px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "headline-sm": ["22px", { "lineHeight": "30px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "label-technical": ["11px", { "lineHeight": "16px", "letterSpacing": "0.12em", "fontWeight": "600" }],
+            "headline-lg": ["44px", { "lineHeight": "52px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-sm": ["13px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "title-lg": ["18px", { "lineHeight": "26px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-md": ["30px", { "lineHeight": "38px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "body-md": ["15px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "monument-xl-mobile": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+            "label-inscription": ["13px", { "lineHeight": "16px", "letterSpacing": "0.18em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#060605] text-[#e6e1d8] antialiased selection:bg-[#d4af37]/20 selection:text-[#d4af37] min-h-screen flex flex-col font-body-md" style="background-color: #060605; background-image: radial-gradient(rgba(212, 175, 55, 0.04) 1px, transparent 1px); background-size: 32px 32px;">
+<!-- TOP APP BAR -->
+
+<!-- ARCHITECTURAL FRIEZE: SELECTED PLAN ANNOUNCEMENT -->
+<section class="w-full bg-[#0c0c0a] border-b border-[#26221c]"><div class="max-w-[1360px] mx-auto px-colonnade-margin py-3 flex flex-col sm:flex-row justify-between items-center gap-2"><div class="flex items-center gap-frieze-sm"><span class="font-label-inscription text-label-inscription text-[#d4af37] uppercase font-semibold tracking-widest">ACTA I // SANCTIONED ENGAGEMENT</span><span class="text-[#3a352c]">|</span><span class="font-label-technical text-label-technical text-[#f5f2eb] font-bold tracking-widest">SELECTED PLAN: SEO GROWTH — £499 / MONTH</span></div><a class="font-label-technical text-label-technical text-[#d4af37] hover:text-white tracking-widest underline decoration-1 underline-offset-4 flex items-center gap-1 uppercase transition-colors" href="#"><span class="">[CHANGE PLAN]</span><span class="material-symbols-outlined text-[14px]">swap_horiz</span></a></div></section>
+<!-- STEPPER: FOUR-FOLD ARCHITECTURAL PROGRESSION -->
+<section class="w-full bg-[#090908] border-b border-[#26221c]"><div class="max-w-[1360px] mx-auto px-colonnade-margin"><div class="w-full grid grid-cols-4 gap-2 sm:gap-3 py-4 border-b border-[#26221c] mb-8"><div class="bg-[#141311] border border-[#38332a] rounded px-3 py-2.5 flex items-center justify-between"><div class="flex items-center space-x-2"><span class="text-[#c5a059] text-xs font-bold">01</span><span class="font-label-technical uppercase tracking-wider text-xs text-[#ded9d1]">PLAN</span></div><span class="text-[#c5a059] font-bold text-xs">✓</span></div><div class="bg-[#1a1815] border-2 border-[#c5a059] rounded px-3 py-2.5 flex items-center justify-between shadow-[0_0_15px_rgba(197,160,89,0.15)]"><div class="flex items-center space-x-2"><span class="bg-[#c5a059] text-[#060605] font-bold text-xs w-5 h-5 rounded-full flex items-center justify-center">02</span><span class="font-label-technical text-xs font-bold tracking-widest text-[#fef9f0] uppercase">DETAILS</span></div><span class="w-2 h-2 rounded-full bg-[#c5a059] animate-pulse"></span></div><div class="bg-[#0e0e0d]/60 border border-[#221f1a] rounded px-3 py-2.5 flex items-center space-x-2 opacity-50"><span class="text-[#7a746a] text-xs font-semibold">03</span><span class="font-label-technical text-[#7a746a] text-xs tracking-wider uppercase">PAYMENT</span></div><div class="bg-[#0e0e0d]/60 border border-[#221f1a] rounded px-3 py-2.5 flex items-center space-x-2 opacity-50"><span class="text-[#7a746a] text-xs font-semibold">04</span><span class="font-label-technical text-[#7a746a] text-xs tracking-wider uppercase">CONFIRMATION</span></div></div></div></section>
+<!-- MAIN CANVAS: TECTONIC DUAL-COLUMN SYSTEM -->
+<main class="flex-grow w-full max-w-[1360px] mx-auto px-colonnade-margin py-colonnade-gutter"><div class="grid grid-cols-1 lg:grid-cols-12 gap-colonnade-gutter items-start"><section class="lg:col-span-8 bg-[#0a0a09] border border-[#26221c] p-6 md:p-colonnade-gutter relative"><div class="border-b border-[#26221c] pb-6 mb-8"><div class="flex items-center justify-between mb-2"><span class="font-label-inscription text-label-inscription text-[#d4af37] tracking-widest uppercase">TABULA REGISTRATIONIS // SEC. II</span><span class="font-label-technical text-label-technical text-[#716b60] uppercase tracking-widest">ID: CHV-SEO-2024-OX</span></div><h1 class="font-monument-xl text-headline-lg text-[#f5f2eb] tracking-tight uppercase">YOUR BUSINESS DETAILS</h1><p class="font-body-md text-body-md text-[#a8a29e] mt-2 max-w-2xl">Provide your operational information to configure your technical SEO engagement. All protocols are sovereignly sandboxed under institutional confidentiality.</p></div><form action="#" class="space-y-6" method="POST" onsubmit="event.preventDefault();"><div class="space-y-5"><div class="flex items-center gap-2 border-b border-[#26221c] pb-2"><span class="font-label-technical text-label-technical text-[#d4af37] font-bold tracking-widest uppercase">§ 01. PRIMARY OPERATIONAL ENTITY (REQUIRED)</span></div><div class="grid grid-cols-1 md:grid-cols-2 gap-frieze-md"><div><label class="block font-label-technical text-label-technical text-[#d1ccc4] tracking-widest uppercase mb-1.5" for="fullName">REF. 001 // FULL NAME *</label><input class="w-full bg-[#121211] border border-[#2d2922] px-4 py-3 font-body-md text-body-md text-[#f5f2eb] focus:border-[#d4af37] focus:ring-0 transition-colors rounded-none placeholder:text-[#5a544b]" id="fullName" name="fullName" placeholder="e.g. Alexander Sterling" required="" type="text" value="Alexander Sterling"></div><div><label class="block font-label-technical text-label-technical text-[#d1ccc4] tracking-widest uppercase mb-1.5" for="companyName">REF. 002 // COMPANY NAME *</label><input class="w-full bg-[#121211] border border-[#2d2922] px-4 py-3 font-body-md text-body-md text-[#f5f2eb] focus:border-[#d4af37] focus:ring-0 transition-colors rounded-none placeholder:text-[#5a544b]" id="companyName" name="companyName" placeholder="e.g. Sterling Industrial Technologies Ltd" required="" type="text" value="Sterling Industrial Technologies Ltd"></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-frieze-md"><div><label class="block font-label-technical text-label-technical text-[#d1ccc4] tracking-widest uppercase mb-1.5" for="email">REF. 003 // BUSINESS EMAIL *</label><input class="w-full bg-[#121211] border border-[#2d2922] px-4 py-3 font-body-md text-body-md text-[#f5f2eb] focus:border-[#d4af37] focus:ring-0 transition-colors rounded-none placeholder:text-[#5a544b]" id="email" name="email" placeholder="alexander@sterling-tech.co.uk" required="" type="email" value="alexander@sterling-tech.co.uk"></div><div><label class="block font-label-technical text-label-technical text-[#d1ccc4] tracking-widest uppercase mb-1.5" for="phone">REF. 004 // PHONE NUMBER *</label><input class="w-full bg-[#121211] border border-[#2d2922] px-4 py-3 font-body-md text-body-md text-[#f5f2eb] focus:border-[#d4af37] focus:ring-0 transition-colors rounded-none placeholder:text-[#5a544b]" id="phone" name="phone" placeholder="+44 20 7946 0192" required="" type="tel" value="+44 20 7946 0192"></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-frieze-md"><div><label class="block font-label-technical text-label-technical text-[#d1ccc4] tracking-widest uppercase mb-1.5" for="website">REF. 005 // WEBSITE URL *</label><div class="relative"><input class="w-full bg-[#121211] border border-[#2d2922] px-4 py-3 font-body-md text-body-md text-[#f5f2eb] focus:border-[#d4af37] focus:ring-0 transition-colors rounded-none placeholder:text-[#5a544b]" id="website" name="website" placeholder="https://sterling-tech.co.uk" required="" type="url" value="https://sterling-tech.co.uk"><span class="absolute right-3 top-3.5 text-[#716b60] material-symbols-outlined text-[18px]">captive_portal</span></div></div><div><label class="block font-label-technical text-label-technical text-[#d1ccc4] tracking-widest uppercase mb-1.5" for="country">REF. 006 // JURISDICTION / COUNTRY *</label><select class="w-full bg-[#121211] border border-[#2d2922] px-4 py-3 font-body-md text-body-md text-[#f5f2eb] focus:border-[#d4af37] focus:ring-0 transition-colors rounded-none cursor-pointer" id="country" name="country"><option selected="" value="UK">United Kingdom</option><option value="US">United States</option><option value="EU">European Union</option><option value="GLOBAL">Global / Multi-National</option></select></div></div></div><div class="space-y-5 pt-4"><div class="flex items-center gap-2 border-b border-[#26221c] pb-2"><span class="font-label-technical text-label-technical text-[#a8a29e] font-bold tracking-widest uppercase">§ 02. STRATEGIC CONTEXT &amp; AMBIT (OPTIONAL)</span></div><div><label class="block font-label-technical text-label-technical text-[#d1ccc4] tracking-widest uppercase mb-1.5" for="targetMarket">REF. 007 // TARGET MARKET / REGIONAL ANCHOR</label><input class="w-full bg-[#121211] border border-[#2d2922] px-4 py-3 font-body-md text-body-md text-[#f5f2eb] focus:border-[#d4af37] focus:ring-0 transition-colors rounded-none placeholder:text-[#5a544b]" id="targetMarket" name="targetMarket" placeholder="e.g., UK National, London &amp; South East, North America..." type="text"></div><div><label class="block font-label-technical text-label-technical text-[#d1ccc4] tracking-widest uppercase mb-1.5" for="improvements">REF. 008 // WHAT WOULD YOU LIKE TO IMPROVE?</label><textarea class="w-full bg-[#121211] border border-[#2d2922] p-4 font-body-md text-body-md text-[#f5f2eb] focus:border-[#d4af37] focus:ring-0 transition-colors rounded-none placeholder:text-[#5a544b] resize-none" id="improvements" name="improvements" placeholder="e.g., Technical site speed, ranking for core UK commercial terms, fixing crawl errors after redesign..." rows="3"></textarea></div></div><div class="p-4 bg-[#121211] border-l-2 border-[#d4af37] flex gap-3 items-start"><span class="material-symbols-outlined text-[#d4af37] text-headline-sm flex-shrink-0">verified_user</span><p class="font-body-sm text-body-sm text-[#a8a29e] leading-relaxed"><strong class="font-label-technical text-label-technical text-[#d4af37] tracking-widest uppercase block mb-1">PRIVACY &amp; COMMERCIAL NOTICE</strong>Your information is strictly utilized for client onboarding, technical domain verification, and correspondence regarding your active SEO subscription. We never share or disclose client data.</p></div><div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4"><div class="flex items-center gap-2 text-[#716b60] font-label-technical text-label-technical uppercase"><span class="material-symbols-outlined text-[16px]">lock</span><span class="">256-BIT ENCRYPTED TUNNEL</span></div><button class="w-full sm:w-auto px-8 py-4 bg-[#d4af37] text-[#060605] font-label-technical text-title-sm font-bold tracking-widest uppercase hover:bg-[#e6c45e] transition-all flex items-center justify-center gap-3 border border-[#d4af37] shadow-none cursor-pointer group" type="submit"><span class="">CONTINUE TO SECURE PAYMENT</span><span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span></button></div></form></section><aside class="lg:col-span-4 space-y-6"><div class="bg-[#0d0c0a] border border-[#26221c] relative p-6"><div class="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-[#d4af37]"></div><div class="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-[#d4af37]"></div><div class="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-[#d4af37]"></div><div class="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-[#d4af37]"></div><div class="border-b border-[#26221c] pb-4 mb-5"><div class="flex justify-between items-center mb-1"><span class="font-label-technical text-label-technical text-[#d4af37] uppercase tracking-widest font-bold">ENGAGEMENT SPECIFICATION</span><span class="px-2 py-0.5 bg-[#171613] border border-[#26221c] text-[#d4af37] font-label-technical text-[10px] uppercase">ACTIVE COHORT</span></div><h2 class="font-headline-sm text-headline-sm text-[#f5f2eb] uppercase">SEO Growth Subscription</h2><p class="font-body-sm text-body-sm text-[#a8a29e] mt-1">Architectural visibility and sovereign algorithmic positioning.</p></div><div class="py-4 border-b border-[#26221c] flex justify-between items-baseline"><span class="font-label-technical text-label-technical text-[#a8a29e] uppercase tracking-widest">RETAINER RATE</span><div class="text-right"><span class="font-headline-md text-headline-md text-[#d4af37] font-bold">£499</span><span class="font-body-sm text-body-sm text-[#a8a29e] block">Billed Monthly (+ VAT)</span></div></div><div class="py-5 border-b border-[#26221c] space-y-3"><span class="font-label-technical text-label-technical text-[#f5f2eb] font-bold tracking-widest uppercase block mb-2">MANDATED SCOPE OF DELIVERABLES</span><div class="flex items-start gap-2.5"><span class="material-symbols-outlined text-[#d4af37] text-[18px] mt-0.5">architecture</span><span class="font-body-sm text-body-sm text-[#d1ccc4]">15 SEO Content assets / month</span></div><div class="flex items-start gap-2.5"><span class="material-symbols-outlined text-[#d4af37] text-[18px] mt-0.5">schema</span><span class="font-body-sm text-body-sm text-[#d1ccc4]">Full Technical SEO Audit</span></div><div class="flex items-start gap-2.5"><span class="material-symbols-outlined text-[#d4af37] text-[18px] mt-0.5">trophy</span><span class="font-body-sm text-body-sm text-[#d1ccc4]">1 Link Building / Outreach Campaign / month</span></div><div class="flex items-start gap-2.5"><span class="material-symbols-outlined text-[#d4af37] text-[18px] mt-0.5">cognition</span><span class="font-body-sm text-body-sm text-[#d1ccc4]">Priority Support</span></div></div><div class="py-4 border-b border-[#26221c] space-y-2"><span class="font-label-technical text-label-technical text-[#d4af37] uppercase tracking-widest font-bold block">COVENANT TERMS</span><p class="font-body-sm text-body-sm text-[#a8a29e] leading-relaxed">No lock-in contract. 30 days cancellation notice. Immediate technical audit commencement upon confirmation.</p></div><div class="pt-4 flex items-center gap-3"><div class="w-10 h-10 border border-[#26221c] bg-[#121211] flex items-center justify-center flex-shrink-0 text-[#d4af37]"><span class="material-symbols-outlined text-body-lg">support_agent</span></div><div><span class="font-label-technical text-label-technical text-[#f5f2eb] uppercase font-bold block">DIRECT CONSULAR ACCESS</span><span class="font-body-sm text-body-sm text-[#a8a29e]">UK-based consulting team. Direct access to your designated technical SEO lead.</span></div></div></div><div class="border border-[#26221c] p-4 bg-[#0a0a09] flex items-center justify-between"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-[#d4af37]">gavel</span><div class="flex flex-col"><span class="font-label-technical text-label-technical text-[#f5f2eb] uppercase font-bold">SOVEREIGN GUARANTEE</span><span class="font-body-sm text-body-sm text-[#a8a29e]">Zero PBNs. Zero Synthetic Link Farming.</span></div></div><span class="font-label-inscription text-label-inscription text-[#d4af37]/80 font-semibold">MMXXIV</span></div></aside></div></main>
+<!-- ARCHITECTURAL FOOTER (MANDATED FROM SHARED COMPONENTS) -->
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

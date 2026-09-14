@@ -1,4 +1,4 @@
-import type { IconName } from "@/components/icons";
+import type { IconName } from "@/components/atoms/icons";
 
 export interface Service {
   index: string;
@@ -8,6 +8,7 @@ export interface Service {
   description: string;
   tags: string[];
   outcome: string;
+  href?: string;
 }
 
 export const SERVICES: Service[] = [
@@ -50,6 +51,7 @@ export const SERVICES: Service[] = [
       "We improve the technical foundations, structure and digital experience of your website so that search engines and customers can understand your business more clearly.",
     tags: ["Technical SEO", "Site Architecture", "Structured Data", "Performance Audits"],
     outcome: "Improve Visibility",
+    href: "/pricing",
   },
 ];
 

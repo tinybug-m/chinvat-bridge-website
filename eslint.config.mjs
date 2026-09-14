@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Root-owned crash-reporter artifact from local sandbox testing (Chromium/crashpad);
+    // unreadable by this project's user and unrelated to source code.
+    ".sentry-native/**",
   ]),
 ]);
 

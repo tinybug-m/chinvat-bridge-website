@@ -1,0 +1,265 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Payment Confirmation // CHINVAT BRIDGE</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-on-surface": "#f5f0e7",
+            "background": "#0a0a09",
+            "on-secondary-fixed-variant": "#5c4211",
+            "tertiary": "#000000",
+            "on-tertiary-container": "#be6e5b",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-fixed-variant": "#743324",
+            "tertiary-fixed-dim": "#ffb4a3",
+            "primary-fixed": "#e6e2de",
+            "surface-container-high": "#191816",
+            "surface": "#121110",
+            "outline-variant": "#34322e",
+            "surface-container": "#151412",
+            "primary-container": "#1c1b19",
+            "secondary-fixed": "#ffdeac",
+            "tertiary-fixed": "#ffdad2",
+            "tertiary-container": "#3b0901",
+            "surface-tint": "#b89758",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed": "#3b0901",
+            "inverse-primary": "#cac6c2",
+            "on-primary-fixed-variant": "#484644",
+            "surface-bright": "#1f1e1b",
+            "on-secondary": "#ffffff",
+            "surface-container-low": "#0d0d0c",
+            "outline": "#7a776f",
+            "on-primary": "#ffffff",
+            "error-container": "#ffdad6",
+            "on-primary-fixed": "#1c1b19",
+            "error": "#ba1a1a",
+            "surface-dim": "#0a0a09",
+            "on-error": "#ffffff",
+            "primary-fixed-dim": "#cac6c2",
+            "on-secondary-fixed": "#281900",
+            "on-primary-container": "#d6d2cb",
+            "inverse-surface": "#f2ede4",
+            "on-surface-variant": "#a6a29a",
+            "secondary-container": "#ffd799",
+            "secondary-fixed-dim": "#e7c184",
+            "surface-variant": "#22201d",
+            "on-secondary-container": "#795c29",
+            "on-background": "#fbf9f5",
+            "on-surface": "#fbf9f5",
+            "surface-container-lowest": "#060605",
+            "surface-container-highest": "#2c2a26",
+            "secondary": "#b89758",
+            "primary": "#fbf9f5"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "frieze-xl": "2rem",
+            "colonnade-2xl": "3rem",
+            "frieze-2xs": "0.25rem",
+            "colonnade-gutter": "2rem",
+            "frieze-sm": "0.75rem",
+            "colonnade-5xl": "8rem",
+            "colonnade-margin": "4rem",
+            "colonnade-4xl": "6rem",
+            "frieze-md": "1rem",
+            "colonnade-3xl": "4rem",
+            "frieze-lg": "1.5rem",
+            "hairline": "1px",
+            "frieze-xs": "0.5rem"
+          },
+          "fontFamily": {
+            "body-lg": ["Inter", "sans-serif"],
+            "monument-xl": ["EB Garamond", "serif"],
+            "title-sm": ["Inter", "sans-serif"],
+            "headline-sm": ["EB Garamond", "serif"],
+            "label-technical": ["Inter", "monospace"],
+            "headline-lg": ["EB Garamond", "serif"],
+            "body-sm": ["Inter", "sans-serif"],
+            "title-lg": ["Inter", "sans-serif"],
+            "headline-md": ["EB Garamond", "serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "headline-lg-mobile": ["EB Garamond", "serif"],
+            "monument-xl-mobile": ["EB Garamond", "serif"],
+            "label-inscription": ["EB Garamond", "serif"]
+          },
+          "fontSize": {
+            "body-lg": ["17px", { "lineHeight": "28px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "monument-xl": ["64px", { "lineHeight": "72px", "letterSpacing": "-0.015em", "fontWeight": "400" }],
+            "title-sm": ["14px", { "lineHeight": "20px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "headline-sm": ["22px", { "lineHeight": "30px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "label-technical": ["11px", { "lineHeight": "16px", "letterSpacing": "0.12em", "fontWeight": "600" }],
+            "headline-lg": ["44px", { "lineHeight": "52px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-sm": ["13px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "title-lg": ["18px", { "lineHeight": "26px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-md": ["30px", { "lineHeight": "38px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "body-md": ["15px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "monument-xl-mobile": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+            "label-inscription": ["13px", { "lineHeight": "16px", "letterSpacing": "0.18em", "fontWeight": "600" }]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col selection:bg-secondary selection:text-background font-body-md antialiased">
+<!-- ==================== HEADER (TopNavBar from Shared Components) ==================== -->
+
+<!-- ==================== PROGRESS INDICATOR (Architrave Progression Band) ==================== -->
+<section class="w-full bg-[#090908] border-b border-[#26221c] mb-8"><div class="max-w-[1360px] mx-auto px-colonnade-margin"><div class="w-full grid grid-cols-4 gap-2 sm:gap-3 py-4 border-b border-[#26221c]"><div class="bg-[#141311] border border-[#38332a] rounded px-3 py-2.5 flex items-center justify-between"><div class="flex items-center space-x-2"><span class="text-[#c5a059] text-xs font-bold">01</span><span class="font-label-technical uppercase tracking-wider text-xs text-[#ded9d1]">PLAN</span></div><span class="text-[#c5a059] font-bold text-xs">✓</span></div><div class="bg-[#141311] border border-[#38332a] rounded px-3 py-2.5 flex items-center justify-between"><div class="flex items-center space-x-2"><span class="text-[#c5a059] text-xs font-bold">02</span><span class="font-label-technical uppercase tracking-wider text-xs text-[#ded9d1]">DETAILS</span></div><span class="text-[#c5a059] font-bold text-xs">✓</span></div><div class="bg-[#141311] border border-[#38332a] rounded px-3 py-2.5 flex items-center justify-between"><div class="flex items-center space-x-2"><span class="text-[#c5a059] text-xs font-bold">03</span><span class="font-label-technical uppercase tracking-wider text-xs text-[#ded9d1]">PAYMENT</span></div><span class="text-[#c5a059] font-bold text-xs">✓</span></div><div class="bg-[#1a1815] border-2 border-[#c5a059] rounded px-3 py-2.5 flex items-center justify-between shadow-[0_0_15px_rgba(197,160,89,0.15)]"><div class="flex items-center space-x-2"><span class="bg-[#c5a059] text-[#060605] font-bold text-xs w-5 h-5 rounded-full flex items-center justify-center">04</span><span class="font-label-technical text-xs font-bold tracking-widest text-[#fef9f0] uppercase">CONFIRMATION</span></div><span class="text-[#c5a059] font-bold text-xs">✓</span></div></div></div></section>
+<!-- ==================== MAIN CANVASS: MONUMENTAL INSCRIBED TABLET ==================== -->
+<main class="flex-grow max-w-[1360px] w-full mx-auto px-colonnade-margin py-colonnade-2xl flex flex-col items-center">
+<!-- Stylobate Raised Tablet Outer Frame with revetment line -->
+<div class="w-full max-w-4xl bg-surface border border-outline-variant p-2 md:p-3 relative shadow-2xl">
+<!-- Interior Architectural Bay / Inscribed Stone Panel -->
+<div class="w-full border border-secondary/30 bg-surface-container-low p-8 md:p-14 relative flex flex-col items-center text-center">
+<!-- Corner Lapidary Accents -->
+<div class="absolute top-2 left-2 w-2 h-2 border-t border-l border-secondary"></div>
+<div class="absolute top-2 right-2 w-2 h-2 border-t border-r border-secondary"></div>
+<div class="absolute bottom-2 left-2 w-2 h-2 border-b border-l border-secondary"></div>
+<div class="absolute bottom-2 right-2 w-2 h-2 border-b border-r border-secondary"></div>
+<!-- Classical Celebratory Medallion Emblem -->
+<div class="relative mb-6">
+<div class="w-28 h-28 rounded-full border-2 border-secondary p-1.5 shadow-[0_0_25px_rgba(184,151,88,0.15)] bg-background flex items-center justify-center">
+<div class="w-full h-full rounded-full border border-secondary/40 overflow-hidden flex items-center justify-center">
+<img alt="Chinvat Bridge Emblem" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLxFYcOG-6kMUW--ZUBcT-q09kWUuLsHFQPUlZqH_VMRjfLHsfF-TGBpalRnnmQiuZqcaL5ZvYH0jtQc-uHYulXBisDH2EPyIvc6Nqd6Z2eySR0GlCvM5zJSu57NOHNy83PU1KjDb6S3Xh3QHgH7FoVHyih9Ory858yExa7VU_bA2zqXl_iWZ76wEkOLhPLLJ6nwHGVLPfzub5wDbirj3PlXwKrtYP74GBQ5XVSvlyrEaHyhSxfUxlOohNSdN6b8Dm0A">
+</div>
+</div>
+<div class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 bg-surface border border-secondary px-3 py-0.5 whitespace-nowrap">
+<span class="font-label-technical text-[9px] uppercase tracking-widest text-secondary font-semibold">SIGILLUM SOVRAN</span>
+</div>
+</div>
+<!-- Monumental Typography -->
+<span class="font-label-technical text-label-technical uppercase tracking-[0.25em] text-secondary mb-2 mt-2">
+          § IV // FORMAL PROTOCOL RATIFIED
+        </span>
+<h1 class="font-monument-xl text-monument-xl text-primary tracking-tight mb-2">
+          WELCOME TO CHINVAT BRIDGE
+        </h1>
+<p class="font-headline-sm text-headline-sm italic text-secondary font-normal mb-8 max-w-xl">
+          Your SEO engagement has been initiated.
+        </p>
+<!-- Status Badges & Engagement Overview Table / Architectural Bays -->
+<div class="w-full max-w-2xl border border-outline-variant bg-surface mb-10 text-left">
+<div class="px-5 py-2.5 border-b border-outline-variant bg-surface-container flex justify-between items-center">
+<span class="font-label-technical text-label-technical uppercase text-on-surface-variant tracking-widest">
+              ENGAGEMENT SPECIFICATION // REF. CHV-882910
+            </span>
+<span class="flex items-center gap-1.5 font-label-technical text-label-technical text-secondary">
+<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full inline-block animate-pulse"></span>
+              VERIFIED RECORD
+            </span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-outline-variant">
+<!-- Left Data Bay -->
+<div class="p-5 space-y-4">
+<div>
+<span class="block font-label-technical text-[10px] text-on-surface-variant uppercase tracking-widest">SELECTED PLAN</span>
+<span class="font-title-lg text-title-lg text-primary tracking-wide">SEO GROWTH (£499 / MONTH)</span>
+</div>
+<div>
+<span class="block font-label-technical text-[10px] text-on-surface-variant uppercase tracking-widest">TARGET DOMAIN</span>
+<span class="font-body-md text-body-md text-secondary font-mono tracking-tight underline underline-offset-4 decoration-secondary/30">
+                  https://sterling-tech.co.uk
+                </span>
+</div>
+<div>
+<span class="block font-label-technical text-[10px] text-on-surface-variant uppercase tracking-widest">ACCOUNT IDENTIFIER</span>
+<span class="font-body-sm text-body-sm text-primary font-mono">ACC-STERLING-04</span>
+</div>
+</div>
+<!-- Right Data Bay -->
+<div class="p-5 space-y-4">
+<div>
+<span class="block font-label-technical text-[10px] text-on-surface-variant uppercase tracking-widest">PAYMENT TRANSACTION</span>
+<div class="mt-1 inline-flex items-center gap-2 border border-secondary/50 bg-secondary/10 px-2.5 py-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="font-label-technical text-[11px] text-primary tracking-widest uppercase font-semibold">
+                    CONFIRMED // REF: CHV-882910
+                  </span>
+</div>
+</div>
+<div>
+<span class="block font-label-technical text-[10px] text-on-surface-variant uppercase tracking-widest">SUBSCRIPTION SCHEDULE</span>
+<div class="mt-1 inline-flex items-center gap-2 border border-outline-variant bg-surface-container-high px-2.5 py-1"><span class="font-label-technical text-[11px] text-primary tracking-widest uppercase font-semibold">ACTIVE // £499 BILLED MONTHLY</span><span class="text-on-surface-variant text-[11px] font-mono font-normal">(BILLED MONTHLY)</span></div>
+</div>
+<div>
+<span class="block font-label-technical text-[10px] text-on-surface-variant uppercase tracking-widest">BILLING CONTACT</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant font-mono">inquiries@sterling-tech.co.uk</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Clear Next Steps & Onboarding Protocol Bay -->
+<div class="w-full max-w-2xl border border-secondary/40 bg-surface-container text-left mb-10">
+<!-- Bay Header -->
+<div class="px-6 py-3.5 border-b border-secondary/30 bg-surface-container-high flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="font-label-inscription text-label-inscription text-secondary">ARCHITECTURAL ONBOARDING PROTOCOL</span>
+</div>
+<span class="font-label-technical text-[10px] uppercase tracking-widest text-on-surface-variant">NEXT STEPS</span>
+</div>
+<!-- Protocol Introduction -->
+<div class="p-6 border-b border-outline-variant bg-surface-container-low">
+<p class="font-body-md text-body-md text-primary leading-relaxed">Our consulting team will review your business details and contact you shortly (typically within 1 business day) to begin the onboarding process, configure your 15 monthly sovereign content assets, and initiate your priority technical SEO audit.</p>
+</div>
+<!-- Week 1 Sequence Colonnade -->
+<div class="p-6">
+<h4 class="font-label-technical text-label-technical uppercase tracking-widest text-secondary mb-4 flex items-center gap-2">
+<span class="">PROJECTION: WHAT TO EXPECT IN WEEK 1</span>
+<span class="flex-grow h-px bg-secondary/20"></span>
+</h4>
+<ol class="space-y-3"><li class="flex items-start gap-4 text-left"><span class="font-label-technical text-label-technical text-secondary font-mono border border-secondary/30 w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">I</span><div><span class="font-title-sm text-title-sm text-primary block">Introduction to your Designated Technical SEO Consultant</span><span class="font-body-sm text-body-sm text-on-surface-variant">Direct priority advisory liaison assigned from our London chamber with algorithmic sector specialization.</span></div></li><li class="flex items-start gap-4 text-left"><span class="font-label-technical text-label-technical text-secondary font-mono border border-secondary/30 w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">II</span><div><span class="font-title-sm text-title-sm text-primary block">Read-only Search Console &amp; Analytics Access Setup</span><span class="font-body-sm text-body-sm text-on-surface-variant">Zero-privilege, read-only handshake to safeguard internal infrastructure and diagnostic integrity.</span></div></li><li class="flex items-start gap-4 text-left"><span class="font-label-technical text-label-technical text-secondary font-mono border border-secondary/30 w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">III</span><div><span class="font-title-sm text-title-sm text-primary block">Baseline Technical Crawl &amp; Priority Audit Delivery</span><span class="font-body-sm text-body-sm text-on-surface-variant">Comprehensive architectural evaluation identifying algorithmic bottlenecks and indexation limits.</span></div></li><li class="flex items-start gap-4 text-left"><span class="font-label-technical text-label-technical text-secondary font-mono border border-secondary/30 w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">IV</span><div><span class="font-title-sm text-title-sm text-primary block">15 Monthly Content Assets Calendar &amp; Roadmap Briefing</span><span class="font-body-sm text-body-sm text-on-surface-variant">Editorial blueprint and publication schedule detailing high-authority organic market capture for the initial cycle.</span></div></li></ol>
+</div>
+</div>
+<!-- Action Pedestals (Primary & Secondary) -->
+<div class="flex flex-col sm:flex-row items-center gap-5 mb-8 w-full max-w-md justify-center">
+<!-- Primary Sovereign Action Button (Solid Burnished Gold) -->
+<a class="w-full sm:w-auto px-8 py-3.5 bg-secondary text-background font-label-technical text-label-technical tracking-widest font-bold uppercase transition-all duration-150 hover:bg-[#d4b06f] text-center shadow-lg border border-secondary flex items-center justify-center gap-2" href="#">
+<span class="">CONTINUE TO CLIENT PORTAL</span>
+<span class="font-bold">→</span>
+</a>
+<!-- Secondary Chiseled Action Button -->
+<a class="w-full sm:w-auto px-6 py-3.5 bg-transparent border border-outline-variant text-on-surface-variant hover:text-primary hover:border-secondary transition-all duration-150 font-label-technical text-label-technical tracking-widest uppercase text-center" href="#">
+            RETURN TO CHINVAT BRIDGE
+          </a>
+</div>
+<!-- Support Note Band -->
+<div class="pt-6 border-t border-outline-variant/60 w-full max-w-xl text-center">
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Have an immediate question? Reach our team directly at 
+            <a class="text-secondary hover:underline underline-offset-4 decoration-secondary/50 font-mono" href="mailto:inquiries@chinvatbridge.co.uk">inquiries@chinvatbridge.co.uk</a>.
+          </p>
+</div>
+</div>
+</div>
+</main>
+<!-- ==================== FOOTER (From Shared Components) ==================== -->
+
+
+
+
+
+
+
+
+
+
+
+</body></html>
