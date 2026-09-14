@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import { createCheckoutSession } from "@/actions/checkout";
+import { useActionState } from "react";
+import { createCheckoutSession, type CheckoutFormState } from "@/actions/checkout";
 import { Icon } from "@/components/atoms/icons";
 import { SubmitButton } from "@/components/atoms/SubmitButton";
 import { FormField } from "@/components/molecules/FormField";
@@ -12,12 +15,12 @@ const COUNTRY_OPTIONS = [
   { value: "GLOBAL", label: "Global / Multi-National" },
 ];
 
-interface DetailsFormProps {
-  planId: PlanId;
-  showMissingFieldsError: boolean;
-}
+const initialState: CheckoutFormState | null = null;
 
-export function DetailsForm({ planId, showMissingFieldsError }: DetailsFormProps) {
+export function DetailsForm({ planId }: { planId: PlanId }) {
+  const [state, formAction] = useActionState(createCheckoutSession, initialState);
+  const values = state?.values;
+
   return (
     <div className="border border-stone-border bg-obsidian-900 rounded-sm p-6 md:p-10">
       <div className="border-b border-stone-border pb-6 mb-8">
@@ -33,13 +36,16 @@ export function DetailsForm({ planId, showMissingFieldsError }: DetailsFormProps
         </p>
       </div>
 
-      {showMissingFieldsError ? (
-        <div className="mb-6 p-4 border border-red-900/60 bg-red-950/20 font-serif-monument text-sm text-parchment-200">
-          Please fill in all required fields before continuing.
+      {state ? (
+        <div
+          role="alert"
+          className="mb-6 p-4 border border-red-900/60 bg-red-950/20 font-serif-monument text-sm text-parchment-200"
+        >
+          {state.message}
         </div>
       ) : null}
 
-      <form action={createCheckoutSession} className="space-y-8">
+      <form action={formAction} className="space-y-8">
         <input type="hidden" name="planId" value={planId} />
 
         <div className="space-y-5">
@@ -49,12 +55,19 @@ export function DetailsForm({ planId, showMissingFieldsError }: DetailsFormProps
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FormField label="Full Name" name="fullName" required placeholder="e.g. Alex Sterling" />
+            <FormField
+              label="Full Name"
+              name="fullName"
+              required
+              placeholder="e.g. Alex Sterling"
+              defaultValue={values?.fullName}
+            />
             <FormField
               label="Company Name"
               name="companyName"
               required
               placeholder="e.g. Sterling Industrial Ltd"
+              defaultValue={values?.companyName}
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -64,8 +77,16 @@ export function DetailsForm({ planId, showMissingFieldsError }: DetailsFormProps
               type="email"
               required
               placeholder="alex@sterling.co.uk"
+              defaultValue={values?.email}
             />
-            <FormField label="Phone Number" name="phone" type="tel" required placeholder="+44 20 7946 0192" />
+            <FormField
+              label="Phone Number"
+              name="phone"
+              type="tel"
+              required
+              placeholder="+44 20 7946 0192"
+              defaultValue={values?.phone}
+            />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <FormField
@@ -74,8 +95,15 @@ export function DetailsForm({ planId, showMissingFieldsError }: DetailsFormProps
               type="url"
               required
               placeholder="https://sterling.co.uk"
+              defaultValue={values?.website}
             />
-            <FormField label="Country" name="country" type="select" options={COUNTRY_OPTIONS} defaultValue="UK" />
+            <FormField
+              label="Country"
+              name="country"
+              type="select"
+              options={COUNTRY_OPTIONS}
+              defaultValue={values?.country ?? "UK"}
+            />
           </div>
         </div>
 
@@ -89,12 +117,14 @@ export function DetailsForm({ planId, showMissingFieldsError }: DetailsFormProps
             label="Target Market"
             name="targetMarket"
             placeholder="e.g. UK National, London & South East"
+            defaultValue={values?.targetMarket}
           />
           <FormField
             label="What would you like to improve?"
             name="improvements"
             type="textarea"
             placeholder="e.g. Site speed, ranking for core commercial terms, fixing crawl errors..."
+            defaultValue={values?.improvements}
           />
         </div>
 

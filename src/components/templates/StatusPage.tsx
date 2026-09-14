@@ -22,6 +22,8 @@ interface StatusPageProps {
   actions: ReactNode;
   contactNote?: ReactNode;
   tone?: StatusPageTone;
+  /** Set when a parent layout (e.g. CheckoutShell) already provides the <main> landmark. */
+  bare?: boolean;
 }
 
 /**
@@ -29,22 +31,36 @@ interface StatusPageProps {
  * checkout error, and the app-level error boundary) — a centered card with an
  * eyebrow label, heading, message, optional contact line and action buttons.
  */
-export function StatusPage({ eyebrow, title, description, actions, contactNote, tone = "neutral" }: StatusPageProps) {
+export function StatusPage({
+  eyebrow,
+  title,
+  description,
+  actions,
+  contactNote,
+  tone = "neutral",
+  bare = false,
+}: StatusPageProps) {
   const toneClasses = TONE_CLASSES[tone];
 
+  const card = (
+    <div className={`max-w-lg w-full text-center space-y-6 p-10 sm:p-14 rounded-sm ${toneClasses.container}`}>
+      <span className={`font-mono text-[10px] tracking-technical uppercase block font-semibold ${toneClasses.eyebrow}`}>
+        {eyebrow}
+      </span>
+      <h1 className="font-serif-monument text-3xl sm:text-4xl text-parchment-50 uppercase tracking-tight">
+        {title}
+      </h1>
+      <p className={`font-serif-monument text-base leading-relaxed ${toneClasses.description}`}>{description}</p>
+      {contactNote ? <p className="font-mono text-xs text-parchment-dim">{contactNote}</p> : null}
+      <div className="flex flex-wrap items-center justify-center gap-4 pt-2">{actions}</div>
+    </div>
+  );
+
+  if (bare) {
+    return <div className="min-h-[60vh] flex items-center justify-center fine-grid py-16 px-6">{card}</div>;
+  }
+
   return (
-    <main className="grow flex items-center justify-center bg-obsidian-950 fine-grid py-24 px-6">
-      <div className={`max-w-lg w-full text-center space-y-6 p-10 sm:p-14 rounded-sm ${toneClasses.container}`}>
-        <span className={`font-mono text-[10px] tracking-technical uppercase block font-semibold ${toneClasses.eyebrow}`}>
-          {eyebrow}
-        </span>
-        <h1 className="font-serif-monument text-3xl sm:text-4xl text-parchment-50 uppercase tracking-tight">
-          {title}
-        </h1>
-        <p className={`font-serif-monument text-base leading-relaxed ${toneClasses.description}`}>{description}</p>
-        {contactNote ? <p className="font-mono text-xs text-parchment-dim">{contactNote}</p> : null}
-        <div className="flex flex-wrap items-center justify-center gap-4 pt-2">{actions}</div>
-      </div>
-    </main>
+    <main className="grow flex items-center justify-center bg-obsidian-950 fine-grid py-24 px-6">{card}</main>
   );
 }

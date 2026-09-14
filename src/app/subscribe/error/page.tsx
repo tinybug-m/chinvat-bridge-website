@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Button } from "@/components/atoms/Button";
 import { EmailLink } from "@/components/atoms/EmailLink";
+import { CheckoutShell } from "@/components/templates/CheckoutShell";
 import { StatusPage } from "@/components/templates/StatusPage";
 
 export const metadata: Metadata = {
@@ -26,25 +27,28 @@ export default async function SubscribeErrorPage({ searchParams }: SubscribeErro
   const message = (reason && MESSAGES[reason]) || DEFAULT_MESSAGE;
 
   return (
-    <StatusPage
-      eyebrow="Checkout Unavailable"
-      title="Something Didn't Go Through."
-      description={message}
-      contactNote={
-        <>
-          Try again, or contact us directly: <EmailLink />
-        </>
-      }
-      actions={
-        <>
-          <Button href="/pricing" size="md">
-            Back to Plans
-          </Button>
-          <Button href="/" variant="outline" size="md">
-            Back to Home
-          </Button>
-        </>
-      }
-    />
+    <CheckoutShell>
+      <StatusPage
+        bare
+        eyebrow="Checkout Unavailable"
+        title="Something Didn't Go Through."
+        description={message}
+        contactNote={
+          <>
+            Try again, or contact us directly: <EmailLink />
+          </>
+        }
+        actions={
+          <>
+            <Button href="/pricing" size="md">
+              Back to Plans
+            </Button>
+            <Button href="/" variant="outline" size="md">
+              Back to Home
+            </Button>
+          </>
+        }
+      />
+    </CheckoutShell>
   );
 }

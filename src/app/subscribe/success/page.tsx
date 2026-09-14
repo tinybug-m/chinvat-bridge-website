@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Button } from "@/components/atoms/Button";
+import { Container } from "@/components/atoms/Container";
 import { EmailLink } from "@/components/atoms/EmailLink";
+import { CheckoutStepper } from "@/components/molecules/CheckoutStepper";
+import { CheckoutShell } from "@/components/templates/CheckoutShell";
 import { StatusPage } from "@/components/templates/StatusPage";
 import { getStripeClient } from "@/lib/stripe";
 import { getPlanById } from "@/data/pricing";
@@ -36,38 +39,46 @@ export default async function SubscribeSuccessPage({ searchParams }: SubscribeSu
   const engagement = await getConfirmedEngagement(sessionId);
 
   return (
-    <StatusPage
-      tone="celebratory"
-      eyebrow="Subscription Confirmed"
-      title="Welcome to Chinvat Bridge."
-      description={
-        engagement?.plan
-          ? `Your ${engagement.plan.name} plan (${engagement.plan.priceLabel}${engagement.plan.billingPeriod}) is now active. We'll be in touch${
-              engagement.email ? ` at ${engagement.email}` : ""
-            } to begin onboarding.`
-          : "Your subscription is active. We'll be in touch at the email you provided during checkout to kick off the work."
-      }
-      contactNote={
-        <>
-          Questions in the meantime? <EmailLink />
-        </>
-      }
-      actions={
-        sessionId ? (
+    <CheckoutShell>
+      <div className="border-b border-stone-border bg-obsidian-950 py-4">
+        <Container>
+          <CheckoutStepper currentStep={4} />
+        </Container>
+      </div>
+      <StatusPage
+        bare
+        tone="celebratory"
+        eyebrow="Subscription Confirmed"
+        title="Welcome to Chinvat Bridge."
+        description={
+          engagement?.plan
+            ? `Your ${engagement.plan.name} plan (${engagement.plan.priceLabel}${engagement.plan.billingPeriod}) is now active. We'll be in touch${
+                engagement.email ? ` at ${engagement.email}` : ""
+              } to begin onboarding.`
+            : "Your subscription is active. We'll be in touch at the email you provided during checkout to kick off the work."
+        }
+        contactNote={
           <>
-            <Button href={`/auth/checkout-login?session_id=${sessionId}`} icon="arrowForward" size="md">
-              Go to Your Client Portal
-            </Button>
-            <Button href="/" variant="outline" size="md">
+            Questions in the meantime? <EmailLink />
+          </>
+        }
+        actions={
+          sessionId ? (
+            <>
+              <Button href={`/auth/checkout-login?session_id=${sessionId}`} icon="arrowForward" size="md">
+                Go to Your Client Portal
+              </Button>
+              <Button href="/" variant="outline" size="md">
+                Back to Home
+              </Button>
+            </>
+          ) : (
+            <Button href="/" size="md">
               Back to Home
             </Button>
-          </>
-        ) : (
-          <Button href="/" size="md">
-            Back to Home
-          </Button>
-        )
-      }
-    />
+          )
+        }
+      />
+    </CheckoutShell>
   );
 }

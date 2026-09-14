@@ -33,6 +33,18 @@ export async function sendMagicLink(_prevState: SendMagicLinkResult | null, form
 
   if (error) {
     console.error("signInWithOtp failed:", error);
+
+    if (error.code === "over_email_send_rate_limit") {
+      return {
+        status: "error",
+        message: "You've requested a few links in a row — please wait a minute before trying again.",
+      };
+    }
+
+    if (error.code === "email_address_invalid") {
+      return { status: "error", message: "That doesn't look like a valid email address." };
+    }
+
     return { status: "error", message: "Something went wrong sending the link. Please try again." };
   }
 

@@ -13,11 +13,11 @@ export const metadata: Metadata = {
 };
 
 interface SubscribeDetailsPageProps {
-  searchParams: Promise<{ plan?: string; error?: string }>;
+  searchParams: Promise<{ plan?: string }>;
 }
 
 export default async function SubscribeDetailsPage({ searchParams }: SubscribeDetailsPageProps) {
-  const { plan: planIdParam, error } = await searchParams;
+  const { plan: planIdParam } = await searchParams;
   const plan = planIdParam ? getPlanById(planIdParam) : undefined;
 
   if (!plan) {
@@ -34,7 +34,7 @@ export default async function SubscribeDetailsPage({ searchParams }: SubscribeDe
       <Container className="py-12 lg:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-8">
-            <DetailsForm planId={plan.id} showMissingFieldsError={error === "missing_fields"} />
+            <DetailsForm planId={plan.id} />
           </div>
           <div className="lg:col-span-4">
             <PlanSummary plan={plan} />
