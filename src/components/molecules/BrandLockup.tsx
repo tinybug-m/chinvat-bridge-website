@@ -20,7 +20,7 @@ export function BrandLockup({ size = "md", showTagline = true }: BrandLockupProp
   return (
     <Link
       aria-label="Chinvat Bridge Home"
-      className="flex items-center gap-3.5 group focus-visible:outline-none"
+      className="flex items-center gap-3.5 group"
       href="/"
     >
       <div

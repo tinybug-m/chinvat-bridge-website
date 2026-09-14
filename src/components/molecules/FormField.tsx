@@ -17,7 +17,7 @@ interface FormFieldProps {
 }
 
 const FIELD_CLASS =
-  "w-full bg-obsidian-900 border border-stone-borderLight px-4 py-3 font-sans text-sm text-parchment-100 focus:border-gold-500 focus:ring-0 focus:outline-none transition-colors rounded-sm placeholder:text-parchment-dim/60";
+  "w-full bg-obsidian-900 border border-stone-borderLight px-4 py-3 font-sans text-sm text-parchment-100 focus:border-gold-500 transition-colors rounded-sm placeholder:text-parchment-dim/60";
 
 export function FormField({
   label,
