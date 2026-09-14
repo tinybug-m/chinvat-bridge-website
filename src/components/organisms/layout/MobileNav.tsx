@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/atoms/icons";
 import { Button } from "@/components/atoms/Button";
@@ -12,12 +12,16 @@ interface MobileNavProps {
 
 export function MobileNav({ links }: MobileNavProps) {
   const [open, setOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") {
+        setOpen(false);
+        toggleRef.current?.focus();
+      }
     }
 
     document.addEventListener("keydown", handleKeyDown);
@@ -27,6 +31,7 @@ export function MobileNav({ links }: MobileNavProps) {
   return (
     <>
       <button
+        ref={toggleRef}
         aria-controls="mobile-nav"
         aria-expanded={open}
         aria-label="Toggle navigation menu"
