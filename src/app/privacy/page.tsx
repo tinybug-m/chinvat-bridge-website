@@ -21,7 +21,7 @@ export default function PrivacyPolicyPage() {
               Privacy Policy
             </h1>
             <p className="font-mono text-[11px] text-parchment-dim uppercase tracking-technical mt-3">
-              Last updated: {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+              Last updated: 14 September 2026
             </p>
           </div>
 
