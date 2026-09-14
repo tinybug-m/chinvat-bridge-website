@@ -9,8 +9,11 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all request paths except static assets and image optimization files.
+     * Match all request paths except static assets, image optimization files, and
+     * /api routes — no API route in this app reads the user's session cookie (the
+     * Stripe webhook uses the service-role admin client instead), so running the
+     * cookie-refresh auth check on every webhook delivery would just add latency.
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
