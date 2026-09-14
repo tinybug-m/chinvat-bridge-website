@@ -1,19 +1,12 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteOrigin } from "@/lib/site-origin";
 
 export interface SendMagicLinkResult {
   status: "sent" | "error";
   message: string;
-}
-
-async function getSiteOrigin(): Promise<string> {
-  const headerList = await headers();
-  const host = headerList.get("host") ?? "localhost:3000";
-  const protocol = host.startsWith("localhost") || host.startsWith("127.0.0.1") ? "http" : "https";
-  return `${protocol}://${host}`;
 }
 
 export async function sendMagicLink(_prevState: SendMagicLinkResult | null, formData: FormData): Promise<SendMagicLinkResult> {

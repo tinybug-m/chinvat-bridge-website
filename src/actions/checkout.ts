@@ -1,8 +1,8 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getStripeClient } from "@/lib/stripe";
+import { getSiteOrigin } from "@/lib/site-origin";
 import { getStripePriceId, PRICING_PLANS, type PlanId } from "@/data/pricing";
 
 export interface CheckoutFormValues {
@@ -29,13 +29,6 @@ function isPlanId(value: FormDataEntryValue | null): value is PlanId {
 function fieldValue(formData: FormData, name: string): string {
   const value = formData.get(name);
   return typeof value === "string" ? value.trim() : "";
-}
-
-async function getSiteOrigin(): Promise<string> {
-  const headerList = await headers();
-  const host = headerList.get("host") ?? "localhost:3000";
-  const protocol = host.startsWith("localhost") || host.startsWith("127.0.0.1") ? "http" : "https";
-  return `${protocol}://${host}`;
 }
 
 export async function createCheckoutSession(
