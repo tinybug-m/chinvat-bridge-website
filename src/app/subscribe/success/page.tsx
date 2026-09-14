@@ -53,9 +53,20 @@ export default async function SubscribeSuccessPage({ searchParams }: SubscribeSu
         </>
       }
       actions={
-        <Button href="/" size="md">
-          Back to Home
-        </Button>
+        sessionId ? (
+          <>
+            <Button href={`/auth/checkout-login?session_id=${sessionId}`} icon="arrowForward" size="md">
+              Go to Your Client Portal
+            </Button>
+            <Button href="/" variant="outline" size="md">
+              Back to Home
+            </Button>
+          </>
+        ) : (
+          <Button href="/" size="md">
+            Back to Home
+          </Button>
+        )
       }
     />
   );

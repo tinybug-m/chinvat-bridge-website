@@ -54,11 +54,11 @@ export async function createCheckoutSession(formData: FormData): Promise<void> {
   const improvements = optionalField(formData, "improvements");
 
   const origin = await getSiteOrigin();
-  const stripe = getStripeClient();
 
   let sessionUrl: string | null;
 
   try {
+    const stripe = getStripeClient();
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],

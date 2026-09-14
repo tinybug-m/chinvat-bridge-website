@@ -39,12 +39,18 @@ export function Footer() {
               <br />
               <EmailLink variant="underline" />
             </p>
-            <div className="pt-2">
+            <div className="pt-2 flex flex-wrap gap-2">
               <Link
                 className="inline-block px-2.5 py-0.5 bg-obsidian-900 border border-gold-500/40 text-[9px] text-gold-300 hover:text-gold-400 transition-colors"
                 href="/#contact"
               >
                 Start a Conversation
+              </Link>
+              <Link
+                className="inline-block px-2.5 py-0.5 bg-obsidian-900 border border-stone-borderLight text-[9px] text-parchment-dim hover:text-gold-300 transition-colors"
+                href="/login"
+              >
+                Client Sign In
               </Link>
             </div>
           </div>
