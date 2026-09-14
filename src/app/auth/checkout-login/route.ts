@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStripeClient } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * Passwordless auto-login right after a successful Stripe checkout.
@@ -33,17 +34,32 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/subscribe/success?session_id=${sessionId}`);
   }
 
-  const supabase = createAdminClient();
-  const { data, error } = await supabase.auth.admin.generateLink({
+  const adminClient = createAdminClient();
+  const { data, error } = await adminClient.auth.admin.generateLink({
     type: "magiclink",
     email,
-    options: { redirectTo: `${origin}/auth/callback?next=/dashboard` },
   });
 
-  if (error || !data.properties?.action_link) {
+  if (error || !data.properties?.hashed_token) {
     console.error("Failed to generate portal login link:", error);
     return NextResponse.redirect(`${origin}/subscribe/success?session_id=${sessionId}`);
   }
 
-  return NextResponse.redirect(data.properties.action_link);
+  // generateLink() is admin-initiated — no browser ever ran signInWithOtp() to store a
+  // PKCE code_verifier for it, so Supabase can only hand back an implicit-flow link
+  // (tokens in a URL hash fragment), which a server-side route can't read at all. Verifying
+  // the token_hash directly here instead establishes the session server-side and writes
+  // the auth cookie via this same response, so no redirect-through-Supabase step is needed.
+  const authClient = await createClient();
+  const { error: verifyError } = await authClient.auth.verifyOtp({
+    token_hash: data.properties.hashed_token,
+    type: "magiclink",
+  });
+
+  if (verifyError) {
+    console.error("Failed to verify portal login token:", verifyError);
+    return NextResponse.redirect(`${origin}/subscribe/success?session_id=${sessionId}`);
+  }
+
+  return NextResponse.redirect(`${origin}/dashboard`);
 }
