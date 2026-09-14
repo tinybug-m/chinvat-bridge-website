@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { getStripeClient } from "@/lib/stripe";
 import { getSiteOrigin } from "@/lib/site-origin";
-import { getStripePriceId, PRICING_PLANS, type PlanId } from "@/data/pricing";
+import { getPlanById } from "@/data/pricing";
 
 export interface CheckoutFormValues {
   fullName: string;
@@ -22,10 +22,6 @@ export interface CheckoutFormState {
   values: CheckoutFormValues;
 }
 
-function isPlanId(value: FormDataEntryValue | null): value is PlanId {
-  return typeof value === "string" && PRICING_PLANS.some((plan) => plan.id === value);
-}
-
 function fieldValue(formData: FormData, name: string): string {
   const value = formData.get(name);
   return typeof value === "string" ? value.trim() : "";
@@ -35,16 +31,20 @@ export async function createCheckoutSession(
   _prevState: CheckoutFormState | null,
   formData: FormData
 ): Promise<CheckoutFormState | null> {
-  const planId = formData.get("planId");
+  const planIdValue = formData.get("planId");
 
-  if (!isPlanId(planId)) {
+  if (typeof planIdValue !== "string") {
     redirect("/subscribe/error?reason=invalid_plan");
   }
 
-  const priceId = getStripePriceId(planId);
+  const plan = await getPlanById(planIdValue);
 
-  if (!priceId) {
-    redirect(`/subscribe/error?reason=not_configured&plan=${planId}`);
+  if (!plan) {
+    redirect("/subscribe/error?reason=invalid_plan");
+  }
+
+  if (!plan.stripePriceId) {
+    redirect(`/subscribe/error?reason=not_configured&plan=${plan.id}`);
   }
 
   const values: CheckoutFormValues = {
@@ -74,13 +74,13 @@ export async function createCheckoutSession(
     const stripe = getStripeClient();
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{ price: plan.stripePriceId, quantity: 1 }],
       success_url: `${origin}/subscribe/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/subscribe/cancelled`,
       customer_email: values.email,
       billing_address_collection: "auto",
       allow_promotion_codes: true,
-      metadata: { planId, ...values },
+      metadata: { planId: plan.id, ...values },
     });
     sessionUrl = session.url;
   } catch (error) {

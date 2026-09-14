@@ -6,6 +6,7 @@ import { Bay } from "@/components/molecules/Bay";
 import { ComingSoonNotice } from "@/components/molecules/ComingSoonNotice";
 import { RealEngagementSummary } from "@/components/organisms/dashboard/RealEngagementSummary";
 import { RealProjectProgress } from "@/components/organisms/dashboard/RealProjectProgress";
+import { RealUpdatesArchive } from "@/components/organisms/dashboard/RealUpdatesArchive";
 import { AdvisoryChannel } from "@/components/organisms/dashboard/AdvisoryChannel";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/actions/auth";
@@ -62,9 +63,7 @@ export default async function DashboardPage() {
                   <RealProjectProgress planId={customer.plan_id} />
                 </div>
                 <div className="lg:col-span-4 space-y-8">
-                  <Bay numeral="II." title="Reports &amp; Archive">
-                    <ComingSoonNotice>Your first report will appear here once it&rsquo;s ready.</ComingSoonNotice>
-                  </Bay>
+                  <RealUpdatesArchive customerId={customer.id} />
                   <AdvisoryChannel />
                 </div>
               </div>

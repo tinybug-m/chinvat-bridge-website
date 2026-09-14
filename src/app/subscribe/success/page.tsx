@@ -23,7 +23,7 @@ async function getConfirmedEngagement(sessionId: string | undefined) {
   try {
     const stripe = getStripeClient();
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-    const plan = session.metadata?.planId ? getPlanById(session.metadata.planId) : undefined;
+    const plan = session.metadata?.planId ? await getPlanById(session.metadata.planId) : undefined;
 
     return {
       plan,

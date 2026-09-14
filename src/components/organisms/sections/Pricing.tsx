@@ -2,9 +2,11 @@ import Link from "next/link";
 import { Section } from "@/components/molecules/Section";
 import { SectionIntro } from "@/components/molecules/SectionIntro";
 import { PricingCard } from "@/components/organisms/sections/PricingCard";
-import { PRICING_PLANS } from "@/data/pricing";
+import { getPlans } from "@/data/pricing";
 
-export function Pricing() {
+export async function Pricing() {
+  const plans = await getPlans();
+
   return (
     <Section id="pricing">
       <SectionIntro
@@ -14,7 +16,7 @@ export function Pricing() {
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
-        {PRICING_PLANS.map((plan) => (
+        {plans.map((plan) => (
           <PricingCard key={plan.id} plan={plan} />
         ))}
       </div>

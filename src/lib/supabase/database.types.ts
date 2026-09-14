@@ -39,6 +39,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      customer_updates: {
+        Row: {
+          body: string
+          created_at: string
+          customer_id: string
+          id: string
+          title: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_updates_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           company_name: string | null
@@ -90,6 +122,57 @@ export type Database = {
           target_market?: string | null
           updated_at?: string
           website?: string | null
+        }
+        Relationships: []
+      }
+      plans: {
+        Row: {
+          billing_period: string
+          capabilities: Json
+          capabilities_label: string
+          created_at: string
+          description: string
+          highlighted: boolean
+          id: string
+          name: string
+          price_label: string
+          sort_order: number
+          specs: Json
+          stripe_price_id: string | null
+          tier_label: string
+          updated_at: string
+        }
+        Insert: {
+          billing_period: string
+          capabilities?: Json
+          capabilities_label: string
+          created_at?: string
+          description: string
+          highlighted?: boolean
+          id: string
+          name: string
+          price_label: string
+          sort_order?: number
+          specs?: Json
+          stripe_price_id?: string | null
+          tier_label: string
+          updated_at?: string
+        }
+        Update: {
+          billing_period?: string
+          capabilities?: Json
+          capabilities_label?: string
+          created_at?: string
+          description?: string
+          highlighted?: boolean
+          id?: string
+          name?: string
+          price_label?: string
+          sort_order?: number
+          specs?: Json
+          stripe_price_id?: string | null
+          tier_label?: string
+          updated_at?: string
         }
         Relationships: []
       }

@@ -18,7 +18,7 @@ interface SubscribeDetailsPageProps {
 
 export default async function SubscribeDetailsPage({ searchParams }: SubscribeDetailsPageProps) {
   const { plan: planIdParam } = await searchParams;
-  const plan = planIdParam ? getPlanById(planIdParam) : undefined;
+  const plan = planIdParam ? await getPlanById(planIdParam) : undefined;
 
   if (!plan) {
     redirect("/pricing");

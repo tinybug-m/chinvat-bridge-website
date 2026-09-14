@@ -2,8 +2,8 @@ import { Bay } from "@/components/molecules/Bay";
 import { Chip } from "@/components/atoms/Chip";
 import { getPlanById } from "@/data/pricing";
 
-export function RealProjectProgress({ planId }: { planId: string }) {
-  const plan = getPlanById(planId);
+export async function RealProjectProgress({ planId }: { planId: string }) {
+  const plan = await getPlanById(planId);
   const scopeItems = plan?.capabilities ?? [];
 
   return (

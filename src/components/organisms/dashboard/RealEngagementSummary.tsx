@@ -14,8 +14,8 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: "Cancelled",
 };
 
-export function RealEngagementSummary({ companyName, website, planId, status }: RealEngagementSummaryProps) {
-  const plan = getPlanById(planId);
+export async function RealEngagementSummary({ companyName, website, planId, status }: RealEngagementSummaryProps) {
+  const plan = await getPlanById(planId);
 
   const metrics = [
     { label: "Active Service", value: plan ? `SEO ${plan.name} — ${plan.priceLabel}/mo` : planId },
