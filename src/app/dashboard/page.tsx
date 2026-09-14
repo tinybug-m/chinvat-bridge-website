@@ -60,7 +60,7 @@ export default async function DashboardPage() {
               />
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <div className="lg:col-span-8 space-y-8">
-                  <RealProjectProgress planId={customer.plan_id} />
+                  <RealProjectProgress customerId={customer.id} planId={customer.plan_id} />
                 </div>
                 <div className="lg:col-span-4 space-y-8">
                   <RealUpdatesArchive customerId={customer.id} />

@@ -39,6 +39,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      customer_progress_items: {
+        Row: {
+          completed_steps: number
+          created_at: string
+          customer_id: string
+          id: string
+          label: string
+          note: string | null
+          percent_label: string
+          sort_order: number
+          status_label: string
+          total_steps: number
+          updated_at: string
+        }
+        Insert: {
+          completed_steps?: number
+          created_at?: string
+          customer_id: string
+          id?: string
+          label: string
+          note?: string | null
+          percent_label: string
+          sort_order?: number
+          status_label: string
+          total_steps?: number
+          updated_at?: string
+        }
+        Update: {
+          completed_steps?: number
+          created_at?: string
+          customer_id?: string
+          id?: string
+          label?: string
+          note?: string | null
+          percent_label?: string
+          sort_order?: number
+          status_label?: string
+          total_steps?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_progress_items_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_updates: {
         Row: {
           body: string
