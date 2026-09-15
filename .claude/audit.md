@@ -56,11 +56,11 @@ Brand voice:           Plain, precise, no hype, no fabricated stats/claims, Brit
 
 ### Open question — needs your review (do not resolve automatically)
 
-`CONTACT_EMAIL` in `src/lib/constants.ts` is `inquiries@chinvatbridge.co.uk` — the **`.co.uk`**
+`CONTACT_EMAIL` in `src/lib/constants.ts` is `chinvatbridge.tech@gmail.com` — the **`.co.uk`**
 domain. But the site's real, live, DNS-resolving domain is **`chinvatbridge.uk`** (no "co.").
 `chinvatbridge.co.uk` does not resolve at all (confirmed via DNS lookup earlier this project).
 This was flagged mid-session once already and never answered: do you have a working inbox at
-`inquiries@chinvatbridge.uk`, or is `.co.uk` a separately-owned domain you actually receive
+`chinvatbridge.tech@gmail.com`, or is `.co.uk` a separately-owned domain you actually receive
 mail at? Left untouched pending your answer — this mission will not guess a business email
 domain.
 
