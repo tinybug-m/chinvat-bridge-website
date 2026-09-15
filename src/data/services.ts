@@ -21,6 +21,7 @@ export const SERVICES: Service[] = [
       "We help businesses identify practical AI opportunities, evaluate the right tools and models, and integrate AI into workflows where it creates measurable value.",
     tags: ["AI Strategy", "LLM Applications", "Automated Workflows", "Internal AI Tools"],
     outcome: "Practical Adoption",
+    href: "/insights/where-ai-can-save-your-business-time",
   },
   {
     index: "II.",
@@ -31,6 +32,7 @@ export const SERVICES: Service[] = [
       "We design and build automated workflows that connect your tools, reduce repetitive tasks and help your team spend more time on higher-value work.",
     tags: ["Workflow Automation", "API Integrations", "Process Orchestration", "System-to-System"],
     outcome: "Reduce Manual Work",
+    href: "/insights/what-should-you-automate-first",
   },
   {
     index: "III.",
@@ -41,6 +43,7 @@ export const SERVICES: Service[] = [
       "We build custom websites, web applications, internal tools and digital products around the way your business actually operates.",
     tags: ["Custom Web Apps", "Internal Tools", "Client Portals", "Dashboards & Systems"],
     outcome: "Built Around You",
+    href: "/insights/when-should-a-business-build-custom-software",
   },
   {
     index: "IV.",
