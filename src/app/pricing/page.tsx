@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/pricing",
   },
+  openGraph: {
+    title: "SEO & Content Pricing — Chinvat Bridge",
+    description:
+      "Monthly SEO and content retainer plans from Chinvat Bridge: technical SEO, keyword research, link building and ongoing content production.",
+  },
 };
 
 export default function PricingPage() {

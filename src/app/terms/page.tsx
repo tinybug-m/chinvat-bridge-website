@@ -5,7 +5,14 @@ import { EmailLink } from "@/components/atoms/EmailLink";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "The terms that govern use of Chinvat Bridge's services.",
+  description:
+    "The terms that govern your subscription to Chinvat Bridge's SEO and content services — billing, cancellation, scope of work and responsibilities.",
+  alternates: { canonical: "/terms" },
+  openGraph: {
+    title: "Terms of Service — Chinvat Bridge",
+    description:
+      "The terms that govern your subscription to Chinvat Bridge's SEO and content services — billing, cancellation, scope of work and responsibilities.",
+  },
 };
 
 export default function TermsOfServicePage() {

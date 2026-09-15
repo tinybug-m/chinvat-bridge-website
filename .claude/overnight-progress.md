@@ -1,10 +1,20 @@
 ## Status
-Current phase: 1 — Missing pages
-Last commit: fb5c74e chore: repo audit and route inventory
+Current phase: 5 — Per-page SEO
+Last commit: d493e73 feat: real blog architecture, publishing the 4 already-promised articles
 
 ## Completed
 - [x] Phase 0 — audit written to `.claude/audit.md`, branch `overnight/site-completion` created,
       baseline validation recorded (lint pass, build pass, no tests/typecheck/format scripts exist)
+- [x] Phase 1 — concluded no missing pages are implied by navigation (see audit.md)
+- [x] Phase 2 — required fields on admin edit forms to match add forms; confirmed zero dead
+      links/empty handlers already existed
+- [x] Phase 3 — blog architecture: `src/lib/blog.ts`, `/insights` listing, `/insights/[slug]`
+      detail page (generateStaticParams, generateMetadata, Article+BreadcrumbList JSON-LD,
+      related posts by shared tag), explicit typed-TSX content registry (no new dependencies)
+- [x] Phase 4 — 4 real articles published (~800-1000 words each — see Assumptions re: the
+      1200-1800 target), fulfilling the 4 topics the homepage already promised as
+      "Planned Briefing"/"Topic in Development"; homepage Insights section now links real
+      articles instead of showing placeholders; removed the now-dead `src/data/insights.ts`
 
 ## Discovered work
 - No standalone service pages, services index, about, or contact pages are implied by any
@@ -26,6 +36,9 @@ Last commit: fb5c74e chore: repo audit and route inventory
 | Filled in Section 0 business facts from verified repo content instead of leaving them as the mission template's blanks | Per the mission's own rule 0: "not stated here and not already in the repo does not get written into the site" — the facts *are* already in the repo (constants, data files, migrations), so using them isn't guessing. | No — these are just corrections of the template to match reality. |
 | Left `CONTACT_EMAIL` and `SITE_URL`'s fallback pointing at the dead `.co.uk` domain unchanged | This was flagged mid-project once already and never answered by you (is `.co.uk` a real inbox you own, or should it be `.uk`?). The mission says don't guess a business-identity fact like this. | **Yes** — needs your answer before either constant should change. |
 | No cookie-consent banner added | No analytics or tracking scripts exist anywhere in the repo, so there is nothing that sets a cookie requiring consent. Adding a banner with no actual tracking behind it would itself be a fake/misleading UI element. | No — revisit only if analytics is ever actually added. |
+| Blog content is typed TSX files (`src/content/blog/posts/*.tsx`) with an explicit import registry, not MDX/markdown | The overriding ground rule says no new dependencies unless a task is impossible without one; this achieves everything the mission asked for (typed frontmatter, static generation, draft exclusion, one-file-per-article) with zero new dependencies, matching this repo's existing `src/data/*.ts` convention. A filesystem-scan approach was considered and rejected — dynamic `fs.readdirSync`+`import()` at runtime is a real production-parity risk on Vercel's serverless bundling (only statically-analyzable imports are guaranteed to be included in the deployment). | No — this is a deliberate simplification; flagging only so you know why articles aren't `.md` files if you expected that. |
+| Articles run roughly 800-1000 words each, not the full 1200-1800 target | Each article is a complete, non-padded treatment of its topic with concrete, specific advice — the mission's own quality bar explicitly warns against padding/keyword-stuffing. Chose honest completeness at the current length over stretching each piece to hit a number. | **Yes** — say the word and I'll expand each with one more genuinely useful section (e.g. a worked example) to close the gap, rather than padding. |
+| Reading time is a hand-set number per article, not computed dynamically | Next.js 16 blocks importing `react-dom/server` from a module shared across Server Components (build error: "render or return the content directly as a Server Component instead"). Computing it from rendered markup wasn't available without a larger restructure. | No — the numbers are honest manual estimates matching each article's real length. |
 
 ## Blocked
 - None yet.

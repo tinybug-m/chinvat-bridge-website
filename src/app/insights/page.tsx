@@ -8,7 +8,8 @@ import { SITE_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Insights",
-  description: "Practical thinking on AI, automation, software and SEO for UK small businesses.",
+  description:
+    "Practical thinking on AI, automation, software and SEO for UK small businesses — written to help you make better, faster operational decisions.",
   alternates: { canonical: "/insights" },
 };
 

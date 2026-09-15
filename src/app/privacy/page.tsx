@@ -5,7 +5,14 @@ import { EmailLink } from "@/components/atoms/EmailLink";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How Chinvat Bridge collects, uses and protects your information.",
+  description:
+    "How Chinvat Bridge collects, uses and protects your information when you visit our site or subscribe to a plan, and your rights under UK data protection law.",
+  alternates: { canonical: "/privacy" },
+  openGraph: {
+    title: "Privacy Policy — Chinvat Bridge",
+    description:
+      "How Chinvat Bridge collects, uses and protects your information when you visit our site or subscribe to a plan, and your rights under UK data protection law.",
+  },
 };
 
 export default function PrivacyPolicyPage() {
