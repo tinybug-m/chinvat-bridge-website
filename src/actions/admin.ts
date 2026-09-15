@@ -22,7 +22,7 @@ export async function updateCustomerDetails(formData: FormData): Promise<void> {
   if (!customerId) return;
 
   const supabase = createAdminClient();
-  await supabase
+  const { error } = await supabase
     .from("customers")
     .update({
       next_billing_date: fieldValue(formData, "nextBillingDate") || null,
@@ -30,6 +30,10 @@ export async function updateCustomerDetails(formData: FormData): Promise<void> {
       status: fieldValue(formData, "status") || "active",
     })
     .eq("id", customerId);
+
+  if (error) {
+    console.error("updateCustomerDetails failed for", customerId, error);
+  }
 
   revalidatePath(`/admin/customers/${customerId}`);
 }
@@ -54,10 +58,12 @@ export async function upsertProgressItem(formData: FormData): Promise<void> {
     sort_order: fieldInt(formData, "sortOrder", 0),
   };
 
-  if (id) {
-    await supabase.from("customer_progress_items").update(row).eq("id", id);
-  } else {
-    await supabase.from("customer_progress_items").insert(row);
+  const { error } = id
+    ? await supabase.from("customer_progress_items").update(row).eq("id", id)
+    : await supabase.from("customer_progress_items").insert(row);
+
+  if (error) {
+    console.error("upsertProgressItem failed for", customerId, error);
   }
 
   revalidatePath(`/admin/customers/${customerId}`);
@@ -73,7 +79,11 @@ export async function deleteProgressItem(formData: FormData): Promise<void> {
   if (!id) return;
 
   const supabase = createAdminClient();
-  await supabase.from("customer_progress_items").delete().eq("id", id);
+  const { error } = await supabase.from("customer_progress_items").delete().eq("id", id);
+
+  if (error) {
+    console.error("deleteProgressItem failed for", id, error);
+  }
 
   revalidatePath(`/admin/customers/${customerId}`);
   revalidatePath("/dashboard");
@@ -97,10 +107,12 @@ export async function upsertSprintItem(formData: FormData): Promise<void> {
     sort_order: fieldInt(formData, "sortOrder", 0),
   };
 
-  if (id) {
-    await supabase.from("customer_sprint_items").update(row).eq("id", id);
-  } else {
-    await supabase.from("customer_sprint_items").insert(row);
+  const { error } = id
+    ? await supabase.from("customer_sprint_items").update(row).eq("id", id)
+    : await supabase.from("customer_sprint_items").insert(row);
+
+  if (error) {
+    console.error("upsertSprintItem failed for", customerId, error);
   }
 
   revalidatePath(`/admin/customers/${customerId}`);
@@ -116,7 +128,11 @@ export async function deleteSprintItem(formData: FormData): Promise<void> {
   if (!id) return;
 
   const supabase = createAdminClient();
-  await supabase.from("customer_sprint_items").delete().eq("id", id);
+  const { error } = await supabase.from("customer_sprint_items").delete().eq("id", id);
+
+  if (error) {
+    console.error("deleteSprintItem failed for", id, error);
+  }
 
   revalidatePath(`/admin/customers/${customerId}`);
   revalidatePath("/dashboard");
@@ -132,7 +148,11 @@ export async function addCustomerUpdate(formData: FormData): Promise<void> {
   if (!customerId || !title || !body) return;
 
   const supabase = createAdminClient();
-  await supabase.from("customer_updates").insert({ customer_id: customerId, title, body });
+  const { error } = await supabase.from("customer_updates").insert({ customer_id: customerId, title, body });
+
+  if (error) {
+    console.error("addCustomerUpdate failed for", customerId, error);
+  }
 
   revalidatePath(`/admin/customers/${customerId}`);
   revalidatePath("/dashboard");
@@ -147,7 +167,11 @@ export async function deleteCustomerUpdate(formData: FormData): Promise<void> {
   if (!id) return;
 
   const supabase = createAdminClient();
-  await supabase.from("customer_updates").delete().eq("id", id);
+  const { error } = await supabase.from("customer_updates").delete().eq("id", id);
+
+  if (error) {
+    console.error("deleteCustomerUpdate failed for", id, error);
+  }
 
   revalidatePath(`/admin/customers/${customerId}`);
   revalidatePath("/dashboard");
