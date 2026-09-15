@@ -1,6 +1,6 @@
 ## Status
-Current phase: 5 — Per-page SEO
-Last commit: d493e73 feat: real blog architecture, publishing the 4 already-promised articles
+Current phase: 10 — Final validation
+Last commit: 32d7341 fix: log errors from admin panel writes instead of failing silently
 
 ## Completed
 - [x] Phase 0 — audit written to `.claude/audit.md`, branch `overnight/site-completion` created,
@@ -15,6 +15,27 @@ Last commit: d493e73 feat: real blog architecture, publishing the 4 already-prom
       1200-1800 target), fulfilling the 4 topics the homepage already promised as
       "Planned Briefing"/"Topic in Development"; homepage Insights section now links real
       articles instead of showing placeholders; removed the now-dead `src/data/insights.ts`
+- [x] Phase 5 — fixed a real bug: /privacy and /terms had no canonical override and were
+      inheriting the root layout's canonical: "/" verbatim (confirmed via curl against
+      rendered HTML), telling search engines they're duplicates of the homepage. Fixed for
+      every public page; expanded descriptions into the 140-160 char target; added
+      page-specific OG overrides. Confirmed alt text already descriptive on all 3 images.
+- [x] Phase 6 — built a real `app/not-found.tsx` (was the framework default — a dead end with
+      no navigation); verified it returns real HTTP 404 and has exactly one `<main>` landmark.
+      sitemap.ts now includes /insights + all 4 articles with real per-post lastModified dates;
+      sitemap URL count (8) matches the actual public route count exactly. robots.ts was
+      already correct. No Service/FAQPage JSON-LD added — neither legitimately applies here.
+- [x] Phase 7 — added forward links from 3 of 4 homepage service cards to their matching
+      article (the 4th, SEO, already links to /pricing, which is more useful there); confirmed
+      via rendered HTML that the hrefs are present and correct.
+- [x] Phase 8 — checked the only genuinely new UI (blog listing/detail, 404) at 320/375/768/1440px
+      plus a full-page 320px screenshot: zero overflow, zero console errors. Everything else was
+      already covered by this session's earlier, separate UX/accessibility audit pass.
+- [x] Phase 9 — confirmed zero `any`/`@ts-ignore`/eslint-disable/stray console.log/TODO exist
+      anywhere in src/. Found and fixed a real gap: every admin Server Action performed its
+      Supabase write without checking the returned error, so a failed write did nothing with
+      no indication anything went wrong — added error logging (matching the webhook handler's
+      existing pattern) to all 7 admin actions.
 
 ## Discovered work
 - No standalone service pages, services index, about, or contact pages are implied by any
@@ -40,8 +61,39 @@ Last commit: d493e73 feat: real blog architecture, publishing the 4 already-prom
 | Articles run roughly 800-1000 words each, not the full 1200-1800 target | Each article is a complete, non-padded treatment of its topic with concrete, specific advice — the mission's own quality bar explicitly warns against padding/keyword-stuffing. Chose honest completeness at the current length over stretching each piece to hit a number. | **Yes** — say the word and I'll expand each with one more genuinely useful section (e.g. a worked example) to close the gap, rather than padding. |
 | Reading time is a hand-set number per article, not computed dynamically | Next.js 16 blocks importing `react-dom/server` from a module shared across Server Components (build error: "render or return the content directly as a Server Component instead"). Computing it from rendered markup wasn't available without a larger restructure. | No — the numbers are honest manual estimates matching each article's real length. |
 
+- [x] Phase 10 — final validation, see below. Everything passes; nothing suppressed or skipped.
+
+## Definition of done
+
+- [x] Every route in the audit resolves; zero dead links or dead buttons — crawled every public
+      route (13), both auth-gated routes correctly redirect (307), unknown routes correctly 404
+- [x] Zero placeholder content, zero `href="#"`, zero empty handlers — grepped clean
+- [x] Legal pages exist — pre-existing from earlier this session, out of tonight's scope to
+      re-review; each still carries real, accurate copy matching what the site actually does
+- [x] Blog listing + article pages work; adding an article is a one-file-plus-one-registry-line
+      change (see Assumptions re: why not pure filesystem auto-discovery)
+- [x] 4 articles published, meeting the quality bar other than exact word count (see Assumptions)
+- [x] Every public page has unique title, description (140-160 chars), canonical, OG, one H1
+- [x] sitemap.xml and robots.txt correct; sitemap URL count (8) matches public route count
+      exactly; drafts excluded (mechanism exists, none currently drafted); private routes
+      (dashboard, admin, login, subscribe/*, client-portal) correctly absent from the sitemap
+- [x] JSON-LD valid on home (Organization, pre-existing) and all 4 articles (Article +
+      BreadcrumbList); Service/FAQPage correctly omitted — neither applies to this site's
+      actual structure
+- [x] 404 page exists and is useful — real navigation, not a dead end
+- [x] Layout works from 320px upward — checked the new surfaces specifically; the rest was
+      covered by this session's separate, earlier UX audit
+- [x] lint and production build pass; no typecheck/test scripts exist in this repo (recorded,
+      not invented)
+- [x] Every phase committed separately on `overnight/site-completion`; nothing pushed
+- [x] This file is accurate as of the last commit
+
 ## Blocked
-- None yet.
+- None. Two items are logged in Assumptions as needing your review (contact email domain,
+  article word count), but neither blocked forward progress.
 
 ## Validation (latest run)
-lint: pass (0 errors) · build: pass (0 errors) · typecheck: covered by build, no standalone script · test: no test runner configured
+lint: pass (0 errors) · build: pass (0 errors) · typecheck: covered by build, no standalone
+script · test: no test runner configured · route crawl: 13/13 public routes return 200, both
+auth-gated routes return 307, unknown routes return 404 · hydration: zero warnings across a
+fresh automated browser session on every new/modified route
