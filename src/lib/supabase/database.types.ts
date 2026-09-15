@@ -89,6 +89,50 @@ export type Database = {
           },
         ]
       }
+      customer_sprint_items: {
+        Row: {
+          created_at: string
+          customer_id: string
+          detail: string
+          id: string
+          item_date: string
+          sort_order: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          detail: string
+          id?: string
+          item_date: string
+          sort_order?: number
+          status: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          detail?: string
+          id?: string
+          item_date?: string
+          sort_order?: number
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_sprint_items_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_updates: {
         Row: {
           body: string
@@ -130,8 +174,10 @@ export type Database = {
           full_name: string | null
           id: string
           improvements: string | null
+          next_billing_date: string | null
           phone: string | null
           plan_id: string
+          practice_lead: string | null
           status: string
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
@@ -147,8 +193,10 @@ export type Database = {
           full_name?: string | null
           id: string
           improvements?: string | null
+          next_billing_date?: string | null
           phone?: string | null
           plan_id: string
+          practice_lead?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -164,8 +212,10 @@ export type Database = {
           full_name?: string | null
           id?: string
           improvements?: string | null
+          next_billing_date?: string | null
           phone?: string | null
           plan_id?: string
+          practice_lead?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null

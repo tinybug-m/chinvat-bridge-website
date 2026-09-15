@@ -6,6 +6,7 @@ import { Bay } from "@/components/molecules/Bay";
 import { ComingSoonNotice } from "@/components/molecules/ComingSoonNotice";
 import { RealEngagementSummary } from "@/components/organisms/dashboard/RealEngagementSummary";
 import { RealProjectProgress } from "@/components/organisms/dashboard/RealProjectProgress";
+import { RealSprintLog } from "@/components/organisms/dashboard/RealSprintLog";
 import { RealUpdatesArchive } from "@/components/organisms/dashboard/RealUpdatesArchive";
 import { AdvisoryChannel } from "@/components/organisms/dashboard/AdvisoryChannel";
 import { createClient } from "@/lib/supabase/server";
@@ -57,10 +58,13 @@ export default async function DashboardPage() {
                 website={customer.website}
                 planId={customer.plan_id}
                 status={customer.status}
+                nextBillingDate={customer.next_billing_date}
+                practiceLead={customer.practice_lead}
               />
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <div className="lg:col-span-8 space-y-8">
                   <RealProjectProgress customerId={customer.id} planId={customer.plan_id} />
+                  <RealSprintLog customerId={customer.id} />
                 </div>
                 <div className="lg:col-span-4 space-y-8">
                   <RealUpdatesArchive customerId={customer.id} />

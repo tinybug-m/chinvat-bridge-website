@@ -6,6 +6,8 @@ interface RealEngagementSummaryProps {
   website: string | null;
   planId: string;
   status: string;
+  nextBillingDate: string | null;
+  practiceLead: string | null;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -14,7 +16,14 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: "Cancelled",
 };
 
-export async function RealEngagementSummary({ companyName, website, planId, status }: RealEngagementSummaryProps) {
+export async function RealEngagementSummary({
+  companyName,
+  website,
+  planId,
+  status,
+  nextBillingDate,
+  practiceLead,
+}: RealEngagementSummaryProps) {
   const plan = await getPlanById(planId);
 
   const metrics = [
@@ -22,6 +31,8 @@ export async function RealEngagementSummary({ companyName, website, planId, stat
     { label: "Company", value: companyName ?? "—" },
     { label: "Domain", value: website ?? "—" },
     { label: "Status", value: STATUS_LABELS[status] ?? status },
+    { label: "Next Billing", value: nextBillingDate ?? "—" },
+    { label: "Practice Lead", value: practiceLead ?? "—" },
   ];
 
   return (
@@ -34,7 +45,7 @@ export async function RealEngagementSummary({ companyName, website, planId, stat
           Your Engagement
         </h2>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-stone-border">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-stone-border [&>*:nth-child(3n+1)]:lg:border-l-0">
         {metrics.map((metric) => (
           <div key={metric.label} className="p-5">
             <span className="block font-mono text-[9px] text-parchment-dim uppercase tracking-technical mb-1">

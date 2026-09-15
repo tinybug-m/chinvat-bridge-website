@@ -15,7 +15,7 @@ export async function RealUpdatesArchive({ customerId }: { customerId: string })
     .order("created_at", { ascending: false });
 
   return (
-    <Bay numeral="II." title="Reports & Archive">
+    <Bay numeral="III." title="Reports & Archive">
       {!updates || updates.length === 0 ? (
         <ComingSoonNotice>Your first update will appear here once your consultant posts one.</ComingSoonNotice>
       ) : (
