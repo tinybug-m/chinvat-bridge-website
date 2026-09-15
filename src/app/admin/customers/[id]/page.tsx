@@ -107,17 +107,17 @@ export default async function AdminCustomerPage({ params }: PageProps) {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className={LABEL}>Label</label>
-                      <input className={INPUT} name="label" defaultValue={item.label} />
+                      <input className={INPUT} name="label" defaultValue={item.label} required />
                     </div>
                     <div>
                       <label className={LABEL}>Status Label</label>
-                      <input className={INPUT} name="statusLabel" defaultValue={item.status_label} />
+                      <input className={INPUT} name="statusLabel" defaultValue={item.status_label} required />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div>
                       <label className={LABEL}>Percent Label</label>
-                      <input className={INPUT} name="percentLabel" defaultValue={item.percent_label} />
+                      <input className={INPUT} name="percentLabel" defaultValue={item.percent_label} required />
                     </div>
                     <div>
                       <label className={LABEL}>Total Steps</label>
@@ -195,11 +195,11 @@ export default async function AdminCustomerPage({ params }: PageProps) {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className={LABEL}>Title</label>
-                      <input className={INPUT} name="title" defaultValue={item.title} />
+                      <input className={INPUT} name="title" defaultValue={item.title} required />
                     </div>
                     <div>
                       <label className={LABEL}>Detail</label>
-                      <input className={INPUT} name="detail" defaultValue={item.detail} />
+                      <input className={INPUT} name="detail" defaultValue={item.detail} required />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -214,7 +214,7 @@ export default async function AdminCustomerPage({ params }: PageProps) {
                     </div>
                     <div>
                       <label className={LABEL}>Date</label>
-                      <input className={INPUT} name="itemDate" defaultValue={item.item_date} placeholder="14 Sep 2026" />
+                      <input className={INPUT} name="itemDate" defaultValue={item.item_date} placeholder="14 Sep 2026" required />
                     </div>
                     <div>
                       <label className={LABEL}>Sort Order</label>
