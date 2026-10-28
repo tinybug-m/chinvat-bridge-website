@@ -1,3 +1,4 @@
+import { LegacyFrame } from "@/components/templates/LegacyFrame";
 import { SiteShell } from "@/components/templates/SiteShell";
 import { Hero } from "@/components/organisms/sections/Hero";
 import { Philosophy } from "@/components/organisms/sections/Philosophy";
@@ -10,15 +11,17 @@ import { Contact } from "@/components/organisms/sections/Contact";
 
 export default function Home() {
   return (
-    <SiteShell>
-      <Hero />
-      <Philosophy />
-      <Services />
-      <Transition />
-      <Process />
-      <Capabilities />
-      <Insights />
-      <Contact />
-    </SiteShell>
+    <LegacyFrame>
+      <SiteShell>
+        <Hero />
+        <Philosophy />
+        <Services />
+        <Transition />
+        <Process />
+        <Capabilities />
+        <Insights />
+        <Contact />
+      </SiteShell>
+    </LegacyFrame>
   );
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LegacyFrame } from "@/components/templates/LegacyFrame";
 import { SiteShell } from "@/components/templates/SiteShell";
 import { StatusPage } from "@/components/templates/StatusPage";
 import { Button } from "@/components/atoms/Button";
@@ -11,7 +12,8 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <SiteShell>
+    <LegacyFrame>
+      <SiteShell>
       <StatusPage
         bare
         eyebrow="404"
@@ -36,6 +38,7 @@ export default function NotFound() {
           </>
         }
       />
-    </SiteShell>
+      </SiteShell>
+    </LegacyFrame>
   );
 }

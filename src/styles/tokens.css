@@ -1,0 +1,38 @@
+/*
+ * Design tokens for the new identity, measured from the owner's mark
+ * (docs/brand/newLogo.jpg): flat ink on paper for the current state, cerulean
+ * and saffron glass for better systems. Contrast notes are against paper.
+ */
+@theme {
+  /* Ground */
+  --color-paper: #f6f4ef;
+  --color-paper-raised: #fbfaf7;
+  --color-haze: #eceeef;
+
+  /* Ink: text and structure */
+  --color-ink: #0b1a26; /* 16:1 */
+  --color-ink-soft: #33414c; /* 9.6:1 */
+  --color-ink-muted: #5b6872; /* 5.2:1, captions */
+  --color-line: #d6d9db; /* hairlines only */
+  --color-line-strong: #b9c0c4;
+  --color-control: #7d8a92; /* 3.2:1, control borders */
+
+  /* Cerulean glass: interactive colour */
+  --color-cobalt-900: #0b263c;
+  --color-cobalt-700: #0f557d; /* 7.3:1, links and primary buttons */
+  --color-cobalt-600: #155f8c;
+  --color-azure-500: #1d75a3; /* 4.6:1, smallest text-safe azure */
+  --color-azure-400: #1c8ec3; /* UI and large text only */
+
+  /* Saffron glass: 700/800 are text-safe, the rest decorative only */
+  --color-saffron-800: #7a4e12;
+  --color-saffron-700: #8e5a1e;
+  --color-saffron-600: #be8c3f;
+  --color-saffron-500: #cf9c48;
+  --color-saffron-300: #ebc26b;
+
+  /* Typefaces are wired up in layout.tsx; these are the fallbacks until they load */
+  --font-display: var(--font-brand), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-brand), ui-sans-serif, system-ui, sans-serif;
+  --font-label: var(--font-brand-mono), ui-monospace, SFMono-Regular, monospace;
+}

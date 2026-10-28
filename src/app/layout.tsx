@@ -1,36 +1,7 @@
 import type { Metadata } from "next";
-import { Cinzel, EB_Garamond, Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { archivo, martianMono } from "@/styles/fonts";
 import { CONTACT_EMAIL, SITE_DESCRIPTION, SITE_NAME, SITE_URL, SITE_TITLE } from "@/lib/constants";
-
-const cinzel = Cinzel({
-  variable: "--font-cinzel",
-  subsets: ["latin"],
-  weight: ["400", "600", "700", "900"],
-  display: "swap",
-});
-
-const ebGaramond = EB_Garamond({
-  variable: "--font-eb-garamond",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -80,9 +51,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en-GB"
       data-scroll-behavior="smooth"
-      className={`${cinzel.variable} ${ebGaramond.variable} ${inter.variable} ${spaceGrotesk.variable} scroll-smooth antialiased h-full`}
+      className={`${archivo.variable} ${martianMono.variable} h-full scroll-smooth antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-obsidian-950 text-parchment-200 font-sans selection:bg-gold-500 selection:text-obsidian-950">
+      <body className="flex min-h-full flex-col bg-paper font-body text-ink selection:bg-cobalt-700 selection:text-paper">
         {children}
         <script
           type="application/ld+json"
