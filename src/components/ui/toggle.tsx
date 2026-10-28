@@ -1,0 +1,46 @@
+"use client"
+
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@/lib/utils"
+import { Toggle as TogglePrimitive } from "radix-ui"
+
+const toggleVariants = cva(
+  "inline-flex items-center justify-center gap-2 rounded-[2px] text-small font-medium whitespace-nowrap text-ink transition-[background-color,color,box-shadow] duration-200 ease-out-quart hover:bg-haze disabled:pointer-events-none disabled:opacity-50 aria-invalid:shadow-[inset_0_0_0_1px_var(--color-destructive)] data-[state=on]:bg-ink data-[state=on]:text-paper [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  {
+    variants: {
+      variant: {
+        default: "bg-transparent",
+        outline:
+          "bg-transparent shadow-[inset_0_0_0_1px_var(--color-control)] hover:shadow-[inset_0_0_0_1px_var(--color-ink)] data-[state=on]:shadow-[inset_0_0_0_1px_var(--color-ink)]",
+      },
+      size: {
+        default: "min-h-11 min-w-11 px-4",
+        sm: "min-h-9 min-w-9 px-3",
+        lg: "min-h-12 min-w-12 px-5",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
+
+function Toggle({
+  className,
+  variant,
+  size,
+  ...props
+}: React.ComponentProps<typeof TogglePrimitive.Root> &
+  VariantProps<typeof toggleVariants>) {
+  return (
+    <TogglePrimitive.Root
+      data-slot="toggle"
+      className={cn(toggleVariants({ variant, size, className }))}
+      {...props}
+    />
+  )
+}
+
+export { Toggle, toggleVariants }

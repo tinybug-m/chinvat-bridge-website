@@ -1,3 +1,6 @@
+/* The site is light only, so `dark:` never follows the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * Design tokens for the new identity, measured from the owner's mark
  * (docs/brand/newLogo.jpg): flat ink on paper for the current state, cerulean

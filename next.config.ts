@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Keeps local screenshots clean; build and runtime errors still surface.
+  devIndicators: false,
   async headers() {
     return [
       {

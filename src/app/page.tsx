@@ -1,27 +1,24 @@
-import { LegacyFrame } from "@/components/templates/LegacyFrame";
-import { SiteShell } from "@/components/templates/SiteShell";
-import { Hero } from "@/components/organisms/sections/Hero";
-import { Philosophy } from "@/components/organisms/sections/Philosophy";
-import { Services } from "@/components/organisms/sections/Services";
-import { Transition } from "@/components/organisms/sections/Transition";
-import { Process } from "@/components/organisms/sections/Process";
-import { Capabilities } from "@/components/organisms/sections/Capabilities";
-import { Insights } from "@/components/organisms/sections/Insights";
-import { Contact } from "@/components/organisms/sections/Contact";
+import { SiteShell } from "@/components/site/SiteShell";
+import { Hero } from "@/components/home/hero/Hero";
+import { Services } from "@/components/home/services/Services";
+import { Bridge } from "@/components/home/bridge/Bridge";
+import { Method } from "@/components/home/method/Method";
+import { Capabilities } from "@/components/home/capabilities/Capabilities";
+import { About } from "@/components/home/about/About";
+import { Insights } from "@/components/home/insights/Insights";
+import { Contact } from "@/components/home/contact/Contact";
 
 export default function Home() {
   return (
-    <LegacyFrame>
-      <SiteShell>
-        <Hero />
-        <Philosophy />
-        <Services />
-        <Transition />
-        <Process />
-        <Capabilities />
-        <Insights />
-        <Contact />
-      </SiteShell>
-    </LegacyFrame>
+    <SiteShell>
+      <Hero />
+      <Services />
+      <Bridge />
+      <Method />
+      <Capabilities />
+      <About />
+      <Insights />
+      <Contact />
+    </SiteShell>
   );
 }
