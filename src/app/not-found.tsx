@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LegacyFrame } from "@/components/templates/LegacyFrame";
+import { legacyBoundaryFontVariables } from "@/styles/legacy-fonts-boundary";
 import { SiteShell } from "@/components/templates/SiteShell";
 import { StatusPage } from "@/components/templates/StatusPage";
 import { Button } from "@/components/atoms/Button";
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <LegacyFrame>
+    <LegacyFrame fonts={legacyBoundaryFontVariables}>
       <SiteShell>
       <StatusPage
         bare

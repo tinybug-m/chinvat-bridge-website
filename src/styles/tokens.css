@@ -71,8 +71,14 @@
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
   --ease-drawn: cubic-bezier(0.45, 0, 0.2, 1);
+}
 
-  /* Typefaces are wired up in layout.tsx; these are the fallbacks until they load */
+/*
+ * Typefaces. The (site) layout defines --font-brand and --font-brand-mono on
+ * its wrapper, not on :root, so these are inlined into each utility and
+ * resolve where they are used. The rest of each stack is the fallback.
+ */
+@theme inline {
   --font-display: var(--font-brand), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-brand), ui-sans-serif, system-ui, sans-serif;
   --font-label: var(--font-brand-mono), ui-monospace, SFMono-Regular, monospace;

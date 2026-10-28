@@ -1,5 +1,7 @@
 import localFont from "next/font/local";
 
+// Preloaded on the routes whose layout applies them: the (site) group.
+
 // Archivo carries the brand: one variable file covers every weight and width,
 // so display type can run expanded while body text stays at normal width.
 export const archivo = localFont({

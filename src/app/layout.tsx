@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { archivo, martianMono } from "@/styles/fonts";
 import { REVEAL_RUNTIME } from "@/components/motion/reveal-runtime";
 import { CONTACT_EMAIL, SITE_DESCRIPTION, SITE_NAME, SITE_URL, SITE_TITLE } from "@/lib/constants";
 
@@ -68,7 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en-GB"
       data-scroll-behavior="smooth"
-      className={`${archivo.variable} ${martianMono.variable} h-full scroll-smooth antialiased`}
+      className="h-full scroll-smooth antialiased"
       // The reveal runtime adds a class before React hydrates.
       suppressHydrationWarning
     >

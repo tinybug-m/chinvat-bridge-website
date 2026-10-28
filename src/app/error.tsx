@@ -5,6 +5,7 @@ import { Button } from "@/components/atoms/Button";
 import { buttonClassName } from "@/components/atoms/buttonStyles";
 import { EmailLink } from "@/components/atoms/EmailLink";
 import { LegacyFrame } from "@/components/templates/LegacyFrame";
+import { legacyBoundaryFontVariables } from "@/styles/legacy-fonts-boundary";
 import { StatusPage } from "@/components/templates/StatusPage";
 
 export default function Error({
@@ -19,7 +20,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <LegacyFrame>
+    <LegacyFrame fonts={legacyBoundaryFontVariables}>
       <StatusPage
         eyebrow="Something Went Wrong"
         title="Unexpected Error"
