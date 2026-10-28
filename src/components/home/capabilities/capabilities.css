@@ -1,0 +1,146 @@
+/*
+ * Capabilities lattice. Highlighting is CSS only: a hovered or focused list
+ * item (.cap-item[data-i]) builds its strut set, chip and connected nodes in
+ * ink, and the rest of the lattice goes back to the drawn state (dashed,
+ * lighter). Nothing is hidden by default, so the finished lattice is what
+ * shows without JS or under reduced motion.
+ */
+.cap-fig svg * {
+  vector-effect: non-scaling-stroke;
+}
+
+.cap-fig [data-c] {
+  transition: opacity var(--motion-quick) ease;
+}
+
+.cap-strut {
+  stroke: var(--color-line-strong);
+  stroke-width: 1;
+  transition: stroke var(--motion-quick) ease, stroke-width var(--motion-quick) ease;
+}
+
+.cap-caption,
+.cap-label {
+  fill: var(--color-ink-muted);
+  letter-spacing: 0.06em;
+}
+
+.cap-box {
+  fill: var(--color-paper);
+  stroke: var(--color-ink);
+  stroke-width: 1.5;
+  transition: fill var(--motion-quick) ease, stroke var(--motion-quick) ease;
+}
+
+.cap-index {
+  fill: var(--color-ink-muted);
+  letter-spacing: 0.06em;
+  transition: fill var(--motion-quick) ease;
+}
+
+.cap-title {
+  fill: var(--color-ink);
+  font-weight: 500;
+  transition: fill var(--motion-quick) ease;
+}
+
+.cap-ring {
+  fill: var(--color-paper);
+  stroke: var(--color-saffron-500);
+  stroke-width: 2;
+  transition: fill var(--motion-quick) ease;
+}
+
+.cap-small {
+  fill: var(--color-paper);
+  stroke: var(--color-ink);
+  stroke-width: 1.5;
+  transition: fill var(--motion-quick) ease;
+}
+
+/* Something is hovered or focused: everything else is drawn, not built. */
+.cap:has(.cap-item:is(:hover, :focus)) .cap-fig [data-c] {
+  opacity: 0.5;
+}
+
+.cap:has(.cap-item:is(:hover, :focus)) .cap-fig .cap-strut {
+  stroke-dasharray: 4 4;
+}
+
+/* The active capability: built in ink. */
+.cap:has(.cap-item[data-i="0"]:is(:hover, :focus)) .cap-fig [data-c~="0"],
+.cap:has(.cap-item[data-i="1"]:is(:hover, :focus)) .cap-fig [data-c~="1"],
+.cap:has(.cap-item[data-i="2"]:is(:hover, :focus)) .cap-fig [data-c~="2"],
+.cap:has(.cap-item[data-i="3"]:is(:hover, :focus)) .cap-fig [data-c~="3"],
+.cap:has(.cap-item[data-i="4"]:is(:hover, :focus)) .cap-fig [data-c~="4"],
+.cap:has(.cap-item[data-i="5"]:is(:hover, :focus)) .cap-fig [data-c~="5"] {
+  opacity: 1;
+}
+
+.cap:has(.cap-item[data-i="0"]:is(:hover, :focus)) .cap-fig .cap-strut[data-c~="0"],
+.cap:has(.cap-item[data-i="1"]:is(:hover, :focus)) .cap-fig .cap-strut[data-c~="1"],
+.cap:has(.cap-item[data-i="2"]:is(:hover, :focus)) .cap-fig .cap-strut[data-c~="2"],
+.cap:has(.cap-item[data-i="3"]:is(:hover, :focus)) .cap-fig .cap-strut[data-c~="3"],
+.cap:has(.cap-item[data-i="4"]:is(:hover, :focus)) .cap-fig .cap-strut[data-c~="4"],
+.cap:has(.cap-item[data-i="5"]:is(:hover, :focus)) .cap-fig .cap-strut[data-c~="5"] {
+  stroke: var(--color-ink);
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+}
+
+.cap:has(.cap-item[data-i="0"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="0"] .cap-box,
+.cap:has(.cap-item[data-i="1"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="1"] .cap-box,
+.cap:has(.cap-item[data-i="2"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="2"] .cap-box,
+.cap:has(.cap-item[data-i="3"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="3"] .cap-box,
+.cap:has(.cap-item[data-i="4"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="4"] .cap-box,
+.cap:has(.cap-item[data-i="5"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="5"] .cap-box {
+  fill: var(--color-ink);
+}
+
+.cap:has(.cap-item[data-i="0"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="0"] .cap-title,
+.cap:has(.cap-item[data-i="1"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="1"] .cap-title,
+.cap:has(.cap-item[data-i="2"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="2"] .cap-title,
+.cap:has(.cap-item[data-i="3"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="3"] .cap-title,
+.cap:has(.cap-item[data-i="4"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="4"] .cap-title,
+.cap:has(.cap-item[data-i="5"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="5"] .cap-title,
+.cap:has(.cap-item[data-i="0"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="0"] .cap-index,
+.cap:has(.cap-item[data-i="1"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="1"] .cap-index,
+.cap:has(.cap-item[data-i="2"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="2"] .cap-index,
+.cap:has(.cap-item[data-i="3"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="3"] .cap-index,
+.cap:has(.cap-item[data-i="4"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="4"] .cap-index,
+.cap:has(.cap-item[data-i="5"]:is(:hover, :focus)) .cap-fig .cap-chip[data-c~="5"] .cap-index {
+  fill: var(--color-paper);
+}
+
+.cap:has(.cap-item[data-i="0"]:is(:hover, :focus)) .cap-fig [data-c~="0"] :is(.cap-ring, .cap-small),
+.cap:has(.cap-item[data-i="1"]:is(:hover, :focus)) .cap-fig [data-c~="1"] :is(.cap-ring, .cap-small),
+.cap:has(.cap-item[data-i="2"]:is(:hover, :focus)) .cap-fig [data-c~="2"] :is(.cap-ring, .cap-small),
+.cap:has(.cap-item[data-i="3"]:is(:hover, :focus)) .cap-fig [data-c~="3"] :is(.cap-ring, .cap-small),
+.cap:has(.cap-item[data-i="4"]:is(:hover, :focus)) .cap-fig [data-c~="4"] :is(.cap-ring, .cap-small),
+.cap:has(.cap-item[data-i="5"]:is(:hover, :focus)) .cap-fig [data-c~="5"] :is(.cap-ring, .cap-small) {
+  fill: var(--color-ink);
+}
+
+.cap:has(.cap-item[data-i="0"]:is(:hover, :focus)) .cap-fig [data-c~="0"] .cap-label,
+.cap:has(.cap-item[data-i="1"]:is(:hover, :focus)) .cap-fig [data-c~="1"] .cap-label,
+.cap:has(.cap-item[data-i="2"]:is(:hover, :focus)) .cap-fig [data-c~="2"] .cap-label,
+.cap:has(.cap-item[data-i="3"]:is(:hover, :focus)) .cap-fig [data-c~="3"] .cap-label,
+.cap:has(.cap-item[data-i="4"]:is(:hover, :focus)) .cap-fig [data-c~="4"] .cap-label,
+.cap:has(.cap-item[data-i="5"]:is(:hover, :focus)) .cap-fig [data-c~="5"] .cap-label {
+  fill: var(--color-ink);
+}
+
+/*
+ * The lattice is drawn in left to right when it scrolls into view. The wipe is
+ * on an inner element: a clipped target would never count as intersecting.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .js-reveal .cap-draw {
+    clip-path: inset(-8px -8px -8px -8px);
+    transition: clip-path 1100ms var(--ease-drawn);
+  }
+
+  .js-reveal .cap-fig:not([data-revealed]) .cap-draw {
+    clip-path: inset(-8px 100% -8px -8px);
+  }
+}

@@ -1,0 +1,36 @@
+/*
+ * Services diagrams: the drawn half is wiped in with dashed construction lines,
+ * then the built half sweeps out from the seam and its fills arrive. Content is
+ * only ever hidden after the reveal runtime has marked the page (.js-reveal)
+ * and never under reduced motion, so the finished diagram is the default.
+ */
+.svc-fig svg * {
+  vector-effect: non-scaling-stroke;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js-reveal .svc-fig .svc-drawn,
+  .js-reveal .svc-fig .svc-built {
+    clip-path: inset(-6px -6px -6px -6px);
+    transition: clip-path 1000ms var(--ease-drawn);
+  }
+
+  .js-reveal .svc-fig .svc-built {
+    transition-duration: 900ms;
+    transition-delay: 700ms;
+  }
+
+  .js-reveal .svc-fig .svc-fill {
+    transition: opacity 600ms var(--ease-out-quart);
+    transition-delay: calc(1100ms + var(--d, 0ms));
+  }
+
+  .js-reveal .svc-fig:not([data-revealed]) .svc-drawn,
+  .js-reveal .svc-fig:not([data-revealed]) .svc-built {
+    clip-path: inset(-6px 100% -6px -6px);
+  }
+
+  .js-reveal .svc-fig:not([data-revealed]) .svc-fill {
+    opacity: 0;
+  }
+}

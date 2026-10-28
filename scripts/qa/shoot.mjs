@@ -62,7 +62,7 @@ for (const size of opts.sizes.split(",")) {
       const el = page.locator(selector).first();
       await el.scrollIntoViewIfNeeded();
       await page.waitForTimeout(opts.wait);
-      await el.screenshot({ path: file });
+      await el.screenshot({ path: file, timeout: 120000 });
     } else {
       if (full) {
         // Walk the page once so scroll reveals and lazy 3D have run, as for a reader.
