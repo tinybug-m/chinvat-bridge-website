@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test:e2e": "playwright test",
+    "shoot": "node scripts/qa/shoot.mjs"
   },
   "dependencies": {
     "@gsap/react": "2.1.2",

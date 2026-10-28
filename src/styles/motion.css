@@ -1,0 +1,31 @@
+/*
+ * Reveal: below-the-fold content rises into place once. Content is only ever
+ * hidden after the inline runtime (components/motion/reveal-runtime.ts) has
+ * marked the page, so it stays visible without JavaScript or with reduced motion.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .js-reveal [data-reveal] {
+    transition:
+      opacity var(--motion-slow) var(--ease-out-quart),
+      translate var(--motion-slow) var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .js-reveal [data-reveal]:not([data-revealed]) {
+    opacity: 0;
+    translate: 0 0.75rem;
+  }
+
+  /* Above-the-fold intro: runs from first paint, so the text is never held back. */
+  .intro-rise {
+    animation: intro-rise var(--motion-slow) var(--ease-out-expo) both;
+    animation-delay: var(--intro-delay, 0ms);
+  }
+}
+
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    translate: 0 0.75rem;
+  }
+}
