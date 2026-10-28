@@ -64,6 +64,16 @@ for (const size of opts.sizes.split(",")) {
       await page.waitForTimeout(opts.wait);
       await el.screenshot({ path: file });
     } else {
+      if (full) {
+        // Walk the page once so scroll reveals and lazy 3D have run, as for a reader.
+        const total = await page.evaluate(() => document.documentElement.scrollHeight);
+        for (let y = 0; y < total; y += Math.round(height * 0.6)) {
+          await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), y);
+          await page.waitForTimeout(250);
+        }
+        await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+        await page.waitForTimeout(opts.wait);
+      }
       if (scrollY) {
         await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), Number(scrollY));
         await page.waitForTimeout(opts.wait);
