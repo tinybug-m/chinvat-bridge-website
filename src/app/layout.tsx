@@ -33,18 +33,34 @@ export const metadata: Metadata = {
   },
 };
 
-const organizationJsonLd = {
+const ORGANIZATION_ID = `${SITE_URL}/#organization`;
+
+const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  name: SITE_NAME,
-  description: SITE_DESCRIPTION,
-  url: SITE_URL,
-  email: CONTACT_EMAIL,
-  areaServed: "Worldwide",
-  address: {
-    "@type": "PostalAddress",
-    addressCountry: "GB",
-  },
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": ORGANIZATION_ID,
+      name: SITE_NAME,
+      legalName: "Chinvat Bridge Ltd",
+      description: SITE_DESCRIPTION,
+      url: SITE_URL,
+      logo: `${SITE_URL}/brand/chinvat-bridge-mark.png`,
+      email: CONTACT_EMAIL,
+      areaServed: "Worldwide",
+      address: { "@type": "PostalAddress", addressCountry: "GB" },
+      knowsAbout: ["Artificial intelligence", "Business automation", "Custom software", "Technical SEO"],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: SITE_NAME,
+      description: SITE_DESCRIPTION,
+      inLanguage: "en-GB",
+      publisher: { "@id": ORGANIZATION_ID },
+    },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -63,7 +79,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {children}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          // Escaped so no string in the data can close the script element.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
         />
       </body>
     </html>
