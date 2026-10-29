@@ -117,5 +117,25 @@ The Name & Origin paragraph is untouched. Two lines were added under it in
 Basis: Insler 1975 and Mills (SBE 31) for Y46.10–11 and Y51.13 (soul and
 conscience vex the wicked at the bridge); West (SBE 24) Mainyo-i Khrad 2.116 for
 the balance that "renders no favour"; Encyclopaedia Iranica "ČINWAD PUHL".
-The last sentence is brand copy, not a claim about the texts. Delete the three
-lines in `About.tsx` and the matching test to revert.
+The last sentence is brand copy, not a claim about the texts. Delete the two
+paragraphs in `About.tsx` and the matching test to revert.
+
+### Considered and declined (Approach section)
+
+An epigraph, a Rashn line or a hairline balance in the Approach section was
+reviewed against the built page and not added.
+
+- The About note already ends on the Approach section's own idea ("look
+  honestly at where things stand, then build the way across"). A second line
+  would repeat it a few screens later.
+- The section already is a bridge: a stage with a draggable seam and five rows
+  that go from drawn to built. Nothing in it is weighed, so a balance would
+  explain nothing and would read as a second, weaker indicator of the seam.
+- A balance weighs good against bad. On a commercial page it would cast the
+  client's current systems as the wrong pan.
+- The wide-or-razor bridge image is from later Pahlavi texts and is disputed
+  (Saadat 2026 on Bundahishn 30.25). It would need hedging, would mix three
+  textual layers, and would bring back the mythological framing the audit pass
+  removed.
+
+Revisit only if the owner asks for more of the origin story on the page.
