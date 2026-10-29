@@ -77,10 +77,10 @@ document for anything already built (tokens, primitives, shell).
 - **Drawn → built on scroll:** SVG strokes draw in (`stroke-dashoffset`) and
   fills appear when a diagram enters view, triggered by `data-revealed` (CSS
   only, no JS) unless the section spec says GSAP.
-- **GSAP:** only Bridge (scroll-scrub of the seam) and Method (step
-  progression). Pattern: `"use client"`, `useGSAP` + `gsap.matchMedia()` with a
-  `(prefers-reduced-motion: no-preference)` branch; the reduced branch leaves
-  the final state; clean up on unmount. No pinning: use CSS `sticky`.
+- **Scroll-driven motion:** none. Nothing on the page is scrubbed, pinned or
+  turned by scroll; Reveal fade-ins and the drawn-to-built wipes (which run
+  once when a diagram enters view) are the only scroll-triggered motion. The
+  Approach seam moves only when the visitor drags or keys it.
 - **Reduced motion:** everything static and fully visible; 3D shows its poster
   or one frame; interactive controls (slider) still work.
 
@@ -91,7 +91,7 @@ document for anything already built (tokens, primitives, shell).
 | — | Hero | — | paper | text left, object right (see hero brief) |
 | 01 | Services | `services` | paper | four discipline "plates" stacked, alternating diagram side |
 | 02 | Approach | `approach` | paper-raised band | full-width interactive seam comparison |
-| 03 | Method | `method` | paper | sticky 3D stage left, steps scroll right |
+| 03 | Method | `method` | paper | four plates of one bridge, one per step, in a row |
 | 04 | Capabilities | `capabilities` (+`#machines`) | paper | lattice diagram + mirrored list |
 | 05 | About | `about` | paper-raised band | quote left, mark explanation right |
 | 06 | Insights | `insights` | paper | index rows |
@@ -148,35 +148,36 @@ discipline index (01–04) linking to `#services-ai|automation|software|seo`.
   `src/data/transition.ts` verbatim (label + status for both states).
 - **Composition (1440):** paper-raised band. Top: marker, H2 left, lede right.
   Below: a full-width stage (`aspect-[21/9]`, max-h ~560px) holding the 3D
-  strut field with the seam as a vertical line + handle at its x position.
+  truss bridge (two banks, today left, what's next right) with the seam as a vertical line + handle at its x position.
   Under the stage: the five comparison rows as a table-like list, each row
   "Current" label/status on the left, "Next" label/status on the right; a row
   flips to built (ink, status in ink, small ring node) once the seam has passed
   its index (row i flips at (i+0.5)/5). **390:** stage `aspect-[4/3]`, rows
   stacked with both states visible, the active state emphasised.
 - **Control:** the shadcn `Slider` (0–100) is the seam: label "Move the seam",
-  `aria-valuetext` "Seam at 40%: 2 of 5 modernised". Scroll scrubs the value
-  from 10→90 as the section passes the viewport centre (GSAP ScrollTrigger,
-  no pin); once the user drags/keys, scroll stops driving it.
-- **3D:** instanced struts (the mark's vocabulary: thin square-section bars and
-  ring nodes). Left of the seam: matte maquette, misaligned (random small
-  rotations/offsets, seeded). Right of the seam: iridescent, aligned into a
-  regular triangulated lattice. Seam blend from the core's seam material.
-  ≤ 2 draw calls, ≤ 30k triangles. Poster fallback for no-WebGL/reduced motion.
+  `aria-valuetext` "Seam at 40%: 2 of 5 modernised". Only the visitor moves
+  it (drag or keys); scrolling never does.
+- **3D:** a through-truss span between two banks, built from instanced thin
+  square-section members and ring nodes (the mark's vocabulary) plus deck and
+  bank slabs. Left of the seam: matte maquette, members loose (seeded small
+  rotations/offsets), some not yet drawn, and a deck only a narrow way wide.
+  Right of the seam: iridescent, settled into a regular truss with a
+  full-width deck. Seam blend from the core's seam material. 3 draw calls,
+  ~7k triangles. Poster fallback for no-WebGL/reduced motion.
 - **Acceptance:** slider keyboard (arrows, Home/End) updates rows and 3D; rows
-  readable in both states without JS; reduced motion = no scrub, slider works.
+  readable in both states without JS; reduced motion = posters, slider works; scroll never moves it.
 
-### 03 Method — 3D
+### 03 Method
 - **Copy:** `src/data/process.ts` verbatim; H2 "How we work." *(live: "Process")*.
-- **Composition (1440):** left `col-span-5` sticky stage (`top-24`, square)
-  with one 3D node; right `col-start-7 col-span-6` the four steps as tall
-  blocks (`min-h-[70vh]` each) with mono index, `h3` title, description. The
-  stage changes state per active step: Discover = point cloud (surveyed),
-  Define = wireframe, Build = matte maquette, Improve = iridescent. A 4-dot
-  progress rail beside the stage. **390 / reduced motion:** no sticky; each
-  step shows its own static frame image (poster per state) above its text.
-- **Acceptance:** step state follows scroll in both directions; no scroll
-  trapping; frames present on mobile; respects the 2-live-context budget.
+- **Composition:** a four-column row (2 x 2 from md, stacked on 390), one
+  plate per step, each the same bridge between two banks: Discover = the gap
+  measured from both banks, Define = the span drawn (dashed), Build = raised
+  from the near bank with the far half still drawn, Improve = standing and
+  measured. Below each plate: mono numeral, `h3` title, description. No 3D,
+  no sticky stage, nothing driven by scroll; the plates draw in once on entry
+  (the Services wipe) and are finished without JS or under reduced motion.
+- **Acceptance:** four decorative plates (`aria-hidden`), readable without JS,
+  no overflow at 390.
 
 ### 04 Capabilities (`#capabilities`, alias `#machines`)
 - **Copy:** `src/data/capabilities.ts` + `SUPPORTING_CAPABILITIES` verbatim.
@@ -256,7 +257,6 @@ Hero: `src/components/home/hero/**`, `src/components/three/{core,materials,geome
 `public/hero/**`, `tests/e2e/hero.spec.ts`. Services: `home/services/**`,
 `tests/e2e/services.spec.ts`. Bridge: `home/bridge/**`, `three/scenes/bridge/**`,
 `scripts/poster/bridge*`, `public/bridge/**`, `tests/e2e/bridge.spec.ts`.
-Method: `home/method/**`, `three/scenes/method/**`, `scripts/poster/method*`,
-`public/method/**`, `tests/e2e/method.spec.ts`. Capabilities+About:
+Method: `home/method/**`, `tests/e2e/method.spec.ts`. Capabilities+About:
 `home/{capabilities,about}/**`, their specs. Insights+Contact:
 `home/{insights,contact}/**`, their specs. Lead: everything else.

@@ -51,7 +51,7 @@ verbatim. The changes are headings, labels and new helper text.
 | Approach columns | Today / What's Next, "Status: Constrained", "Direction: Better Systems" and a one-line description per column | Column labels "Current state" and "Future direction" only | The interactive seam replaces the two description cards. |
 | Approach control | (none) | "Move the seam", "N of 5 modernised" | Labels for the new slider. |
 | Method heading | The Method, A Clear, Disciplined Process | 03 Method, How we work. | Shorter; the lede keeps the "no unnecessary complexity" line. |
-| Method frames | (none) | Point cloud · Wireframe · Maquette · Material, "Fig. 03" | Labels for the 3D states. |
+| Method frames | (none) | (none) | The 3D state labels (Point cloud, Wireframe, Maquette, Material) and "Fig. 03" were dropped with the 3D scene; the four steps are now text beside unlabelled bridge plates. |
 | Capabilities heading | § 05.00 // The Capabilities, Ancient Principles. Modern Machines. | 04 Capabilities, What we build with. | Drops the mythological framing (retired with the old identity). Lede verbatim. |
 | About heading | § 02.00 // The Philosophy, The right technology connects the pieces. | 05 About, The right technology connects the pieces. | Same words, now the About section. |
 | About mark captions | (none) | "The way it works today" / "The system it becomes", "Drawn" / "Built" | Explains the two halves of the logo. |

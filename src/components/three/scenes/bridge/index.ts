@@ -1,6 +1,8 @@
 import {
   BoxGeometry,
   DirectionalLight,
+  DynamicDrawUsage,
+  Euler,
   HemisphereLight,
   InstancedMesh,
   Matrix4,
@@ -9,21 +11,21 @@ import {
   Scene,
   TorusGeometry,
   Vector3,
-  Euler,
-  DynamicDrawUsage,
 } from "three";
 import { clamp, damp } from "../../core/motion";
 import { devParam } from "../../core/switches";
 import type { SceneContext, SceneInstance, SceneModule, StageSize } from "../../core/types";
 import { createSeamMaterial } from "../../materials/seam";
-import { BRIDGE_FIELD } from "./config";
+import { BRIDGE_SPAN } from "./config";
 
 /*
- * The Bridge: a space-frame strut field. Left of the seam it is the DRAWN
- * maquette (grey card linework, every strut and ring a little loose: seeded small
- * rotations, offsets and sag); right of it, BUILT: thin-film struts settled
- * into a regular triangulated lattice. Two instanced draw calls share one
- * seam material.
+ * The Bridge: a through-truss span between two banks, from how a business
+ * works today (left bank) to how it could (right bank). Left of the seam it
+ * is the DRAWN maquette (grey card linework, every member a little loose,
+ * some not yet drawn, and a deck only a narrow way wide); right of it,
+ * BUILT: thin-film members settled into a regular truss with a full-width
+ * deck. Three instanced draw calls (members, nodes, slabs) share one seam
+ * material.
  *
  * Inputs (StageHandle.set):
  *   built  0..1  share modernised; the seam sits at (1 - built) of the width
@@ -67,15 +69,15 @@ function smooth(t: number) {
 export function createScene(context: SceneContext): SceneInstance {
   const { quality, capture } = context;
   const tier = quality.tier === "low" ? "low" : "high";
-  const F = BRIDGE_FIELD;
-  const rand = random(F.seed);
+  const S = BRIDGE_SPAN;
+  const rand = random(S.seed);
   const spread = (amount: number) => (rand() * 2 - 1) * amount;
 
   const scene = new Scene();
 
   // Orthographic, pitch only: an axonometric drawing, and world x = screen x.
   const camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 200);
-  const elevation = F.elevation * DEG;
+  const elevation = S.elevation * DEG;
   camera.position.set(0, Math.sin(elevation) * 60, Math.cos(elevation) * 60);
   camera.lookAt(0, 0, 0);
   const toCamera = camera.position.clone().normalize();
@@ -87,43 +89,52 @@ export function createScene(context: SceneContext): SceneInstance {
   const ambient = new HemisphereLight(0xffffff, 0xd9d3c7, 1);
   scene.add(key, key.target, fill, fill.target, ambient);
 
-  // --- The lattice -------------------------------------------------------
-  const halfThickness = F.thickness / 2;
-  const x0 = ((F.columns - 1) * F.bay) / 2;
-  const z0 = ((F.rows - 1) * F.bay) / 2;
-  const top = (i: number, k: number) => new Vector3(i * F.bay - x0, halfThickness, k * F.bay - z0);
-  const bottom = (i: number, k: number) =>
-    new Vector3((i + 0.5) * F.bay - x0, -halfThickness, (k + 0.5) * F.bay - z0);
+  // --- The truss ---------------------------------------------------------
+  const halfSpan = (S.panels * S.panel) / 2;
+  const halfDepth = S.depth / 2;
+  const nodeX = (i: number) => i * S.panel - halfSpan;
+  const topHeight = (i: number) => {
+    const s = i / S.panels;
+    return S.endHeight + (S.crownHeight - S.endHeight) * 4 * s * (1 - s);
+  };
+  const bottom = (i: number, side: -1 | 1) => new Vector3(nodeX(i), 0, side * halfDepth);
+  const top = (i: number, side: -1 | 1) => new Vector3(nodeX(i), topHeight(i), side * halfDepth);
 
-  const segments: [Vector3, Vector3][] = [];
-  for (let k = 0; k < F.rows; k++) {
-    for (let i = 0; i < F.columns; i++) {
-      if (i < F.columns - 1) segments.push([top(i, k), top(i + 1, k)]);
-      if (k < F.rows - 1) segments.push([top(i, k), top(i, k + 1)]);
+  // Members are tagged with whether the maquette may leave them out: chords
+  // and floor beams stay, some posts and diagonals have not been drawn yet.
+  const segments: [Vector3, Vector3, boolean][] = [];
+  const mid = S.panels / 2;
+  for (const side of [-1, 1] as const) {
+    for (let i = 0; i <= S.panels; i++) {
+      segments.push([bottom(i, side), top(i, side), i > 0 && i < S.panels]);
+      if (i < S.panels) {
+        segments.push([bottom(i, side), bottom(i + 1, side), false]);
+        segments.push([top(i, side), top(i + 1, side), false]);
+        // Pratt: diagonals fall toward midspan.
+        segments.push(i < mid ? [top(i, side), bottom(i + 1, side), true] : [bottom(i, side), top(i + 1, side), true]);
+      }
     }
   }
-  for (let k = 0; k < F.rows - 1; k++) {
-    for (let i = 0; i < F.columns - 1; i++) {
-      if (i < F.columns - 2) segments.push([bottom(i, k), bottom(i + 1, k)]);
-      if (k < F.rows - 2) segments.push([bottom(i, k), bottom(i, k + 1)]);
-      const b = bottom(i, k);
-      segments.push([b, top(i, k)], [b, top(i + 1, k)], [b, top(i, k + 1)], [b, top(i + 1, k + 1)]);
-    }
+  for (let i = 0; i <= S.panels; i++) {
+    segments.push([bottom(i, -1), bottom(i, 1), false]);
+    if (i > 0 && i < S.panels) segments.push([top(i, -1), top(i, 1), false]);
   }
 
   const tilt = new Euler();
   const jitter = new Quaternion();
+  const trim = S.ringRadius * 1.1;
 
-  const struts: Piece[] = segments.map(([a, b]) => {
+  const struts: Piece[] = segments.map(([a, b, optional]) => {
     const direction = b.clone().sub(a);
     const length = direction.length();
     const quaternion = new Quaternion().setFromUnitVectors(X_AXIS, direction.normalize());
     const position = a.clone().add(b).multiplyScalar(0.5);
     // Trim at the rings so the joints read.
-    const built: Pose = { position, quaternion, scale: new Vector3(length - F.ringRadius * 1.1, 1, 1) };
-    // Loose: a drawing not yet trued up. Most pieces a degree or two out, a
+    const built: Pose = { position, quaternion, scale: new Vector3(length - trim, 1, 1) };
+    // Loose: a drawing not yet trued up. Most members a degree or two out, a
     // few further, all a little short of their joints; never a heap.
     const stray = rand() < 0.03;
+    const left = optional && rand() < S.missing;
     const angle = (stray ? 10 : 3) * DEG;
     tilt.set(spread(angle), spread(angle), spread(angle * 1.4));
     const loose: Pose = {
@@ -131,31 +142,62 @@ export function createScene(context: SceneContext): SceneInstance {
         .clone()
         .add(new Vector3(spread(stray ? 0.17 : 0.05), spread(0.03) - rand() * (stray ? 0.22 : 0.08), spread(stray ? 0.17 : 0.05))),
       quaternion: quaternion.clone().premultiply(jitter.setFromEuler(tilt)),
-      scale: new Vector3((length - F.ringRadius * 1.1) * (0.86 + rand() * 0.08), 1, 1),
+      scale: left ? new Vector3(0.001, 0.001, 0.001) : new Vector3((length - trim) * (0.86 + rand() * 0.08), 1, 1),
     };
     return { x: position.x, built, loose };
   });
 
   const facing = new Quaternion().setFromUnitVectors(Z_AXIS, toCamera);
   const rings: Piece[] = [];
-  for (let k = 0; k < F.rows; k++) {
-    for (let i = 0; i < F.columns; i++) {
-      const position = top(i, k);
-      const built: Pose = { position, quaternion: facing, scale: new Vector3(1, 1, 1) };
-      tilt.set(spread(12 * DEG), spread(12 * DEG), spread(6 * DEG));
-      const loose: Pose = {
-        position: position.clone().add(new Vector3(spread(0.07), -rand() * 0.1, spread(0.07))),
-        quaternion: facing.clone().multiply(jitter.setFromEuler(tilt)),
-        scale: new Vector3(0.86, 0.86, 0.86),
-      };
-      rings.push({ x: position.x, built, loose });
+  for (const side of [-1, 1] as const) {
+    for (let i = 0; i <= S.panels; i++) {
+      for (const position of [bottom(i, side), top(i, side)]) {
+        const built: Pose = { position, quaternion: facing, scale: new Vector3(1, 1, 1) };
+        tilt.set(spread(12 * DEG), spread(12 * DEG), spread(6 * DEG));
+        const loose: Pose = {
+          position: position.clone().add(new Vector3(spread(0.07), -rand() * 0.1, spread(0.07))),
+          quaternion: facing.clone().multiply(jitter.setFromEuler(tilt)),
+          scale: new Vector3(0.86, 0.86, 0.86),
+        };
+        rings.push({ x: position.x, built, loose });
+      }
     }
+  }
+
+  // --- Deck and banks ------------------------------------------------------
+  const identity = new Quaternion();
+  const slabs: Piece[] = [];
+  for (let i = 0; i < S.panels; i++) {
+    const x = nodeX(i) + S.panel / 2;
+    const y = S.deckThickness / 2 - 0.02;
+    const built: Pose = {
+      position: new Vector3(x, y, 0),
+      quaternion: identity,
+      scale: new Vector3(S.panel * 0.94, S.deckThickness, S.depth * 0.96),
+    };
+    // Drawn: only a narrow way across, wandering a little and not yet laid flat.
+    tilt.set(spread(2 * DEG), spread(3 * DEG), spread(2.5 * DEG));
+    const loose: Pose = {
+      position: new Vector3(x + spread(0.06), y - rand() * 0.1, spread(0.4)),
+      quaternion: identity.clone().premultiply(jitter.setFromEuler(tilt)),
+      scale: new Vector3(S.panel * (0.8 + rand() * 0.12), S.deckThickness, S.depth * S.deckDrawn * (0.8 + rand() * 0.4)),
+    };
+    slabs.push({ x, built, loose });
+  }
+  const bankDepth = S.depth * 1.5;
+  for (const side of [-1, 1] as const) {
+    const pose: Pose = {
+      position: new Vector3(side * (halfSpan + S.bankWidth / 2 - 0.9), -S.bankHeight / 2 - 0.2, 0),
+      quaternion: identity,
+      scale: new Vector3(S.bankWidth, S.bankHeight, bankDepth),
+    };
+    slabs.push({ x: pose.position.x, built: pose, loose: pose });
   }
 
   const { material, uniforms } = createSeamMaterial({
     envMap: context.environment(),
     tier,
-    halfDepth: z0 + F.bay * 0.5,
+    halfDepth: bankDepth / 2,
     seamX: 0,
   });
   uniforms.uSeamLineWidth.value = 0.02;
@@ -166,15 +208,22 @@ export function createScene(context: SceneContext): SceneInstance {
   uniforms.uMatteRoughness.value = 0.9;
   uniforms.uFilmGlow.value = 0.26;
 
-  const strutGeometry = new BoxGeometry(1, F.strut, F.strut);
-  const ringGeometry = new TorusGeometry(F.ringRadius, F.ringTube, 4, 14);
-  const strutMesh = new InstancedMesh(strutGeometry, material, struts.length);
-  const ringMesh = new InstancedMesh(ringGeometry, material, rings.length);
-  for (const mesh of [strutMesh, ringMesh]) {
+  const strutMesh = new InstancedMesh(new BoxGeometry(1, S.strut, S.strut), material, struts.length);
+  const ringMesh = new InstancedMesh(new TorusGeometry(S.ringRadius, S.ringTube, 4, 14), material, rings.length);
+  const slabMesh = new InstancedMesh(new BoxGeometry(1, 1, 1), material, slabs.length);
+  for (const mesh of [strutMesh, ringMesh, slabMesh]) {
     mesh.instanceMatrix.setUsage(DynamicDrawUsage);
     mesh.frustumCulled = false;
     scene.add(mesh);
   }
+
+  // --- Framing: what the camera must hold, in view space --------------------
+  const cos = Math.cos(elevation);
+  const sin = Math.sin(elevation);
+  const totalWidth = 2 * (halfSpan + S.bankWidth - 0.9);
+  const viewTop = (S.crownHeight + S.ringRadius) * cos + halfDepth * sin;
+  const viewBottom = -(S.bankHeight + 0.2) * cos - (bankDepth / 2) * sin;
+  const viewMiddle = (viewTop + viewBottom) / 2;
 
   // --- Seam ---------------------------------------------------------------
   const matrix = new Matrix4();
@@ -197,7 +246,7 @@ export function createScene(context: SceneContext): SceneInstance {
       const piece = pieces[index];
       // 0 = loose (drawn side), 1 = settled (built side). Pieces settle on
       // the drawn side of the seam, so nothing half-loose crosses into the film.
-      const t = smooth(clamp((piece.x - (seam - 2 * F.band)) / (2 * F.band)));
+      const t = smooth(clamp((piece.x - (seam - 2 * S.band)) / (2 * S.band)));
       position.lerpVectors(piece.loose.position, piece.built.position, t);
       quaternion.slerpQuaternions(piece.loose.quaternion, piece.built.quaternion, t);
       scale.lerpVectors(piece.loose.scale, piece.built.scale, t);
@@ -214,22 +263,25 @@ export function createScene(context: SceneContext): SceneInstance {
     laidOutFor = seam;
     layOut(strutMesh, struts, seam);
     layOut(ringMesh, rings, seam);
+    layOut(slabMesh, slabs, seam);
   }
 
   function resize(size: StageSize) {
     const aspect = size.width / Math.max(1, size.height);
-    const projected = F.rows * F.bay * Math.sin(elevation) + F.thickness * Math.cos(elevation);
-    let viewHeight = projected * F.margin;
+    let viewHeight = (viewTop - viewBottom) * S.margin;
     viewWidth = viewHeight * aspect;
-    const widest = (F.columns - 1.5) * F.bay;
-    if (viewWidth > widest) {
-      viewWidth = widest;
+    // Wide stages show the whole span; narrow ones crop the banks first.
+    if (viewWidth > totalWidth) {
+      viewWidth = totalWidth;
+      viewHeight = viewWidth / aspect;
+    } else if (viewWidth < totalWidth * S.minShare) {
+      viewWidth = totalWidth * S.minShare;
       viewHeight = viewWidth / aspect;
     }
     camera.left = -viewWidth / 2;
     camera.right = viewWidth / 2;
-    camera.top = viewHeight / 2 + F.centreY;
-    camera.bottom = -viewHeight / 2 + F.centreY;
+    camera.top = viewHeight / 2 + viewMiddle;
+    camera.bottom = -viewHeight / 2 + viewMiddle;
     camera.updateProjectionMatrix();
     laidOutFor = Number.NaN;
     apply();

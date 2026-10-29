@@ -6,10 +6,10 @@ import type { ReactNode } from "react";
  * subject before and after. `svc-*` classes are animated by services.css.
  */
 
-const PAPER = "var(--color-paper)";
-const SAFFRON = "var(--color-saffron-500)";
+export const PAPER = "var(--color-paper)";
+export const SAFFRON = "var(--color-saffron-500)";
 
-function Drawn({ children }: { children: ReactNode }) {
+export function Drawn({ children }: { children: ReactNode }) {
   return (
     <g className="svc-drawn text-control" fill="none" stroke="currentColor" strokeWidth="1">
       {children}
@@ -17,7 +17,7 @@ function Drawn({ children }: { children: ReactNode }) {
   );
 }
 
-function Built({ children }: { children: ReactNode }) {
+export function Built({ children }: { children: ReactNode }) {
   return (
     <g className="svc-built text-ink" fill="none" stroke="currentColor" strokeWidth="1.5">
       {children}
@@ -25,7 +25,7 @@ function Built({ children }: { children: ReactNode }) {
   );
 }
 
-function Fill({ delay = 0, children }: { delay?: number; children: ReactNode }) {
+export function Fill({ delay = 0, children }: { delay?: number; children: ReactNode }) {
   return (
     <g className="svc-fill" style={{ "--d": `${delay}ms` } as React.CSSProperties}>
       {children}
@@ -33,7 +33,7 @@ function Fill({ delay = 0, children }: { delay?: number; children: ReactNode }) 
   );
 }
 
-const DASH = "4 4";
+export const DASH = "4 4";
 const GUESS = "2 5";
 
 /* ---------------------------------------------------------------- AI */

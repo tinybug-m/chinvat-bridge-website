@@ -1,5 +1,5 @@
-// Renders the Bridge strut field's two rest poses to public/bridge/:
-// bridge-drawn-<v>.png (all maquette) and bridge-built-<v>.png (all lattice). The page
+// Renders the Bridge truss span's two rest poses to public/bridge/:
+// bridge-drawn-<v>.png (all maquette) and bridge-built-<v>.png (all built truss). The page
 // splits them at the seam with a clip-path when WebGL is not live.
 //
 //   node scripts/poster/bridge.mjs [--base http://localhost:3000]
@@ -10,7 +10,7 @@ import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const argv = process.argv.slice(2);
-const VERSION = "v6"; // keep in step with BRIDGE_POSTERS in scenes/bridge/config.ts
+const VERSION = "v7"; // keep in step with BRIDGE_POSTERS in scenes/bridge/config.ts
 const base = argv.includes("--base") ? argv[argv.indexOf("--base") + 1] : "http://localhost:3000";
 
 const browser = await chromium.launch({

@@ -1,6 +1,6 @@
 # three/ — WebGL stages
 
-Shared runtime for every 3D scene on the site (hero seam, Bridge, Method).
+Shared runtime for every 3D scene on the site (hero seam, Approach bridge).
 three.js is **never** in the initial bundle: only `core/ThreeStage.tsx`,
 `core/controller.ts`, `core/quality.ts`, `core/budget.ts` and type-only
 imports ship with the page; `core/runtime.ts` and the scene module are

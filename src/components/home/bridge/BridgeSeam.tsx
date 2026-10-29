@@ -17,11 +17,8 @@ import { SeamSlider } from "./SeamSlider";
  * modernised (0..100); the seam sits at (100 - value)% of the stage width,
  * drawn maquette on its left, built lattice on its right.
  *
- * Who drives it:
- *   scroll   10 -> 90 while the stage's centre crosses the viewport (GSAP
- *            ScrollTrigger, scrubbed, no pin; motion allowed only, and GSAP
- *            is fetched only once the island comes within a screen of view)
- *   the user once they drag or key the slider; scroll lets go for good
+ * Only the visitor moves it, by dragging or keying the slider; scrolling
+ * the page never does.
  *
  * The fractional value lives in a ref and goes straight to --seam (the line,
  * the handle, the poster split) and the scene; React only hears about whole
@@ -59,9 +56,6 @@ export function BridgeSeam({ className }: { className?: string }) {
   const [value, setValue] = useState<number>(BRIDGE_SEAM.initial);
   const handle = useRef<StageHandle>(null);
   const rootRef = useRef<HTMLDivElement>(null);
-  const frameRef = useRef<HTMLDivElement>(null);
-  const userTookOver = useRef(false);
-  const releaseScroll = useRef<(() => void) | null>(null);
   const fraction = useRef<number>(BRIDGE_SEAM.initial);
   const shown = useRef<number>(BRIDGE_SEAM.initial);
 
@@ -81,68 +75,6 @@ export function BridgeSeam({ className }: { className?: string }) {
     handle.current?.set("built", BRIDGE_SEAM.initial / 100);
   }, []);
 
-  // Scroll scrub. GSAP stays out of the first bundle, is never fetched under
-  // reduced motion, and loads only as the island nears the viewport.
-  useEffect(() => {
-    const trigger = frameRef.current;
-    if (!trigger || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let cancelled = false;
-    let revert: (() => void) | null = null;
-
-    const load = () =>
-      Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(([{ gsap }, { ScrollTrigger }]) => {
-        if (cancelled || userTookOver.current) return;
-        gsap.registerPlugin(ScrollTrigger);
-        const mm = gsap.matchMedia();
-        mm.add("(prefers-reduced-motion: no-preference)", () => {
-          const proxy = { value: BRIDGE_SEAM.scrubFrom };
-          const tween = gsap.to(proxy, {
-            value: BRIDGE_SEAM.scrubTo,
-            ease: "none",
-            scrollTrigger: { trigger, start: "center bottom", end: "center top", scrub: 0.6 },
-            onUpdate: () => {
-              if (!userTookOver.current) drive(proxy.value);
-            },
-          });
-          const progress = tween.scrollTrigger?.progress ?? 0;
-          drive(BRIDGE_SEAM.scrubFrom + (BRIDGE_SEAM.scrubTo - BRIDGE_SEAM.scrubFrom) * progress);
-        });
-        revert = () => mm.revert();
-        releaseScroll.current = () => {
-          revert?.();
-          revert = null;
-        };
-      });
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        void load();
-      },
-      { rootMargin: "100% 0px" },
-    );
-    observer.observe(trigger);
-
-    return () => {
-      cancelled = true;
-      observer.disconnect();
-      revert?.();
-      releaseScroll.current = null;
-    };
-  }, [drive]);
-
-  const onUserChange = useCallback(
-    (next: number) => {
-      if (!userTookOver.current) {
-        userTookOver.current = true;
-        releaseScroll.current?.();
-      }
-      drive(next);
-    },
-    [drive],
-  );
-
   const count = modernisedCount(value);
   const valueText = `${value}% modernised: ${count} of ${ROW_COUNT}`;
 
@@ -155,7 +87,7 @@ export function BridgeSeam({ className }: { className?: string }) {
             <span className="text-right">Future direction</span>
           </Container>
         </div>
-        <div ref={frameRef} className="relative" data-seam-value={value}>
+        <div className="relative" data-seam-value={value}>
           <ThreeStage
             id="bridge"
             load={loadBridgeScene}
@@ -185,7 +117,7 @@ export function BridgeSeam({ className }: { className?: string }) {
             max={BRIDGE_SEAM.max}
             valueText={valueText}
             labelledBy="approach-seam-label"
-            onValueChange={onUserChange}
+            onValueChange={drive}
           />
         </div>
 
