@@ -37,8 +37,7 @@ export function Method() {
                   <Plate uid={`method-plate-${index}`} />
                 </PlateDiagram>
                 <Reveal delay={80} className="mt-6">
-                  <p className="font-label text-label uppercase text-ink-muted">{step.index}</p>
-                  <h3 className="mt-2 font-display text-heading font-medium text-ink">{step.title}</h3>
+                  <h3 className="font-display text-heading font-medium text-ink">{step.title}</h3>
                   <p className="mt-4 max-w-measure text-body text-pretty text-ink-soft">{step.description}</p>
                 </Reveal>
               </li>

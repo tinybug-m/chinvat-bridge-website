@@ -28,7 +28,7 @@ export const MARK_WIDTH_UNITS = (MARK_BOUNDS.maxX - MARK_BOUNDS.minX) * UNITS_PE
  * `minEdge` px to the previous one, and points where the outline doubles
  * back on itself. Bevels turn both into spikes.
  */
-function cleanRing(ring: Ring, minEdge = 0.75): Point[] {
+function cleanRing(ring: Ring, minEdge = 0.75, maxSpikeEdge = 6): Point[] {
   let points = ring.slice();
   let changed = true;
   while (changed && points.length > 3) {
@@ -48,8 +48,9 @@ function cleanRing(ring: Ring, minEdge = 0.75): Point[] {
         changed = true;
         continue;
       }
-      // A turn of more than ~150 degrees is a spike, not a corner.
-      if (lb > 0 && (ax * bx + ay * by) / (la * lb) < -0.86) {
+      // A turn of more than ~150 degrees is a spike, not a corner, unless both
+      // edges are long: the thin sliver holes in the mark end in genuine points.
+      if (lb > 0 && Math.min(la, lb) < maxSpikeEdge && (ax * bx + ay * by) / (la * lb) < -0.86) {
         changed = true;
         continue;
       }

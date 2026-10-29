@@ -9,7 +9,7 @@ import { ContactBrief } from "./ContactBrief";
 export function Contact() {
   return (
     <Section id="contact" labelledBy="contact-title" className="bg-haze">
-      <Container className="grid gap-x-6 gap-y-14 lg:grid-cols-12">
+      <Container className="grid grid-cols-1 gap-x-6 gap-y-14 lg:grid-cols-12">
         <div className="lg:col-span-5 lg:sticky lg:top-28 lg:self-start">
           <Reveal>
             <SectionHeading id="contact-title">Build a better way forward.</SectionHeading>

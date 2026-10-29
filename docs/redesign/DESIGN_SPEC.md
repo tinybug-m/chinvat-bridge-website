@@ -184,7 +184,7 @@ discipline index (01–04) linking to `#services-ai|automation|software|seo`.
   stone in every plate. Discover = the loose stones as they lie, with the gap
   measured from both plinths; Define = the deck drawn in dashes; Build =
   raised from the near plinth with the far part still drawn; Improve =
-  standing, inlaid and measured. Below each plate: mono numeral, `h3` title,
+  standing, inlaid and measured. Below each plate: `h3` title (no step numerals),
   description. Colours are the `--color-slab-*` tokens. No 3D, no sticky
   stage, nothing driven by scroll; the plates draw in once on entry (the
   Services wipe) and are finished without JS or under reduced motion.

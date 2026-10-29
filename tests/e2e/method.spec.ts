@@ -36,8 +36,8 @@ test.describe("method", () => {
       await expect(plates.nth(index)).toHaveAttribute("aria-hidden", "true");
       await expect(plates.nth(index).locator("text")).toHaveCount(0);
     }
-    // The step numerals keep their order.
-    await expect(section.locator("li > div p.font-label, li p.font-label")).toHaveText(["I.", "II.", "III.", "IV."]);
+    // No step numerals above the titles: the plates already show the order.
+    await expect(section.locator("li p.font-label")).toHaveCount(0);
   });
 
   test("the plates are one bridge: same board, stone fills, saffron inlay once built, unique gradient ids", async ({ page }) => {
