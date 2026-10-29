@@ -91,7 +91,7 @@ document for anything already built (tokens, primitives, shell).
 | — | Hero | — | paper | text left, object right (see hero brief) |
 | 01 | Services | `services` | paper | four discipline "plates" stacked, alternating diagram side |
 | 02 | Approach | `approach` | paper-raised band | full-width interactive seam comparison |
-| 03 | Method | `method` | paper | four plates of one bridge, one per step, in a row |
+| 03 | Method | `method` | paper | four plates of the Approach's stone path, one per step, in a 2 × 2 grid |
 | 04 | Capabilities | `capabilities` (+`#machines`) | paper | lattice diagram + mirrored list |
 | 05 | About | `about` | paper-raised band | quote left, mark explanation right |
 | 06 | Insights | `insights` | paper | index rows |
@@ -177,13 +177,17 @@ discipline index (01–04) linking to `#services-ai|automation|software|seo`.
 
 ### 03 Method
 - **Copy:** `src/data/process.ts` verbatim; H2 "How we work." *(live: "Process")*.
-- **Composition:** a four-column row (2 x 2 from md, stacked on 390), one
-  plate per step, each the same bridge between two banks: Discover = the gap
-  measured from both banks, Define = the span drawn (dashed), Build = raised
-  from the near bank with the far half still drawn, Improve = standing and
-  measured. Below each plate: mono numeral, `h3` title, description. No 3D,
-  no sticky stage, nothing driven by scroll; the plates draw in once on entry
-  (the Services wipe) and are finished without JS or under reduced motion.
+- **Composition:** a 2 x 2 grid from lg (stacked below 1024), one plate per step,
+  each the same stone path as the Approach stage (src/components/home/method/stonePlates.ts
+  projects the 3D scene's own layout and camera into SVG, so proportions, the
+  rise toward the far plinth and the saffron inlay match). Both plinths are
+  stone in every plate. Discover = the loose stones as they lie, with the gap
+  measured from both plinths; Define = the deck drawn in dashes; Build =
+  raised from the near plinth with the far part still drawn; Improve =
+  standing, inlaid and measured. Below each plate: mono numeral, `h3` title,
+  description. Colours are the `--color-slab-*` tokens. No 3D, no sticky
+  stage, nothing driven by scroll; the plates draw in once on entry (the
+  Services wipe) and are finished without JS or under reduced motion.
 - **Acceptance:** four decorative plates (`aria-hidden`), readable without JS,
   no overflow at 390.
 

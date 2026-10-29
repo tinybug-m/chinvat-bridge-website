@@ -6,11 +6,12 @@ import { SectionHeading } from "@/components/system/SectionHeading";
 import { PlateDiagram } from "@/components/home/services/PlateDiagram";
 import { PROCESS_STEPS } from "@/data/process";
 import { METHOD_PLATES } from "./MethodDiagrams";
+import { STONE_BOARD } from "./stonePlates";
 
 /*
  * Method. One crossing in four steps: the gap is measured, the span is drawn,
  * raised from the near bank, and measured again once it stands. Each step is
- * a plate of the same bridge. Nothing moves with scroll; the plates draw in
+ * a plate of the same stone path as the Approach stage. Nothing moves with scroll; the plates draw in
  * once, like the Services diagrams, and are finished from the start without
  * JavaScript or under reduced motion.
  */
@@ -27,13 +28,13 @@ export function Method() {
           </p>
         </Reveal>
 
-        <ol className="mt-12 grid gap-x-6 gap-y-14 md:mt-16 md:grid-cols-2 lg:grid-cols-4">
+        <ol className="mt-12 grid gap-x-10 gap-y-14 md:mt-16 lg:grid-cols-2">
           {PROCESS_STEPS.map((step, index) => {
             const Plate = METHOD_PLATES[index];
             return (
               <li key={step.title} data-method-step={index}>
-                <PlateDiagram viewBox="0 50 400 150" className="w-full max-w-[26rem] text-ink">
-                  <Plate />
+                <PlateDiagram viewBox={STONE_BOARD.viewBox} className="w-full max-w-[40rem] text-ink">
+                  <Plate uid={`method-plate-${index}`} />
                 </PlateDiagram>
                 <Reveal delay={80} className="mt-6">
                   <p className="font-label text-label uppercase text-ink-muted">{step.index}</p>

@@ -8,33 +8,13 @@ import {
   Shape,
   SRGBColorSpace,
 } from "three";
+import { random, smooth } from "./math";
 
 /*
  * Pieces for the Bridge's stone path: a chamfered slab, a plinth block that
  * fades into the page, and the faint travertine banding they share. All of it
  * is generated, so there are no model or texture files to load.
  */
-
-/** Seeded PRNG (mulberry32), so the path is the same on every visit and in the posters. */
-export function random(seed: number) {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-export function smooth(t: number) {
-  const x = Math.min(1, Math.max(0, t));
-  return x * x * (3 - 2 * x);
-}
-
-export function mix(a: number, b: number, t: number) {
-  return a + (b - a) * t;
-}
 
 /** A slab with one chamfer all round, centred on the origin: length along x, thickness along y, depth along z. */
 export function chamferedSlab(length: number, thickness: number, depth: number, bevel: number): BufferGeometry {

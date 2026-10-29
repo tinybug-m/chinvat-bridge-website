@@ -27,6 +27,12 @@
   --color-azure-500: #1d75a3; /* 4.6:1, smallest text-safe azure */
   --color-azure-400: #1c8ec3; /* UI and large text only */
 
+  /* Pale stone: the Bridge's slabs where they are drawn flat (Method plates); the 3D scene lights the same stone */
+  --color-slab-top: #fffaf0;
+  --color-slab-end: #ece5d6;
+  --color-slab-face: #8a9099;
+  --color-slab-edge: #cbc4b4;
+
   /* Saffron glass: 700/800 are text-safe, the rest decorative only */
   --color-saffron-800: #7a4e12;
   --color-saffron-700: #8e5a1e;

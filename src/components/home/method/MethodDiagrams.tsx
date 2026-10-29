@@ -1,136 +1,193 @@
-import { Built, DASH, Drawn, Fill, PAPER, SAFFRON } from "@/components/home/services/diagrams";
+import { Built, DASH, Drawn, Fill, SAFFRON } from "@/components/home/services/diagrams";
+import { deckOutline, GAUGE, inlayPath, RULER, slabPoint, STONE, type StoneFaces } from "./stonePlates";
 
 /*
- * Four plates of one bridge, on a 400 x 200 board (the plate crops the empty sky): two banks with a gap
- * between them, and the same span at each step. Discover measures the gap,
- * Define draws the span, Build raises it from the near bank, Improve measures
- * what stands. Hairlines and dashes are not yet built; solid ink is. Same
- * language as the Approach seam and the Services diagrams.
+ * Four plates of one bridge: the stone path from the Approach stage, flattened
+ * (see stonePlates.ts), with the same plinths in every plate and the same
+ * span at each step. Discover shows the stones as they lie and measures the
+ * gap, Define draws the span, Build raises it from the near bank, Improve
+ * measures what stands. Hairlines and dashes are not yet built; stone with a
+ * saffron inlay is.
  */
 
-const LEFT = 80;
-const RIGHT = 320;
-const GROUND = 150;
-const PANELS = 8;
-const RISE = 80;
-
-const nodeX = (i: number) => LEFT + ((RIGHT - LEFT) / PANELS) * i;
-const archY = (i: number) => {
-  const s = i / PANELS;
-  return GROUND - RISE * 4 * s * (1 - s);
-};
-
-const range = (from: number, to: number) => Array.from({ length: to - from + 1 }, (_, i) => from + i);
-
-/** Deck, arch, hangers and diagonals between panel nodes `from` and `to`. */
-function span(from: number, to: number) {
-  const nodes = range(from, to);
-  const chord = nodes.map((i, k) => `${k ? "L" : "M"}${nodeX(i)} ${archY(i).toFixed(1)}`).join(" ");
-  const hangers = nodes.map((i) => `M${nodeX(i)} ${GROUND} V${archY(i).toFixed(1)}`).join(" ");
-  const diagonals = nodes
-    .slice(0, -1)
-    .map((i) => (i < PANELS / 2 ? `M${nodeX(i)} ${archY(i).toFixed(1)} L${nodeX(i + 1)} ${GROUND}` : `M${nodeX(i)} ${GROUND} L${nodeX(i + 1)} ${archY(i + 1).toFixed(1)}`))
-    .join(" ");
-  return { deck: `M${nodeX(from)} ${GROUND} H${nodeX(to)}`, chord, hangers, diagonals };
+interface PlateProps {
+  /** Unique per plate on the page: the plinth fades are gradients with ids. */
+  uid: string;
 }
 
-function Banks({ solid }: { solid?: boolean }) {
-  const bank = (
+const SLAB = {
+  top: "var(--color-slab-top)",
+  end: "var(--color-slab-end)",
+  face: "var(--color-slab-face)",
+  edge: "var(--color-slab-edge)",
+} as const;
+const farToNear = Array.from({ length: STONE.count }, (_, index) => STONE.count - 1 - index);
+
+/** A slab or plinth: top, front and, where the camera sees it, the end. */
+function Stone({ faces, front, end }: { faces: StoneFaces; front?: string; end?: string | false }) {
+  return (
+    <g stroke={SLAB.edge} strokeWidth="1" strokeLinejoin="round">
+      {end !== false && <path d={faces.end} fill={end ?? SLAB.end} stroke={end ? "none" : SLAB.edge} />}
+      <path d={faces.front} fill={front ?? SLAB.face} stroke={front ? "none" : SLAB.edge} />
+      <path d={faces.top} fill={SLAB.top} />
+    </g>
+  );
+}
+
+/** Plinth faces dissolve downward into the page, as they do in the 3D scene. */
+function Fades({ uid }: PlateProps) {
+  const gradient = (id: string, [from, to]: [number, number], colour: string) => (
+    <linearGradient id={`${uid}-${id}`} gradientUnits="userSpaceOnUse" x1="0" x2="0" y1={from} y2={to}>
+      <stop offset="0.05" stopColor={colour} />
+      <stop offset="0.5" stopColor={colour} stopOpacity="0.55" />
+      <stop offset="0.95" stopColor={colour} stopOpacity="0" />
+    </linearGradient>
+  );
+  return (
+    <defs>
+      {gradient("near-front", STONE.nearFade, SLAB.face)}
+      {gradient("near-end", STONE.nearFade, SLAB.end)}
+      {gradient("far-front", STONE.farFade, SLAB.face)}
+      {gradient("far-end", STONE.farFade, SLAB.end)}
+    </defs>
+  );
+}
+
+const FarPlinth = ({ uid }: PlateProps) => (
+  <>
+    <Stone faces={STONE.farBlock} front={`url(#${uid}-far-front)`} end={`url(#${uid}-far-end)`} />
+    <Stone faces={STONE.farStep} front={`url(#${uid}-far-front)`} end={false} />
+  </>
+);
+
+const NearStep = ({ uid }: PlateProps) => <Stone faces={STONE.nearStep} front={`url(#${uid}-near-front)`} end={false} />;
+const NearBlock = ({ uid }: PlateProps) => (
+  <Stone faces={STONE.nearBlock} front={`url(#${uid}-near-front)`} end={`url(#${uid}-near-end)`} />
+);
+
+/** Built slabs `from` to `to`, far to near, so each overlaps the next one along. The near step sits under slab 0. */
+function Slabs({ from, to, uid }: { from: number; to: number } & PlateProps) {
+  return (
     <>
-      <path d={`M0 ${GROUND} H${LEFT} V196`} />
-      <path d={`M${RIGHT} 196 V${GROUND} H400`} />
+      {farToNear
+        .filter((index) => index >= from && index <= to)
+        .map((index) => (
+          <g key={index}>
+            {index === 0 && <NearStep uid={uid} />}
+            <Stone faces={STONE.built[index]} end={index === 0 ? undefined : false} />
+          </g>
+        ))}
     </>
   );
-  return solid ? <Built>{bank}</Built> : <Drawn>{bank}</Drawn>;
 }
 
-function Ring({ x, y, delay = 0 }: { x: number; y: number; delay?: number }) {
+/** The slabs `from` to `to` as one deck in outline only: the span drawn, not yet built. */
+function Outlines({ from, to, nearCap = true }: { from: number; to: number; nearCap?: boolean }) {
+  const { edges, joints } = deckOutline(from, to, nearCap);
+  return (
+    <>
+      <path d={edges} strokeWidth="1" strokeDasharray={DASH} strokeLinejoin="round" />
+      <path d={joints} strokeWidth="0.9" strokeDasharray="1.5 4" />
+    </>
+  );
+}
+
+function Ring({ at, delay = 0 }: { at: [number, number]; delay?: number }) {
   return (
     <Fill delay={delay}>
-      <circle cx={x} cy={y} r="5" stroke={SAFFRON} strokeWidth="1.5" fill={PAPER} />
+      <circle cx={at[0]} cy={at[1]} r="6" stroke={SAFFRON} strokeWidth="1.5" fill={SLAB.top} />
     </Fill>
   );
 }
 
-/** I. Discover: the gap measured from both banks. */
-export function DiscoverPlate() {
-  return (
-    <>
-      <Banks />
-      <Drawn>
-        <g strokeDasharray={DASH}>
-          <path d={`M${LEFT} 112 H${RIGHT}`} />
-          <path d={`M${nodeX(0)} ${GROUND} L${nodeX(4)} 70 L${nodeX(8)} ${GROUND}`} strokeWidth="0.75" />
-        </g>
-        <path d={`M${LEFT} 104 V120 M${RIGHT} 104 V120`} />
-        <path d="M24 146 l8 8 m0 -8 l-8 8 M54 146 l8 8 m0 -8 l-8 8 M338 146 l8 8 m0 -8 l-8 8 M368 146 l8 8 m0 -8 l-8 8" strokeWidth="0.75" />
-      </Drawn>
-      <Ring x={LEFT} y={GROUND} />
-      <Ring x={RIGHT} y={GROUND} delay={120} />
-    </>
-  );
-}
+const Inlay = ({ from, to }: { from: number; to: number }) => (
+  <path d={inlayPath(from, to)} stroke={SAFFRON} strokeWidth="1.75" strokeLinecap="butt" />
+);
 
-/** II. Define: one span chosen and drawn, not yet built. */
-export function DefinePlate() {
-  const all = span(0, PANELS);
+/** I. Discover: the stones as they lie today, and the gap measured from both plinths. */
+export function DiscoverPlate({ uid }: PlateProps) {
   return (
     <>
-      <Banks />
-      <Drawn>
-        <g strokeDasharray={DASH}>
-          <path d={all.deck} />
-          <path d={all.chord} />
-        </g>
-        <path d={all.hangers} strokeWidth="0.75" strokeDasharray="2 5" />
-      </Drawn>
-      <Ring x={nodeX(4)} y={archY(4)} />
-    </>
-  );
-}
-
-/** III. Build: raised from the near bank, the far half still on paper. */
-export function BuildPlate() {
-  const done = span(0, 5);
-  const rest = span(5, PANELS);
-  return (
-    <>
-      <Banks solid />
-      <Drawn>
-        <g strokeDasharray={DASH}>
-          <path d={rest.deck} />
-          <path d={rest.chord} />
-        </g>
-        <path d={rest.hangers} strokeWidth="0.75" strokeDasharray="2 5" />
-      </Drawn>
+      <Fades uid={uid} />
       <Built>
-        <path d={done.deck} />
-        <path d={done.chord} />
-        <path d={done.hangers} strokeWidth="1" />
-        <path d={done.diagonals} strokeWidth="1" />
+        <FarPlinth uid={uid} />
+        {farToNear.map((index) => (
+          <g key={index}>
+            {index === 0 && <NearStep uid={uid} />}
+            <Stone faces={STONE.loose[index]} />
+          </g>
+        ))}
+        <NearBlock uid={uid} />
       </Built>
-      <Ring x={nodeX(5)} y={GROUND} />
+      <Drawn>
+        <g strokeDasharray={DASH}>
+          <path d={GAUGE.line} />
+        </g>
+        <path d={GAUGE.legs} />
+      </Drawn>
+      <Ring at={GAUGE.feet[0]} />
+      <Ring at={GAUGE.feet[1]} delay={120} />
+    </>
+  );
+}
+
+/** II. Define: one span chosen and drawn on the plinths, not yet built. */
+export function DefinePlate({ uid }: PlateProps) {
+  return (
+    <>
+      <Fades uid={uid} />
+      <Built>
+        <FarPlinth uid={uid} />
+        <NearStep uid={uid} />
+        <NearBlock uid={uid} />
+      </Built>
+      <Drawn>
+        <Outlines from={0} to={STONE.count - 1} />
+        <path d={inlayPath(0, STONE.count - 1)} strokeDasharray={DASH} strokeWidth="1.1" />
+      </Drawn>
+      <Ring at={slabPoint(6, 1)} />
+    </>
+  );
+}
+
+const BUILT_TO = 7;
+
+/** III. Build: raised from the near plinth, the far half still on paper. */
+export function BuildPlate({ uid }: PlateProps) {
+  return (
+    <>
+      <Fades uid={uid} />
+      <Built>
+        <FarPlinth uid={uid} />
+        <Slabs from={0} to={BUILT_TO} uid={uid} />
+        <NearBlock uid={uid} />
+        <Inlay from={0} to={BUILT_TO} />
+      </Built>
+      <Drawn>
+        <Outlines from={BUILT_TO + 1} to={STONE.count - 1} nearCap={false} />
+        <path d={inlayPath(BUILT_TO + 1, STONE.count - 1)} strokeDasharray={DASH} strokeWidth="1.1" />
+      </Drawn>
+      <Ring at={slabPoint(BUILT_TO, 1)} />
     </>
   );
 }
 
 /** IV. Improve: the whole span stands and is measured. */
-export function ImprovePlate() {
-  const all = span(0, PANELS);
+export function ImprovePlate({ uid }: PlateProps) {
   return (
     <>
-      <Banks solid />
+      <Fades uid={uid} />
       <Built>
-        <path d={all.deck} />
-        <path d={all.chord} />
-        <path d={all.hangers} strokeWidth="1" />
-        <path d={all.diagonals} strokeWidth="1" />
-        <path d={`M${LEFT} 180 H${RIGHT}`} strokeWidth="1" />
-        <path d={range(0, PANELS).map((i) => `M${nodeX(i)} 175 V185`).join(" ")} strokeWidth="1" />
+        <FarPlinth uid={uid} />
+        <Slabs from={0} to={STONE.count - 1} uid={uid} />
+        <NearBlock uid={uid} />
+        <Inlay from={0} to={STONE.count - 1} />
+        <path d={RULER.line} strokeWidth="1" />
+        <path d={RULER.ticks} strokeWidth="1" />
       </Built>
-      <Ring x={nodeX(4)} y={archY(4)} />
-      <Ring x={nodeX(2)} y={GROUND} delay={120} />
-      <Ring x={nodeX(6)} y={GROUND} delay={240} />
+      <Ring at={slabPoint(3)} />
+      <Ring at={slabPoint(7)} delay={120} />
+      <Ring at={slabPoint(11)} delay={240} />
     </>
   );
 }

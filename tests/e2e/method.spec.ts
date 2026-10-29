@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 /*
- * 03 Method: one crossing in four steps, each a plate of the same bridge.
+ * 03 Method: one crossing in four steps, each a plate of the same stone path.
  * Nothing is driven by scroll and no WebGL stage runs here.
  */
 
@@ -38,6 +38,22 @@ test.describe("method", () => {
     }
     // The step numerals keep their order.
     await expect(section.locator("li > div p.font-label, li p.font-label")).toHaveText(["I.", "II.", "III.", "IV."]);
+  });
+
+  test("the plates are one bridge: same board, stone fills, saffron inlay once built, unique gradient ids", async ({ page }) => {
+    await page.goto("/");
+    const plates = page.locator("#method li svg");
+    const boards = await plates.evaluateAll((svgs) => svgs.map((svg) => svg.getAttribute("viewBox")));
+    expect(new Set(boards).size).toBe(1);
+    const ids = await plates.evaluateAll((svgs) => svgs.flatMap((svg) => [...svg.querySelectorAll("linearGradient")].map((node) => node.id)));
+    expect(ids).toHaveLength(16);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (let index = 0; index < 4; index++) {
+      await expect(plates.nth(index).locator('path[fill="var(--color-slab-top)"]').first()).toBeAttached();
+    }
+    // Saffron inlay runs on the built slabs only: none in Discover and Define, some in Build and Improve.
+    const inlays = await plates.evaluateAll((svgs) => svgs.map((svg) => svg.querySelectorAll('path[stroke="var(--color-saffron-500)"]').length));
+    expect(inlays).toEqual([0, 0, 1, 1]);
   });
 
   test("the plates draw in once the section is reached", async ({ page }) => {
