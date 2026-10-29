@@ -15,7 +15,7 @@ import { SeamSlider } from "./SeamSlider";
 /*
  * The seam, its stage and the rows that follow it. The value is the share
  * modernised (0..100); the seam sits at (100 - value)% of the stage width,
- * drawn maquette on its left, built lattice on its right.
+ * loose stone slabs on its left, one level deck on its right.
  *
  * Only the visitor moves it, by dragging or keying the slider; scrolling
  * the page never does.
@@ -26,7 +26,8 @@ import { SeamSlider } from "./SeamSlider";
  *
  * Without WebGL, under reduced motion or before the canvas is live, two
  * posters (all drawn, all built) are split at the seam with a clip-path, so
- * the control still shows what it does.
+ * the control still shows what it does. They are cover-fitted, and the scene
+ * crops its view the same way, so poster and canvas show the same picture.
  */
 
 const loadBridgeScene = () => import("@/components/three/scenes/bridge");

@@ -148,7 +148,7 @@ discipline index (01–04) linking to `#services-ai|automation|software|seo`.
   `src/data/transition.ts` verbatim (label + status for both states).
 - **Composition (1440):** paper-raised band. Top: marker, H2 left, lede right.
   Below: a full-width stage (`aspect-[21/9]`, max-h ~560px) holding the 3D
-  truss bridge (two banks, today left, what's next right) with the seam as a vertical line + handle at its x position.
+  stone path (rising from a low near plinth, today left, to a higher far one, what's next right) with the seam as a vertical line + handle at its x position.
   Under the stage: the five comparison rows as a table-like list, each row
   "Current" label/status on the left, "Next" label/status on the right; a row
   flips to built (ink, status in ink, small ring node) once the seam has passed
@@ -157,13 +157,21 @@ discipline index (01–04) linking to `#services-ai|automation|software|seo`.
 - **Control:** the shadcn `Slider` (0–100) is the seam: label "Move the seam",
   `aria-valuetext` "Seam at 40%: 2 of 5 modernised". Only the visitor moves
   it (drag or keys); scrolling never does.
-- **3D:** a through-truss span between two banks, built from instanced thin
-  square-section members and ring nodes (the mark's vocabulary) plus deck and
-  bank slabs. Left of the seam: matte maquette, members loose (seeded small
-  rotations/offsets), some not yet drawn, and a deck only a narrow way wide.
-  Right of the seam: iridescent, settled into a regular truss with a
-  full-width deck. Seam blend from the core's seam material. 3 draw calls,
-  ~7k triangles. Poster fallback for no-WebGL/reduced motion.
+- **3D:** fourteen chamfered pale-travertine slabs between two plinths (each
+  with one low step), with nothing beneath or around them, rising from the low
+  near plinth to a clearly higher far one in one eased line, seen from a low
+  three-quarter view along the path. Left of the seam: slabs small, far apart,
+  sunk, yawed and a few tilted, no inlay. Right of the seam: grown, level and
+  closed up into one broad deck with a thin saffron inlay down its middle.
+  Slabs settle by where they sit on the stage, so the seam line stays true
+  under perspective. Matte Lambert stone (not tone mapped) over a faint warm
+  glow behind the far end; the far plinth dissolves into the page. 2 instanced
+  draw calls for slabs and inlays, 4 plinth meshes and the glow plane (7 in
+  all), ~1k triangles, render on demand. Framed once at a reference aspect
+  (1.4) and cropped like `object-cover` up to a stage aspect of 2.9, so the
+  cover-fitted posters (`bridge-*-v8.png`, composited on paper-raised) match
+  the canvas; on wider stages the canvas keeps the whole path and adds empty
+  paper at the sides. Poster fallback for no-WebGL/reduced motion.
 - **Acceptance:** slider keyboard (arrows, Home/End) updates rows and 3D; rows
   readable in both states without JS; reduced motion = posters, slider works; scroll never moves it.
 

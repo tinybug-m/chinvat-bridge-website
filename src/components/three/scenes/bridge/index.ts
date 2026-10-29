@@ -3,29 +3,45 @@ import {
   DirectionalLight,
   DynamicDrawUsage,
   Euler,
+  Fog,
+  Group,
   HemisphereLight,
   InstancedMesh,
   Matrix4,
-  OrthographicCamera,
+  Mesh,
+  MeshBasicMaterial,
+  MeshLambertMaterial,
+  PerspectiveCamera,
+  PlaneGeometry,
   Quaternion,
   Scene,
-  TorusGeometry,
   Vector3,
 } from "three";
 import { clamp, damp } from "../../core/motion";
 import { devParam } from "../../core/switches";
 import type { SceneContext, SceneInstance, SceneModule, StageSize } from "../../core/types";
-import { createSeamMaterial } from "../../materials/seam";
-import { BRIDGE_SPAN } from "./config";
+import { PALETTE_3D } from "../../materials/palette";
+import { BRIDGE_PATH } from "./config";
+import { chamferedSlab, fadedBlock, glowTexture, mix, random, smooth, stoneTexture } from "./stone";
 
 /*
- * The Bridge: a through-truss span between two banks, from how a business
- * works today (left bank) to how it could (right bank). Left of the seam it
- * is the DRAWN maquette (grey card linework, every member a little loose,
- * some not yet drawn, and a deck only a narrow way wide); right of it,
- * BUILT: thin-film members settled into a regular truss with a full-width
- * deck. Three instanced draw calls (members, nodes, slabs) share one seam
- * material.
+ * The Bridge: a path of pale stone slabs rising from a low near plinth to a
+ * higher far one, with nothing under it and nothing around it. Left of the
+ * seam it is how things work today: the slabs are small, far apart, sunk,
+ * yawed and a few tilted, and the way across is only inferred. Right of it,
+ * the slabs have grown, levelled and closed up into one broad deck that
+ * climbs to the far plinth, with a thin saffron inlay down its middle.
+ *
+ * Slabs settle from loose to level by where they sit on the stage (the seam is
+ * a vertical line on the page, and the camera is a perspective one, so
+ * world x is not screen x). The camera is framed once for a reference aspect
+ * and then cropped like object-cover, so the posters, which are cover-fitted,
+ * show the same picture as the canvas.
+ *
+ * The slabs and their inlays are two instanced draw calls; the plinths are
+ * four static meshes that fade out below, and a faint warm glow sits behind
+ * the far end. Nothing animates by itself: the loop only runs while the seam
+ * moves.
  *
  * Inputs (StageHandle.set):
  *   built  0..1  share modernised; the seam sits at (1 - built) of the width
@@ -33,256 +49,318 @@ import { BRIDGE_SPAN } from "./config";
  * Capture (?poster=1): renders fully drawn, or fully built with &bridge=built.
  */
 
-const DEG = Math.PI / 180;
-const X_AXIS = new Vector3(1, 0, 0);
-const Z_AXIS = new Vector3(0, 0, 1);
-
-/** Seeded PRNG (mulberry32), so the maquette is the same on every visit and in the posters. */
-function random(seed: number) {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
 interface Pose {
-  position: Vector3;
-  quaternion: Quaternion;
-  scale: Vector3;
+  x: number;
+  y: number;
+  z: number;
+  pitch: number;
+  yaw: number;
+  roll: number;
+  /** Scale on the built slab, per axis. */
+  sx: number;
+  sy: number;
+  sz: number;
 }
 
-interface Piece {
-  /** Aligned x, which decides when the piece settles. */
-  x: number;
+interface Slab {
   built: Pose;
   loose: Pose;
+  /** Where the built slab sits across the stage, 0 (left edge) to 1 (right edge). */
+  screen: number;
 }
 
-function smooth(t: number) {
-  return t * t * (3 - 2 * t);
-}
+const DEG = 180 / Math.PI;
 
 export function createScene(context: SceneContext): SceneInstance {
   const { quality, capture } = context;
-  const tier = quality.tier === "low" ? "low" : "high";
-  const S = BRIDGE_SPAN;
-  const rand = random(S.seed);
-  const spread = (amount: number) => (rand() * 2 - 1) * amount;
+  const P = BRIDGE_PATH;
+  const rand = random(P.seed);
 
   const scene = new Scene();
+  const camera = new PerspectiveCamera(P.fov, P.referenceAspect, 0.5, 400);
 
-  // Orthographic, pitch only: an axonometric drawing, and world x = screen x.
-  const camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 200);
-  const elevation = S.elevation * DEG;
-  camera.position.set(0, Math.sin(elevation) * 60, Math.cos(elevation) * 60);
-  camera.lookAt(0, 0, 0);
-  const toCamera = camera.position.clone().normalize();
+  scene.add(new HemisphereLight(0xf4f6fa, 0x5f82b0, 1.55));
+  const key = new DirectionalLight(0xfff6e6, 2.5);
+  key.position.set(-14, 16, -1);
+  scene.add(key);
 
-  const key = new DirectionalLight(0xffffff, 2.1);
-  key.position.set(-7, 10, 6);
-  const fill = new DirectionalLight(0xe4ebf1, 0.5);
-  fill.position.set(8, 4, 3);
-  const ambient = new HemisphereLight(0xffffff, 0xd9d3c7, 1);
-  scene.add(key, key.target, fill, fill.target, ambient);
+  // Not tone mapped: the stone is lit and coloured to read as it does on the page, and the
+  // runtime's tone mapping would grey it. The fog is the page colour, so the far end dissolves into it.
+  const map = stoneTexture();
+  map.anisotropy = quality.tier === "low" ? 1 : 4;
+  const slabMaterial = new MeshLambertMaterial({ color: 0xf7f4ec, map, toneMapped: false });
+  const plinthMaterial = new MeshLambertMaterial({
+    color: 0xf3efe4,
+    map,
+    vertexColors: true,
+    transparent: true,
+    depthWrite: false,
+    toneMapped: false,
+  });
+  const inlayMaterial = new MeshLambertMaterial({
+    color: PALETTE_3D.saffron,
+    emissive: PALETTE_3D.saffronLight,
+    emissiveIntensity: 0.45,
+    fog: false,
+    toneMapped: false,
+  });
 
-  // --- The truss ---------------------------------------------------------
-  const halfSpan = (S.panels * S.panel) / 2;
-  const halfDepth = S.depth / 2;
-  const nodeX = (i: number) => i * S.panel - halfSpan;
-  const topHeight = (i: number) => {
-    const s = i / S.panels;
-    return S.endHeight + (S.crownHeight - S.endHeight) * 4 * s * (1 - s);
+  // --- The path ------------------------------------------------------------
+  const count = P.slabs;
+  const pitch = P.length + P.closed;
+  const deckEnd = P.lead + count * pitch - P.closed;
+
+  // One profile for the whole path: a steady climb eased at both ends, so it starts low and keeps rising to the far plinth.
+  const lift = (x: number) => {
+    const u = clamp(x / deckEnd);
+    return P.rise * (P.climb * u + (1 - P.climb) * u * u * (3 - 2 * u));
   };
-  const bottom = (i: number, side: -1 | 1) => new Vector3(nodeX(i), 0, side * halfDepth);
-  const top = (i: number, side: -1 | 1) => new Vector3(nodeX(i), topHeight(i), side * halfDepth);
+  const slope = (x: number) => {
+    const u = clamp(x / deckEnd);
+    return (P.rise * (P.climb + (1 - P.climb) * 6 * u * (1 - u))) / deckEnd;
+  };
 
-  // Members are tagged with whether the maquette may leave them out: chords
-  // and floor beams stay, some posts and diagonals have not been drawn yet.
-  const segments: [Vector3, Vector3, boolean][] = [];
-  const mid = S.panels / 2;
-  for (const side of [-1, 1] as const) {
-    for (let i = 0; i <= S.panels; i++) {
-      segments.push([bottom(i, side), top(i, side), i > 0 && i < S.panels]);
-      if (i < S.panels) {
-        segments.push([bottom(i, side), bottom(i + 1, side), false]);
-        segments.push([top(i, side), top(i + 1, side), false]);
-        // Pratt: diagonals fall toward midspan.
-        segments.push(i < mid ? [top(i, side), bottom(i + 1, side), true] : [bottom(i, side), top(i + 1, side), true]);
-      }
+  // Loose slabs sit far apart near the start and close up toward the end; the row is then fitted back
+  // between the same first and last slab as the built deck, so both states reach the same plinths.
+  const looseCentres: number[] = [];
+  let looseReach = 0;
+  for (let i = 0; i < count; i++) {
+    const t = i / (count - 1);
+    const length = P.length * mix(P.looseLength[0], P.looseLength[1], t);
+    if (i > 0) {
+      const before = P.length * mix(P.looseLength[0], P.looseLength[1], (i - 1) / (count - 1));
+      looseReach += (before + length) / 2 + mix(P.looseGap[0], P.looseGap[1], smooth((t - 0.1) / 0.8));
     }
+    looseCentres.push(looseReach);
   }
-  for (let i = 0; i <= S.panels; i++) {
-    segments.push([bottom(i, -1), bottom(i, 1), false]);
-    if (i > 0 && i < S.panels) segments.push([top(i, -1), top(i, 1), false]);
-  }
+  const firstX = P.lead + P.length / 2;
+  const looseFit = ((count - 1) * pitch) / looseReach;
 
-  const tilt = new Euler();
-  const jitter = new Quaternion();
-  const trim = S.ringRadius * 1.1;
-
-  const struts: Piece[] = segments.map(([a, b, optional]) => {
-    const direction = b.clone().sub(a);
-    const length = direction.length();
-    const quaternion = new Quaternion().setFromUnitVectors(X_AXIS, direction.normalize());
-    const position = a.clone().add(b).multiplyScalar(0.5);
-    // Trim at the rings so the joints read.
-    const built: Pose = { position, quaternion, scale: new Vector3(length - trim, 1, 1) };
-    // Loose: a drawing not yet trued up. Most members a degree or two out, a
-    // few further, all a little short of their joints; never a heap.
-    const stray = rand() < 0.03;
-    const left = optional && rand() < S.missing;
-    const angle = (stray ? 10 : 3) * DEG;
-    tilt.set(spread(angle), spread(angle), spread(angle * 1.4));
-    const loose: Pose = {
-      position: position
-        .clone()
-        .add(new Vector3(spread(stray ? 0.17 : 0.05), spread(0.03) - rand() * (stray ? 0.22 : 0.08), spread(stray ? 0.17 : 0.05))),
-      quaternion: quaternion.clone().premultiply(jitter.setFromEuler(tilt)),
-      scale: left ? new Vector3(0.001, 0.001, 0.001) : new Vector3((length - trim) * (0.86 + rand() * 0.08), 1, 1),
-    };
-    return { x: position.x, built, loose };
-  });
-
-  const facing = new Quaternion().setFromUnitVectors(Z_AXIS, toCamera);
-  const rings: Piece[] = [];
-  for (const side of [-1, 1] as const) {
-    for (let i = 0; i <= S.panels; i++) {
-      for (const position of [bottom(i, side), top(i, side)]) {
-        const built: Pose = { position, quaternion: facing, scale: new Vector3(1, 1, 1) };
-        tilt.set(spread(12 * DEG), spread(12 * DEG), spread(6 * DEG));
-        const loose: Pose = {
-          position: position.clone().add(new Vector3(spread(0.07), -rand() * 0.1, spread(0.07))),
-          quaternion: facing.clone().multiply(jitter.setFromEuler(tilt)),
-          scale: new Vector3(0.86, 0.86, 0.86),
-        };
-        rings.push({ x: position.x, built, loose });
-      }
-    }
-  }
-
-  // --- Deck and banks ------------------------------------------------------
-  const identity = new Quaternion();
-  const slabs: Piece[] = [];
-  for (let i = 0; i < S.panels; i++) {
-    const x = nodeX(i) + S.panel / 2;
-    const y = S.deckThickness / 2 - 0.02;
+  const slabs: Slab[] = [];
+  for (let i = 0; i < count; i++) {
+    const t = i / (count - 1);
+    const x = P.lead + i * pitch + P.length / 2;
     const built: Pose = {
-      position: new Vector3(x, y, 0),
-      quaternion: identity,
-      scale: new Vector3(S.panel * 0.94, S.deckThickness, S.depth * 0.96),
+      x,
+      y: -P.thickness / 2 + lift(x),
+      z: 0,
+      pitch: 0,
+      yaw: 0,
+      roll: Math.atan(slope(x)),
+      sx: 1,
+      sy: 1,
+      sz: 1,
     };
-    // Drawn: only a narrow way across, wandering a little and not yet laid flat.
-    tilt.set(spread(2 * DEG), spread(3 * DEG), spread(2.5 * DEG));
+
+    // The drawn state is a little less loose toward the far end, so the path still leans somewhere.
+    const looseness = mix(1, 0.55, t);
+    const jitterX = (rand() - 0.5) * 2;
+    const jitterY = (rand() - 0.5) * 2;
+    const jitterZ = (rand() - 0.5) * 2;
+    const jitterYaw = (rand() - 0.5) * 2;
+    const sy = mix(P.looseThickness[0], P.looseThickness[1], t);
+    const looseX = firstX + looseCentres[i] * looseFit + jitterX * 0.1 * looseness;
     const loose: Pose = {
-      position: new Vector3(x + spread(0.06), y - rand() * 0.1, spread(0.4)),
-      quaternion: identity.clone().premultiply(jitter.setFromEuler(tilt)),
-      scale: new Vector3(S.panel * (0.8 + rand() * 0.12), S.deckThickness, S.depth * S.deckDrawn * (0.8 + rand() * 0.4)),
+      x: looseX,
+      y: (-P.thickness * sy) / 2 - looseness * (0.12 + 0.5 * Math.abs(jitterY)) + looseness * jitterY * 0.1 + lift(looseX),
+      z: looseness * jitterZ * 1.2,
+      pitch: 0,
+      yaw: looseness * jitterYaw * 0.75,
+      roll: 0,
+      sx: mix(P.looseLength[0], P.looseLength[1], t),
+      sy,
+      sz: mix(P.looseDepth[0], P.looseDepth[1], t),
     };
-    slabs.push({ x, built, loose });
+    slabs.push({ built, loose, screen: 0 });
   }
-  const bankDepth = S.depth * 1.5;
-  for (const side of [-1, 1] as const) {
-    const pose: Pose = {
-      position: new Vector3(side * (halfSpan + S.bankWidth / 2 - 0.9), -S.bankHeight / 2 - 0.2, 0),
-      quaternion: identity,
-      scale: new Vector3(S.bankWidth, S.bankHeight, bankDepth),
-    };
-    slabs.push({ x: pose.position.x, built: pose, loose: pose });
-  }
+  // A few slabs are visibly tilted, so the loose state reads as unfinished rather than merely sparse.
+  slabs[1].loose.roll = 0.2;
+  slabs[3].loose.pitch = -0.17;
+  slabs[3].loose.yaw += 0.22;
+  slabs[5].loose.roll = -0.14;
+  slabs[6].loose.pitch = 0.1;
 
-  const { material, uniforms } = createSeamMaterial({
-    envMap: context.environment(),
-    tier,
-    halfDepth: bankDepth / 2,
-    seamX: 0,
-  });
-  uniforms.uSeamLineWidth.value = 0.02;
-  uniforms.uSeamLineStrength.value = 1.6;
-  // Cool grey linework (a shade under the strong rule colour), so the drawn half holds its
-  // own against the film without turning into a second material.
-  uniforms.uMatteColor.value.setHex(0xa3acb2);
-  uniforms.uMatteRoughness.value = 0.9;
-  uniforms.uFilmGlow.value = 0.26;
+  const group = new Group();
+  group.position.x = -deckEnd / 2;
+  scene.add(group);
 
-  const strutMesh = new InstancedMesh(new BoxGeometry(1, S.strut, S.strut), material, struts.length);
-  const ringMesh = new InstancedMesh(new TorusGeometry(S.ringRadius, S.ringTube, 4, 14), material, rings.length);
-  const slabMesh = new InstancedMesh(new BoxGeometry(1, 1, 1), material, slabs.length);
-  for (const mesh of [strutMesh, ringMesh, slabMesh]) {
+  const slabMesh = new InstancedMesh(
+    chamferedSlab(P.length, P.thickness, P.depth, P.bevel),
+    slabMaterial,
+    count,
+  );
+  // The inlay runs down each slab's middle; the last instance sits on the far plinth and appears with the last slab.
+  const inlayMesh = new InstancedMesh(new BoxGeometry(1, 0.014, 0.12), inlayMaterial, count + 1);
+  for (const mesh of [slabMesh, inlayMesh]) {
     mesh.instanceMatrix.setUsage(DynamicDrawUsage);
     mesh.frustumCulled = false;
-    scene.add(mesh);
+    group.add(mesh);
   }
 
-  // --- Framing: what the camera must hold, in view space --------------------
-  const cos = Math.cos(elevation);
-  const sin = Math.sin(elevation);
-  const totalWidth = 2 * (halfSpan + S.bankWidth - 0.9);
-  const viewTop = (S.crownHeight + S.ringRadius) * cos + halfDepth * sin;
-  const viewBottom = -(S.bankHeight + 0.2) * cos - (bankDepth / 2) * sin;
-  const viewMiddle = (viewTop + viewBottom) / 2;
+  const endGap = 0.07;
+  const rightTop = P.rise;
+  const makeBlock = (x: number, top: number) => {
+    const mesh = new Mesh(fadedBlock(P.plinthLength, P.plinthHeight, P.plinthDepth, 0.05, 0.95), plinthMaterial);
+    mesh.position.set(x, top - P.plinthHeight / 2, 0);
+    mesh.renderOrder = 2;
+    return mesh;
+  };
+  // Each plinth has one low step toward the path, like the stepped terraces at Persepolis.
+  const makeStep = (x: number, top: number) => {
+    const height = P.plinthHeight - 0.34;
+    const mesh = new Mesh(fadedBlock(0.8, height, P.plinthDepth * 0.9, 0.05, 0.7), plinthMaterial);
+    mesh.position.set(x, top - 0.34 - height / 2, 0);
+    mesh.renderOrder = 2;
+    return mesh;
+  };
+  const leftBlock = makeBlock(-endGap - P.plinthLength / 2 - 0.3, 0);
+  const leftStep = makeStep(leftBlock.position.x + P.plinthLength / 2 + 0.4, 0);
+  const rightBlock = makeBlock(deckEnd + endGap + P.plinthLength / 2, rightTop);
+  const rightStep = makeStep(deckEnd + endGap - 0.4, rightTop);
+  group.add(leftBlock, leftStep, rightBlock, rightStep);
 
-  // --- Seam ---------------------------------------------------------------
   const matrix = new Matrix4();
   const position = new Vector3();
-  const quaternion = new Quaternion();
   const scale = new Vector3();
-  let viewWidth = 1;
+  const quaternion = new Quaternion();
+  const euler = new Euler();
+  const noRotation = new Quaternion();
+  const inlayMatrix = new Matrix4();
+  const plinthInlayX = rightBlock.position.x - 0.05;
 
+  // The glow is a camera-facing plane behind everything, so it can only ever sit behind the stone.
+  const glow = new Mesh(
+    new PlaneGeometry(1, 1),
+    new MeshBasicMaterial({ map: glowTexture(), transparent: true, depthWrite: false, fog: false, toneMapped: false }),
+  );
+  glow.renderOrder = -1;
+  scene.add(glow);
+
+  // --- Framing ---------------------------------------------------------------
+  const span = deckEnd + 2 * P.plinthLength + 1.1;
+  const referenceTan = Math.tan((P.fov * Math.PI) / 360) * P.referenceAspect;
+
+  // Fit once, at the reference aspect: the two plinth ends land symmetrically about the middle of the
+  // stage, and the path sits in the middle of its height, so moderately wide stages crop only empty space.
+  function frame() {
+    const target = new Vector3(0, -0.6 + P.rise * 0.5, 0);
+    let distance = span / (P.fit * 2 * referenceTan);
+    const farBack = new Vector3(rightBlock.position.x + P.plinthLength / 2, rightTop, -P.plinthDepth / 2);
+    const nearFront = new Vector3(leftBlock.position.x - P.plinthLength / 2, 0, P.plinthDepth / 2);
+    const nearLow = nearFront.clone().setY(-P.plinthHeight / 2);
+    const [near, far, low] = [nearFront, farBack, nearLow].map((point) => point.add(group.position));
+    const right = new Vector3();
+    const up = new Vector3();
+    const place = () => {
+      camera.position.set(
+        target.x - distance * Math.sin(P.azimuth) * Math.cos(P.elevation),
+        target.y + distance * Math.sin(P.elevation),
+        target.z + distance * Math.cos(P.azimuth) * Math.cos(P.elevation),
+      );
+      camera.lookAt(target);
+      camera.updateMatrixWorld();
+    };
+    const halfHeight = Math.tan((P.fov * Math.PI) / 360);
+    for (let pass = 0; pass < 6; pass++) {
+      place();
+      const a = near.clone().project(camera);
+      const b = far.clone().project(camera);
+      const bottom = low.clone().project(camera);
+      distance *= (b.x - a.x) / (2 * P.fit);
+      right.setFromMatrixColumn(camera.matrixWorld, 0);
+      up.setFromMatrixColumn(camera.matrixWorld, 1);
+      target.addScaledVector(right, ((a.x + b.x) / 2) * distance * referenceTan);
+      target.addScaledVector(up, ((bottom.y + b.y) / 2) * distance * halfHeight);
+    }
+    place();
+
+    const reach = (span / 2) * Math.sin(P.azimuth);
+    scene.fog = new Fog(PALETTE_3D.paperRaised, distance - reach * 0.7, distance + reach * 1.9);
+
+    // Behind the far end, facing the camera, a little wider than the stage.
+    const forward = new Vector3();
+    camera.getWorldDirection(forward);
+    glow.position
+      .set(deckEnd + 1.2, rightTop + 0.2, 0)
+      .add(group.position)
+      .addScaledVector(forward, P.plinthDepth * 1.5);
+    glow.quaternion.copy(camera.quaternion);
+    const viewHeight = 2 * glow.position.distanceTo(camera.position) * Math.tan((P.fov * Math.PI) / 360);
+    glow.scale.set(viewHeight * P.referenceAspect * 1.15, viewHeight * 1.18, 1);
+  }
+  frame();
+
+  // --- Seam ------------------------------------------------------------------
   const captureBuilt = capture && devParam("bridge") === "built";
   let built = capture ? (captureBuilt ? 1 : 0) : context.input("built", 0.5);
   let laidOutFor = Number.NaN;
 
-  function seamX() {
+  /** Seam position across the stage, 0 (left edge) to 1 (right edge). */
+  function seamFraction() {
     if (capture) return captureBuilt ? -1e3 : 1e3;
-    return (0.5 - built) * viewWidth;
+    return 1 - built;
   }
 
-  function layOut(mesh: InstancedMesh, pieces: Piece[], seam: number) {
-    for (let index = 0; index < pieces.length; index++) {
-      const piece = pieces[index];
-      // 0 = loose (drawn side), 1 = settled (built side). Pieces settle on
-      // the drawn side of the seam, so nothing half-loose crosses into the film.
-      const t = smooth(clamp((piece.x - (seam - 2 * S.band)) / (2 * S.band)));
-      position.lerpVectors(piece.loose.position, piece.built.position, t);
-      quaternion.slerpQuaternions(piece.loose.quaternion, piece.built.quaternion, t);
-      scale.lerpVectors(piece.loose.scale, piece.built.scale, t);
-      mesh.setMatrixAt(index, matrix.compose(position, quaternion, scale));
+  function layOut(seam: number) {
+    for (let index = 0; index < count; index++) {
+      const { built: end, loose: start, screen } = slabs[index];
+      // 0 = loose (drawn side), 1 = level (built side). Slabs settle on the drawn side of the seam,
+      // so nothing half-loose crosses into the built deck.
+      const t = smooth((screen - (seam - P.band)) / P.band);
+      position.set(mix(start.x, end.x, t), mix(start.y, end.y, t), mix(start.z, end.z, t));
+      euler.set(mix(start.pitch, end.pitch, t), mix(start.yaw, end.yaw, t), mix(start.roll, end.roll, t), "YXZ");
+      quaternion.setFromEuler(euler);
+      scale.set(mix(start.sx, end.sx, t), mix(start.sy, end.sy, t), mix(start.sz, end.sz, t));
+      matrix.compose(position, quaternion, scale);
+      slabMesh.setMatrixAt(index, matrix);
+
+      // The inlay shows only once the slab is nearly level; the last one runs on to the plinth.
+      const last = index === count - 1;
+      const reveal = smooth((t - 0.55) / 0.45);
+      inlayMatrix
+        .compose(
+          position.set(last ? 0.05 : 0, P.thickness / 2 + 0.004, 0),
+          noRotation,
+          scale.set(Math.max(0.001, (P.length - 0.03 + (last ? 0.1 : 0)) * reveal), 1, 1),
+        )
+        .premultiply(matrix);
+      inlayMesh.setMatrixAt(index, inlayMatrix);
+      // The strip on the far plinth follows the last slab, so the drawn side has no inlay at all.
+      if (last) {
+        inlayMatrix.compose(
+          position.set(plinthInlayX, rightTop + 0.004, 0),
+          noRotation,
+          scale.set(Math.max(0.001, (P.plinthLength - 0.5) * reveal), 1, 1),
+        );
+        inlayMesh.setMatrixAt(count, inlayMatrix);
+      }
     }
-    mesh.instanceMatrix.needsUpdate = true;
+    slabMesh.instanceMatrix.needsUpdate = true;
+    inlayMesh.instanceMatrix.needsUpdate = true;
   }
 
   function apply() {
-    const seam = seamX();
-    uniforms.uSeamX.value = seam;
-    uniforms.uPhase.value = 0.08 + built * 0.3;
+    const seam = seamFraction();
     if (seam === laidOutFor) return;
     laidOutFor = seam;
-    layOut(strutMesh, struts, seam);
-    layOut(ringMesh, rings, seam);
-    layOut(slabMesh, slabs, seam);
+    layOut(seam);
   }
 
   function resize(size: StageSize) {
     const aspect = size.width / Math.max(1, size.height);
-    let viewHeight = (viewTop - viewBottom) * S.margin;
-    viewWidth = viewHeight * aspect;
-    // Wide stages show the whole span; narrow ones crop the banks first.
-    if (viewWidth > totalWidth) {
-      viewWidth = totalWidth;
-      viewHeight = viewWidth / aspect;
-    } else if (viewWidth < totalWidth * S.minShare) {
-      viewWidth = totalWidth * S.minShare;
-      viewHeight = viewWidth / aspect;
-    }
-    camera.left = -viewWidth / 2;
-    camera.right = viewWidth / 2;
-    camera.top = viewHeight / 2 + viewMiddle;
-    camera.bottom = -viewHeight / 2 + viewMiddle;
+    camera.aspect = aspect;
+    // Wider than the reference: keep its width and crop top and bottom, like object-cover on the posters.
+    // Past maxAspect the crop stops, so on ultra-wide stages the path keeps its height and gains empty
+    // paper at the sides instead of losing its slabs.
+    const cropAspect = Math.min(aspect, P.maxAspect);
+    camera.fov =
+      cropAspect >= P.referenceAspect ? DEG * 2 * Math.atan((Math.tan((P.fov * Math.PI) / 360) * P.referenceAspect) / cropAspect) : P.fov;
     camera.updateProjectionMatrix();
+    camera.updateMatrixWorld();
+    for (const slab of slabs) {
+      position.set(slab.built.x, slab.built.y, slab.built.z).add(group.position).project(camera);
+      slab.screen = position.x * 0.5 + 0.5;
+    }
     laidOutFor = Number.NaN;
     apply();
   }

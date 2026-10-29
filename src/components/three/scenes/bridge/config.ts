@@ -1,45 +1,53 @@
 /*
- * Shared numbers for the Bridge span and the HTML around it. Pure data (no
+ * Shared numbers for the Bridge path and the HTML around it. Pure data (no
  * three), so server components can import it.
  *
- * The span is a through-truss bridge between two banks, seen from the side
- * and a little above by an orthographic camera that only pitches: world x is
- * screen x, so the material seam (a plane at world x) lands exactly under the
- * HTML seam line. The left bank is how things work today, the right bank is
- * where they could.
+ * The path is a row of pale stone slabs rising from a low near plinth to a
+ * higher far one, seen from a low three-quarter view that looks along it from
+ * the near end. The left of the seam is how things work today (slabs small,
+ * far apart, sunk and yawed, a few tilted); the right is where they could be
+ * (slabs grown, level and closed up into one broad deck with a saffron inlay).
  */
 
-export const BRIDGE_SPAN = {
-  /** Bays along the span, and the length of one, world units. */
-  panels: 10,
-  panel: 1.6,
-  /** Distance between the two trusses, which is also the width of the deck. */
-  depth: 2.6,
-  /** Truss height above the deck at the abutments and at midspan. */
-  endHeight: 0.9,
-  crownHeight: 4,
-  /** Square-section strut size. */
-  strut: 0.09,
-  /** Ring node radius and tube (square-ish section: 4 radial segments). */
-  ringRadius: 0.17,
-  ringTube: 0.04,
-  deckThickness: 0.1,
-  /** Share of the deck's width that is walkable while the span is still drawn. */
-  deckDrawn: 0.28,
-  /** Share of the diagonals and verticals left out of the drawing. */
-  missing: 0.14,
-  /** The two banks the span rests on. */
-  bankWidth: 2.6,
-  bankHeight: 1.6,
-  /** Camera elevation above the deck, degrees (90 = plan view). */
-  elevation: 22,
-  /** Room around the structure, as a share of its projected height. */
-  margin: 1.14,
-  /** Narrowest share of the whole span the frame may crop to (small screens). */
-  minShare: 0.7,
-  /** Half-width of the band in which a piece settles from loose to aligned, world units. */
-  band: 0.85,
-  seed: 20251,
+export const BRIDGE_PATH = {
+  slabs: 14,
+  /** Built slab, world units: along the path, across it, and thick. */
+  length: 1.8,
+  depth: 3.2,
+  thickness: 0.78,
+  /** Gap between built slabs, and from the near plinth to the first slab. */
+  closed: 0.05,
+  lead: 0.1,
+  bevel: 0.035,
+  /** Loose slab size as a share of the built one, at the near end and at the far end. */
+  looseLength: [0.55, 0.75],
+  looseDepth: [0.31, 0.62],
+  looseThickness: [0.64, 0.85],
+  /** Open space between loose slabs (world units, before the path is fitted back to its ends), near end and far end. */
+  looseGap: [1.3, 0.6],
+  /** Total rise from the near plinth to the far one, and the share of it that is a steady climb. */
+  rise: 4.4,
+  climb: 0.62,
+  plinthLength: 2,
+  plinthDepth: 2.5,
+  plinthHeight: 1.1,
+  /** Camera: azimuth and elevation off the path's axis (radians), vertical field of view (degrees). */
+  azimuth: 0.82,
+  elevation: 0.17,
+  fov: 30,
+  /**
+   * The stage is framed once at this aspect. Wider stages keep that width and
+   * crop top and bottom, narrower ones crop the sides: the same as the
+   * posters' object-cover, so poster and canvas line up, up to maxAspect.
+   */
+  referenceAspect: 1.4,
+  /** Beyond this stage aspect the crop stops (the path stays whole and the sides gain empty paper). */
+  maxAspect: 2.9,
+  /** Share of the half-width the path (plinth to plinth) fills at the reference aspect. */
+  fit: 0.66,
+  /** Share of the stage width in which a slab settles from loose to level. */
+  band: 0.12,
+  seed: 2718,
 } as const;
 
 /** Slider range (value = share modernised, 0..100). */
@@ -52,6 +60,6 @@ export const BRIDGE_SEAM = {
 
 /** Rendered by scripts/poster/bridge.mjs; bump the version there and here after a scene change (busts the image cache). */
 export const BRIDGE_POSTERS = {
-  drawn: "/bridge/bridge-drawn-v7.png",
-  built: "/bridge/bridge-built-v7.png",
+  drawn: "/bridge/bridge-drawn-v8.png",
+  built: "/bridge/bridge-built-v8.png",
 } as const;
