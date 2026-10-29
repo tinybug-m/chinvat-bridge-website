@@ -77,10 +77,13 @@ document for anything already built (tokens, primitives, shell).
 - **Drawn → built on scroll:** SVG strokes draw in (`stroke-dashoffset`) and
   fills appear when a diagram enters view, triggered by `data-revealed` (CSS
   only, no JS) unless the section spec says GSAP.
-- **Scroll-driven motion:** none. Nothing on the page is scrubbed, pinned or
-  turned by scroll; Reveal fade-ins and the drawn-to-built wipes (which run
-  once when a diagram enters view) are the only scroll-triggered motion. The
-  Approach seam moves only when the visitor drags or keys it.
+- **Scroll-driven motion:** one place only. The Approach seam is scrubbed by
+  scroll: the value sweeps 0 (today) to 100 (what's next) as the stage rises
+  through the viewport (stage centre at 100% of viewport height down to 45%,
+  at least 420px of travel) and runs back on scroll up. The value is eased,
+  and written to a CSS variable so only whole-percent steps reach React.
+  Nothing else is scrubbed or pinned; Reveal fade-ins and the drawn-to-built
+  wipes (run once on entry) are the only other scroll-triggered motion.
 - **Reduced motion:** everything static and fully visible; 3D shows its poster
   or one frame; interactive controls (slider) still work.
 
@@ -156,7 +159,10 @@ discipline index (01–04) linking to `#services-ai|automation|software|seo`.
   stacked with both states visible, the active state emphasised.
 - **Control:** the shadcn `Slider` (0–100) is the seam: label "Move the seam",
   `aria-valuetext` "Seam at 40%: 2 of 5 modernised". Only the visitor moves
-  it (drag or keys); scrolling never does.
+  it (drag or keys) as a manual override, which fades back into the scroll
+  position over ~320px of scrolling. Scrolling down and up also sweeps it (see
+  Motion); reduced motion and no-JS never scroll-drive it. Rows flip as they
+  come into view, not all at once.
 - **3D:** fourteen chamfered pale-travertine slabs between two plinths (each
   with one low step), with nothing beneath or around them, rising from the low
   near plinth to a clearly higher far one in one eased line, seen from a low
@@ -169,11 +175,13 @@ discipline index (01–04) linking to `#services-ai|automation|software|seo`.
   draw calls for slabs and inlays, 4 plinth meshes and the glow plane (7 in
   all), ~1k triangles, render on demand. Framed once at a reference aspect
   (1.4) and cropped like `object-cover` up to a stage aspect of 2.9, so the
-  cover-fitted posters (`bridge-*-v8.png`, composited on paper-raised) match
+  cover-fitted posters (`bridge-*-v9.png`, composited on paper-raised) match
   the canvas; on wider stages the canvas keeps the whole path and adds empty
   paper at the sides. Poster fallback for no-WebGL/reduced motion.
 - **Acceptance:** slider keyboard (arrows, Home/End) updates rows and 3D; rows
-  readable in both states without JS; reduced motion = posters, slider works; scroll never moves it.
+  readable in both states without JS; reduced motion = posters, slider works, scroll does not move the seam; with
+  motion, scrolling down builds the path and scrolling up undoes it; no
+  sideways scroll with the seam at 0 or 100 (handle and line are clamped).
 
 ### 03 Method
 - **Copy:** `src/data/process.ts` verbatim; H2 "How we work." *(live: "Process")*.

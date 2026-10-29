@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { TransitionItem } from "@/data/transition";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +17,7 @@ interface BridgeRowsProps {
   className?: string;
 }
 
-export function BridgeRows({ current, next, count, className }: BridgeRowsProps) {
+export const BridgeRows = memo(function BridgeRows({ current, next, count, className }: BridgeRowsProps) {
   return (
     <ol className={cn("grid gap-y-10 md:gap-y-12", className)}>
       {current.map((today, index) => {
@@ -65,4 +66,4 @@ export function BridgeRows({ current, next, count, className }: BridgeRowsProps)
       })}
     </ol>
   );
-}
+});

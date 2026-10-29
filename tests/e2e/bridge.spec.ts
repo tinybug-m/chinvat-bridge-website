@@ -75,40 +75,65 @@ test.describe("approach (bridge)", () => {
 
   test("scrolling down builds the path and scrolling up undoes it", async ({ page }) => {
     await page.goto("/");
-    const value = async () => Number(await slider(page).getAttribute("aria-valuenow"));
-    const settle = () => page.waitForTimeout(400);
+    const value = () => slider(page).getAttribute("aria-valuenow").then(Number);
+    /** The value once the ease has finished: the same reading twice, 250 ms apart. */
+    const settled = async () => {
+      let before = await value();
+      for (let tries = 0; tries < 20; tries++) {
+        await page.waitForTimeout(250);
+        const now = await value();
+        if (now === before) return now;
+        before = now;
+      }
+      return before;
+    };
+    const seam = () =>
+      section(page).evaluate((element) =>
+        getComputedStyle(element.querySelector<HTMLElement>("[data-seam-value]")!.parentElement!.parentElement!).getPropertyValue("--seam").trim(),
+      );
 
+    // The seam eases to the scroll position, so poll rather than sleep.
     await placeStage(page, 1.3);
-    await settle();
-    expect(await value()).toBe(0);
+    await expect.poll(value).toBe(0);
     await expect(builtRows(page)).toHaveCount(0);
 
-    await placeStage(page, 0.55);
-    await settle();
-    const middle = await value();
-    expect(middle).toBeGreaterThan(20);
-    expect(middle).toBeLessThan(80);
+    await placeStage(page, 0.7);
+    await expect.poll(value).toBeGreaterThan(20);
+    await expect.poll(value).toBeLessThan(85);
+    const middle = await settled();
 
-    await placeStage(page, 0.05);
-    await settle();
-    expect(await value()).toBe(100);
-    await expect(builtRows(page)).toHaveCount(5);
+    // Centred on the stage the bridge is fully built, with the stage whole.
+    await placeStage(page, 0.3);
+    await expect.poll(value).toBe(100);
     await expect(section(page).getByTestId("approach-readout")).toHaveText("Everything improved");
+    // The rows flip as they come into view, not while still below the fold.
+    await section(page).locator("ol > li").last().scrollIntoViewIfNeeded();
+    await expect(builtRows(page)).toHaveCount(5);
 
-    // And back up: the same positions give the same values.
-    await placeStage(page, 0.55);
-    await settle();
-    expect(await value()).toBe(middle);
+    // And back up: the same position gives (nearly) the same value, and the seam line follows it.
+    await placeStage(page, 0.7);
+    await expect.poll(async () => Math.abs((await value()) - middle)).toBeLessThanOrEqual(2);
     await placeStage(page, 1.3);
-    await settle();
-    expect(await value()).toBe(0);
-    const offset = await section(page).evaluate((element) =>
-      getComputedStyle(element.querySelector<HTMLElement>("[data-seam-value]")!.parentElement!.parentElement!).getPropertyValue("--seam").trim(),
-    );
-    expect(offset).toBe("100%");
+    await expect.poll(value).toBe(0);
+    await expect.poll(seam).toBe("100%");
     // No pin: the section keeps its place in the flow.
-    const position = await section(page).evaluate((element) => getComputedStyle(element).position);
-    expect(position).toBe("relative");
+    expect(await section(page).evaluate((element) => getComputedStyle(element).position)).toBe("relative");
+  });
+
+  test("no sideways scroll with the seam at either end", async ({ page }) => {
+    await page.goto("/");
+    for (const [share, expected] of [
+      [1.3, 0],
+      [0.3, 100],
+    ] as const) {
+      await placeStage(page, share);
+      await expect.poll(async () => Number(await slider(page).getAttribute("aria-valuenow"))).toBe(expected);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
+      // The handle stays whole on screen.
+      const box = (await slider(page).boundingBox())!;
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+    }
   });
 
   test("keyboard moves the seam and updates the rows", async ({ page }) => {
@@ -138,12 +163,13 @@ test.describe("approach (bridge)", () => {
     });
     expect(offset).toBe("0%");
 
-    // A small scroll leaves the visitor's value alone; a long one hands the seam back to the page.
-    await page.evaluate(() => window.scrollBy({ top: 60, behavior: "instant" }));
-    await page.waitForTimeout(400);
-    await expect(thumb).toHaveAttribute("aria-valuenow", "100");
+    // A small scroll barely moves the visitor's value; a long one hands the seam back to the page.
+    await page.evaluate(() => window.scrollBy({ top: 40, behavior: "instant" }));
+    await page.waitForTimeout(500);
+    expect(Number(await thumb.getAttribute("aria-valuenow"))).toBeGreaterThan(85);
+    await thumb.blur();
     await placeStage(page, 1.3);
-    await expect(thumb).toHaveAttribute("aria-valuenow", "0");
+    await expect.poll(async () => Number(await thumb.getAttribute("aria-valuenow"))).toBe(0);
   });
 
   test("reduced motion: posters, no GSAP, the slider still works", async ({ browser }) => {
@@ -198,7 +224,7 @@ test.describe("approach (bridge)", () => {
       const frame = element.querySelector("[data-seam-value]")!;
       return {
         thumb: box(element.querySelector("[role=slider]")!),
-        line: box(frame.querySelector(".left-\\(--seam\\)")!),
+        line: box(frame.querySelector(":scope > div[aria-hidden=true]")!),
         stage: box(frame),
       };
     });

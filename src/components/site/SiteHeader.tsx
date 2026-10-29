@@ -28,8 +28,8 @@ export function SiteHeader() {
       data-scrolled={scrolled || undefined}
       className="group/header fixed inset-x-0 top-0 z-50 border-b border-transparent transition-[background-color,border-color] duration-300 ease-out-quart data-scrolled:border-line data-scrolled:bg-paper"
     >
-      <Container className="flex h-16 items-center justify-between gap-6 transition-[height] duration-300 ease-out-quart lg:h-18 lg:group-data-scrolled/header:h-15">
-        <Lockup className="-my-2 py-2" />
+      <Container className="flex h-16 items-center justify-between gap-2 transition-[height] duration-300 ease-out-quart lg:h-18 sm:gap-6 lg:group-data-scrolled/header:h-15">
+        <Lockup className="min-h-11" />
 
         <nav aria-label="Main" className="hidden lg:block">
           <ul className="flex items-center xl:gap-1">
@@ -64,7 +64,7 @@ export function SiteHeader() {
             {CONTACT_LINK.label}
           </ButtonLink>
           {/* Below sm the full label does not fit beside the menu; the conversion path stays one tap away. */}
-          <ButtonLink href={CONTACT_LINK.href} className="px-4 sm:hidden">
+          <ButtonLink href={CONTACT_LINK.href} className="px-3 min-[360px]:px-4 sm:hidden">
             Contact
           </ButtonLink>
           <MobileMenu />

@@ -49,7 +49,7 @@ export function SeamSlider({ value, min, max, valueText, labelledBy, onValueChan
         aria-labelledby={labelledBy}
         aria-valuetext={valueText}
         className={cn(
-          "pointer-events-auto relative grid size-10 cursor-grab touch-none place-items-center rounded-full border-[1.5px] border-ink bg-paper-raised text-ink",
+          "pointer-events-auto relative grid size-10 cursor-grab touch-pan-y place-items-center rounded-full border-[1.5px] border-ink bg-paper-raised text-ink",
           "transition-[background-color,scale] duration-200 ease-out-quart before:absolute before:-inset-2 before:content-['']",
           "hover:bg-haze active:cursor-grabbing active:scale-95",
         )}

@@ -25,7 +25,7 @@ export function SiteFooter() {
     <footer className="border-t border-line bg-paper-raised">
       <Container className="grid gap-10 py-12 md:grid-cols-12 md:gap-6 lg:py-20">
         <div className="md:col-span-5 lg:col-span-4">
-          <Lockup />
+          <Lockup className="min-h-11" />
           <p className="mt-6 max-w-[34ch] text-small text-ink-soft">
             Chinvat Bridge is a UK-based technology consultancy helping businesses use AI, automation, software and SEO
             to work better and grow.
@@ -63,10 +63,10 @@ export function SiteFooter() {
         <p>UK Based // Working Globally</p>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
           <p>&copy; {year} Chinvat Bridge Ltd. All rights reserved.</p>
-          <Link href="/privacy" className="inline-flex min-h-11 items-center hover:text-ink md:min-h-6 md:py-1">
+          <Link href="/privacy" className="inline-flex min-h-11 items-center hover:text-ink">
             Privacy Policy
           </Link>
-          <Link href="/terms" className="inline-flex min-h-11 items-center hover:text-ink md:min-h-6 md:py-1">
+          <Link href="/terms" className="inline-flex min-h-11 items-center hover:text-ink">
             Terms of Service
           </Link>
         </div>
