@@ -18,7 +18,39 @@ test.describe("services section", () => {
       await expect(article.getByRole("heading", { level: 3 })).toHaveText(title);
       await expect(article.locator(`a[href="${href}"]`)).toHaveCount(1);
     }
-    await expect(section).toContainText("Also: Digital Strategy · Data Integration · Analytics & BI · Technical Architecture");
+    // The supporting capabilities are listed once, under Capabilities.
+    await expect(section).not.toContainText("Also:");
+  });
+
+  test("tags carry no separator glyphs and plates are not stamped copies", async ({ page }) => {
+    await page.goto("/");
+    const article = page.locator("#services-ai");
+    await expect(article.locator("ul > li")).toHaveText(["AI strategy", "LLM applications", "Automated workflows", "Internal AI tools"]);
+    // No generated content on a tag, so a wrapped line never starts on a separator.
+    const before = await article.locator("ul > li").first().evaluate((el) => getComputedStyle(el, "::before").content);
+    expect(["none", "normal"]).toContain(before);
+    // Plates differ in type scale and in how the link is set.
+    const sizes = await page.locator("#services article h3").evaluateAll((els) => els.map((el) => getComputedStyle(el).fontSize));
+    expect(new Set(sizes).size).toBeGreaterThan(1);
+    await expect(page.locator("#services-software a[href^='/insights/']")).toHaveClass(/shadow/);
+    await expect(page.locator("#services-ai a[href^='/insights/']")).not.toHaveClass(/shadow/);
+  });
+
+  test("the software plate sits on a full-bleed haze band", async ({ page }) => {
+    await page.goto("/");
+    const band = await page.locator("#services-software").evaluate((el) => {
+      const style = getComputedStyle(el, "::before");
+      return { bg: style.backgroundColor, width: parseFloat(style.width), vw: document.documentElement.clientWidth };
+    });
+    expect(band.bg).toBe("rgb(236, 238, 239)");
+    expect(Math.round(band.width)).toBeGreaterThanOrEqual(band.vw);
+  });
+
+  test("the SEO chart runs to the viewport edge on purpose, with no sideways scroll", async ({ page }) => {
+    await page.goto("/");
+    const edge = await page.locator("#services-seo .svc-built line").first().evaluate((el) => el.getBoundingClientRect().right);
+    const vw = await page.evaluate(() => document.documentElement.clientWidth);
+    expect(Math.round(edge)).toBe(vw);
   });
 
   test("anchors scroll to their plate", async ({ page }) => {
@@ -31,8 +63,10 @@ test.describe("services section", () => {
     const frames = page.locator("#services .svc-fig");
     await expect(frames).toHaveCount(4);
     for (let i = 0; i < 4; i++) {
-      await expect(frames.nth(i).locator("> div").first()).toHaveAttribute("aria-hidden", "true");
+      await expect(frames.nth(i).locator("> svg")).toHaveAttribute("aria-hidden", "true");
     }
+    // Frameless: no registration marks, Drawn/Built captions or seam inside the plates.
+    await expect(page.locator("#services").getByText(/^(Drawn|Built)$/)).toHaveCount(0);
     const link = page.locator("#services-ai").getByRole("link", { name: /Read the article/ });
     await link.scrollIntoViewIfNeeded();
     const box = await link.boundingBox();
@@ -70,7 +104,8 @@ test.describe("services section", () => {
   test("diagram draws in and builds on reveal", async ({ page }) => {
     await page.goto("/");
     const fill = page.locator("#services-software .svc-fill").first();
-    await page.locator("#services-software").scrollIntoViewIfNeeded();
+    // On narrow screens the diagram sits below the text, so scroll to it directly.
+    await page.locator("#services-software .svc-fig").scrollIntoViewIfNeeded();
     await expect.poll(() => fill.evaluate((el) => getComputedStyle(el).opacity), { timeout: 5000 }).toBe("1");
   });
 });

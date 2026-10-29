@@ -1,19 +1,15 @@
 import { cn } from "@/lib/utils";
 
 interface SectionMarkerProps {
-  /** Two-digit chapter number, e.g. "02". */
-  index: string;
   label: string;
   className?: string;
 }
 
-/** Mono chapter marker: index, hairline, name. */
-export function SectionMarker({ index, label, className }: SectionMarkerProps) {
-  return (
-    <p className={cn("flex items-center gap-3 font-label text-label uppercase text-ink-muted", className)}>
-      <span className="text-ink">{index}</span>
-      <span aria-hidden="true" className="h-px w-10 bg-line-strong" />
-      <span>{label}</span>
-    </p>
-  );
+/**
+ * Quiet section name above a heading. Plain sentence-case text: no rule, no
+ * mono caps. Use it sparingly (two or three sections at most) so it stays a
+ * choice and never becomes the page's template.
+ */
+export function SectionMarker({ label, className }: SectionMarkerProps) {
+  return <p className={cn("text-small font-medium text-ink-muted", className)}>{label}</p>;
 }

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
-import { Annotation } from "@/components/system/Annotation";
+import { Container } from "@/components/system/Container";
 import { Seam } from "@/components/system/Seam";
 import { ThreeStage } from "@/components/three/core/ThreeStage";
 import type { StageHandle } from "@/components/three/core/types";
@@ -19,8 +19,13 @@ import { SeamSlider } from "./SeamSlider";
  *
  * Who drives it:
  *   scroll   10 -> 90 while the stage's centre crosses the viewport (GSAP
- *            ScrollTrigger, scrubbed, no pin; motion allowed only)
- *   the user once they drag, click or key the slider; scroll lets go for good
+ *            ScrollTrigger, scrubbed, no pin; motion allowed only, and GSAP
+ *            is fetched only once the island comes within a screen of view)
+ *   the user once they drag or key the slider; scroll lets go for good
+ *
+ * The fractional value lives in a ref and goes straight to --seam (the line,
+ * the handle, the poster split) and the scene; React only hears about whole
+ * steps, which is all the slider, the readout and the rows need.
  *
  * Without WebGL, under reduced motion or before the canvas is live, two
  * posters (all drawn, all built) are split at the seam with a clip-path, so
@@ -45,64 +50,83 @@ const posterLayer = cn(
 
 const POSTER_SIZES = "(min-width: 90rem) 86rem, 100vw";
 
-function Corner({ className }: { className: string }) {
-  return (
-    <span aria-hidden="true" className={cn("pointer-events-none absolute size-4", className)}>
-      <span className="absolute top-1/2 left-0 h-px w-4 bg-control" />
-      <span className="absolute top-0 left-1/2 h-4 w-px bg-control" />
-    </span>
-  );
-}
+const seamOffset = (value: number) => `${100 - value}%`;
+
+/** Server render; constant, so React never rewrites what drive() sets. */
+const INITIAL_STYLE = { "--seam": seamOffset(BRIDGE_SEAM.initial) } as CSSProperties;
 
 export function BridgeSeam({ className }: { className?: string }) {
   const [value, setValue] = useState<number>(BRIDGE_SEAM.initial);
   const handle = useRef<StageHandle>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const userTookOver = useRef(false);
   const releaseScroll = useRef<(() => void) | null>(null);
+  const fraction = useRef<number>(BRIDGE_SEAM.initial);
+  const shown = useRef<number>(BRIDGE_SEAM.initial);
 
   const drive = useCallback((next: number) => {
-    setValue(Math.round(next * 10) / 10);
+    if (next === fraction.current) return;
+    fraction.current = next;
+    rootRef.current?.style.setProperty("--seam", seamOffset(next));
     handle.current?.set("built", next / 100);
+    // Whole steps only: the slider, the readout and the rows follow the rounded value.
+    const rounded = Math.round(next);
+    if (rounded === shown.current) return;
+    shown.current = rounded;
+    setValue(rounded);
   }, []);
 
   useEffect(() => {
     handle.current?.set("built", BRIDGE_SEAM.initial / 100);
   }, []);
 
-  // Scroll scrub, loaded after hydration so GSAP stays out of the first bundle.
+  // Scroll scrub. GSAP stays out of the first bundle, is never fetched under
+  // reduced motion, and loads only as the island nears the viewport.
   useEffect(() => {
     const trigger = frameRef.current;
-    if (!trigger) return;
+    if (!trigger || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let cancelled = false;
     let revert: (() => void) | null = null;
 
-    void Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(([{ gsap }, { ScrollTrigger }]) => {
-      if (cancelled || userTookOver.current) return;
-      gsap.registerPlugin(ScrollTrigger);
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const proxy = { value: BRIDGE_SEAM.scrubFrom };
-        const tween = gsap.to(proxy, {
-          value: BRIDGE_SEAM.scrubTo,
-          ease: "none",
-          scrollTrigger: { trigger, start: "center bottom", end: "center top", scrub: 0.6 },
-          onUpdate: () => {
-            if (!userTookOver.current) drive(proxy.value);
-          },
+    const load = () =>
+      Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(([{ gsap }, { ScrollTrigger }]) => {
+        if (cancelled || userTookOver.current) return;
+        gsap.registerPlugin(ScrollTrigger);
+        const mm = gsap.matchMedia();
+        mm.add("(prefers-reduced-motion: no-preference)", () => {
+          const proxy = { value: BRIDGE_SEAM.scrubFrom };
+          const tween = gsap.to(proxy, {
+            value: BRIDGE_SEAM.scrubTo,
+            ease: "none",
+            scrollTrigger: { trigger, start: "center bottom", end: "center top", scrub: 0.6 },
+            onUpdate: () => {
+              if (!userTookOver.current) drive(proxy.value);
+            },
+          });
+          const progress = tween.scrollTrigger?.progress ?? 0;
+          drive(BRIDGE_SEAM.scrubFrom + (BRIDGE_SEAM.scrubTo - BRIDGE_SEAM.scrubFrom) * progress);
         });
-        const progress = tween.scrollTrigger?.progress ?? 0;
-        drive(BRIDGE_SEAM.scrubFrom + (BRIDGE_SEAM.scrubTo - BRIDGE_SEAM.scrubFrom) * progress);
+        revert = () => mm.revert();
+        releaseScroll.current = () => {
+          revert?.();
+          revert = null;
+        };
       });
-      revert = () => mm.revert();
-      releaseScroll.current = () => {
-        revert?.();
-        revert = null;
-      };
-    });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        void load();
+      },
+      { rootMargin: "100% 0px" },
+    );
+    observer.observe(trigger);
 
     return () => {
       cancelled = true;
+      observer.disconnect();
       revert?.();
       releaseScroll.current = null;
     };
@@ -120,18 +144,18 @@ export function BridgeSeam({ className }: { className?: string }) {
   );
 
   const count = modernisedCount(value);
-  const rounded = Math.round(value);
-  const valueText = `Seam at ${rounded}%: ${count} of ${ROW_COUNT} modernised`;
-  const seamStyle = { "--seam": `${100 - value}%` } as CSSProperties;
+  const valueText = `${value}% modernised: ${count} of ${ROW_COUNT}`;
 
   return (
-    <div className={className} style={seamStyle}>
+    <div ref={rootRef} className={className} style={INITIAL_STYLE}>
       <figure className="m-0">
-        <div aria-hidden="true" className="mb-4 flex justify-between gap-4">
-          <Annotation>Current state</Annotation>
-          <Annotation className="text-right">Future direction</Annotation>
+        <div aria-hidden="true" className="mb-4">
+          <Container className="flex justify-between gap-4 text-small text-ink-muted">
+            <span>Current state</span>
+            <span className="text-right">Future direction</span>
+          </Container>
         </div>
-        <div ref={frameRef} className="relative border border-line" data-seam-value={rounded}>
+        <div ref={frameRef} className="relative" data-seam-value={value}>
           <ThreeStage
             id="bridge"
             load={loadBridgeScene}
@@ -151,11 +175,6 @@ export function BridgeSeam({ className }: { className?: string }) {
             </div>
           </ThreeStage>
 
-          <Corner className="-top-2 -left-2" />
-          <Corner className="-top-2 -right-2" />
-          <Corner className="-bottom-2 -left-2" />
-          <Corner className="-right-2 -bottom-2" />
-
           <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-(--seam)">
             <Seam node={0} className="h-full -translate-x-1/2 bg-ink" />
           </div>
@@ -170,17 +189,19 @@ export function BridgeSeam({ className }: { className?: string }) {
           />
         </div>
 
-        <figcaption className="mt-9 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 font-label text-label uppercase">
-          <span id="approach-seam-label" className="text-ink">
+        <Container as="figcaption" className="mt-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 text-small">
+          <span id="approach-seam-label" className="font-medium text-ink">
             Move the seam
           </span>
           <span className="text-ink-muted" data-testid="approach-readout">
-            <span className="text-ink tabular-nums">{count}</span> of {ROW_COUNT} modernised
+            {count === 0 ? "Everything as it is today" : count === ROW_COUNT ? "Everything improved" : "Partly improved"}
           </span>
-        </figcaption>
+        </Container>
       </figure>
 
-      <BridgeRows current={CURRENT_STATE_ITEMS} next={FUTURE_STATE_ITEMS} count={count} className="mt-14 md:mt-20" />
+      <Container>
+        <BridgeRows current={CURRENT_STATE_ITEMS} next={FUTURE_STATE_ITEMS} count={count} className="mt-14 md:mt-20" />
+      </Container>
     </div>
   );
 }

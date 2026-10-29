@@ -9,8 +9,9 @@ import type { StageHandle } from "@/components/three/core/types";
  * allowed) it reads where the four step blocks sit in the viewport and turns
  * that into one continuous value, 0..3, for the scene; it also writes the
  * nearest step to data-active on the section root, which method.css uses for
- * the poster, the caption, the rail and the step emphasis. Scrolling up runs
+ * the poster, the caption and the step emphasis. Scrolling up runs
  * the same mapping backwards. Nothing is pinned: the stage is CSS sticky.
+ * Scroll is only read while the section is on screen.
  */
 
 const loadMethodScene = () => import("@/components/three/scenes/method");
@@ -36,6 +37,7 @@ export function MethodStage({ className, children }: MethodStageProps) {
     const layout = window.matchMedia(STICKY_LAYOUT);
     let frame = 0;
     let active = -1;
+    let onScreen = false;
 
     const measure = () => {
       frame = 0;
@@ -56,17 +58,29 @@ export function MethodStage({ className, children }: MethodStageProps) {
         root.dataset.active = String(next);
       }
     };
-    const onScroll = () => {
+    const schedule = () => {
       if (!frame) frame = requestAnimationFrame(measure);
     };
+    const onScroll = () => {
+      if (onScreen) schedule();
+    };
+    // One last reading on the way in and out, so a fast scroll past still
+    // leaves the stage on the first or last step.
+    const visibility = new IntersectionObserver((entries) => {
+      onScreen = entries[entries.length - 1].isIntersecting;
+      schedule();
+    });
     const start = () => {
       measure();
+      visibility.observe(root);
       window.addEventListener("scroll", onScroll, { passive: true });
       window.addEventListener("resize", onScroll);
     };
     const stop = () => {
       cancelAnimationFrame(frame);
       frame = 0;
+      visibility.disconnect();
+      onScreen = false;
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       active = -1;

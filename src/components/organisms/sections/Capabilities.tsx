@@ -23,7 +23,7 @@ export function Capabilities() {
             className="p-4 bg-obsidian-850 border border-stone-border rounded-sm hover:border-gold-500/60 transition-colors"
           >
             <span className="font-mono text-[9px] text-gold-500 block mb-1 font-semibold">
-              {`${capability.index} // ${capability.category}`}
+              {capability.category}
             </span>
             <h3 className="font-mono text-sm text-parchment-100 font-semibold mb-1">{capability.title}</h3>
             <p className="font-serif-monument text-xs text-parchment-dim leading-snug">{capability.description}</p>

@@ -55,7 +55,3 @@ export function releaseContext(member: BudgetMember) {
   const next = [...waiting].sort((a, b) => a.distance() - b.distance())[0];
   next?.retry();
 }
-
-export function liveContextCount() {
-  return live.size;
-}

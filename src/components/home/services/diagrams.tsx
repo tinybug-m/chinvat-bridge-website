@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 
 /*
- * Four diagrams on a 400 x 300 board. The seam is x = 200: everything left of
- * it is drawn (hairlines, dashes, unfilled), everything right of it is built
- * (solid ink, fills). `svc-*` classes are animated by services.css.
+ * Four diagrams on a 400 x 300 board. Left of x = 200 is drawn (hairlines,
+ * dashes, unfilled), right of it is built (solid ink, fills): the same
+ * subject before and after. `svc-*` classes are animated by services.css.
  */
 
 const PAPER = "var(--color-paper)";
@@ -296,7 +296,8 @@ export function SeoDiagram() {
         ))}
       </Drawn>
       <Built>
-        <line x1="204" y1={BASE_Y} x2="388" y2={BASE_Y} />
+        {/* The baseline runs to the edge of the board, which the plate bleeds to the edge of the viewport. */}
+        <line x1="204" y1={BASE_Y} x2="400" y2={BASE_Y} />
         {SIGNAL.map(({ x, top }) => (
           <line key={x} x1={x} y1={BASE_Y} x2={x} y2={top} strokeWidth="1.25" opacity="0.5" />
         ))}

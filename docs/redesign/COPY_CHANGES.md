@@ -11,7 +11,7 @@ Status: **Proposed**, nothing here is approved yet.
 
 | Where | Live site | Redesign | Why |
 |---|---|---|---|
-| Header nav | Services, Approach, Insights, About | Services, Approach, Insights, About, **Pricing** | Pricing was only reachable by URL. |
+| Header nav | Services, Approach, Insights, About | Services, Work, Approach, About, Insights, **Pricing** | Pricing was only reachable by URL; Work follows the new section. |
 | Header | (no login link; "Client Sign In" only in the footer) | **Client login** | Returning clients find it without scrolling. |
 | Header CTA | (none) | Start a conversation | Keeps the main action one click away. |
 | All CTAs | Start a Conversation | Start a conversation | Sentence case. |
@@ -32,7 +32,78 @@ Status: **Proposed**, nothing here is approved yet.
 
 ## Homepage sections
 
-Filled in from each section build's report at the checkpoint.
+Body copy, service descriptions, tags, outcomes, transition rows, process
+steps, capabilities, the philosophy quote and the Name & Origin note are all
+verbatim. The changes are headings, labels and new helper text.
+
+| Where | Live site | Redesign | Why |
+|---|---|---|---|
+| Hero H1 | Build a better way forward. | Same business. / Better systems. | States the brand idea (current state → better systems) in the first line. The old line moves to Contact. |
+| Hero quick facts | AI & Automation / Software / SEO with one-line descriptions | Replaced by a four-item discipline index (AI integration, Automation & workflows, Software & web, SEO & growth) linking to each service | Covers all four disciplines and doubles as navigation. |
+| Hero annotations | (none) | 01 Current state · 02 Transition · 03 Better systems | Labels the two halves of the 3D mark. |
+| Hero secondary CTA | Explore Our Services | Explore services | Sentence case, shorter. |
+| Services heading | § 03.00 // The Core Disciplines, What We Do | 01 Services, Four disciplines, one way of working. | Heading carries a point of view. Section numbers are plain. |
+| Services lede | Practical technology solutions built around real business problems. | (not shown) | The four plates make the point. Can be restored. |
+| Service indices | I–IV | 01–04 | Matches the section index style. |
+| Service links | Whole card linked | "Read the article" (AI, Automation, Software), "See pricing" (SEO) | Visible link text; same targets. |
+| Service diagrams | (none) | Captions "Fig. 0N · Drawn" and "Built" | Decorative labels for the new diagrams. |
+| Approach heading | From Today to What’s Next. | From today to what’s next. | Sentence case. |
+| Approach columns | Today / What's Next, "Status: Constrained", "Direction: Better Systems" and a one-line description per column | Column labels "Current state" and "Future direction" only | The interactive seam replaces the two description cards. |
+| Approach control | (none) | "Move the seam", "N of 5 modernised" | Labels for the new slider. |
+| Method heading | The Method, A Clear, Disciplined Process | 03 Method, How we work. | Shorter; the lede keeps the "no unnecessary complexity" line. |
+| Method frames | (none) | Point cloud · Wireframe · Maquette · Material, "Fig. 03" | Labels for the 3D states. |
+| Capabilities heading | § 05.00 // The Capabilities, Ancient Principles. Modern Machines. | 04 Capabilities, What we build with. | Drops the mythological framing (retired with the old identity). Lede verbatim. |
+| About heading | § 02.00 // The Philosophy, The right technology connects the pieces. | 05 About, The right technology connects the pieces. | Same words, now the About section. |
+| About mark captions | (none) | "The way it works today" / "The system it becomes", "Drawn" / "Built" | Explains the two halves of the logo. |
+| Insights heading | Insights, Ideas & Observations | 06 Insights, Ideas and observations. | Sentence case. Note line verbatim. |
+| Insights rows | (cards) | "6 min read" per article, "All insights" link | Read time comes from the articles' existing metadata. |
+| Contact eyebrow and heading | Start the Conversation, Cross the Bridge. | 07 Contact, Build a better way forward. | Keeps the old hero line; drops the mythological phrase. |
+| Contact form | (email link only) | Guided brief: name, email, company (optional), what you need, timeline (optional), message; helper "Nothing is sent from this page. Your email app does the sending."; counter "N / 20 minimum"; error messages such as "Enter your name." and "Choose at least one option."; fallback "Your email app should open. If it didn't:" with Copy message / Copy address; no-JS note "The brief needs JavaScript. Please write to …" | New guided brief (opens the visitor's email app; nothing stored). |
+
+## Numbering and decoration removed (audit pass)
+
+No decorative numbers remain: section markers, service plates, hero index and
+callouts, "Fig." captions, capability rows and method steps are unnumbered
+(order is carried by list order). The Approach readout is now words
+("Everything as it is today" / "Partly improved" / "Everything improved")
+instead of "N of 5 modernised". The Capabilities lattice diagram was removed;
+the six capabilities are a plain two-column list with the original copy.
+
+## Work and Team (added)
+
+Both sections are new and use only material supplied by the owner's team.
+
+| Where | Old | New | Why |
+| --- | --- | --- | --- |
+| Work heading | (none) | Recent work. | New section showing real projects. |
+| Work labels | (none) | Client project (Scornik Gerstein LLP) / Concept (Benedict, NATURAGLOW) | Each project is labelled truthfully; concepts are never presented as commissioned. |
+| Work lead | (none) | Scornik Gerstein LLP, "London law firm.", "We designed and built their website." | The one real client, named with the owner's approval. |
+| Work concepts heading and note | (none) | Concepts, "Two concepts. Speculative, not client work." | Says plainly that the concepts are speculative. |
+| Work concept lines | (none) | Benedict Funeral Directors: "Funeral directors, Henlow Camp, Bedfordshire." NATURAGLOW: "Skincare and wellness clinic, Beverly Hills." | Context from the supplied facts only. |
+| Work links | (none) | Visit the site (screen readers also hear "for <project> (opens in a new tab)") | External links open in a new tab. |
+| Work image alt text | (none) | One description of each screenshot's page | Describes what the screenshot shows. |
+| Team heading | (none) | The team. | New section. |
+| Team names and roles | (none) | Artin, Owner. Arshia, CTO. Erik, SEO expert. | First names and roles only; no bios, quotes or photos exist. |
+
+## De-template pass (casing and removals)
+
+Casing only, no wording changed:
+
+| Where | Old | New | Why |
+| --- | --- | --- | --- |
+| Approach sublabels (src/data/transition.ts) | Title Case ("High Human Overhead", "Fragmented Data", "Lost Inbound Demand", "Slow Iteration Speed", "Compounding Cost"; "Reliable & Fast", "Single Source of Truth", "Consistent Inbound Trust", "Clear Conversion", "Enduring Advantage") | Sentence case ("High human overhead", "Reliable & fast", and so on) | Title Case on every label read as templated. |
+| Service straplines, tags and outcomes (src/data/services.ts) | Title Case (for example "AI That Serves the Business", "Practical Adoption") | Sentence case ("AI that serves the business", "Practical adoption") | Same. |
+| Capability categories (src/data/capabilities.ts) | AUTOMATION and the other upper-case categories | Automation and so on | Same. |
+
+Removed strings and decoration:
+
+| Where | Removed | Why |
+| --- | --- | --- |
+| Services | "Drawn" / "Built" diagram captions | Repeated decoration on every plate. |
+| All sections | Mono-caps section markers and numbers | Repeated decoration. |
+| Insights rows | "N min read" and the date | All four posts carried the same hand-set value. Set real dates in src/content/blog/posts/*. |
+| Contact and mobile menu | "UK Based // Working Globally" | Repeated three times. Still in the footer if present there. |
+| Hero | "Current state" and "Better systems" callouts | Only the "Transition" callout stays; the others are in the screen-reader caption. |
 
 ## Origin note: sourced addition (proposed, needs owner approval)
 

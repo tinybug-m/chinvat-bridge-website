@@ -44,6 +44,6 @@ export const BRIDGE_SEAM = {
 
 /** Rendered by scripts/poster/bridge.mjs; bump the version there and here after a scene change (busts the image cache). */
 export const BRIDGE_POSTERS = {
-  drawn: "/bridge/bridge-drawn-v5.png",
-  built: "/bridge/bridge-built-v5.png",
+  drawn: "/bridge/bridge-drawn-v6.png",
+  built: "/bridge/bridge-built-v6.png",
 } as const;

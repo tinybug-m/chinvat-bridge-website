@@ -4,90 +4,127 @@ import { ArrowIcon } from "@/components/system/ArrowIcon";
 import { TextLink } from "@/components/system/TextLink";
 import type { Service } from "@/data/services";
 import { cn } from "@/lib/utils";
-import { DiagramFrame } from "./DiagramFrame";
+import { ButtonLink } from "@/components/system/Button";
+import { PlateDiagram } from "./PlateDiagram";
+
+/**
+ * How a plate sets its text. The plates share one vocabulary (strapline,
+ * title, description, tags, outcome, link) and each picks its own scale and
+ * placement, so the four read as one system without being stamped copies.
+ */
+export interface PlateTone {
+  /** Size of the H3. */
+  title: "heading" | "title";
+  /** Description in the lede size instead of body. */
+  lede?: boolean;
+  /** Tags run across the line, or stand one to a line. */
+  tags: "row" | "stack";
+  /** Outcome: after the tags, as the first thing under the title, or as a display line before the link. */
+  outcome: "inline" | "lead" | "closing";
+  /** Text link, or an outlined button. */
+  link: "text" | "button";
+  /** Full-bleed haze band behind the plate. */
+  band?: boolean;
+}
 
 export interface PlateProps {
   service: Service;
   /** Anchor slug: the article gets id="services-<slug>". */
   slug: string;
-  /** Position in the list, from 0. Odd plates mirror the layout. */
-  position: number;
   Diagram: ComponentType;
-  /** Where the ring node sits on the diagram's seam, in percent. */
-  node: number;
+  /** Crop of the diagram board for this plate. */
+  viewBox: string;
+  tone: PlateTone;
+  /** Per-plate layout: each plate sets its own spans, offsets and bleed. */
+  layout: {
+    /** Margin above the plate, which sets the vertical rhythm of the list. */
+    article: string;
+    grid: string;
+    text: string;
+    figure: string;
+  };
 }
 
-const pad = (n: number) => String(n).padStart(2, "0");
+const BAND =
+  "relative isolate py-14 before:absolute before:inset-y-0 before:left-1/2 before:-z-10 before:w-screen before:-translate-x-1/2 before:bg-haze before:content-[''] lg:py-24";
 
-export function ServicePlate({ service, slug, position, Diagram, node }: PlateProps) {
-  const mirrored = position % 2 === 1;
+export function ServicePlate({ service, slug, Diagram, viewBox, tone, layout }: PlateProps) {
   const linkLabel = service.href?.startsWith("/insights/") ? "Read the article" : "See pricing";
   const headingId = `services-${slug}-title`;
+
+  const outcome = (
+    <p className={tone.outcome === "inline" ? "mt-6 text-body" : tone.outcome === "lead" ? "mt-5" : "mt-8"}>
+      <span className="text-body text-ink-muted">Outcome — </span>
+      <span
+        className={cn(
+          "font-medium text-ink",
+          tone.outcome === "inline" ? "text-body" : "font-display text-subheading",
+        )}
+      >
+        {service.outcome}
+      </span>
+    </p>
+  );
 
   return (
     <li>
       <article
         id={`services-${slug}`}
         aria-labelledby={headingId}
-        className="scroll-mt-20 border-t border-line py-12 lg:py-16"
+        className={cn("scroll-mt-20", layout.article, tone.band && BAND)}
       >
-        <div className="grid grid-cols-1 items-center gap-y-10 lg:grid-cols-12 lg:gap-x-6">
-          <Reveal
-            className={cn(
-              "lg:row-start-1",
-              mirrored ? "lg:col-span-5 lg:col-start-8" : "lg:col-span-5 lg:col-start-1",
-            )}
-          >
-            <p className="flex items-center gap-3 font-label text-label uppercase text-ink-muted">
-              <span className="text-ink">{pad(position + 1)}</span>
-              <span aria-hidden="true" className="h-px w-8 bg-line-strong" />
-              <span>{service.strapline}</span>
-            </p>
+        <div className={cn("grid grid-cols-1 gap-y-10 lg:grid-cols-12 lg:gap-x-6", layout.grid)}>
+          <Reveal className={cn("lg:row-start-1", layout.text)}>
+            <p className="text-small text-ink-muted">{service.strapline}</p>
             <h3
               id={headingId}
-              className="mt-5 max-w-[16ch] text-balance font-display text-heading font-medium [font-stretch:100%] lg:[font-stretch:112%]"
+              className={cn(
+                "mt-3 text-balance font-display font-medium [font-stretch:100%] lg:[font-stretch:112%]",
+                tone.title === "title" ? "max-w-[12ch] text-title" : "max-w-[16ch] text-heading",
+              )}
             >
               {service.title}
             </h3>
-            <p className="mt-5 max-w-measure text-pretty text-body text-ink-soft">{service.description}</p>
-            <ul className="mt-6 flex flex-wrap font-label text-label uppercase text-ink-muted">
-              {service.tags.map((tag, i) => (
-                <li key={tag}>
-                  {tag}
-                  {i < service.tags.length - 1 ? <span aria-hidden="true" className="mx-2">·</span> : null}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-6 flex items-center gap-3 border-t border-line pt-5">
-              <span
-                aria-hidden="true"
-                className="size-[11px] shrink-0 rounded-full border-2 border-saffron-500 bg-paper"
-              />
-              <span>
-                <span className="font-label text-label uppercase text-ink-muted">Outcome — </span>
-                <span className="font-medium text-ink">{service.outcome}</span>
-              </span>
+            {tone.outcome === "lead" ? outcome : null}
+            <p className={cn("max-w-measure text-pretty text-ink-soft", tone.outcome === "lead" ? "mt-4" : "mt-5", tone.lede ? "text-lede" : "text-body")}>
+              {service.description}
             </p>
+            {tone.tags === "row" ? (
+              <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-small text-ink-muted">
+                {service.tags.map((tag) => (
+                  <li key={tag}>{tag}</li>
+                ))}
+              </ul>
+            ) : (
+              <ul className="mt-6 grid gap-y-1 text-small text-ink-muted">
+                {service.tags.map((tag) => (
+                  <li key={tag}>{tag}</li>
+                ))}
+              </ul>
+            )}
+            {tone.outcome === "inline" || tone.outcome === "closing" ? outcome : null}
             {service.href ? (
-              <p className="mt-3">
-                <TextLink href={service.href} className="inline-flex min-h-11 items-center gap-2 text-body">
-                  {linkLabel}
-                  <span className="sr-only">: {service.title}</span>
-                  <ArrowIcon />
-                </TextLink>
-              </p>
+              tone.link === "button" ? (
+                <p className="mt-6">
+                  <ButtonLink href={service.href} variant="secondary" arrow="right" className="w-full sm:w-auto">
+                    {linkLabel}
+                    <span className="sr-only">: {service.title}</span>
+                  </ButtonLink>
+                </p>
+              ) : (
+                <p className="mt-2">
+                  <TextLink href={service.href} className="inline-flex min-h-11 items-center gap-2 text-body">
+                    {linkLabel}
+                    <span className="sr-only">: {service.title}</span>
+                    <ArrowIcon />
+                  </TextLink>
+                </p>
+              )
             ) : null}
           </Reveal>
-          <div
-            className={cn(
-              "lg:row-start-1",
-              mirrored ? "lg:col-span-6 lg:col-start-1" : "lg:col-span-6 lg:col-start-7",
-            )}
-          >
-            <DiagramFrame figure={pad(position + 1)} node={node}>
-              <Diagram />
-            </DiagramFrame>
-          </div>
+          <PlateDiagram viewBox={viewBox} className={cn("lg:row-start-1", layout.figure)}>
+            <Diagram />
+          </PlateDiagram>
         </div>
       </article>
     </li>

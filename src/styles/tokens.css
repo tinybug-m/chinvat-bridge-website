@@ -62,7 +62,7 @@
 
   /* Layout rhythm */
   --spacing-gutter: clamp(1.25rem, -0.143rem + 5.714vw, 5rem); /* 20 → 80 page margin */
-  --spacing-section: clamp(5rem, 3.143rem + 7.619vw, 10rem); /* 80 → 160 between sections */
+  --spacing-section: clamp(4.5rem, 2.9rem + 5vw, 7rem); /* 72 → 112 between sections */
   --container-page: 90rem; /* 1440 */
   --container-measure: 38rem; /* comfortable reading width */
 
@@ -79,8 +79,8 @@
  * resolve where they are used. The rest of each stack is the fallback.
  */
 @theme inline {
-  --font-display: var(--font-brand), ui-sans-serif, system-ui, sans-serif;
-  --font-body: var(--font-brand), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-brand), "Archivo Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-brand), "Archivo Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-label: var(--font-brand-mono), ui-monospace, SFMono-Regular, monospace;
 }
 

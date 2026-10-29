@@ -16,15 +16,15 @@ export const HERO_COPY = {
 
 /** The only place the disciplines appear in the hero; short forms of the service titles. */
 export const HERO_DISCIPLINES = [
-  { index: "01", label: "AI integration", href: "/#services-ai" },
-  { index: "02", label: "Automation & workflows", href: "/#services-automation" },
-  { index: "03", label: "Software & web", href: "/#services-software" },
-  { index: "04", label: "SEO & growth", href: "/#services-seo" },
+  { label: "AI integration", href: "/#services-ai" },
+  { label: "Automation & workflows", href: "/#services-automation" },
+  { label: "Software & web", href: "/#services-software" },
+  { label: "SEO & growth", href: "/#services-seo" },
 ] as const;
 
 /** Drawing callouts tied to the object. */
 export const SEAM_LABELS = {
-  drawn: { index: "01", label: "Current state" },
-  seam: { index: "02", label: "Transition" },
-  built: { index: "03", label: "Better systems" },
+  drawn: { label: "Current state" },
+  seam: { label: "Transition" },
+  built: { label: "Better systems" },
 } as const;

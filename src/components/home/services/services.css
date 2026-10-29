@@ -34,3 +34,16 @@
     opacity: 0;
   }
 }
+
+/*
+ * Run a diagram off one edge of the viewport. The offset is the outer margin
+ * plus whatever the 90rem page container leaves on a wider screen; the section
+ * clips the overhang so a scrollbar never causes sideways scroll.
+ */
+.svc-bleed-l {
+  margin-left: calc(-1 * (max(0px, (100vw - var(--container-page)) / 2) + var(--spacing-gutter)));
+}
+
+.svc-bleed-r {
+  margin-right: calc(-1 * (max(0px, (100vw - var(--container-page)) / 2) + var(--spacing-gutter)));
+}

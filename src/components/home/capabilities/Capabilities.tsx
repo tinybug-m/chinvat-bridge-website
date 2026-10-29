@@ -1,80 +1,56 @@
 import { Reveal } from "@/components/motion/Reveal";
 import { Container } from "@/components/system/Container";
 import { Section } from "@/components/system/Section";
-import { SectionMarker } from "@/components/system/SectionMarker";
+import { SectionHeading } from "@/components/system/SectionHeading";
 import { CAPABILITIES } from "@/data/capabilities";
 import { SUPPORTING_CAPABILITIES } from "@/data/services";
-import { Lattice } from "./Lattice";
-import "./capabilities.css";
 
-const CORNERS = [
-  "-left-1 -top-1",
-  "-right-1 -top-1",
-  "-bottom-1 -left-1",
-  "-bottom-1 -right-1",
-] as const;
+/*
+ * One running list, no boxes. Titles are the loudest type in the section and
+ * step across the left half of the grid; every description sits in the same
+ * column to the right, so the eye reads the stagger once and the prose as a
+ * single edge. The offsets only apply from lg up: below that every row is a
+ * plain stack. Classes are spelled out in full so Tailwind can see them.
+ */
+const TITLE_STARTS = ["lg:col-start-1", "lg:col-start-3", "lg:col-start-2"];
 
 export function Capabilities() {
   return (
-    <Section id="capabilities" labelledBy="capabilities-title" ruled>
-      <Container className="cap grid gap-x-6 gap-y-12 xl:grid-cols-12 xl:grid-rows-[auto_1fr]">
-        <span id="machines" aria-hidden="true" className="absolute -top-px block scroll-mt-20" />
+    <Section id="capabilities" labelledBy="capabilities-title">
+      <span id="machines" aria-hidden="true" className="absolute -top-px block scroll-mt-20" />
+      <Container>
+        <div className="grid gap-x-6 gap-y-6 lg:grid-cols-12 lg:items-end">
+          <Reveal className="lg:col-span-7">
+            <SectionHeading id="capabilities-title">What we build with.</SectionHeading>
+          </Reveal>
+          <Reveal delay={80} className="lg:col-span-4 lg:col-start-9">
+            <p className="max-w-measure text-pretty text-lede text-ink-soft">
+              Modern businesses have more tools than ever. The challenge is knowing which ones actually create value.
+            </p>
+          </Reveal>
+        </div>
 
-        <Reveal className="order-1 xl:col-span-4 xl:row-start-1">
-          <SectionMarker index="04" label="Capabilities" />
-          <h2
-            id="capabilities-title"
-            className="mt-8 max-w-[18ch] text-balance font-display text-title font-medium [font-stretch:100%] lg:[font-stretch:112%]"
-          >
-            What we build with.
-          </h2>
-          <p className="mt-6 max-w-measure text-pretty text-lede text-ink-soft">
-            Modern businesses have more tools than ever. The challenge is knowing which ones actually create value.
-          </p>
-        </Reveal>
-
-        {/* Diagram: decorative, so it is hidden from assistive tech. */}
-        <Reveal
-          delay={80}
-          className="cap-fig relative order-2 w-full max-w-[45rem] border border-line p-2 sm:p-6 xl:sticky xl:top-28 xl:col-span-7 xl:col-start-6 xl:row-span-2 xl:row-start-1 xl:max-w-none xl:self-start"
-        >
-          <div aria-hidden="true" className="cap-draw">
-            <Lattice variant="narrow" />
-            <Lattice variant="wide" />
-            {CORNERS.map((position) => (
-              <span key={position} className={`absolute size-2 ${position}`}>
-                <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-control" />
-                <span className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-control" />
-              </span>
-            ))}
-          </div>
-        </Reveal>
-
-        <div className="order-3 xl:col-span-4 xl:row-start-2">
-          <ul className="list-none border-b border-line">
-            {CAPABILITIES.map((capability, index) => (
-              <li
-                key={capability.title}
-                data-i={index}
-                // Focusable on purpose: keyboard focus drives the same highlight as hover.
-                tabIndex={0}
-                className="cap-item group relative border-t border-line py-6 pl-5 transition-colors duration-200 hover:bg-paper-raised focus:bg-paper-raised"
-              >
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-y-0 left-0 w-0.5 origin-top scale-y-0 bg-ink transition-transform duration-200 group-hover:scale-y-100 group-focus:scale-y-100"
-                />
-                <p className="font-label text-label uppercase text-ink-muted">
-                  <span className="text-ink">{capability.index}</span>
-                  <span aria-hidden="true"> · </span>
-                  {capability.category}
-                </p>
-                <h3 className="mt-2 font-display text-subheading font-medium">{capability.title}</h3>
-                <p className="mt-2 max-w-measure text-pretty text-body text-ink-soft">{capability.description}</p>
+        <ul className="mt-16 grid list-none gap-y-14 md:mt-24 lg:gap-x-6 lg:gap-y-20">
+          {CAPABILITIES.map((capability, index) => {
+            const titleStart = TITLE_STARTS[index % TITLE_STARTS.length];
+            return (
+              <li key={capability.title} className="grid gap-x-6 gap-y-4 lg:grid-cols-12 lg:items-end">
+                <Reveal className={`lg:col-span-6 ${titleStart}`}>
+                  <p className="text-small text-ink-muted">{capability.category}</p>
+                  <h3 className="mt-1 text-balance font-display text-[length:clamp(1.875rem,1.2rem+2.9vw,3.25rem)] font-medium leading-[1.04] tracking-[-0.015em]">
+                    {capability.title}
+                  </h3>
+                </Reveal>
+                <Reveal delay={60} className={`lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:pb-1.5`}>
+                  <p className="max-w-measure text-pretty text-body text-ink-soft">{capability.description}</p>
+                </Reveal>
               </li>
-            ))}
-          </ul>
-          <p className="mt-6 font-label text-label uppercase text-ink-muted">
+            );
+          })}
+        </ul>
+
+        <div className="mt-20 lg:grid lg:grid-cols-12 lg:gap-x-6">
+          <p className="text-small text-ink-muted lg:col-span-4 lg:col-start-9">
             Also: {SUPPORTING_CAPABILITIES.join(" · ")}
           </p>
         </div>

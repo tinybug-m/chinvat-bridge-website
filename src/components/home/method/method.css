@@ -1,57 +1,21 @@
 /*
- * 03 Method: state that follows the active step. The stage island writes
+ * Method: state that follows the active step. The stage island writes
  * data-active (0..3) on [data-method-root] on the sticky layout only; without
  * it (no JS, mobile, reduced motion) the first poster shows, every step is
- * fully inked and the rail is empty.
+ * fully inked.
  */
 
-[data-method-poster],
-[data-method-caption] {
+[data-method-poster] {
   opacity: 0;
   transition: opacity var(--motion-base) var(--ease-out-quart);
 }
 
 [data-method-root]:not([data-active]) [data-method-poster="0"],
-[data-method-root]:not([data-active]) [data-method-caption="0"],
 [data-method-root][data-active="0"] [data-method-poster="0"],
 [data-method-root][data-active="1"] [data-method-poster="1"],
 [data-method-root][data-active="2"] [data-method-poster="2"],
-[data-method-root][data-active="3"] [data-method-poster="3"],
-[data-method-root][data-active="0"] [data-method-caption="0"],
-[data-method-root][data-active="1"] [data-method-caption="1"],
-[data-method-root][data-active="2"] [data-method-caption="2"],
-[data-method-root][data-active="3"] [data-method-caption="3"] {
+[data-method-root][data-active="3"] [data-method-poster="3"] {
   opacity: 1;
-}
-
-.method-rail-fill {
-  transform: scaleY(0);
-  transform-origin: top;
-  transition: transform var(--motion-slow) var(--ease-out-quart);
-}
-[data-method-root][data-active="1"] .method-rail-fill {
-  transform: scaleY(0.3333);
-}
-[data-method-root][data-active="2"] .method-rail-fill {
-  transform: scaleY(0.6667);
-}
-[data-method-root][data-active="3"] .method-rail-fill {
-  transform: scaleY(1.0000);
-}
-
-.method-dot {
-  transition:
-    background-color var(--motion-quick) var(--ease-out-quart),
-    border-color var(--motion-quick) var(--ease-out-quart),
-    transform var(--motion-quick) var(--ease-out-quart);
-}
-[data-method-root][data-active="0"] [data-method-dot="0"],
-[data-method-root][data-active="1"] [data-method-dot="1"],
-[data-method-root][data-active="2"] [data-method-dot="2"],
-[data-method-root][data-active="3"] [data-method-dot="3"] {
-  border-color: var(--color-ink);
-  background-color: var(--color-ink);
-  transform: scale(1.2);
 }
 
 @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {

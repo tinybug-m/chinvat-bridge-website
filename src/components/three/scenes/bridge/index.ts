@@ -20,7 +20,7 @@ import { BRIDGE_FIELD } from "./config";
 
 /*
  * The Bridge: a space-frame strut field. Left of the seam it is the DRAWN
- * maquette (matte card, every strut and ring a little loose: seeded small
+ * maquette (grey card linework, every strut and ring a little loose: seeded small
  * rotations, offsets and sag); right of it, BUILT: thin-film struts settled
  * into a regular triangulated lattice. Two instanced draw calls share one
  * seam material.
@@ -121,16 +121,17 @@ export function createScene(context: SceneContext): SceneInstance {
     const position = a.clone().add(b).multiplyScalar(0.5);
     // Trim at the rings so the joints read.
     const built: Pose = { position, quaternion, scale: new Vector3(length - F.ringRadius * 1.1, 1, 1) };
-    // Loose: most pieces a few degrees out; some still lying where they were dropped.
-    const stray = rand() < 0.1;
-    const angle = (stray ? 24 : 6) * DEG;
+    // Loose: a drawing not yet trued up. Most pieces a degree or two out, a
+    // few further, all a little short of their joints; never a heap.
+    const stray = rand() < 0.03;
+    const angle = (stray ? 10 : 3) * DEG;
     tilt.set(spread(angle), spread(angle), spread(angle * 1.4));
     const loose: Pose = {
       position: position
         .clone()
-        .add(new Vector3(spread(stray ? 0.34 : 0.1), spread(0.06) - rand() * (stray ? 0.45 : 0.16), spread(stray ? 0.34 : 0.1))),
+        .add(new Vector3(spread(stray ? 0.17 : 0.05), spread(0.03) - rand() * (stray ? 0.22 : 0.08), spread(stray ? 0.17 : 0.05))),
       quaternion: quaternion.clone().premultiply(jitter.setFromEuler(tilt)),
-      scale: new Vector3((length - F.ringRadius * 1.1) * (0.78 + rand() * 0.16), 1, 1),
+      scale: new Vector3((length - F.ringRadius * 1.1) * (0.86 + rand() * 0.08), 1, 1),
     };
     return { x: position.x, built, loose };
   });
@@ -141,9 +142,9 @@ export function createScene(context: SceneContext): SceneInstance {
     for (let i = 0; i < F.columns; i++) {
       const position = top(i, k);
       const built: Pose = { position, quaternion: facing, scale: new Vector3(1, 1, 1) };
-      tilt.set(spread(30 * DEG), spread(30 * DEG), spread(14 * DEG));
+      tilt.set(spread(12 * DEG), spread(12 * DEG), spread(6 * DEG));
       const loose: Pose = {
-        position: position.clone().add(new Vector3(spread(0.14), -rand() * 0.2, spread(0.14))),
+        position: position.clone().add(new Vector3(spread(0.07), -rand() * 0.1, spread(0.07))),
         quaternion: facing.clone().multiply(jitter.setFromEuler(tilt)),
         scale: new Vector3(0.86, 0.86, 0.86),
       };
@@ -159,8 +160,9 @@ export function createScene(context: SceneContext): SceneInstance {
   });
   uniforms.uSeamLineWidth.value = 0.02;
   uniforms.uSeamLineStrength.value = 1.6;
-  // Grey card a few shades under the paper band, so the maquette reads as an object.
-  uniforms.uMatteColor.value.setHex(0xd3cec4);
+  // Cool grey linework (a shade under the strong rule colour), so the drawn half holds its
+  // own against the film without turning into a second material.
+  uniforms.uMatteColor.value.setHex(0xa3acb2);
   uniforms.uMatteRoughness.value = 0.9;
   uniforms.uFilmGlow.value = 0.26;
 
@@ -193,8 +195,9 @@ export function createScene(context: SceneContext): SceneInstance {
   function layOut(mesh: InstancedMesh, pieces: Piece[], seam: number) {
     for (let index = 0; index < pieces.length; index++) {
       const piece = pieces[index];
-      // 0 = loose (drawn side), 1 = settled (built side).
-      const t = smooth(clamp((piece.x - (seam - F.band)) / (2 * F.band)));
+      // 0 = loose (drawn side), 1 = settled (built side). Pieces settle on
+      // the drawn side of the seam, so nothing half-loose crosses into the film.
+      const t = smooth(clamp((piece.x - (seam - 2 * F.band)) / (2 * F.band)));
       position.lerpVectors(piece.loose.position, piece.built.position, t);
       quaternion.slerpQuaternions(piece.loose.quaternion, piece.built.quaternion, t);
       scale.lerpVectors(piece.loose.scale, piece.built.scale, t);

@@ -20,8 +20,8 @@ test.describe("insights section", () => {
       await expect(row.getByRole("heading", { level: 3 })).toHaveText(title);
       await expect(row.locator("a")).toHaveAttribute("href", `/insights/${slug}`);
       await expect(row).toContainText(category);
-      await expect(row).toContainText(`0${index + 1}`);
-      await expect(row).toContainText("6 min read");
+      await expect(row.locator("time")).toHaveCount(0);
+      await expect(row).not.toContainText("min read");
     }
     await expect(section.getByRole("link", { name: /All insights/ })).toHaveAttribute("href", "/insights");
   });

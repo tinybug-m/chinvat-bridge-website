@@ -56,9 +56,16 @@ test.describe("hero", () => {
       const box = await index.nth(i).boundingBox();
       expect(box!.height).toBeGreaterThanOrEqual(44);
     }
-    for (const label of ["Current state", "Transition", "Better systems"]) {
-      await expect(hero.locator("figure").getByText(label, { exact: true })).toBeVisible();
-    }
+    // One callout on the mark, where the seam leaves it; the figure's screen-reader caption names all three states.
+    await expect(hero.locator("figure").getByText("Transition", { exact: true })).toBeVisible();
+    await expect(hero.locator("figure figcaption")).toContainText(/Current state.*Transition.*Better systems/);
+    // The eyebrow is plain text, not mono capitals.
+    const eyebrow = await hero.getByText("UK Based // Working Globally").evaluate((el) => {
+      const style = getComputedStyle(el);
+      return { transform: style.textTransform, family: style.fontFamily };
+    });
+    expect(eyebrow.transform).toBe("none");
+    expect(eyebrow.family).not.toMatch(/mono/i);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBe(0);
     expect(errors).toEqual([]);

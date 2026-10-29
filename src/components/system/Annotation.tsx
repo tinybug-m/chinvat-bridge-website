@@ -2,8 +2,6 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 interface AnnotationProps {
-  /** Two-digit callout number, e.g. "01". */
-  index?: string;
   children: ReactNode;
   /** Which side the leader line runs out from, if any. */
   leader?: "start" | "end" | "none";
@@ -13,10 +11,11 @@ interface AnnotationProps {
 }
 
 /**
- * Drawing-style callout: mono caption on a hairline leader that ends in a
- * ring node, the joint used throughout the mark.
+ * Drawing-style callout: a short mono caption, optionally on a hairline leader
+ * that ends in a ring node. Reserve it for the hero mark and the seam; a
+ * caption on every frame turns it into decoration.
  */
-export function Annotation({ index, children, leader = "none", leaderLength = "3rem", className }: AnnotationProps) {
+export function Annotation({ children, leader = "none", leaderLength = "3rem", className }: AnnotationProps) {
   const line = (
     <span aria-hidden="true" className={cn("flex items-center", leader === "end" && "flex-row-reverse")}>
       <span className="size-1.5 shrink-0 rounded-full border border-saffron-600" />
@@ -25,9 +24,8 @@ export function Annotation({ index, children, leader = "none", leaderLength = "3
   );
 
   return (
-    <span className={cn("inline-flex items-center gap-2 font-label text-label uppercase text-ink-muted", className)}>
+    <span className={cn("inline-flex items-center gap-2 font-label text-label text-ink-muted", className)}>
       {leader === "start" ? line : null}
-      {index ? <span className="text-ink">{index}</span> : null}
       <span>{children}</span>
       {leader === "end" ? line : null}
     </span>

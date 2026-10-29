@@ -49,6 +49,7 @@ export function ContactBrief() {
   const manualRef = useRef<HTMLTextAreaElement>(null);
 
   const errors = attempted ? validateBrief(values) : {};
+  const errorCount = Object.keys(errors).length;
   const set = <K extends keyof BriefValues>(key: K, value: BriefValues[K]) =>
     setValues((current) => ({ ...current, [key]: value }));
 
@@ -154,7 +155,7 @@ export function ContactBrief() {
           variant="outline"
           spacing={2}
           aria-labelledby="brief-needs-label"
-          className="w-full flex-wrap"
+          className="w-full flex-wrap [&[aria-invalid=true]_[data-state=off]]:shadow-[inset_0_0_0_1px_var(--color-destructive)]"
           value={values.needs}
           onValueChange={(next) => set("needs", next)}
           {...aria("needs")}
@@ -203,17 +204,23 @@ export function ContactBrief() {
           <div>
             <FieldError id="brief-message-error">{errors.message}</FieldError>
           </div>
-          <p id="brief-message-hint" className="ml-auto mt-0 font-label text-label uppercase text-ink-muted">
+          <p id="brief-message-hint" className="ml-auto mt-0 whitespace-nowrap text-small tabular-nums text-ink-muted">
             {values.message.trim().length} / {MIN_MESSAGE} minimum
           </p>
         </div>
       </Field>
 
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-3 sm:col-span-2">
-        <Button type="submit" size="lg" arrow="right">
-          Open email to send
-        </Button>
-        <p className="max-w-[28ch] text-small text-ink-muted">Nothing is sent from this page. Your email app does the sending.</p>
+      <div className="flex flex-col gap-3 sm:col-span-2">
+        {/* The same count the live region announces, in view until every field is right. */}
+        {errorCount ? (
+          <p id="brief-error-count" className="text-small font-medium text-destructive">{describeErrors(errorCount)}</p>
+        ) : null}
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          <Button type="submit" size="lg" arrow="right">
+            Send brief
+          </Button>
+          <p className="max-w-[28ch] text-small text-ink-muted">Opens your email app with the brief filled in.</p>
+        </div>
       </div>
 
       <p role="status" aria-live="polite" className="sr-only">

@@ -11,6 +11,8 @@ import type { QualityProfile, SceneModule, StageHandle, StageState } from "./typ
  * viewport and the page has finished loading and gone idle.
  *
  *   near (mountMargin)        after load + idle: create the context and the scene
+ *   quality                   probed once (a throwaway WebGL 2 context) on first
+ *                             approach or when the browser is idle, never during hydration
  *   visible (0px margin)      run the loop; pause it offscreen or in a hidden tab
  *   far (beyond releaseMargin) dispose everything, including the context
  *   budget                    at most two live contexts; the farthest is suspended
@@ -30,6 +32,17 @@ export interface StageOptions {
 }
 
 type Listener = () => void;
+
+/** requestIdleCallback with a timeout, or a short timer where it is missing. */
+function onIdle(callback: () => void, signal: AbortSignal, timeout: number) {
+  if ("requestIdleCallback" in window) {
+    const id = window.requestIdleCallback(callback, { timeout });
+    signal.addEventListener("abort", () => window.cancelIdleCallback(id));
+  } else {
+    const id = setTimeout(callback, 200);
+    signal.addEventListener("abort", () => clearTimeout(id));
+  }
+}
 
 function whenLoadedAndIdle(signal: AbortSignal): Promise<void> {
   return new Promise((resolve) => {
@@ -129,11 +142,8 @@ export class StageController implements BudgetMember, StageHandle {
       { signal },
     );
 
-    this.quality = detectQuality();
-    if (this.capture) this.quality = { ...this.quality, tier: this.quality.tier === "none" ? "none" : "high" };
-    if (this.quality.tier === "none" || this.blockedByMotion()) {
-      this.setState("fallback");
-    }
+    if (this.quality?.tier === "none" || this.blockedByMotion()) this.setState("fallback");
+    onIdle(() => this.detect(), signal, 2000);
 
     const observe = (rootMargin: string, onChange: (entry: IntersectionObserverEntry) => void) => {
       const observer = new IntersectionObserver((entries) => entries.forEach(onChange), { rootMargin });
@@ -145,6 +155,7 @@ export class StageController implements BudgetMember, StageHandle {
       this.syncActive();
     });
     observe(this.options.mountMargin ?? "50% 0px", (entry) => {
+      if (entry.isIntersecting) this.detect();
       this.near = entry.isIntersecting || this.capture;
       this.maybeMount();
     });
@@ -177,6 +188,14 @@ export class StageController implements BudgetMember, StageHandle {
     this.host = null;
   }
 
+  /** Decide the quality tier, once per controller (detectQuality caches it per page). */
+  private detect() {
+    if (this.quality) return;
+    const quality = detectQuality();
+    this.quality = this.capture ? { ...quality, tier: quality.tier === "none" ? "none" : "high" } : quality;
+    if (this.quality.tier === "none") this.release("fallback");
+  }
+
   private blockedByMotion() {
     return this.reducedMotion && (this.options.reducedMotion ?? "fallback") === "fallback" && !this.capture;
   }
@@ -187,6 +206,7 @@ export class StageController implements BudgetMember, StageHandle {
 
   private maybeMount() {
     if (!this.ready || !this.near || this.runtime || this.loading) return;
+    this.detect();
     if (!this.root || !this.host || !this.quality || this.quality.tier === "none") return;
     if (this.state === "fallback" || this.blockedByMotion()) return;
     if (!acquireContext(this)) return;
@@ -234,8 +254,9 @@ export class StageController implements BudgetMember, StageHandle {
     }
   }
 
-  /** Drop the context (if any) and move to `state`. */
+  /** Drop the context (if any) and move to `state`. Fallback is sticky: only the motion listener leaves it. */
   private release(state: StageState) {
+    if (this.state === "fallback" && state !== "fallback") state = "fallback";
     this.generation += 1;
     this.loading = false;
     this.runtime?.dispose();

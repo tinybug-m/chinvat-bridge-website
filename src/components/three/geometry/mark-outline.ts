@@ -1,4 +1,5 @@
-import { MARK_AXIS_X, MARK_BOUNDS, MARK_POLYGONS } from "@/components/brand/mark-geometry";
+import { MARK_AXIS_X, MARK_BOUNDS } from "@/components/brand/mark-geometry";
+import { MARK_POLYGONS } from "@/components/brand/mark-polygons";
 
 /*
  * The welded brand mark as clean 2D rings, shared by the 3D extrusion, the

@@ -42,6 +42,14 @@ test.describe("method", () => {
     const titles = section.getByRole("heading", { level: 3 });
     await expect(titles).toHaveText(["Discover", "Define", "Build", "Improve"]);
     await expect(section.getByText("We understand your business, your existing systems and the problems worth solving.")).toBeAttached();
+    await expect(section.getByRole("link", { name: "Start a conversation" })).toHaveAttribute("href", "/#contact");
+    // State names are not painted on the stage; each step keeps one as screen-reader text.
+    for (const caption of ["Point cloud", "Wireframe", "Maquette", "Material"]) {
+      const text = section.locator(".sr-only", { hasText: new RegExp(`^${caption}$`) });
+      await expect(text).toHaveCount(1);
+      expect(await text.evaluate((el) => getComputedStyle(el).position)).toBe("absolute");
+    }
+    await expect(section.locator("[data-method-caption]")).toHaveCount(0);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(0);
     // Errors from other sections are their builders' business; method's own must be clean.

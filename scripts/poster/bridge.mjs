@@ -10,7 +10,7 @@ import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const argv = process.argv.slice(2);
-const VERSION = "v5"; // keep in step with BRIDGE_POSTERS in scenes/bridge/config.ts
+const VERSION = "v6"; // keep in step with BRIDGE_POSTERS in scenes/bridge/config.ts
 const base = argv.includes("--base") ? argv[argv.indexOf("--base") + 1] : "http://localhost:3000";
 
 const browser = await chromium.launch({

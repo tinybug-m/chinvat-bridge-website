@@ -16,7 +16,11 @@
     translate: 0 0.75rem;
   }
 
-  /* Above-the-fold intro: runs from first paint, so the text is never held back. */
+  /*
+   * Above-the-fold intro: runs from first paint, so the text is never held back.
+   * It only moves: nothing is transparent at any point, so the headline and lede
+   * are painted (and counted as painted) from the first frame.
+   */
   .intro-rise {
     animation: intro-rise var(--motion-slow) var(--ease-out-expo) both;
     animation-delay: var(--intro-delay, 0ms);
@@ -25,7 +29,6 @@
 
 @keyframes intro-rise {
   from {
-    opacity: 0;
     translate: 0 0.75rem;
   }
 }

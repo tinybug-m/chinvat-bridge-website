@@ -28,10 +28,10 @@ test.describe("contact section", () => {
     const section = page.locator("#contact");
     await expect(section.getByRole("heading", { level: 2 })).toHaveText("Build a better way forward.");
     await expect(section.getByRole("link", { name: EMAIL })).toHaveAttribute("href", `mailto:${EMAIL}`);
-    await expect(section).toContainText("UK Based // Working Globally");
+    await expect(section).not.toContainText("Working Globally");
     await expect(section.getByRole("group", { name: "What do you need?" }).getByRole("button")).toHaveCount(5);
     await expect(section.getByRole("radiogroup", { name: /Timeline/ }).getByRole("radio")).toHaveCount(4);
-    await expect(section.getByRole("button", { name: "Open email to send" })).toBeVisible();
+    await expect(section.getByRole("button", { name: "Send brief" })).toBeVisible();
   });
 
   test("validates on submit, then live per field", async ({ page }) => {
@@ -41,8 +41,11 @@ test.describe("contact section", () => {
     const email = page.getByLabel("Email", { exact: true });
     const message = page.getByLabel("Message");
     await expect(name).not.toHaveAttribute("aria-invalid", "true");
+    await expect(page.locator("#brief-error-count")).toHaveCount(0);
+    const shadow = page.locator("#brief-needs [data-state=off]").first();
+    const calmShadow = await shadow.evaluate((el) => getComputedStyle(el).boxShadow);
 
-    await page.getByRole("button", { name: "Open email to send" }).click();
+    await page.getByRole("button", { name: "Send brief" }).click();
     await expect(page.locator("#contact").getByRole("status").first()).toHaveText("4 fields need attention");
     await expect(name).toBeFocused();
     for (const [field, text] of [
@@ -55,6 +58,11 @@ test.describe("contact section", () => {
       await expect(page.locator(`#${describedBy?.split(" ")[0]}`)).toHaveText(text);
     }
     await expect(page.locator("#brief-needs-error")).toHaveText("Choose at least one option.");
+    // The count is also on screen, above the button, and the needs group shows the danger state.
+    const count = page.locator("#brief-error-count");
+    await expect(count).toHaveText("4 fields need attention");
+    await expect(page.locator("#brief-needs")).toHaveAttribute("aria-invalid", "true");
+    expect(await shadow.evaluate((el) => getComputedStyle(el).boxShadow)).not.toBe(calmShadow);
     expect(await page.evaluate(() => (window as unknown as { __mailto: string[] }).__mailto)).toEqual([]);
 
     await name.fill("Ada");
@@ -65,13 +73,14 @@ test.describe("contact section", () => {
     await expect(page.locator("#brief-message-error")).toContainText("at least 20 characters");
     await page.getByRole("button", { name: "Software & Web" }).click();
     await expect(page.locator("#brief-needs-error")).toBeHidden();
+    await expect(count).toHaveText("2 fields need attention");
 
-    await page.getByRole("button", { name: "Open email to send" }).click();
+    await page.getByRole("button", { name: "Send brief" }).click();
     await expect(page.locator("#contact").getByRole("status").first()).toHaveText("2 fields need attention");
     await expect(email).toBeFocused();
     await email.fill("ada@example.com");
     await message.fill("Exactly twenty chars!");
-    await page.getByRole("button", { name: "Open email to send" }).click();
+    await page.getByRole("button", { name: "Send brief" }).click();
     await expect(page.getByText("Your email app should open. If it didn’t:")).toBeVisible();
   });
 
@@ -80,7 +89,7 @@ test.describe("contact section", () => {
     await page.goto("/");
     await fill(page);
     await page.getByLabel(/Company/).fill("Analytical Engines Ltd");
-    await page.getByRole("button", { name: "Open email to send" }).click();
+    await page.getByRole("button", { name: "Send brief" }).click();
 
     const body = [
       "Name: Ada Lovelace",
@@ -102,7 +111,7 @@ test.describe("contact section", () => {
     await page.getByLabel("Email", { exact: true }).fill("ada@example.com");
     await page.getByRole("button", { name: "Not sure yet" }).click();
     await page.getByLabel("Message").fill("Just a conversation about options.");
-    await page.getByRole("button", { name: "Open email to send" }).click();
+    await page.getByRole("button", { name: "Send brief" }).click();
     const [url] = await page.evaluate(() => (window as unknown as { __mailto: string[] }).__mailto);
     const body = decodeURIComponent(url.split("&body=")[1]);
     expect(body).toContain("Company: —\nInterested in: Not sure yet\nTimeline: —\n\nJust a conversation");
@@ -114,7 +123,7 @@ test.describe("contact section", () => {
     if (testInfo.project.name === "desktop") await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await page.goto("/");
     await fill(page);
-    await page.getByRole("button", { name: "Open email to send" }).click();
+    await page.getByRole("button", { name: "Send brief" }).click();
     await expect(page.getByText("Your email app should open. If it didn’t:")).toBeVisible();
     await expect(page.getByRole("button", { name: "Copy message" })).toBeVisible();
 
@@ -137,7 +146,7 @@ test.describe("contact section", () => {
   test("no horizontal overflow and tap targets are 44px", async ({ page }) => {
     await page.goto("/");
     await page.locator("#contact").scrollIntoViewIfNeeded();
-    for (const locator of [page.getByRole("button", { name: "Workflows" }), page.getByRole("radio", { name: "Just exploring" }), page.getByRole("button", { name: "Open email to send" })]) {
+    for (const locator of [page.getByRole("button", { name: "Workflows" }), page.getByRole("radio", { name: "Just exploring" }), page.getByRole("button", { name: "Send brief" })]) {
       await locator.scrollIntoViewIfNeeded();
       expect((await locator.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
     }

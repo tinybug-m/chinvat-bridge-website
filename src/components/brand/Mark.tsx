@@ -4,14 +4,15 @@ import { MARK_LEFT_PATH, MARK_RIGHT_PATH } from "./mark-geometry";
 
 /**
  * - glass: ink drawing on the left, the material half on the right (primary, on light grounds)
+ * - glass-paper: the same, with the flat half in paper, for dark grounds
  * - duo: flat ink and cerulean, for small sizes and favicons
  * - ink / paper: single colour, for print-like uses and dark grounds
  */
-export type MarkVariant = "glass" | "duo" | "ink" | "paper";
+export type MarkVariant = "glass" | "glass-paper" | "duo" | "ink" | "paper";
 
 const VIEWBOX = "318 325 615 598";
 
-const FLAT_FILLS: Record<Exclude<MarkVariant, "glass">, [string, string]> = {
+const FLAT_FILLS: Record<Exclude<MarkVariant, "glass" | "glass-paper">, [string, string]> = {
   duo: ["var(--color-ink)", "var(--color-cobalt-700)"],
   ink: ["var(--color-ink)", "var(--color-ink)"],
   paper: ["var(--color-paper)", "var(--color-paper)"],
@@ -26,8 +27,10 @@ interface MarkProps {
 
 export function Mark({ variant = "glass", className, title }: MarkProps) {
   const gradientId = useId();
-  const [left, right] =
-    variant === "glass" ? ["var(--color-ink)", `url(#${gradientId})`] : FLAT_FILLS[variant];
+  const isGlass = variant === "glass" || variant === "glass-paper";
+  const [left, right] = isGlass
+    ? [variant === "glass-paper" ? "var(--color-paper)" : "var(--color-ink)", `url(#${gradientId})`]
+    : FLAT_FILLS[variant];
 
   return (
     <svg
@@ -38,7 +41,7 @@ export function Mark({ variant = "glass", className, title }: MarkProps) {
       focusable="false"
     >
       {title ? <title>{title}</title> : null}
-      {variant === "glass" ? (
+      {isGlass ? (
         // A static stand-in for the 3D glass: deep cerulean body, azure sheen, saffron light.
         <linearGradient id={gradientId} gradientUnits="userSpaceOnUse" x1="640" y1="340" x2="900" y2="900">
           <stop offset="0" stopColor="#0b263c" />

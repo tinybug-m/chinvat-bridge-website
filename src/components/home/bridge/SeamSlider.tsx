@@ -4,14 +4,18 @@ import { Slider as SliderPrimitive } from "radix-ui";
 import { cn } from "@/lib/utils";
 
 /*
- * The seam control: components/ui/slider restyled as a handle on the stage's
- * bottom edge. Local because the shared Slider does not pass props to its
- * thumb (aria-valuetext, aria-labelledby).
+ * The seam control: components/ui/slider restyled as a handle riding the
+ * seam line, halfway up the stage. Local because the shared Slider does not
+ * pass props to its thumb (aria-valuetext, aria-labelledby).
  *
- * The root overhangs the stage by half the thumb (14px) on each side, which
- * cancels Radix's in-bounds offset: the thumb's centre sits exactly at the
- * value's share of the stage width, under the seam line. `inverted`: the
- * value is the share built, measured from the right, so dragging left builds.
+ * Radix gets the rounded value (aria-valuenow stays an integer) and would
+ * place the thumb on whole steps; the thumb wrapper is pinned to --seam
+ * instead, the fractional position the seam line itself uses, so handle and
+ * line never part. The root spans the stage exactly, so a pointer at x
+ * still maps to a seam at x. Only the thumb takes pointers: the strip across
+ * the image neither jumps the seam on a stray tap nor blocks page scrolling.
+ * `inverted`: the value is the share built, measured from the right, so
+ * dragging left builds.
  */
 
 interface SeamSliderProps {
@@ -34,23 +38,22 @@ export function SeamSlider({ value, min, max, valueText, labelledBy, onValueChan
       inverted
       onValueChange={([next]) => onValueChange(next)}
       className={cn(
-        "absolute -inset-x-3.5 bottom-0 flex h-11 translate-y-1/2 cursor-pointer touch-none items-center select-none",
+        "pointer-events-none absolute inset-x-0 top-1/2 flex h-11 -translate-y-1/2 items-center select-none",
+        "[&>span:has([role=slider])]:right-auto! [&>span:has([role=slider])]:left-(--seam)!",
         className,
       )}
     >
-      <SliderPrimitive.Track className="relative mx-3.5 h-px grow bg-transparent">
-        <SliderPrimitive.Range className="absolute h-[2px] -translate-y-px bg-ink" />
-      </SliderPrimitive.Track>
+      <SliderPrimitive.Track className="relative h-px grow" />
       <SliderPrimitive.Thumb
         aria-labelledby={labelledBy}
         aria-valuetext={valueText}
         className={cn(
-          "relative grid size-7 cursor-grab place-items-center rounded-full border-[1.5px] border-ink bg-paper-raised text-ink",
+          "pointer-events-auto relative grid size-10 cursor-grab touch-none place-items-center rounded-full border-[1.5px] border-ink bg-paper-raised text-ink",
           "transition-[background-color,scale] duration-200 ease-out-quart before:absolute before:-inset-2 before:content-['']",
           "hover:bg-haze active:cursor-grabbing active:scale-95",
         )}
       >
-        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" className="size-3.5">
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" className="size-4">
           <path d="M6 4 2 8l4 4M10 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
         </svg>
       </SliderPrimitive.Thumb>

@@ -10,6 +10,8 @@ export const archivo = localFont({
   weight: "100 900",
   style: "normal",
   display: "swap",
+  // The stand-in is hand-tuned per stretch and weight in base.css.
+  adjustFontFallback: false,
   declarations: [{ prop: "font-stretch", value: "62% 125%" }],
 });
 

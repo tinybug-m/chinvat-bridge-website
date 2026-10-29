@@ -26,13 +26,13 @@ export function SiteHeader() {
   return (
     <header
       data-scrolled={scrolled || undefined}
-      className="group/header fixed inset-x-0 top-0 z-50 border-b border-transparent transition-[background-color,border-color] duration-300 ease-out-quart data-scrolled:border-line data-scrolled:bg-paper/90 data-scrolled:backdrop-blur-md"
+      className="group/header fixed inset-x-0 top-0 z-50 border-b border-transparent transition-[background-color,border-color] duration-300 ease-out-quart data-scrolled:border-line data-scrolled:bg-paper"
     >
       <Container className="flex h-16 items-center justify-between gap-6 transition-[height] duration-300 ease-out-quart lg:h-18 lg:group-data-scrolled/header:h-15">
         <Lockup className="-my-2 py-2" />
 
         <nav aria-label="Main" className="hidden lg:block">
-          <ul className="flex items-center gap-1 xl:gap-2">
+          <ul className="flex items-center xl:gap-1">
             {[...SECTION_LINKS, PRICING_LINK].map((link) => {
               const isActive = active !== null && link.href === `/#${active}`;
               return (
@@ -40,13 +40,9 @@ export function SiteHeader() {
                   <Link
                     href={link.href}
                     data-active={isActive || undefined}
-                    className="group/link relative inline-flex min-h-11 items-center px-3 text-small text-ink-soft transition-colors duration-200 hover:text-ink data-active:text-ink"
+                    aria-current={isActive ? "location" : undefined}
+                    className="inline-flex min-h-11 items-center px-2 text-small text-ink-soft underline decoration-transparent decoration-1 underline-offset-8 transition-colors duration-200 hover:text-ink data-active:text-ink data-active:decoration-ink xl:px-3"
                   >
-                    {/* Ring node: the mark's joint marks the chapter in view. */}
-                    <span
-                      aria-hidden="true"
-                      className="absolute top-1/2 left-0 size-1.5 -translate-y-1/2 scale-50 rounded-full border border-saffron-600 opacity-0 transition-[opacity,scale] duration-300 ease-out-quart group-data-active/link:scale-100 group-data-active/link:opacity-100"
-                    />
                     {link.label}
                   </Link>
                 </li>
@@ -59,13 +55,17 @@ export function SiteHeader() {
           <Link
             href={LOGIN_LINK.href}
             className={cn(
-              "hidden min-h-11 items-center px-3 text-small text-ink-soft transition-colors duration-200 hover:text-ink lg:inline-flex",
+              "hidden min-h-11 items-center px-2 text-small whitespace-nowrap text-ink-soft transition-colors duration-200 hover:text-ink lg:inline-flex xl:px-3",
             )}
           >
             {LOGIN_LINK.label}
           </Link>
-          <ButtonLink href={CONTACT_LINK.href} className="hidden sm:inline-flex">
+          <ButtonLink href={CONTACT_LINK.href} className="hidden whitespace-nowrap sm:inline-flex">
             {CONTACT_LINK.label}
+          </ButtonLink>
+          {/* Below sm the full label does not fit beside the menu; the conversion path stays one tap away. */}
+          <ButtonLink href={CONTACT_LINK.href} className="px-4 sm:hidden">
+            Contact
           </ButtonLink>
           <MobileMenu />
         </div>

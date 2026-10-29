@@ -13,7 +13,11 @@ export function useActiveSection(ids: string[]) {
 
   useEffect(() => {
     const watched = [...key.split(" "), ...Object.keys(SECTION_ALIASES)];
-    const elements = watched.map((id) => document.getElementById(id)).filter((el) => el !== null);
+    const elements = watched
+      .map((id) => document.getElementById(id))
+      .filter((el) => el !== null)
+      // Page order, so that "the later one wins" below holds whatever order the ids arrive in.
+      .sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
     if (!elements.length) return;
 
     const visible = new Set<string>();

@@ -38,14 +38,86 @@ test.describe("site shell", () => {
     await expect(page.locator("#insights")).toBeInViewport();
   });
 
+  test("the menu sheet is loaded on demand, not with the page", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === "desktop", "the menu button is hidden on desktop");
+    const scripts: { url: string; body: Promise<string> }[] = [];
+    page.on("response", (response) => {
+      if (response.request().resourceType() === "script") scripts.push({ url: response.url(), body: response.text().catch(() => "") });
+    });
+    // Radix Dialog's focus guards are a string that survives minification.
+    const withDialog = async () => (await Promise.all(scripts.map(async (s) => ((await s.body).includes("data-radix-focus-guard") ? s.url : null)))).filter(Boolean);
+
+    await page.goto("/", { waitUntil: "load" });
+    expect(await withDialog()).toEqual([]);
+    await page.getByRole("button", { name: "Menu" }).click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    expect((await withDialog()).length).toBeGreaterThan(0);
+  });
+
+  test("mobile header keeps a compact Contact link beside the menu", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "mobile", "below sm only");
+    for (const width of [390, 360]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto("/");
+      const header = page.locator("header");
+      const contact = header.getByRole("link", { name: "Contact", exact: true });
+      await expect(contact).toBeVisible();
+      await expect(contact).toHaveAttribute("href", "/#contact");
+      expect((await contact.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
+      const menu = await header.getByRole("button", { name: "Menu" }).boundingBox();
+      const cta = await contact.boundingBox();
+      expect(cta!.x + cta!.width).toBeLessThanOrEqual(menu!.x);
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      expect(overflow).toBeLessThanOrEqual(0);
+    }
+  });
+
   test("desktop header links reach every chapter", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "desktop only");
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: "Main" });
-    for (const name of ["Services", "Approach", "Insights", "About"]) {
+    for (const name of ["Services", "Work", "Approach", "About", "Insights"]) {
       await nav.getByRole("link", { name }).click();
-      await expect(page.locator(`#${name === "Approach" ? "approach" : name.toLowerCase()}`)).toBeInViewport();
+      // Generous: the long smooth scroll passes the 3D stages, which can hold the main thread for a few seconds.
+      await expect(page.locator(`#${name === "Approach" ? "approach" : name.toLowerCase()}`)).toBeInViewport({ timeout: 20_000 });
     }
     await expect(nav.getByRole("link", { name: "Pricing" })).toHaveAttribute("href", "/pricing");
+    // Links run in page order.
+    await expect(nav.getByRole("link")).toHaveText(["Services", "Work", "Approach", "About", "Insights", "Pricing"]);
+  });
+
+  test("the active chapter stays on Approach while reading Method, and clears when Capabilities opens", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "desktop only");
+    await page.goto("/");
+    const nav = page.getByRole("navigation", { name: "Main" });
+    await page.evaluate(() => document.getElementById("capabilities")!.scrollIntoView({ behavior: "instant", block: "center" }));
+    await expect(page.locator("#capabilities")).toBeInViewport();
+    await expect(nav.locator("[data-active]")).toHaveCount(0);
+    await page.evaluate(() => document.getElementById("method")!.scrollIntoView({ behavior: "instant", block: "center" }));
+    await expect(nav.getByRole("link", { name: "Approach" })).toHaveAttribute("data-active", "true");
+  });
+
+  test("reading Team keeps About lit", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "desktop only");
+    await page.goto("/");
+    const nav = page.getByRole("navigation", { name: "Main" });
+    await page.evaluate(() => document.getElementById("team")!.scrollIntoView({ behavior: "instant", block: "center" }));
+    await expect(page.locator("#team")).toBeInViewport();
+    await expect(nav.getByRole("link", { name: "About" })).toHaveAttribute("data-active", "true");
+  });
+
+  test("the scrolled header is a solid paper bar, not translucent", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => document.getElementById("about")!.scrollIntoView({ behavior: "instant", block: "center" }));
+    const header = page.locator("header").first();
+    await expect(header).toHaveAttribute("data-scrolled", "true");
+    await expect.poll(() => header.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(246, 244, 239)");
+    expect(await header.evaluate((el) => getComputedStyle(el).backdropFilter)).toBe("none");
+  });
+
+  test("the footer lists Work among the chapters", async ({ page }) => {
+    await page.goto("/");
+    const explore = page.getByRole("navigation", { name: "Footer: Explore" });
+    await expect(explore.getByRole("link", { name: "Work" })).toHaveAttribute("href", "/#work");
   });
 });

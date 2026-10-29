@@ -23,15 +23,15 @@ test.describe("about section", () => {
     await expect(section).toContainText("Sources: Yasna 46.10–11, 51.13; Mainyo-i Khrad 2");
   });
 
-  test("the mark and its callouts: mark is decorative, captions are text", async ({ page }) => {
+  test("the mark is decorative and the section is the page's dark band", async ({ page }) => {
     await page.goto("/");
-    const figure = page.locator("#about figure");
-    await expect(figure.locator("svg")).toHaveAttribute("aria-hidden", "true");
-    await expect(figure).toContainText("The way it works today");
-    await expect(figure).toContainText("The system it becomes");
+    const section = page.locator("#about");
+    await expect(section.locator("figure svg")).toHaveAttribute("aria-hidden", "true");
+    await expect(section).toHaveCSS("background-color", "rgb(11, 26, 38)");
+    await expect(section.locator("figcaption")).toHaveCount(0);
   });
 
-  test("on small screens the text comes first, then the mark, then the note", async ({ page }, testInfo) => {
+  test("on small screens the quote comes first, then the origin note, with the mark between", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile", "stacked layout only");
     await page.goto("/");
     const text = await page.locator("#about blockquote").boundingBox();

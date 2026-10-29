@@ -1,3 +1,78 @@
+/*
+ * Archivo's stand-in while it loads (font-display: swap). The page wraps its
+ * text, so the stand-in has to be as wide as Archivo, or the hero lede and the
+ * headlines reflow when the font arrives. Arial is scaled to Archivo's average
+ * advance; the widths differ by stretch (display type runs at 112%) and by
+ * weight, so each combination gets its own scale. Measured, not guessed: the
+ * same sample text set in Archivo and in Arial, at each stretch and weight.
+ * Listed after --font-brand in tokens.css (next/font's own fallback is off).
+ */
+@font-face {
+  font-family: "Archivo Fallback";
+  src: local(Arial);
+  font-weight: 1 450;
+  font-stretch: 100%;
+  size-adjust: 98.8%;
+  ascent-override: 88.87%;
+  descent-override: 21.26%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Archivo Fallback";
+  src: local(Arial);
+  font-weight: 451 549;
+  font-stretch: 100%;
+  size-adjust: 100.8%;
+  ascent-override: 87.10%;
+  descent-override: 20.83%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Archivo Fallback";
+  src: local(Arial);
+  font-weight: 550 900;
+  font-stretch: 100%;
+  size-adjust: 102.4%;
+  ascent-override: 85.74%;
+  descent-override: 20.51%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Archivo Fallback";
+  src: local(Arial);
+  font-weight: 1 450;
+  font-stretch: 112%;
+  size-adjust: 111.8%;
+  ascent-override: 78.53%;
+  descent-override: 18.78%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Archivo Fallback";
+  src: local(Arial);
+  font-weight: 451 549;
+  font-stretch: 112%;
+  size-adjust: 114.0%;
+  ascent-override: 77.02%;
+  descent-override: 18.42%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Archivo Fallback";
+  src: local(Arial);
+  font-weight: 550 900;
+  font-stretch: 112%;
+  size-adjust: 117%;
+  ascent-override: 75.04%;
+  descent-override: 17.95%;
+  line-gap-override: 0%;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
