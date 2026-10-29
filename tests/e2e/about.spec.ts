@@ -15,6 +15,14 @@ test.describe("about section", () => {
     await expect(section).toContainText("ancient Persian concept of a bridge");
   });
 
+  test("the origin note says what the texts say, and names its sources", async ({ page }) => {
+    await page.goto("/");
+    const section = page.locator("#about");
+    await expect(section).toContainText("In the Gathas, the oldest Zoroastrian texts, the bridge is where a person’s own conscience meets them.");
+    await expect(section).toContainText("Later Middle Persian writings add Rashn, who weighs deeds on a balance that favours no one.");
+    await expect(section).toContainText("Sources: Yasna 46.10–11, 51.13; Mainyo-i Khrad 2");
+  });
+
   test("the mark and its callouts: mark is decorative, captions are text", async ({ page }) => {
     await page.goto("/");
     const figure = page.locator("#about figure");

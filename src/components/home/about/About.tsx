@@ -74,6 +74,14 @@ export function About() {
               state and another. For us, it represents the transition from how a business works today to how it
               could work tomorrow.
             </p>
+            <p className="mt-4 max-w-measure text-pretty text-body text-ink-soft">
+              In the Gathas, the oldest Zoroastrian texts, the bridge is where a person&rsquo;s own conscience meets
+              them. Later Middle Persian writings add Rashn, who weighs deeds on a balance that favours no one. We
+              borrow the idea, not the religion: look honestly at where things stand, then build the way across.
+            </p>
+            <p className="mt-3 font-label text-label uppercase text-ink-muted">
+              Sources: Yasna 46.10&ndash;11, 51.13; Mainyo-i Khrad 2
+            </p>
           </div>
         </Reveal>
       </Container>

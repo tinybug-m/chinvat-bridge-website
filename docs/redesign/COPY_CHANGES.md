@@ -33,3 +33,18 @@ Status: **Proposed**, nothing here is approved yet.
 ## Homepage sections
 
 Filled in from each section build's report at the checkpoint.
+
+## Origin note: sourced addition (proposed, needs owner approval)
+
+The Name & Origin paragraph is untouched. Two lines were added under it in
+`About.tsx`:
+
+> In the Gathas, the oldest Zoroastrian texts, the bridge is where a person's own conscience meets them. Later Middle Persian writings add Rashn, who weighs deeds on a balance that favours no one. We borrow the idea, not the religion: look honestly at where things stand, then build the way across.
+>
+> Sources: Yasna 46.10–11, 51.13; Mainyo-i Khrad 2
+
+Basis: Insler 1975 and Mills (SBE 31) for Y46.10–11 and Y51.13 (soul and
+conscience vex the wicked at the bridge); West (SBE 24) Mainyo-i Khrad 2.116 for
+the balance that "renders no favour"; Encyclopaedia Iranica "ČINWAD PUHL".
+The last sentence is brand copy, not a claim about the texts. Delete the three
+lines in `About.tsx` and the matching test to revert.
