@@ -17,8 +17,11 @@ import { SeamSlider } from "./SeamSlider";
  * modernised (0..100); the seam sits at (100 - value)% of the stage width,
  * loose stone slabs on its left, one level deck on its right.
  *
- * Only the visitor moves it, by dragging or keying the slider; scrolling
- * the page never does.
+ * Scrolling moves it: as the stage rises through the viewport the seam
+ * sweeps from today (0) to the future (100), and back as the page scrolls
+ * up. The slider is a manual override: while the visitor has just dragged
+ * or keyed it, scrolling leaves it alone until the page has moved on by
+ * a good stretch. Reduced motion and no JS never scroll-drive it.
  *
  * The fractional value lives in a ref and goes straight to --seam (the line,
  * the handle, the poster split) and the scene; React only hears about whole
@@ -46,9 +49,43 @@ const posterLayer = cn(
   "group-data-[stage-state=live]/stage:opacity-0",
 );
 
-const POSTER_SIZES = "(min-width: 90rem) 86rem, 100vw";
+/*
+ * The stage runs edge to edge, so the poster is always as wide as the viewport. A narrower "sizes"
+ * (it used to say 86rem from 90rem up) makes the browser lay out object-cover against a smaller
+ * intrinsic size than the box it fills, and the poster then shows larger and lower than the canvas.
+ */
+const POSTER_SIZES = "100vw";
+
+/**
+ * Scroll sweep: the value is 0 while the stage's centre is at or below SWEEP_FROM of the viewport
+ * height and 100 once it has risen to SWEEP_TO (a little over half a screen of scrolling).
+ */
+const SWEEP_FROM = 0.9;
+const SWEEP_TO = 0.22;
+/** After a manual change, scrolling is ignored until the page has moved this far (px). */
+const MANUAL_HOLD = 160;
+/** Time constant (ms) of the ease that carries the seam to its scroll position, so wheel notches glide. */
+const FOLLOW_MS = 110;
 
 const seamOffset = (value: number) => `${100 - value}%`;
+
+/** Share modernised (0..100) for a stage whose centre sits at `centre` of the viewport height. */
+function sweepValue(centre: number) {
+  const sweep = (SWEEP_FROM - centre) / (SWEEP_FROM - SWEEP_TO);
+  return Math.min(1, Math.max(0, sweep)) * 100;
+}
+
+/*
+ * Runs while the HTML is parsed, right after the stage: puts the seam where the scroll already is
+ * before the first paint. Without it the server's 50 shows until hydration (a reload part-way down
+ * the page, or a jump to #approach), and the poster visibly jumps from a half split to the real one
+ * once React takes over. Reduced motion and no JS keep the server value.
+ */
+const FIRST_SEAM = `(function(s){try{
+if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+var f=s.previousElementSibling,r=f.getBoundingClientRect(),c=(r.top+r.height/2)/innerHeight,
+v=Math.round(Math.min(1,Math.max(0,(${SWEEP_FROM}-c)/(${SWEEP_FROM}-${SWEEP_TO})))*100);
+s.parentElement.parentElement.style.setProperty("--seam",(100-v)+"%");}catch(e){}})(document.currentScript)`;
 
 /** Server render; constant, so React never rewrites what drive() sets. */
 const INITIAL_STYLE = { "--seam": seamOffset(BRIDGE_SEAM.initial) } as CSSProperties;
@@ -57,8 +94,11 @@ export function BridgeSeam({ className }: { className?: string }) {
   const [value, setValue] = useState<number>(BRIDGE_SEAM.initial);
   const handle = useRef<StageHandle>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const manualAt = useRef<number | null>(null);
   const fraction = useRef<number>(BRIDGE_SEAM.initial);
   const shown = useRef<number>(BRIDGE_SEAM.initial);
+  const target = useRef<number>(BRIDGE_SEAM.initial);
 
   const drive = useCallback((next: number) => {
     if (next === fraction.current) return;
@@ -72,15 +112,67 @@ export function BridgeSeam({ className }: { className?: string }) {
     setValue(rounded);
   }, []);
 
+  const slide = useCallback(
+    (next: number) => {
+      manualAt.current = window.scrollY;
+      target.current = next;
+      drive(next);
+    },
+    [drive],
+  );
+
   useEffect(() => {
     handle.current?.set("built", BRIDGE_SEAM.initial / 100);
-  }, []);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const frame = frameRef.current;
+    if (!frame) return;
+
+    let queued = 0;
+    let easing = 0;
+    let last = 0;
+    // Eases the fractional value toward the scroll position, so the line, the posters and the
+    // scene all move smoothly together instead of in whole-percent jumps.
+    const ease = (now: number) => {
+      const dt = Math.min(64, now - last);
+      last = now;
+      const gap = target.current - fraction.current;
+      const next = Math.abs(gap) < 0.05 ? target.current : fraction.current + gap * (1 - Math.exp(-dt / FOLLOW_MS));
+      drive(next);
+      easing = next === target.current ? 0 : requestAnimationFrame(ease);
+    };
+    const follow = (jump = false) => {
+      queued = 0;
+      if (manualAt.current !== null) {
+        if (Math.abs(window.scrollY - manualAt.current) < MANUAL_HOLD) return;
+        manualAt.current = null;
+      }
+      const rect = frame.getBoundingClientRect();
+      target.current = sweepValue((rect.top + rect.height / 2) / window.innerHeight);
+      if (jump) drive(target.current);
+      else if (!easing) {
+        last = performance.now();
+        easing = requestAnimationFrame(ease);
+      }
+    };
+    const onScroll = () => {
+      if (!queued) queued = requestAnimationFrame(() => follow());
+    };
+    follow(true);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      cancelAnimationFrame(queued);
+      cancelAnimationFrame(easing);
+    };
+  }, [drive]);
 
   const count = modernisedCount(value);
   const valueText = `${value}% modernised: ${count} of ${ROW_COUNT}`;
 
   return (
-    <div ref={rootRef} className={className} style={INITIAL_STYLE}>
+    <div ref={rootRef} className={className} style={INITIAL_STYLE} suppressHydrationWarning>
       <figure className="m-0">
         <div aria-hidden="true" className="mb-4">
           <Container className="flex justify-between gap-4 text-small text-ink-muted">
@@ -88,7 +180,7 @@ export function BridgeSeam({ className }: { className?: string }) {
             <span className="text-right">Future direction</span>
           </Container>
         </div>
-        <div className="relative" data-seam-value={value}>
+        <div ref={frameRef} className="relative overflow-x-clip" data-seam-value={value}>
           <ThreeStage
             id="bridge"
             load={loadBridgeScene}
@@ -118,9 +210,10 @@ export function BridgeSeam({ className }: { className?: string }) {
             max={BRIDGE_SEAM.max}
             valueText={valueText}
             labelledBy="approach-seam-label"
-            onValueChange={drive}
+            onValueChange={slide}
           />
         </div>
+        <script dangerouslySetInnerHTML={{ __html: FIRST_SEAM }} />
 
         <Container as="figcaption" className="mt-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 text-small">
           <span id="approach-seam-label" className="font-medium text-ink">

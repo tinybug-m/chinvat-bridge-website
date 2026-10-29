@@ -2,8 +2,9 @@ import { type Page, expect, test } from "@playwright/test";
 
 /*
  * 02 Approach (The Bridge): the seam slider drives the rows and the stage;
- * only the visitor moves it (drag or keys), never scrolling; reduced motion
- * and no-JS keep everything readable and the control working.
+ * scrolling sweeps it from today to the future and back, the visitor can
+ * override it (drag or keys); reduced motion and no-JS keep everything
+ * readable, the control working and never scroll-drive it.
  */
 
 // GSAP's core keeps this global's name through minification, so it marks the
@@ -72,17 +73,39 @@ test.describe("approach (bridge)", () => {
     await expect(first).toContainText("What we build");
   });
 
-  test("scrolling never moves the seam", async ({ page }) => {
+  test("scrolling down builds the path and scrolling up undoes it", async ({ page }) => {
     await page.goto("/");
-    for (const share of [1.1, 0.5, -0.2, 0.5]) {
-      await placeStage(page, share);
-      await page.waitForTimeout(500);
-      await expect(slider(page)).toHaveAttribute("aria-valuenow", "50");
-    }
+    const value = async () => Number(await slider(page).getAttribute("aria-valuenow"));
+    const settle = () => page.waitForTimeout(400);
+
+    await placeStage(page, 1.3);
+    await settle();
+    expect(await value()).toBe(0);
+    await expect(builtRows(page)).toHaveCount(0);
+
+    await placeStage(page, 0.55);
+    await settle();
+    const middle = await value();
+    expect(middle).toBeGreaterThan(20);
+    expect(middle).toBeLessThan(80);
+
+    await placeStage(page, 0.05);
+    await settle();
+    expect(await value()).toBe(100);
+    await expect(builtRows(page)).toHaveCount(5);
+    await expect(section(page).getByTestId("approach-readout")).toHaveText("Everything improved");
+
+    // And back up: the same positions give the same values.
+    await placeStage(page, 0.55);
+    await settle();
+    expect(await value()).toBe(middle);
+    await placeStage(page, 1.3);
+    await settle();
+    expect(await value()).toBe(0);
     const offset = await section(page).evaluate((element) =>
       getComputedStyle(element.querySelector<HTMLElement>("[data-seam-value]")!.parentElement!.parentElement!).getPropertyValue("--seam").trim(),
     );
-    expect(offset).toBe("50%");
+    expect(offset).toBe("100%");
     // No pin: the section keeps its place in the flow.
     const position = await section(page).evaluate((element) => getComputedStyle(element).position);
     expect(position).toBe("relative");
@@ -115,10 +138,12 @@ test.describe("approach (bridge)", () => {
     });
     expect(offset).toBe("0%");
 
-    // Scrolling away and back leaves it where the visitor put it.
-    await placeStage(page, 1.1);
-    await page.waitForTimeout(800);
+    // A small scroll leaves the visitor's value alone; a long one hands the seam back to the page.
+    await page.evaluate(() => window.scrollBy({ top: 60, behavior: "instant" }));
+    await page.waitForTimeout(400);
     await expect(thumb).toHaveAttribute("aria-valuenow", "100");
+    await placeStage(page, 1.3);
+    await expect(thumb).toHaveAttribute("aria-valuenow", "0");
   });
 
   test("reduced motion: posters, no GSAP, the slider still works", async ({ browser }) => {

@@ -184,6 +184,9 @@ export function createScene(context: SceneContext): SceneInstance {
   const captureBuilt = capture && devParam("bridge") === "built";
   let built = capture ? (captureBuilt ? 1 : 0) : context.input("built", 0.5);
   let laidOutFor = Number.NaN;
+  // The first frame lays out the seam as it is now, not as it was when the scene was created
+  // (the module can take a while to load, and the seam moves with the scroll meanwhile).
+  let settled = capture;
 
   /** Seam position across the stage, 0 (left edge) to 1 (right edge). */
   function seamFraction() {
@@ -261,7 +264,8 @@ export function createScene(context: SceneContext): SceneInstance {
       return false;
     }
     const target = clamp(context.input("built", built));
-    built = damp(built, target, 8, deltaMs);
+    built = settled ? damp(built, target, 8, deltaMs) : target;
+    settled = true;
     const moving = Math.abs(built - target) > 1e-4;
     if (!moving) built = target;
     apply();

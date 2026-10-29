@@ -13,7 +13,7 @@ import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const argv = process.argv.slice(2);
-const VERSION = "v8"; // keep in step with BRIDGE_POSTERS in scenes/bridge/config.ts
+const VERSION = "v9"; // keep in step with BRIDGE_POSTERS in scenes/bridge/config.ts
 const REFERENCE_ASPECT = 1.4; // keep in step with BRIDGE_PATH.referenceAspect
 const PAPER_RAISED = "#fbfaf7"; // --color-paper-raised, the Approach band's ground
 const base = argv.includes("--base") ? argv[argv.indexOf("--base") + 1] : "http://localhost:3000";

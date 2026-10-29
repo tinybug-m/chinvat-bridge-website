@@ -11,7 +11,8 @@ import { cn } from "@/lib/utils";
  * Radix gets the rounded value (aria-valuenow stays an integer) and would
  * place the thumb on whole steps; the thumb wrapper is pinned to --seam
  * instead, the fractional position the seam line itself uses, so handle and
- * line never part. The root spans the stage exactly, so a pointer at x
+ * line stay together; the handle alone is kept its own radius inside the stage,
+ * so at 0 and 100 it does not hang past the screen edge and add a sideways scroll. The root spans the stage exactly, so a pointer at x
  * still maps to a seam at x. Only the thumb takes pointers: the strip across
  * the image neither jumps the seam on a stray tap nor blocks page scrolling.
  * `inverted`: the value is the share built, measured from the right, so
@@ -39,7 +40,7 @@ export function SeamSlider({ value, min, max, valueText, labelledBy, onValueChan
       onValueChange={([next]) => onValueChange(next)}
       className={cn(
         "pointer-events-none absolute inset-x-0 top-1/2 flex h-11 -translate-y-1/2 items-center select-none",
-        "[&>span:has([role=slider])]:right-auto! [&>span:has([role=slider])]:left-(--seam)!",
+        "[&>span:has([role=slider])]:right-auto! [&>span:has([role=slider])]:left-[clamp(1.25rem,var(--seam),calc(100%_-_1.25rem))]!",
         className,
       )}
     >
