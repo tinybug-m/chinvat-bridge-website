@@ -52,6 +52,26 @@ test.describe("approach (bridge)", () => {
     expect(errors).toEqual([]);
   });
 
+  test("origin touches: balance note with its source, a later-tradition caption, plain row headings", async ({ page }) => {
+    await page.goto("/");
+    const approach = section(page);
+    await expect(approach).toContainText("In the Middle Persian texts, Rashn’s balance “renders no favour.”");
+    await expect(approach).toContainText("by weighing where things really stand");
+    await expect(approach).toContainText("Mainyo-i Khrad 2");
+    // The width image is labelled as a later tradition and never as an early-text detail.
+    await expect(approach).toContainText("A later Pahlavi tradition describes the bridge as narrow as a razor or nine lances wide");
+    await expect(approach).toContainText("Later tradition: Dadestan i Denig 21.5; Denkard 809");
+    await expect(approach).not.toContainText("Gathas");
+    // The drawn balance is decorative: hidden from assistive tech, and it carries no text of its own.
+    const balance = approach.locator("svg[aria-hidden=true]").first();
+    await expect(balance).toHaveAttribute("focusable", "false");
+    await expect(balance.locator("text")).toHaveCount(0);
+    // Row headings read as plain statements, not scores.
+    const first = approach.locator("ol > li").first();
+    await expect(first).toContainText("Where it stands");
+    await expect(first).toContainText("What we build");
+  });
+
   test("scroll scrubs the seam from 10 to 90 without pinning", async ({ page }) => {
     await page.goto("/");
     await placeStage(page, 1.1);

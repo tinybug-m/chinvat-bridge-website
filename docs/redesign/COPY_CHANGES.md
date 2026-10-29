@@ -120,22 +120,21 @@ the balance that "renders no favour"; Encyclopaedia Iranica "ČINWAD PUHL".
 The last sentence is brand copy, not a claim about the texts. Delete the two
 paragraphs in `About.tsx` and the matching test to revert.
 
-### Considered and declined (Approach section)
+### Direction A+ rollout (approved by the owner; proposed copy)
 
-An epigraph, a Rashn line or a hairline balance in the Approach section was
-reviewed against the built page and not added.
+The owner approved Direction A+ and lifted the "retired mythology" decision for
+this scoped set. Everything below is additive except the row headings. Each
+historical statement is attributed to its layer: Gathas for the conscience,
+Middle Persian for Rashn's balance, later Pahlavi for the bridge's width.
 
-- The About note already ends on the Approach section's own idea ("look
-  honestly at where things stand, then build the way across"). A second line
-  would repeat it a few screens later.
-- The section already is a bridge: a stage with a draggable seam and five rows
-  that go from drawn to built. Nothing in it is weighed, so a balance would
-  explain nothing and would read as a second, weaker indicator of the seam.
-- A balance weighs good against bad. On a commercial page it would cast the
-  client's current systems as the wrong pan.
-- The wide-or-razor bridge image is from later Pahlavi texts and is disputed
-  (Saadat 2026 on Bundahishn 30.25). It would need hedging, would mix three
-  textual layers, and would bring back the mythological framing the audit pass
-  removed.
+| Where | Added or changed | Basis |
+|---|---|---|
+| Approach, under the lede | "In the Middle Persian texts, Rashn's balance "renders no favour." We begin the same way, by weighing where things really stand." Source: Mainyo-i Khrad 2. A small level-balance drawing (`BalanceDiagram`, hairline, drawn on the left and built on the right, `aria-hidden`). | West, SBE 24, MX 2.116 to 2.119. The last sentence is brand copy. |
+| Approach, under the slider | "A later Pahlavi tradition describes the bridge as narrow as a razor or nine lances wide, depending on who crosses. We borrow only the picture: friction narrows the way, better systems widen it." Source: Dadestan i Denig 21.5; Denkard 809. | Labelled as a later tradition. Saadat 2026 and Bundahishn 30.25 show the mechanism is debated, so it is not stated as fact. |
+| Approach rows (mobile headings, read aloud on desktop) | "Current" becomes "Where it stands"; "Next" becomes "What we build". Row labels and status lines are unchanged. | Echoes the About note; no scores or ratings. |
+| JSON-LD | Organization `description` gains: "The name comes from the Chinvat Bridge of ancient Persian tradition, the crossing where a person's own conscience meets them, and stands for the move from how a business works today to how it could work tomorrow." (`SITE_ORIGIN` in `lib/constants.ts`). The meta description is unchanged. | Same basis as the About note. |
+| Open Graph alt text | Now says the mark is named for the Chinvat Bridge of Persian tradition. | |
+| Insights | New article "Where the Name Chinvat Bridge Comes From" (category "Our Name"), with a sources list. | Same sources as the About note, plus Encyclopaedia Iranica and Saadat 2026. |
 
-Revisit only if the owner asks for more of the origin story on the page.
+Revert: delete the three Approach additions and the article, restore the two row
+headings and the old description and alt text.

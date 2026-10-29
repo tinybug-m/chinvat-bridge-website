@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { REVEAL_RUNTIME } from "@/components/motion/reveal-runtime";
-import { CONTACT_EMAIL, SITE_DESCRIPTION, SITE_NAME, SITE_URL, SITE_TITLE } from "@/lib/constants";
+import { CONTACT_EMAIL, SITE_DESCRIPTION, SITE_NAME, SITE_ORIGIN, SITE_URL, SITE_TITLE } from "@/lib/constants";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -42,7 +42,7 @@ const jsonLd = {
       "@id": ORGANIZATION_ID,
       name: SITE_NAME,
       legalName: "Chinvat Bridge Ltd",
-      description: SITE_DESCRIPTION,
+      description: `${SITE_DESCRIPTION} ${SITE_ORIGIN}`,
       url: SITE_URL,
       logo: `${SITE_URL}/brand/chinvat-bridge-mark.png`,
       email: CONTACT_EMAIL,

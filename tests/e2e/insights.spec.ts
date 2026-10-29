@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 const ROWS = [
+  { slug: "where-the-name-chinvat-bridge-comes-from", title: "Where the Name Chinvat Bridge Comes From", category: "Our Name" },
   { slug: "where-ai-can-save-your-business-time", title: "Where AI Can Actually Save Your Business Time", category: "AI & Workflows" },
   { slug: "what-should-you-automate-first", title: "What Should You Automate First?", category: "Process Automation" },
   { slug: "why-your-website-isnt-bringing-you-customers", title: "Why Your Website Isn't Bringing You Enough Customers", category: "SEO & Discovery" },
@@ -8,13 +9,13 @@ const ROWS = [
 ];
 
 test.describe("insights section", () => {
-  test("four index rows link to their articles", async ({ page }) => {
+  test("five index rows link to their articles", async ({ page }) => {
     await page.goto("/");
     const section = page.locator("#insights");
     await expect(section.getByRole("heading", { level: 2 })).toHaveText("Ideas and observations.");
     await expect(section).toHaveAttribute("aria-labelledby", "insights-title");
     const rows = section.locator("ol > li");
-    await expect(rows).toHaveCount(4);
+    await expect(rows).toHaveCount(5);
     for (const [index, { slug, title, category }] of ROWS.entries()) {
       const row = rows.nth(index);
       await expect(row.getByRole("heading", { level: 3 })).toHaveText(title);
@@ -57,7 +58,7 @@ test.describe("insights section", () => {
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
     await page.goto("/");
-    await expect(page.locator("#insights ol > li")).toHaveCount(4);
+    await expect(page.locator("#insights ol > li")).toHaveCount(5);
     await expect(page.locator("#insights ol a").first()).toBeVisible();
     await context.close();
   });

@@ -200,6 +200,13 @@ export function BridgeSeam({ className }: { className?: string }) {
       </figure>
 
       <Container>
+        <p className="mt-6 max-w-measure text-pretty text-small text-ink-muted">
+          A later Pahlavi tradition describes the bridge as narrow as a razor or nine lances wide, depending on who
+          crosses. We borrow only the picture: friction narrows the way, better systems widen it.
+          <span className="mt-1.5 block font-label text-label uppercase">
+            Later tradition: Dadestan i Denig 21.5; Denkard 809
+          </span>
+        </p>
         <BridgeRows current={CURRENT_STATE_ITEMS} next={FUTURE_STATE_ITEMS} count={count} className="mt-14 md:mt-20" />
       </Container>
     </div>

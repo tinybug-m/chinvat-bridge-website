@@ -29,7 +29,7 @@ export function BridgeRows({ current, next, count, className }: BridgeRowsProps)
             className="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-12 md:items-baseline"
           >
             <div className="md:col-span-5">
-              <p className="text-small text-ink-muted md:sr-only">Current</p>
+              <p className="text-small text-ink-muted md:sr-only">Where it stands</p>
               <p
                 className={cn(
                   "mt-1 text-subheading font-medium transition-colors duration-200 md:mt-0",
@@ -42,7 +42,7 @@ export function BridgeRows({ current, next, count, className }: BridgeRowsProps)
             </div>
 
             <div className="md:col-span-6 md:col-start-7">
-              <p className="text-small text-ink-muted md:sr-only">Next</p>
+              <p className="text-small text-ink-muted md:sr-only">What we build</p>
               <p
                 className={cn(
                   "mt-1 font-display text-heading font-medium transition-colors duration-200 md:mt-0",

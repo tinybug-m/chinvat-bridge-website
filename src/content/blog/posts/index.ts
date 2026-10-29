@@ -3,6 +3,7 @@ import * as automateFirst from "./what-should-you-automate-first";
 import * as aiSaveTime from "./where-ai-can-save-your-business-time";
 import * as websiteNotBringingCustomers from "./why-your-website-isnt-bringing-you-customers";
 import * as buildCustomSoftware from "./when-should-a-business-build-custom-software";
+import * as whereTheNameComesFrom from "./where-the-name-chinvat-bridge-comes-from";
 
 /**
  * Explicit registry rather than a filesystem scan: this keeps article discovery a plain,
@@ -16,4 +17,5 @@ export const ALL_POSTS: Post[] = [
   { meta: automateFirst.meta, Content: automateFirst.Content },
   { meta: websiteNotBringingCustomers.meta, Content: websiteNotBringingCustomers.Content },
   { meta: buildCustomSoftware.meta, Content: buildCustomSoftware.Content },
+  { meta: whereTheNameComesFrom.meta, Content: whereTheNameComesFrom.Content },
 ];
