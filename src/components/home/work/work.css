@@ -1,0 +1,90 @@
+/*
+ * Work index. Fine pointers get the hover preview; everything else (touch,
+ * no hover, and no JavaScript on any device) keeps the screenshot inline.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .work-inline {
+    display: none;
+  }
+
+  .work-row {
+    transition: color var(--motion-quick) var(--ease-out-quart);
+  }
+
+  /* While one name is hovered or focused, the others step back to muted ink (still 5.2:1). */
+  .work-index:has(.work-row[data-current]) .work-row:not([data-current]) .work-name {
+    color: var(--color-ink-muted);
+  }
+
+  .work-name {
+    transition:
+      color var(--motion-base) var(--ease-out-quart),
+      translate var(--motion-base) var(--ease-out-expo);
+  }
+
+  .work-row[data-current] .work-name {
+    translate: 0.5rem 0;
+  }
+
+  /*
+   * The hovered name sits above the preview (z 45, under the header's 50) and
+   * inverts what is behind it: paper minus paper is near-black on the page,
+   * and over the screenshot it turns light. Colour and blend switch together,
+   * with no colour transition, so it never flashes the inverse.
+   */
+  .work-row[data-current] .work-name {
+    position: relative;
+    z-index: 45;
+    color: var(--color-paper);
+    mix-blend-mode: difference;
+    transition-property: translate, opacity;
+  }
+
+  .work-arrow {
+    opacity: 0;
+    translate: -0.5rem 0.25rem;
+    transition:
+      opacity var(--motion-quick) var(--ease-out-quart),
+      translate var(--motion-base) var(--ease-out-expo);
+  }
+
+  .work-row[data-current] .work-arrow,
+  .work-link:focus-visible .work-arrow {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* Created on <body> by WorkIndex; positioned each frame with a transform. */
+.work-preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.work-preview canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media not ((hover: hover) and (pointer: fine)) {
+  .work-preview {
+    display: none;
+  }
+}
+
+/* The link is stretched over the row, so the focus ring goes on the row. */
+.work-row:has(.work-link:focus-visible) {
+  outline: 2px solid var(--color-cobalt-700);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-name,
+  .work-arrow {
+    transition: none;
+  }
+}
