@@ -1,22 +1,24 @@
 import { Mark } from "@/components/brand/Mark";
 import { Reveal } from "@/components/motion/Reveal";
+import { ArrowIcon } from "@/components/system/ArrowIcon";
 import { Container } from "@/components/system/Container";
 import { Section } from "@/components/system/Section";
 import { SectionHeading } from "@/components/system/SectionHeading";
+import { TextLink } from "@/components/system/TextLink";
 import { MarkSheen } from "./MarkSheen";
 import "./about.css";
 
-const PILLARS = ["Strategy", "Engineering", "Automation", "Measurable Outcomes"];
-
 /*
- * The page's one dark band and its one specific story, so it gets the most
- * room: the quote and the origin text are set large, and the mark bleeds off
- * the right edge on wide screens. Body text is paper at 80% or more on ink,
- * well past 4.5:1.
+ * The page's one dark band and its one specific story, kept to two things: the
+ * quote, and the origin of the name in a single paragraph. The sourced story
+ * (the Gathas, Rashn, the texts) lives in the article the quiet link points to,
+ * not here. On wide screens the mark spans both rows and bleeds off the right
+ * edge. Text is paper at 70% or more on ink, well past 4.5:1; the link is paper
+ * with an underline (cobalt would vanish on ink), and so is its focus ring.
  */
 export function About() {
   return (
-    <Section id="about" labelledBy="about-title" className="overflow-hidden bg-ink py-24 text-paper md:py-32 lg:py-40">
+    <Section id="about" labelledBy="about-title" className="overflow-hidden bg-ink py-20 text-paper md:py-28 lg:py-32">
       <Container className="grid gap-x-6 gap-y-14 lg:grid-cols-12 lg:gap-y-20">
         <div className="lg:col-span-7">
           <Reveal>
@@ -32,10 +34,6 @@ export function About() {
                 to work better together.&rdquo;
               </p>
             </blockquote>
-            <p className="mt-8 max-w-measure text-pretty text-lede text-paper/80">
-              Chinvat Bridge helps identify where technology can remove friction, automate repetitive work and create
-              better digital experiences.
-            </p>
           </Reveal>
         </div>
 
@@ -54,24 +52,13 @@ export function About() {
             and another. For us, it represents the transition from how a business works today to how it could work
             tomorrow.
           </p>
-          <p className="mt-6 max-w-measure text-pretty text-lede text-paper/80">
-            In the Gathas, the oldest Zoroastrian texts, the bridge is where a person&rsquo;s own conscience meets them.
-            Later Middle Persian writings add Rashn, who weighs deeds on a balance that favours no one. We borrow the
-            idea, not the religion: look honestly at where things stand, then build the way across.
-          </p>
-          <p className="mt-4 font-label text-label uppercase text-paper/70">
-            Sources: Yasna 46.10&ndash;11, 51.13; Mainyo-i Khrad 2
-          </p>
-        </Reveal>
-
-        <Reveal delay={120} className="lg:col-span-12">
-          <ul className="grid list-none grid-cols-2 gap-x-8 gap-y-4 text-lede font-medium text-paper/80 sm:flex sm:flex-wrap sm:gap-x-12">
-            {PILLARS.map((pillar, index) => (
-              <li key={pillar} className={index === PILLARS.length - 1 ? "text-paper" : undefined}>
-                {pillar}
-              </li>
-            ))}
-          </ul>
+          <TextLink
+            href="/insights/where-the-name-chinvat-bridge-comes-from"
+            className="mt-6 inline-flex min-h-11 items-center gap-2 text-body text-paper decoration-paper/50 hover:decoration-paper focus-visible:outline-paper"
+          >
+            Where the name comes from
+            <ArrowIcon />
+          </TextLink>
         </Reveal>
       </Container>
     </Section>

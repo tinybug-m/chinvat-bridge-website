@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("about section", () => {
-  test("heading, philosophy copy, pillars and name origin", async ({ page }) => {
+  test("heading, quote and name origin", async ({ page }) => {
     await page.goto("/");
     const section = page.locator("#about");
     await expect(section.getByRole("heading", { level: 2 })).toHaveText("The right technology connects the pieces.");
@@ -9,18 +9,44 @@ test.describe("about section", () => {
     await expect(section.locator("blockquote")).toContainText(
       "Most businesses don’t need more software. They need their people, processes and systems to work better together.",
     );
-    await expect(section).toContainText("Chinvat Bridge helps identify where technology can remove friction");
-    await expect(section.locator("ul > li")).toHaveText(["Strategy", "Engineering", "Automation", "Measurable Outcomes"]);
     await expect(section.getByRole("heading", { level: 3 })).toHaveText("The Name & Origin");
     await expect(section).toContainText("ancient Persian concept of a bridge");
   });
 
-  test("the origin note says what the texts say, and names its sources", async ({ page }) => {
+  test("the hero-repeat lede, the pillars and the sourced story are gone", async ({ page }) => {
     await page.goto("/");
     const section = page.locator("#about");
-    await expect(section).toContainText("In the Gathas, the oldest Zoroastrian texts, the bridge is where a person’s own conscience meets them.");
-    await expect(section).toContainText("Later Middle Persian writings add Rashn, who weighs deeds on a balance that favours no one.");
-    await expect(section).toContainText("Sources: Yasna 46.10–11, 51.13; Mainyo-i Khrad 2");
+    await expect(section).not.toContainText("Chinvat Bridge helps identify where technology can remove friction");
+    await expect(section.locator("ul")).toHaveCount(0);
+    await expect(section).not.toContainText("Measurable Outcomes");
+    await expect(section).not.toContainText("In the Gathas");
+    await expect(section).not.toContainText("Rashn");
+    await expect(section).not.toContainText("Sources:");
+  });
+
+  test("the origin note links to the article that tells the full story", async ({ page }) => {
+    await page.goto("/");
+    const link = page.locator("#about").getByRole("link", { name: "Where the name comes from" });
+    await expect(link).toHaveCount(1);
+    await expect(link).toHaveAttribute("href", "/insights/where-the-name-chinvat-bridge-comes-from");
+    await expect(link).toBeVisible();
+    // Paper on ink, underlined: cobalt would fail contrast on the dark band.
+    await expect(link).toHaveCSS("color", "rgb(246, 244, 239)");
+    await expect(link).toHaveCSS("text-decoration-line", "underline");
+    const box = await link.boundingBox();
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+    const response = await page.request.get("/insights/where-the-name-chinvat-bridge-comes-from");
+    expect(response.status()).toBe(200);
+  });
+
+  test("the link's focus ring is paper, visible on ink", async ({ page }) => {
+    await page.goto("/");
+    const link = page.locator("#about").getByRole("link", { name: "Where the name comes from" });
+    await link.focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
+    await expect(link).toBeFocused();
+    await expect(link).toHaveCSS("outline-color", "rgb(246, 244, 239)");
   });
 
   test("the mark is decorative and the section is the page's dark band", async ({ page }) => {
