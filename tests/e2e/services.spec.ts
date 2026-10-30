@@ -103,15 +103,17 @@ test.describe("services section", () => {
     const context = await browser.newContext({ reducedMotion: "reduce" });
     const page = await context.newPage();
     await page.goto("/");
-    // The AI plate's nodes carry their own motion (.pop / .rise-in) inside noclip groups; all must be finished.
-    const moving = page.locator("#services-ai :is(.pop, .rise-in)");
-    await moving.first().scrollIntoViewIfNeeded();
-    for (const el of await moving.all()) {
+    // The AI plate morphs START -> END in its loop; without motion it must sit in the END state.
+    await page.locator("#services-ai .svc-fig").scrollIntoViewIfNeeded();
+    for (const el of await page.locator("#services-ai :is(.ai-face-end, .ai-spoke, .ai-rim, .ai-ring)").all()) {
       expect(await el.evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
-      expect(await el.evaluate((node) => getComputedStyle(node).scale)).toMatch(/^(none|1|1 1)$/);
+      expect(await el.evaluate((node) => getComputedStyle(node).transform)).toBe("none");
     }
-    for (const el of await page.locator("#services-ai .svc-built").all()) {
-      expect(await el.evaluate((node) => getComputedStyle(node).clipPath)).toBe("none");
+    for (const el of await page.locator("#services-ai :is(.ai-face-start, .ai-merge, .ai-guess)").all()) {
+      expect(await el.evaluate((node) => getComputedStyle(node).opacity)).toBe("0");
+    }
+    for (const el of await page.locator("#services-ai .ai-travel").all()) {
+      expect(await el.evaluate((node) => getComputedStyle(node).transform)).toBe("none");
     }
     await context.close();
   });

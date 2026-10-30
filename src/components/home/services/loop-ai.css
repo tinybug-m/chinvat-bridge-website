@@ -1,63 +1,77 @@
 /*
- * AI plate loop (see loop.css for the contract and the shared clock).
- * 0-10 rest, 10-35 guesses worked, 35-50 marker crosses x=200, 50-80 graph
- * responds, 80-88 ring lands, 88-100 ease back. 0% / 100% = settled design.
+ * AI plate loop (see loop.css for the contract). Unlike the other plates this
+ * one is a single composition that morphs START -> END and back: the SVG is
+ * authored in the END state, and every keyframe at 0% / 100% is the START
+ * state (loose guesses scattered over the board). The fill runs backwards too,
+ * so the plate shows START from first paint while the loop is paused, and
+ * the morph is the first thing the loop plays. Reduced motion and no-JS never
+ * get here and keep the authored END state.
+ *
+ *    0 - 14   START: scattered hairline guesses, dashed guess lines
+ *   12 - 24   guess lines fade
+ *   14 - 48   guesses travel to their nodes (three converge on the hub)
+ *   34 - 46   hairline faces give way to solid ink
+ *   48 - 66   spokes grow out of the hub, then the rim
+ *   62 - 76   saffron ring lands last
+ *   76 - 84   END holds
+ *   82 - 100  ease back to START
  */
+.svc-fig .ai-morph {
+  --loop-duration: 10s;
+  --loop-start: 0.6s;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  .js-reveal .svc-fig .ai-guess.loop { animation-name: ai-guess-march; --loop-ease: linear; }
-  /* the seam dash (period 8) must not inherit the march (period 7): it would end out of phase */
-  .js-reveal .svc-fig .ai-guess path { stroke-dashoffset: 0; }
-  .js-reveal .svc-fig .ai-loose-a.loop { animation-name: ai-sway-a; }
-  .js-reveal .svc-fig .ai-loose-b.loop { animation-name: ai-sway-b; }
-  .js-reveal .svc-fig .ai-marker.loop { animation-name: ai-marker; }
-  .js-reveal .svc-fig .ai-hub.loop { animation-name: ai-hub; transform-box: fill-box; transform-origin: center; }
-  .js-reveal .svc-fig .ai-spoke.loop { animation-name: ai-spoke; }
-  .js-reveal .svc-fig .ai-node.loop { animation-name: ai-node; transform-box: fill-box; transform-origin: center; }
+  .js-reveal .svc-fig .ai-morph .loop { animation-fill-mode: both; }
+  .js-reveal .svc-fig .ai-guess.loop { animation-name: ai-guess; }
+  .js-reveal .svc-fig .ai-travel.loop { animation-name: ai-travel; }
+  .js-reveal .svc-fig .ai-face-start.loop { animation-name: ai-face-start; }
+  .js-reveal .svc-fig .ai-face-end.loop { animation-name: ai-face-end; }
+  .js-reveal .svc-fig .ai-merge.loop { animation-name: ai-merge; }
+  .js-reveal .svc-fig .ai-spoke.loop { animation-name: ai-spoke; transform-box: fill-box; transform-origin: var(--o); }
+  .js-reveal .svc-fig .ai-rim.loop { animation-name: ai-rim; }
   .js-reveal .svc-fig .ai-ring.loop { animation-name: ai-ring; transform-box: fill-box; transform-origin: center; }
 }
 
-@keyframes ai-guess-march {
-  0%, 10% { stroke-dashoffset: 0; }
-  40%, 100% { stroke-dashoffset: -14; }
+@keyframes ai-guess {
+  0%, 12% { opacity: 1; }
+  24%, 92% { opacity: 0; }
+  100% { opacity: 1; }
 }
-@keyframes ai-sway-a {
-  0%, 10% { transform: translate(0, 0); }
-  22% { transform: translate(3px, -2px); }
-  34% { transform: translate(-2px, 2px); }
-  46%, 100% { transform: translate(0, 0); }
+@keyframes ai-travel {
+  0%, 14% { transform: translate(var(--sx), var(--sy)); }
+  48%, 82% { transform: translate(0, 0); }
+  100% { transform: translate(var(--sx), var(--sy)); }
 }
-@keyframes ai-sway-b {
-  0%, 10% { transform: translate(0, 0); }
-  22% { transform: translate(-3px, 2px); }
-  34% { transform: translate(2px, -2px); }
-  46%, 100% { transform: translate(0, 0); }
+@keyframes ai-face-start {
+  0%, 34% { opacity: 1; }
+  46%, 86% { opacity: 0; }
+  96%, 100% { opacity: 1; }
 }
-/* from the loose cluster (172,148) over the seam (200) to the hub (306,160) */
-@keyframes ai-marker {
-  0%, 30% { opacity: 0; transform: translate(0, 0); animation-timing-function: var(--ease-out-quart); }
-  35% { opacity: 1; transform: translate(0, 0); animation-timing-function: var(--ease-drawn); }
-  50% { opacity: 1; transform: translate(70px, -2px); animation-timing-function: var(--ease-out-expo); }
-  58% { opacity: 1; transform: translate(134px, 12px); animation-timing-function: var(--ease-out-quart); }
-  64%, 100% { opacity: 0; transform: translate(134px, 12px); }
+@keyframes ai-face-end {
+  0%, 34% { opacity: 0; }
+  46%, 86% { opacity: 1; }
+  96%, 100% { opacity: 0; }
 }
-@keyframes ai-hub {
-  0%, 52% { transform: scale(1); animation-timing-function: var(--ease-out-quart); }
-  58% { transform: scale(1.06); animation-timing-function: var(--ease-drawn); }
-  72%, 100% { transform: scale(1); }
+/* a guess that merges into the hub fades as it arrives */
+@keyframes ai-merge {
+  0%, 38% { opacity: 1; }
+  48%, 86% { opacity: 0; }
+  96%, 100% { opacity: 1; }
 }
 @keyframes ai-spoke {
-  0%, 52% { opacity: 1; animation-timing-function: var(--ease-drawn); }
-  58% { opacity: 0.4; animation-timing-function: var(--ease-out-quart); }
-  70%, 100% { opacity: 1; }
+  0%, 48% { opacity: 0; transform: scale(0); animation-timing-function: var(--ease-out-quart); }
+  60%, 80% { opacity: 1; transform: scale(1); animation-timing-function: var(--ease-drawn); }
+  88%, 100% { opacity: 0; transform: scale(0); }
 }
-@keyframes ai-node {
-  0%, 60% { transform: scale(1); animation-timing-function: var(--ease-out-quart); }
-  66% { transform: scale(1.25); animation-timing-function: var(--ease-drawn); }
-  76%, 100% { transform: scale(1); }
+@keyframes ai-rim {
+  0%, 56% { opacity: 0; }
+  66%, 80% { opacity: 1; }
+  88%, 100% { opacity: 0; }
 }
 @keyframes ai-ring {
-  0%, 10% { opacity: 1; transform: scale(1); animation-timing-function: var(--ease-drawn); }
-  22%, 76% { opacity: 0.4; transform: scale(0.94); animation-timing-function: var(--ease-out-expo); }
-  84% { opacity: 1; transform: scale(1.04); animation-timing-function: var(--ease-drawn); }
-  92%, 100% { opacity: 1; transform: scale(1); }
+  0%, 62% { opacity: 0; transform: scale(0.85); animation-timing-function: var(--ease-out-expo); }
+  70% { opacity: 1; transform: scale(1.05); animation-timing-function: var(--ease-drawn); }
+  76%, 82% { opacity: 1; transform: scale(1); }
+  88%, 100% { opacity: 0; transform: scale(0.85); }
 }

@@ -56,39 +56,28 @@ export function Fill({ delay = 0, children }: { delay?: number; children: ReactN
 }
 
 export const DASH = "4 4";
-const GUESS = "2 5";
 
 /* ---------------------------------------------------------------- AI */
 
-const AI_LOOSE: [number, number, number][] = [
-  [46, 96, 7],
-  [98, 66, 5],
-  [70, 152, 8],
-  [138, 112, 6],
-  [160, 198, 7],
-  [90, 236, 5],
-  [40, 208, 6],
-  [172, 148, 6],
-  [132, 258, 5],
-  [170, 74, 6],
-];
-const AI_GUESSES: [number, number, number, number][] = [
-  [46, 96, 98, 66],
-  [138, 112, 172, 148],
-  [70, 152, 40, 208],
-  [90, 236, 132, 258],
-  [160, 198, 172, 148],
-];
+/*
+ * One composition, two states of the same nodes. The SVG is authored in its
+ * END state (the settled graph), so reduced motion and no-JS show the
+ * finished design; the loop (loop-ai.css) starts each node at its START
+ * offset, scattered loose guesses, and morphs it into place.
+ */
+const GUESS = "2 5";
+
+/** The settled graph: hub, then the ring of nodes around it. */
+const AI_HUB: [number, number, number] = [230, 155, 18];
 const AI_GRAPH: [number, number, number][] = [
-  [234, 138, 6],
-  [264, 86, 7],
-  [340, 72, 6],
-  [374, 130, 6],
-  [366, 214, 7],
-  [302, 256, 6],
-  [240, 214, 6],
+  [136, 126, 7],
+  [175, 59, 8],
+  [274, 41, 7],
+  [318, 116, 7],
+  [308, 225, 8],
+  [225, 280, 7],
+  [144, 225, 7],
 ];
-const AI_HUB: [number, number] = [306, 160];
 const AI_RIM: [number, number][] = [
   [0, 1],
   [1, 2],
@@ -99,97 +88,108 @@ const AI_RIM: [number, number][] = [
   [6, 0],
 ];
 
-/** Where each loose circle starts before it settles onto its guess line. */
-const AI_DRIFT: [number, number][] = [
-  [-5, 4],
-  [4, -5],
-  [-4, -4],
-  [5, 5],
-  [-5, -3],
-  [4, 5],
-  [-4, 4],
-  [5, -4],
-  [-5, 5],
-  [4, -5],
+/**
+ * The loose guesses: where each starts (x, y, r) and where it lands, a graph
+ * node index or "hub". Three guesses converge on the hub; only the first of
+ * them becomes it, the other two merge in and fade.
+ */
+const AI_LOOSE: { at: [number, number, number]; to: number | "hub"; merge?: boolean }[] = [
+  { at: [108, 152, 8], to: "hub" },
+  { at: [46, 96, 7], to: 0 },
+  { at: [181, 66, 5], to: 1 },
+  { at: [368, 74, 6], to: 2 },
+  { at: [285, 112, 6], to: 3 },
+  { at: [342, 198, 7], to: 4 },
+  { at: [269, 258, 5], to: 5 },
+  { at: [160, 236, 5], to: 6 },
+  { at: [34, 208, 6], to: "hub", merge: true },
+  { at: [373, 148, 6], to: "hub", merge: true },
+];
+/** Dashed guesses between loose circles (indices into AI_LOOSE), drawn at the start positions. */
+const AI_GUESSES: [number, number][] = [
+  [1, 0],
+  [0, 8],
+  [7, 6],
+  [4, 9],
+  [5, 9],
+  [2, 4],
 ];
 
 export function AiDiagram() {
-  const [hx, hy] = AI_HUB;
+  const [hx, hy, hr] = AI_HUB;
+  const target = (to: number | "hub") => (to === "hub" ? AI_HUB : AI_GRAPH[to]);
   return (
-    <>
-      <Drawn>
-        <g strokeDasharray={GUESS} className="text-line-strong ai-guess loop">
-          <path d="M172 148 L200 142" className="text-control" strokeDasharray={DASH} />
-          {AI_GUESSES.map(([x1, y1, x2, y2]) => (
-            <line key={`${x1}${y1}`} x1={x1} y1={y1} x2={x2} y2={y2} />
-          ))}
-        </g>
-      </Drawn>
-      {/* The loose guesses settle onto their lines, staggered, once the lines are in. */}
-      <Drawn noclip>
-        {[0, 1].map((par) => (
-          <g key={par} className={par ? "ai-loose-b loop" : "ai-loose-a loop"}>
-            {AI_LOOSE.map(([x, y, r], i) =>
-              i % 2 === par ? (
-                <circle
-                  key={`${x}${y}`}
-                  className="drift"
-                  style={vars({ "--i": i, "--dx": `${AI_DRIFT[i][0]}px`, "--dy": `${AI_DRIFT[i][1]}px` })}
-                  cx={x}
-                  cy={y}
-                  r={r}
-                  fill={PAPER}
-                />
-              ) : null,
-            )}
-          </g>
+    <g className="ai-morph">
+      <g className="text-line-strong" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray={GUESS}>
+        {AI_GUESSES.map(([a, b]) => (
+          <line
+            key={`g${a}${b}`}
+            className="ai-guess loop"
+            x1={AI_LOOSE[a].at[0]}
+            y1={AI_LOOSE[a].at[1]}
+            x2={AI_LOOSE[b].at[0]}
+            y2={AI_LOOSE[b].at[1]}
+            opacity="0"
+          />
         ))}
-      </Drawn>
-      <Built>
-        <path d="M200 142 L234 138" />
-      </Built>
-      {/* The graph builds from the hub: hub, spokes outward, nodes, rim, then the ring. */}
-      <Built noclip>
-        {AI_GRAPH.map(([x, y], i) => (
-          <g key={`h${x}${y}`} className="ai-spoke loop" style={vars({ "--loop-d": `${i * 0.12}s` })}>
-            <path d={`M${hx} ${hy} L${x} ${y}`} {...drawProps(1.5, { delay: 800 + i * 50, duration: 600 })} />
-          </g>
-        ))}
+      </g>
+      {/* Links of the settled graph: the rim fades in, the spokes grow out of the hub. */}
+      <g className="text-ink" fill="none" stroke="currentColor">
         <g strokeWidth="1" opacity="0.55">
           {AI_RIM.map(([a, b], i) => (
             <path
               key={`r${a}${b}`}
+              className="ai-rim loop"
+              style={vars({ "--loop-d": `${i * 0.06}s` })}
               d={`M${AI_GRAPH[a][0]} ${AI_GRAPH[a][1]} L${AI_GRAPH[b][0]} ${AI_GRAPH[b][1]}`}
-              {...drawProps(1, { delay: 1300 + i * 50, duration: 600 })}
             />
           ))}
         </g>
-      </Built>
-      <g className="text-ink" fill="currentColor" stroke="none" style={vars({ "--delay": "1200ms" })}>
-        <g className="ai-hub loop">
-          <circle className="pop t-built" cx={hx} cy={hy} r="15" />
+        <g strokeWidth="1.5">
+          {AI_GRAPH.map(([x, y], i) => (
+            <path
+              key={`s${x}${y}`}
+              className="ai-spoke loop"
+              // Grow from the hub end: the corner of the spoke's own box that the hub sits on.
+              style={vars({ "--loop-d": `${i * 0.06}s`, "--o": `${x < hx ? 100 : 0}% ${y < hy ? 100 : 0}%` })}
+              d={`M${hx} ${hy} L${x} ${y}`}
+            />
+          ))}
         </g>
-        {AI_GRAPH.map(([x, y, r], i) => (
-          <g key={`n${x}${y}`} className="ai-node loop" style={vars({ "--loop-d": `${i * 0.12}s` })}>
-            <circle className="pop" style={vars({ "--i": i })} cx={x} cy={y} r={r} />
+      </g>
+      {/* Each guess travels from its start to its node, its hairline face giving way to the solid one. */}
+      {AI_LOOSE.map(({ at: [sx, sy, sr], to, merge }, i) => {
+        const [ex, ey, er] = target(to);
+        return (
+          <g
+            key={`n${sx}${sy}`}
+            className="ai-travel loop"
+            style={vars({ "--sx": `${sx - ex}px`, "--sy": `${sy - ey}px`, "--loop-d": `${(i % 4) * 0.08}s` })}
+          >
+            <circle
+              className={cn(merge ? "ai-merge" : "ai-face-start", "loop text-control")}
+              cx={ex}
+              cy={ey}
+              r={sr}
+              fill={PAPER}
+              stroke="currentColor"
+              strokeWidth="1"
+              opacity="0"
+            />
+            {merge ? null : (
+              <circle
+                className="ai-face-end loop text-ink"
+                cx={ex}
+                cy={ey}
+                r={er}
+                fill="currentColor"
+              />
+            )}
           </g>
-        ))}
-      </g>
-      <g className="ai-ring loop">
-        <circle
-          className="pop"
-          style={vars({ "--delay": "2000ms" })}
-          cx={hx}
-          cy={hy}
-          r="23"
-          fill="none"
-          stroke={SAFFRON}
-          strokeWidth="1.5"
-        />
-      </g>
-      {/* The loop's travelling saffron marker: hidden at rest, only plays in the loop. */}
-      <circle className="ai-marker loop" cx="172" cy="148" r="4" fill={SAFFRON} opacity="0" />
-    </>
+        );
+      })}
+      <circle className="ai-ring loop" cx={hx} cy={hy} r={hr + 9} fill="none" stroke={SAFFRON} strokeWidth="1.5" />
+    </g>
   );
 }
 
