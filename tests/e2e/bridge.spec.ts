@@ -89,7 +89,7 @@ test.describe("approach (bridge)", () => {
     };
     const seam = () =>
       section(page).evaluate((element) =>
-        getComputedStyle(element.querySelector<HTMLElement>("[data-seam-value]")!.parentElement!.parentElement!).getPropertyValue("--seam").trim(),
+        getComputedStyle(element.querySelector<HTMLElement>("[data-seam-value]")!).getPropertyValue("--seam").trim(),
       );
 
     // The seam eases to the scroll position, so poll rather than sleep.
@@ -157,11 +157,19 @@ test.describe("approach (bridge)", () => {
     await expect(section(page).getByTestId("approach-readout")).toHaveText("Everything improved");
 
     // The seam line follows: it sits at the left edge when everything is built.
-    const offset = await section(page).evaluate((element) => {
-      const frame = element.querySelector<HTMLElement>("[data-seam-value]")!;
-      return getComputedStyle(frame.parentElement!.parentElement!).getPropertyValue("--seam").trim();
-    });
-    expect(offset).toBe("0%");
+    // (The line is eased toward the slider value, so it arrives a few frames after the key press.)
+    await expect
+      .poll(() =>
+        section(page).evaluate((element) => {
+          const frame = element.querySelector<HTMLElement>("[data-seam-value]")!;
+          return getComputedStyle(frame).getPropertyValue("--seam").trim();
+        }),
+      )
+      .toBe("0%");
+    // --seam is scoped to the frame: nothing above it carries the variable.
+    expect(
+      await section(page).evaluate((element) => getComputedStyle(element).getPropertyValue("--seam").trim()),
+    ).toBe("");
 
     // A small scroll barely moves the visitor's value; a long one hands the seam back to the page.
     await page.evaluate(() => window.scrollBy({ top: 40, behavior: "instant" }));
@@ -172,7 +180,7 @@ test.describe("approach (bridge)", () => {
     await expect.poll(async () => Number(await thumb.getAttribute("aria-valuenow"))).toBe(0);
   });
 
-  test("reduced motion: posters, no GSAP, the slider still works", async ({ browser }) => {
+  test("reduced motion: posters, no animation library, the slider still works", async ({ browser }) => {
     const context = await browser.newContext({ reducedMotion: "reduce" });
     const page = await context.newPage();
     const scripts: Promise<boolean>[] = [];

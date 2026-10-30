@@ -1,0 +1,76 @@
+/*
+ * Method plates: one-shot motion on top of the Services clock (services.css)
+ * and the shared helpers (styles/motion.css). Like those, it only hides
+ * anything under .js-reveal and before [data-revealed], and only when motion
+ * is allowed, so the finished plate is the default.
+ *
+ *   --plate-delay  one beat for the right-hand plate and its text at lg, where
+ *                  the two plates sit side by side; stacked, each reveals alone
+ *   --at           a node's own start time, from the start of the plate
+ *   .m-early       a built group that wipes at once, not at --svc-t-built
+ *   .m-wipe        a group wiped in left to right (the deck runs left to right)
+ *   .m-axis        a group wiped along the deck's own axis (--axis-hidden/-shown)
+ *   .m-leg         a gauge leg growing from its foot (with .grow-y)
+ */
+.method-text {
+  --reveal-delay: calc(80ms + var(--plate-delay, 0ms));
+}
+
+@media (min-width: 64rem) {
+  .method-col-1 {
+    --plate-delay: 120ms;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The shared groups, shifted by the plate's beat. */
+  .js-reveal [data-reveal].method-plate .svc-drawn:not(.svc-noclip) {
+    transition-delay: var(--plate-delay, 0ms);
+  }
+
+  .js-reveal [data-reveal].method-plate .svc-built:not(.svc-noclip) {
+    transition-delay: calc(var(--svc-t-built) + var(--plate-delay, 0ms));
+  }
+
+  .js-reveal [data-reveal].method-plate .svc-built.m-early:not(.svc-noclip) {
+    transition-delay: var(--plate-delay, 0ms);
+  }
+
+  .js-reveal [data-reveal].method-plate .svc-fill {
+    transition-delay: calc(var(--svc-t-fill) + var(--d, 0ms) + var(--plate-delay, 0ms));
+  }
+
+  .js-reveal [data-reveal] .m-at {
+    --delay: calc(var(--at, 0ms) + var(--plate-delay, 0ms));
+  }
+
+  /* Slabs settle with the quart curve: they are stone, not travel. */
+  .js-reveal [data-reveal].method-plate .rise-in {
+    transition-timing-function: var(--ease-out-quart);
+  }
+
+  .js-reveal [data-reveal].method-plate .m-leg {
+    transition-duration: var(--motion-base);
+    transition-timing-function: var(--ease-drawn);
+  }
+
+  .js-reveal [data-reveal] .m-wipe {
+    clip-path: inset(-6px -6px -6px -6px);
+    transition: clip-path var(--m-wipe-duration, 500ms) var(--ease-drawn);
+    transition-delay: calc(var(--at, 0ms) + var(--plate-delay, 0ms));
+  }
+
+  .js-reveal [data-reveal]:not([data-revealed]) .m-wipe {
+    clip-path: inset(-6px 100% -6px -6px);
+  }
+
+  .js-reveal [data-reveal] .m-axis {
+    clip-path: var(--axis-shown);
+    transition: clip-path 1100ms var(--ease-drawn);
+    transition-delay: var(--plate-delay, 0ms);
+  }
+
+  .js-reveal [data-reveal]:not([data-revealed]) .m-axis {
+    clip-path: var(--axis-hidden);
+  }
+}

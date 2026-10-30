@@ -234,6 +234,8 @@ export function slabPoint(index: number, along = 0): Point {
 export const GAUGE = {
   line: stroke(gaugeHead.map(project)),
   legs: gaugeFoot.map((foot, index) => stroke([project(foot), project(gaugeHead[index])])).join(" "),
+  /** The same two legs, one path each (foot to head), so each can grow from its own foot. */
+  legList: gaugeFoot.map((foot, index) => stroke([project(foot), project(gaugeHead[index])])),
   feet: gaugeFoot.map((foot) => toBoard(project(foot))),
 };
 

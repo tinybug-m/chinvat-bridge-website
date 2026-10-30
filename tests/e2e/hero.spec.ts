@@ -1,4 +1,4 @@
-import { type Page, expect, test } from "@playwright/test";
+import { type Locator, type Page, expect, test } from "@playwright/test";
 
 type StageProbe = { state: string; frames: number; running: boolean; visible: boolean; triangles?: number; calls?: number };
 
@@ -29,9 +29,21 @@ function collectErrors(page: Page) {
   return errors;
 }
 
+// The WebGL canvas. The line drawing also carries a 2D canvas for the chrome
+// texture (MarkChromeCanvas, data-material="chrome"); it is not the scene.
+const sceneCanvas = (stage: Locator) => stage.locator("canvas:not([data-material])");
+
 const probe = (page: Page) => page.evaluate(() => (window as unknown as { __three?: Record<string, StageProbe> }).__three?.seam);
 
 test.describe("hero", () => {
+  test("the line drawing is one path per ring: an outer ring, then the holes", async ({ page }) => {
+    await page.goto("/");
+    const rings = page.locator('[data-layer="drawing"] svg path');
+    expect(await rings.count()).toBeGreaterThan(1);
+    await expect(rings.first()).toHaveAttribute("data-ring", "outer");
+    await expect(page.locator('[data-layer="drawing"] path[data-ring="outer"]')).toHaveCount(1);
+  });
+
   test("content, links and one h1, with no console errors", async ({ page }) => {
     const errors = collectErrors(page);
     await page.goto("/");
@@ -111,24 +123,30 @@ test.describe("hero", () => {
     expect(fetched.filter((s) => s.at <= loadedAt && s.three).map((s) => s.url)).toEqual([]);
     expect(fetched.some((s) => s.at > loadedAt && s.three)).toBe(true);
 
-    const canvas = stage.locator("canvas");
+    const canvas = sceneCanvas(stage);
     await expect(canvas).toHaveAttribute("aria-hidden", "true");
+    // window.__three only exists in development builds (three/core/debug.ts), so the
+    // frame and triangle checks are skipped against `next start`.
     const info = await probe(page);
-    expect(info?.triangles).toBeLessThanOrEqual(20_000);
-    expect(info?.calls).toBeLessThanOrEqual(4);
+    if (info) {
+      expect(info.triangles).toBeLessThanOrEqual(20_000);
+      expect(info.calls).toBeLessThanOrEqual(4);
+    }
 
     // Offscreen: the loop stops and no more frames are drawn.
     await page.evaluate(() => window.scrollTo({ top: window.innerHeight * 1.6, behavior: "instant" }));
-    await expect.poll(async () => (await probe(page))?.running, { timeout: 15_000 }).toBe(false);
-    const frames = (await probe(page))!.frames;
-    await page.mouse.move(200, 200);
-    await page.waitForTimeout(800);
-    expect((await probe(page))!.frames).toBe(frames);
+    if (info) {
+      await expect.poll(async () => (await probe(page))?.running, { timeout: 15_000 }).toBe(false);
+      const frames = (await probe(page))!.frames;
+      await page.mouse.move(200, 200);
+      await page.waitForTimeout(800);
+      expect((await probe(page))!.frames).toBe(frames);
+    }
 
     // Far offscreen: the context is released and the poster takes over.
     await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
     await expect(stage).toHaveAttribute("data-stage-state", "suspended", { timeout: 15_000 });
-    await expect(stage.locator("canvas")).toHaveCount(0);
+    await expect(sceneCanvas(stage)).toHaveCount(0);
 
     // Back on screen: it comes back.
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
@@ -142,9 +160,9 @@ test.describe("hero", () => {
     await page.goto("/", { waitUntil: "load" });
     const stage = page.locator('[data-stage="seam"]');
     await expect(stage).toHaveAttribute("data-stage-state", "fallback");
-    await expect(stage.locator('[data-layer="poster"] img')).toBeVisible();
+    await expect(stage.locator('[data-layer="poster"] [data-material="chrome"] img')).toBeVisible();
     await page.waitForTimeout(1500);
-    await expect(stage.locator("canvas")).toHaveCount(0);
+    await expect(sceneCanvas(stage)).toHaveCount(0);
     const animation = await page.locator("h1").evaluate((el) => getComputedStyle(el).animationName);
     expect(animation).toBe("none");
     expect(errors).toEqual([]);
@@ -165,11 +183,11 @@ test.describe("hero without WebGL", () => {
       await page.goto("/", { waitUntil: "load" });
       const stage = page.locator('[data-stage="seam"]');
       await expect(stage).toHaveAttribute("data-stage-state", "fallback");
-      const poster = stage.locator('[data-layer="poster"] img');
+      const poster = stage.locator('[data-layer="poster"] [data-material="chrome"] img');
       await expect(poster).toBeVisible();
       await expect.poll(() => poster.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
       await page.waitForTimeout(1500);
-      await expect(stage.locator("canvas")).toHaveCount(0);
+      await expect(sceneCanvas(stage)).toHaveCount(0);
       expect((await scripts()).filter((s) => s.three).map((s) => s.url)).toEqual([]);
       expect(errors).toEqual([]);
     } finally {

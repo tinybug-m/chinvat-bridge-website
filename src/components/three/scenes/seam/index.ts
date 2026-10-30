@@ -6,12 +6,15 @@ import {
   Mesh,
   PerspectiveCamera,
   Scene,
+  type Texture,
 } from "three";
 import { EASE, clamp, damp } from "../../core/motion";
 import type { SceneContext, SceneInstance, SceneModule, StageSize } from "../../core/types";
 import { createMarkGeometry, createMarkOutline } from "../../geometry/mark";
 import { pxToWorld } from "../../geometry/mark-outline";
 import { createMarkShadow } from "../../geometry/shadow";
+import { devParam } from "../../core/switches";
+import { type ChromeTextureRequest, loadChromeTexture } from "../../materials/chrome";
 import { createPencilMaterial } from "../../materials/pencil";
 import { createSeamMaterial } from "../../materials/seam";
 import { SEAM_FRAME, SEAM_FRAME_UNITS, SEAM_SCENE } from "./config";
@@ -33,7 +36,7 @@ import { SEAM_FRAME, SEAM_FRAME_UNITS, SEAM_SCENE } from "./config";
 
 const DEG = Math.PI / 180;
 
-export function createScene(context: SceneContext): SceneInstance {
+export async function createScene(context: SceneContext): Promise<SceneInstance> {
   const { quality, capture } = context;
   const tier = quality.tier === "low" ? "low" : "high";
   const { depth, bevel, bevelSegments, cameraDistance, maxYaw, maxPitch, seamReach } = SEAM_SCENE;
@@ -78,6 +81,44 @@ export function createScene(context: SceneContext): SceneInstance {
   });
   scene.add(shadow.mesh);
 
+  // The built half's material: the real chrome pixels (input "chrome" = 1, the
+  // default) or the procedural cerulean / saffron film (0, the classic look).
+  // Switching only moves uChromeMix, so nothing is rebuilt. The texture loads
+  // lazily, and only when chrome is wanted; the film shows until it arrives (and
+  // stays if the load fails). Poster capture waits for it (?material=classic skips it).
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let chrome: ChromeTextureRequest | null = null;
+  // Capture picks its material from ?material=classic|chrome (default chrome),
+  // never from the page, so the poster script can render either.
+  let chromeWanted = capture ? devParam("material") !== "classic" : context.input("chrome", 1) >= 0.5;
+  let chromeTarget = 0;
+  let chromeFade = 0;
+  let disposed = false;
+  function applyChromeTarget() {
+    chromeTarget = chromeWanted && uniforms.uChromeMap.value ? 1 : 0;
+    if (capture || reduceMotion) {
+      chromeFade = chromeTarget;
+      uniforms.uChromeMix.value = chromeTarget;
+    }
+    context.invalidate();
+  }
+  function attachChrome(texture: Texture | null) {
+    if (!texture || disposed) return;
+    uniforms.uChromeMap.value = texture;
+    applyChromeTarget();
+  }
+  function requestChrome() {
+    if (chrome) return chrome.promise;
+    chrome = loadChromeTexture(tier, context.renderer.capabilities.getMaxAnisotropy());
+    const pending = chrome.promise;
+    if (!capture) void pending.then(attachChrome);
+    return pending;
+  }
+  if (chromeWanted) {
+    const pending = requestChrome();
+    if (capture) attachChrome(await pending);
+  }
+
   // Motion state. The intro sweeps the seam in from the right (fully drawn)
   // to the axis; scrolling adds a sweep from the axis to the far left.
   const playIntro = context.firstMount && !capture;
@@ -120,6 +161,12 @@ export function createScene(context: SceneContext): SceneInstance {
       return false;
     }
     let moving = false;
+    if (chromeFade !== chromeTarget) {
+      chromeFade = damp(chromeFade, chromeTarget, 10, deltaMs);
+      if (Math.abs(chromeFade - chromeTarget) < 1e-3) chromeFade = chromeTarget;
+      uniforms.uChromeMix.value = chromeFade;
+      moving = true;
+    }
     if (playIntro && introClock < SEAM_SCENE.introDelay + SEAM_SCENE.introDuration) {
       introClock += deltaMs;
       moving = true;
@@ -146,7 +193,15 @@ export function createScene(context: SceneContext): SceneInstance {
     camera,
     resize,
     update,
+    onInput(key, value) {
+      if (key !== "chrome" || capture) return;
+      chromeWanted = value >= 0.5;
+      if (chromeWanted) requestChrome();
+      applyChromeTarget();
+    },
     dispose() {
+      disposed = true;
+      chrome?.dispose();
       shadow.texture.dispose();
     },
   };

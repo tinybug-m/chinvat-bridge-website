@@ -17,30 +17,30 @@ const LEFT = pathOf("MARK_LEFT_PATH");
 const RIGHT = pathOf("MARK_RIGHT_PATH");
 const VIEWBOX = "318 325 615 598";
 
+const texSrc = read("src/components/brand/mark-texture.ts").toString();
+const texNum = (name) => Number(texSrc.match(new RegExp(`\\b${name}: (\\d+)`))[1]);
+const TEX = { x: texNum("x"), y: texNum("y"), w: texNum("width"), h: texNum("height") };
+const uri = (file) => `data:image/webp;base64,${read(file).toString("base64")}`;
+const TEX_FULL = uri("public/brand/chrome-texture.webp");
+const TEX_SM = uri("public/brand/chrome-texture-sm.webp");
+
 const INK = "#0B1A26";
 const COBALT = "#0F557D";
 const PAPER = "#F6F4EF";
 
-// Same stops as the glass variant of components/brand/Mark.tsx.
-const GLASS = `<linearGradient id="glass" gradientUnits="userSpaceOnUse" x1="640" y1="340" x2="900" y2="900">
-  <stop offset="0" stop-color="#0b263c"/><stop offset="0.22" stop-color="#0f557d"/>
-  <stop offset="0.36" stop-color="#1c8ec3"/><stop offset="0.46" stop-color="#ebc26b"/>
-  <stop offset="0.55" stop-color="#be8c3f"/><stop offset="0.68" stop-color="#0f557d"/>
-  <stop offset="0.86" stop-color="#0b263c"/><stop offset="1" stop-color="#1d75a3"/>
-</linearGradient>`;
-
-const markSvg = (variant, attrs = "") => {
-  const right = variant === "glass" ? "url(#glass)" : COBALT;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${VIEWBOX}" ${attrs}>${variant === "glass" ? GLASS : ""}
-<path d="${LEFT}" fill="${INK}" fill-rule="evenodd"/><path d="${RIGHT}" fill="${right}" fill-rule="evenodd"/></svg>`;
+// The right half is the real chrome photo texture, clipped to the right path.
+let clipN = 0;
+const markSvg = (variant, attrs = "", tex = TEX_FULL) => {
+  if (variant !== "glass") {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${VIEWBOX}" ${attrs}>
+<path d="${LEFT}" fill="${INK}" fill-rule="evenodd"/><path d="${RIGHT}" fill="${COBALT}" fill-rule="evenodd"/></svg>`;
+  }
+  const id = `rc${clipN++}`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="${VIEWBOX}" ${attrs}>
+<clipPath id="${id}"><path d="${RIGHT}" clip-rule="evenodd"/></clipPath>
+<path d="${LEFT}" fill="${INK}" fill-rule="evenodd"/>
+<image clip-path="url(#${id})" href="${tex}" x="${TEX.x}" y="${TEX.y}" width="${TEX.w}" height="${TEX.h}" preserveAspectRatio="none"/></svg>`;
 };
-
-// Vector favicon: the left half turns paper-coloured in dark browser chrome.
-const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${VIEWBOX}">
-<style>.l{fill:${INK}}.r{fill:${COBALT}}@media (prefers-color-scheme:dark){.l{fill:${PAPER}}.r{fill:#1C8EC3}}</style>
-<path class="l" d="${LEFT}" fill-rule="evenodd"/><path class="r" d="${RIGHT}" fill-rule="evenodd"/></svg>
-`;
-writeFileSync(new URL("src/app/icon.svg", root), iconSvg);
 
 const font = (file) => read(`src/styles/fonts/${file}`).toString("base64");
 const FONTS = `
@@ -49,7 +49,7 @@ const FONTS = `
 
 // A small paper tile keeps the ink half legible on any tab colour.
 const tile = (size, pad, radius) => `<div style="width:${size}px;height:${size}px;background:${PAPER};border-radius:${radius}px;display:grid;place-items:center">
-${markSvg("duo", `width="${size - pad * 2}" height="${size - pad * 2}"`)}</div>`;
+${markSvg("glass", `width="${size - pad * 2}" height="${size - pad * 2}"`, TEX_SM)}</div>`;
 
 const apple = `<div style="width:180px;height:180px;background:${PAPER};display:grid;place-items:center">
 ${markSvg("glass", 'width="132" height="132"')}</div>`;
@@ -92,6 +92,17 @@ const shoot = async (html, width, height, path, { transparent = false, css = "" 
   await page.evaluate(() => document.fonts.ready);
   return page.screenshot({ path, clip: { x: 0, y: 0, width, height }, omitBackground: transparent });
 };
+
+// Vector favicon: the same real chrome pixels, from a tiny 80px-wide crop of the
+// texture (scripts/brand/chrome-texture-icon.webp, ~2.6KB) so the SVG stays small.
+const TEX_ICON = `data:image/webp;base64,${read("scripts/brand/chrome-texture-icon.webp").toString("base64")}`;
+// In dark mode a light hairline rings the chrome half: its own dark rim would otherwise vanish on a dark tab.
+const iconRight = `<path class="o" fill="none" d="${RIGHT}" fill-rule="evenodd"/><clipPath id="c"><path d="${RIGHT}" clip-rule="evenodd"/></clipPath><image clip-path="url(#c)" href="${TEX_ICON}" x="${TEX.x}" y="${TEX.y}" width="${TEX.w}" height="${TEX.h}" preserveAspectRatio="none"/>`;
+const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${VIEWBOX}">
+<style>.l{fill:${INK}}.o{stroke:none}@media (prefers-color-scheme:dark){.l{fill:${PAPER}}.o{stroke:${PAPER};stroke-opacity:.38;stroke-width:22;stroke-linejoin:round}}</style>
+<path class="l" d="${LEFT}" fill-rule="evenodd"/>${iconRight}</svg>
+`;
+writeFileSync(new URL("src/app/icon.svg", root), iconSvg);
 
 const out = (path) => new URL(path, root).pathname;
 await shoot(og, 1200, 630, out("src/app/opengraph-image.png"), { css: ogCss });

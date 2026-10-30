@@ -3,6 +3,8 @@ import { Reveal } from "@/components/motion/Reveal";
 import { Container } from "@/components/system/Container";
 import { Section } from "@/components/system/Section";
 import { SectionHeading } from "@/components/system/SectionHeading";
+import { MarkSheen } from "./MarkSheen";
+import "./about.css";
 
 const PILLARS = ["Strategy", "Engineering", "Automation", "Measurable Outcomes"];
 
@@ -38,8 +40,10 @@ export function About() {
         </div>
 
         <Reveal delay={160} className="lg:col-span-5 lg:row-span-2 lg:self-center">
-          <figure aria-hidden="true" className="-mr-6 ml-auto w-72 max-w-full sm:w-96 lg:-mr-0 lg:ml-0 lg:w-[145%] lg:max-w-none lg:-translate-x-[6%]">
-            <Mark variant="glass-paper" className="w-full" />
+          <figure aria-hidden="true" className="about-mark -mr-6 ml-auto w-72 max-w-full sm:w-96 lg:-mr-0 lg:ml-0 lg:w-[145%] lg:max-w-none lg:-translate-x-[6%]">
+            <MarkSheen>
+              <Mark variant="glass-paper" sheen className="w-full" />
+            </MarkSheen>
           </figure>
         </Reveal>
 

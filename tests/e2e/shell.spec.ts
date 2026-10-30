@@ -106,6 +106,32 @@ test.describe("site shell", () => {
     await expect(nav.getByRole("link", { name: "About" })).toHaveAttribute("data-active", "true");
   });
 
+  test("one decorative indicator follows the lit link and hides when none is lit", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "desktop only");
+    await page.goto("/");
+    const nav = page.getByRole("navigation", { name: "Main" });
+    const bar = nav.locator("span[aria-hidden=true]");
+    await expect(bar).toHaveCount(1);
+    await expect(bar).toHaveCSS("opacity", "0");
+    await page.evaluate(() => document.getElementById("about")!.scrollIntoView({ behavior: "instant", block: "center" }));
+    await expect(nav.getByRole("link", { name: "About" })).toHaveAttribute("aria-current", "location");
+    await expect(bar).toHaveCSS("opacity", "1");
+    const linkBox = await nav.getByRole("link", { name: "About" }).boundingBox();
+    // Settled under the About label (350ms slide).
+    await expect.poll(async () => Math.abs(((await bar.boundingBox())?.x ?? -999) - (linkBox!.x + 8))).toBeLessThanOrEqual(14);
+    await page.evaluate(() => document.getElementById("capabilities")!.scrollIntoView({ behavior: "instant", block: "center" }));
+    await expect(bar).toHaveCSS("opacity", "0");
+  });
+
+  // /pricing renders the legacy shell (its own header), so SiteHeader only ever sees the homepage:
+  // Pricing is never lit there.
+  test("Pricing is not lit on the homepage", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "desktop only");
+    await page.goto("/");
+    const nav = page.getByRole("navigation", { name: "Main" });
+    await expect(nav.getByRole("link", { name: "Pricing" })).not.toHaveAttribute("aria-current", /.+/);
+  });
+
   test("the scrolled header is a solid paper bar, not translucent", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => document.getElementById("about")!.scrollIntoView({ behavior: "instant", block: "center" }));

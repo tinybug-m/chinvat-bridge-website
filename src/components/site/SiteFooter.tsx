@@ -32,7 +32,7 @@ export function SiteFooter() {
           </p>
           <a
             href={`mailto:${CONTACT_EMAIL}`}
-            className="mt-6 inline-flex min-h-11 items-center text-small text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-ink"
+            className="mt-6 inline-flex min-h-11 items-center text-small text-ink underline decoration-line-strong underline-offset-4 transition-[color,text-decoration-color] duration-200 ease-out-quart hover:decoration-ink motion-reduce:transition-none"
           >
             {CONTACT_EMAIL}
           </a>
@@ -47,7 +47,7 @@ export function SiteFooter() {
                   <li key={link.href + link.label}>
                     <Link
                       href={link.href}
-                      className="inline-flex min-h-11 items-center text-small text-ink-soft transition-colors duration-200 hover:text-ink lg:min-h-9"
+                      className="inline-flex min-h-11 items-center text-small text-ink-soft transition-[color,text-decoration-color] duration-200 ease-out-quart hover:text-ink motion-reduce:transition-none lg:min-h-9"
                     >
                       {link.label}
                     </Link>
@@ -59,14 +59,14 @@ export function SiteFooter() {
         </div>
       </Container>
 
-      <Container className="flex flex-col gap-2 pb-6 text-small text-ink-muted md:flex-row md:items-center md:justify-between">
+      <Container className="flex flex-col gap-2 pb-6 text-small text-ink-muted lg:flex-row lg:items-center lg:justify-between">
         <p>UK Based // Working Globally</p>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
           <p>&copy; {year} Chinvat Bridge Ltd. All rights reserved.</p>
-          <Link href="/privacy" className="inline-flex min-h-11 items-center hover:text-ink">
+          <Link href="/privacy" className="inline-flex min-h-11 items-center transition-[color,text-decoration-color] duration-200 ease-out-quart hover:text-ink motion-reduce:transition-none">
             Privacy Policy
           </Link>
-          <Link href="/terms" className="inline-flex min-h-11 items-center hover:text-ink">
+          <Link href="/terms" className="inline-flex min-h-11 items-center transition-[color,text-decoration-color] duration-200 ease-out-quart hover:text-ink motion-reduce:transition-none">
             Terms of Service
           </Link>
         </div>

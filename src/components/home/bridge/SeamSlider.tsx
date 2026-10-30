@@ -1,7 +1,9 @@
 "use client";
 
 import { Slider as SliderPrimitive } from "radix-ui";
+import { type CSSProperties, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import "./bridge.css";
 
 /*
  * The seam control: components/ui/slider restyled as a handle riding the
@@ -30,6 +32,24 @@ interface SeamSliderProps {
 }
 
 export function SeamSlider({ value, min, max, valueText, labelledBy, onValueChange, className }: SeamSliderProps) {
+  const thumb = useRef<HTMLSpanElement>(null);
+
+  // The chevrons part once (bridge.css) the first time the handle is mostly on screen.
+  useEffect(() => {
+    const el = thumb.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        el.dataset.hint = "";
+        observer.disconnect();
+      },
+      { threshold: 0.9 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <SliderPrimitive.Root
       value={[value]}
@@ -46,6 +66,7 @@ export function SeamSlider({ value, min, max, valueText, labelledBy, onValueChan
     >
       <SliderPrimitive.Track className="relative h-px grow" />
       <SliderPrimitive.Thumb
+        ref={thumb}
         aria-labelledby={labelledBy}
         aria-valuetext={valueText}
         className={cn(
@@ -54,8 +75,9 @@ export function SeamSlider({ value, min, max, valueText, labelledBy, onValueChan
           "hover:bg-haze active:cursor-grabbing active:scale-95",
         )}
       >
-        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" className="size-4">
-          <path d="M6 4 2 8l4 4M10 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square">
+          <path className="seam-chevron" style={{ "--part": -1 } as CSSProperties} d="M6 4 2 8l4 4" />
+          <path className="seam-chevron" style={{ "--part": 1 } as CSSProperties} d="M10 4l4 4-4 4" />
         </svg>
       </SliderPrimitive.Thumb>
     </SliderPrimitive.Root>

@@ -63,6 +63,19 @@ test.describe("method", () => {
     await expect(plate).toHaveAttribute("data-revealed", /.*/, { timeout: 10_000 });
   });
 
+  test("Build and Improve settle slab by slab from the near bank, unclipped", async ({ page }) => {
+    await page.goto("/");
+    const plates = page.locator("#method li .svc-fig");
+    for (const [plate, count] of [[2, 8], [3, 14]] as const) {
+      const slabs = plates.nth(plate).locator(".rise-in");
+      await expect(slabs).toHaveCount(count);
+      // Painted far to near; --i counts from the near bank (0), so the stagger starts there.
+      const order = await slabs.evaluateAll((nodes) => nodes.map((node) => Number((node as SVGElement).style.getPropertyValue("--i"))));
+      expect(order).toEqual(Array.from({ length: count }, (_, index) => count - 1 - index));
+      await expect(slabs.first().locator("xpath=..")).toHaveClass(/svc-noclip/);
+    }
+  });
+
   test("the plates fit at every width", async ({ page }) => {
     await page.goto("/");
     for (const step of STEPS) {

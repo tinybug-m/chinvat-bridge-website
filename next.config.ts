@@ -22,6 +22,12 @@ const nextConfig: NextConfig = {
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
         ],
       },
+      {
+        // Brand textures keep their file names, so revalidate daily rather than
+        // pinning them immutable (a replaced texture must not stay stale for a year).
+        source: "/brand/:file*.webp",
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
+      },
     ];
   },
 };

@@ -1,33 +1,75 @@
-import { MARK_OUTLINE_PATH } from "@/components/three/geometry/mark-outline";
+import type { CSSProperties } from "react";
+import { MarkClassicGradient } from "@/components/brand/mark-classic";
+import { MARK_RIGHT_PATH } from "@/components/brand/mark-geometry";
+import { MARK_TEXTURE } from "@/components/brand/mark-texture";
+import { MARK_RING_PATHS } from "@/components/three/geometry/mark-outline";
 import { SEAM_FRAME } from "@/components/three/scenes/seam/config";
 import { cn } from "@/lib/utils";
+import "@/components/brand/logo-material.css";
+import { MarkChromeCanvas } from "./MarkChromeCanvas";
+import "./hero.css";
 
 /**
  * The first-paint state of the hero object: the mark as an ink line drawing,
  * framed exactly like the 3D camera frames the silhouette, so the maquette
- * that replaces it lands on the same lines. Inline SVG, so it costs no
- * request and is never the LCP element.
+ * that replaces it lands on the same lines. Inline SVG, so the lines cost no
+ * request and are never the LCP element.
+ *
+ * The built half's chrome is a <canvas> under the lines (MarkChromeCanvas),
+ * not an SVG <image>: a large image would be the LCP candidate, and the
+ * canvas fetches its texture only when chrome is the chosen material.
+ *
+ * One path per ring so it can draw on: the outer ring first, then the holes
+ * (see hero.css). Together the paths are the welded outline. Where the draw
+ * cannot keep a 1px stroke (see hero.css) it stays the static drawing.
  */
 export function MarkDrawing({ className }: { className?: string }) {
   const { x, y, width, height } = SEAM_FRAME;
   return (
-    <svg
-      aria-hidden="true"
-      focusable="false"
-      viewBox={`${x} ${y} ${width} ${height}`}
-      preserveAspectRatio="xMidYMid meet"
-      className={cn("absolute inset-0 size-full", className)}
-    >
-      <path
-        d={MARK_OUTLINE_PATH}
-        fill="none"
-        fillRule="evenodd"
-        stroke="var(--color-ink)"
-        strokeOpacity="0.62"
-        strokeWidth="1"
-        strokeLinejoin="miter"
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
+    <>
+      <MarkChromeCanvas className="mark-chrome-canvas absolute inset-0 size-full" />
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        viewBox={`${x} ${y} ${width} ${height}`}
+        preserveAspectRatio="xMidYMid meet"
+        className={cn("absolute inset-0 size-full", className)}
+        style={{ "--vbw": width, "--vbh": height } as CSSProperties}
+      >
+        {/* The built half's classic material; fades in per <html data-logo-material> (logo-material.css). The chrome is the canvas under this SVG. */}
+        <g data-material="classic" clipPath="url(#mark-drawing-chrome)">
+          <rect
+            className="mark-chrome"
+            x={MARK_TEXTURE.x}
+            y={MARK_TEXTURE.y}
+            width={MARK_TEXTURE.width}
+            height={MARK_TEXTURE.height}
+            fill="url(#mark-drawing-classic)"
+          />
+        </g>
+        {MARK_RING_PATHS.map((d, index) => (
+          <path
+            key={index}
+            d={d}
+            pathLength={1}
+            className="mark-ring"
+            data-ring={index === 0 ? "outer" : "hole"}
+            style={{ "--i": index } as CSSProperties}
+            fill="none"
+            fillRule="evenodd"
+            stroke="var(--color-ink)"
+            strokeOpacity="0.62"
+            strokeWidth="1"
+            strokeLinejoin="miter"
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
+        {/* Defs last, so the first <path> in the drawing is the outer ring. */}
+        <MarkClassicGradient id="mark-drawing-classic" />
+        <clipPath id="mark-drawing-chrome">
+          <path d={MARK_RIGHT_PATH} clipRule="evenodd" />
+        </clipPath>
+      </svg>
+    </>
   );
 }

@@ -6,6 +6,7 @@ import { SEAM_ANCHORS } from "@/components/three/scenes/seam/config";
 import { HERO_COPY, SEAM_LABELS } from "./content";
 import { DisciplineIndex } from "./DisciplineIndex";
 import { HeroObject } from "./HeroObject";
+import { LogoMaterialToggle } from "./LogoMaterialToggle";
 
 /*
  * EXHIBIT layout. Text on the left (columns 1-7), the mark as an exhibit on
@@ -65,6 +66,8 @@ export function Hero() {
           >
             <SeamCaption />
           </HeroObject>
+          {/* Small, in the figure's bottom margin at the content edge (lg: the figure bleeds by one gutter). */}
+          <LogoMaterialToggle className="intro-rise absolute right-0 bottom-1 lg:right-gutter lg:bottom-2" />
           <figcaption className="sr-only">
             The Chinvat Bridge mark, half drawn and half built: {SEAM_LABELS.drawn.label}, {SEAM_LABELS.seam.label},{" "}
             {SEAM_LABELS.built.label}.
@@ -90,9 +93,12 @@ function SeamCaption() {
         className="absolute -translate-x-[3px] translate-y-6"
         style={{ left: `${foot.left}%`, top: `${foot.top}%` }}
       >
-        <Annotation leader="start" leaderLength="1.25rem" className="bg-paper pr-1 font-body text-small whitespace-nowrap">
-          {SEAM_LABELS.seam.label}
-        </Annotation>
+        {/* Its own wrapper: the offset above uses `translate`, which the rise would replace. Lands just after the seam sweep. */}
+        <div className="intro-rise" style={rise(1200)}>
+          <Annotation leader="start" leaderLength="1.25rem" className="bg-paper pr-1 font-body text-small whitespace-nowrap">
+            {SEAM_LABELS.seam.label}
+          </Annotation>
+        </div>
       </div>
     </div>
   );

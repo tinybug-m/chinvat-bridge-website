@@ -1,3 +1,4 @@
+import type { CSSProperties, ReactNode } from "react";
 import { Built, DASH, Drawn, Fill, SAFFRON } from "@/components/home/services/diagrams";
 import { deckOutline, GAUGE, inlayPath, RULER, slabPoint, STONE, type StoneFaces } from "./stonePlates";
 
@@ -15,12 +16,65 @@ interface PlateProps {
   uid: string;
 }
 
+/*
+ * Motion (method.css). Groups that carry their own per-node motion or wipe
+ * drop the generic group wipe (.svc-noclip) and take a time from --at; the
+ * rest of each plate keeps the shared clock (drawn 0, built --svc-t-built,
+ * fills --svc-t-fill). Same grammar throughout: lines first, stone settles,
+ * the saffron ring lands last.
+ */
+const SLAB_AT = 300;
+
+type Css = CSSProperties & Record<`--${string}`, string | number>;
+
+/** Same markup as Built / Drawn, plus the motion hooks those components do not take. */
+function Layer({
+  kind,
+  className,
+  style,
+  children,
+}: {
+  kind: "built" | "drawn";
+  className?: string;
+  style?: Css;
+  children: ReactNode;
+}) {
+  return kind === "built" ? (
+    <g className={`svc-built text-ink ${className ?? ""}`} fill="none" stroke="currentColor" strokeWidth="1.5" style={style}>
+      {children}
+    </g>
+  ) : (
+    <g className={`svc-drawn text-control ${className ?? ""}`} fill="none" stroke="currentColor" strokeWidth="1" style={style}>
+      {children}
+    </g>
+  );
+}
+
 const SLAB = {
   top: "var(--color-slab-top)",
   end: "var(--color-slab-end)",
   face: "var(--color-slab-face)",
   edge: "var(--color-slab-edge)",
 } as const;
+
+/*
+ * The Define wipe runs along the deck: a half-plane perpendicular to the line
+ * from the near slab to the far slab sweeps along it, as a polygon in board
+ * units (view-box), so it follows the deck's slant rather than the page.
+ */
+const AXIS = (() => {
+  const from = slabPoint(0);
+  const to = slabPoint(STONE.count - 1);
+  const length = Math.hypot(to[0] - from[0], to[1] - from[1]);
+  const u = [(to[0] - from[0]) / length, (to[1] - from[1]) / length];
+  const reach = 500;
+  const at = (along: number, across: number) =>
+    `${(from[0] + u[0] * along - u[1] * across).toFixed(1)}px ${(from[1] + u[1] * along + u[0] * across).toFixed(1)}px`;
+  const sweep = (front: number) =>
+    `polygon(${[at(-reach, -reach), at(-reach, reach), at(front, reach), at(front, -reach)].join(", ")}) view-box`;
+  // Clear of the deck at both ends: nothing shown before, everything after.
+  return { hidden: sweep(-60), shown: sweep(length + 60) };
+})();
 const farToNear = Array.from({ length: STONE.count }, (_, index) => STONE.count - 1 - index);
 
 /** A slab or plinth: top, front and, where the camera sees it, the end. */
@@ -65,19 +119,22 @@ const NearBlock = ({ uid }: PlateProps) => (
   <Stone faces={STONE.nearBlock} front={`url(#${uid}-near-front)`} end={`url(#${uid}-near-end)`} />
 );
 
-/** Built slabs `from` to `to`, far to near, so each overlaps the next one along. The near step sits under slab 0. */
+/**
+ * Built slabs `from` to `to`, far to near, so each overlaps the next one along. The near step sits under slab 0.
+ * Index 0 is the near bank (the Approach path starts there), so --i = index settles the deck from the near bank.
+ */
 function Slabs({ from, to, uid }: { from: number; to: number } & PlateProps) {
   return (
-    <>
+    <Layer kind="built" className="svc-noclip m-at" style={{ "--at": `${SLAB_AT}ms` }}>
       {farToNear
         .filter((index) => index >= from && index <= to)
         .map((index) => (
-          <g key={index}>
+          <g key={index} className="rise-in" style={{ "--i": index } as Css}>
             {index === 0 && <NearStep uid={uid} />}
             <Stone faces={STONE.built[index]} end={index === 0 ? undefined : false} />
           </g>
         ))}
-    </>
+    </Layer>
   );
 }
 
@@ -92,16 +149,33 @@ function Outlines({ from, to, nearCap = true }: { from: number; to: number; near
   );
 }
 
+/** The saffron ring fades in at --svc-t-fill + `delay` ms and pops from 0.6 to 1 with it. */
 function Ring({ at, delay = 0 }: { at: [number, number]; delay?: number }) {
   return (
     <Fill delay={delay}>
-      <circle cx={at[0]} cy={at[1]} r="6" stroke={SAFFRON} strokeWidth="1.5" fill={SLAB.top} />
+      <circle
+        className="pop m-at"
+        style={{ "--at": `calc(var(--svc-t-fill) + ${delay}ms)` } as Css}
+        cx={at[0]}
+        cy={at[1]}
+        r="6"
+        stroke={SAFFRON}
+        strokeWidth="1.5"
+        fill={SLAB.top}
+      />
     </Fill>
   );
 }
 
+/** The saffron inlay wipes in near to far, once the slabs it runs on are down. */
 const Inlay = ({ from, to }: { from: number; to: number }) => (
-  <path d={inlayPath(from, to)} stroke={SAFFRON} strokeWidth="1.75" strokeLinecap="butt" />
+  <Layer
+    kind="built"
+    className="svc-noclip m-wipe"
+    style={{ "--at": `calc(${SLAB_AT}ms + ${to - from} * var(--stagger-step) + 50ms)` }}
+  >
+    <path d={inlayPath(from, to)} stroke={SAFFRON} strokeWidth="1.75" strokeLinecap="butt" />
+  </Layer>
 );
 
 /** I. Discover: the stones as they lie today, and the gap measured from both plinths. */
@@ -109,7 +183,7 @@ export function DiscoverPlate({ uid }: PlateProps) {
   return (
     <>
       <Fades uid={uid} />
-      <Built>
+      <Layer kind="built" className="m-early">
         <FarPlinth uid={uid} />
         {farToNear.map((index) => (
           <g key={index}>
@@ -118,15 +192,26 @@ export function DiscoverPlate({ uid }: PlateProps) {
           </g>
         ))}
         <NearBlock uid={uid} />
-      </Built>
-      <Drawn>
-        <g strokeDasharray={DASH}>
+      </Layer>
+      <Layer kind="drawn" className="svc-noclip">
+        <g
+          className="m-wipe"
+          strokeDasharray={DASH}
+          style={{ "--at": "700ms", "--m-wipe-duration": "var(--motion-slow)" } as Css}
+        >
           <path d={GAUGE.line} />
         </g>
-        <path d={GAUGE.legs} />
-      </Drawn>
-      <Ring at={GAUGE.feet[0]} />
-      <Ring at={GAUGE.feet[1]} delay={120} />
+        {GAUGE.legList.map((leg, index) => (
+          <path
+            key={index}
+            d={leg}
+            className="grow-y m-leg m-at"
+            style={{ "--at": `${400 + index * 350}ms`, "--origin": `${GAUGE.feet[index][0]}px ${GAUGE.feet[index][1]}px` } as Css}
+          />
+        ))}
+      </Layer>
+      <Ring at={GAUGE.feet[0]} delay={200} />
+      <Ring at={GAUGE.feet[1]} delay={320} />
     </>
   );
 }
@@ -141,11 +226,13 @@ export function DefinePlate({ uid }: PlateProps) {
         <NearStep uid={uid} />
         <NearBlock uid={uid} />
       </Built>
-      <Drawn>
-        <Outlines from={0} to={STONE.count - 1} />
-        <path d={inlayPath(0, STONE.count - 1)} strokeDasharray={DASH} strokeWidth="1.1" />
-      </Drawn>
-      <Ring at={slabPoint(6, 1)} />
+      <Layer kind="drawn" className="svc-noclip">
+        <g className="m-axis" style={{ "--axis-hidden": AXIS.hidden, "--axis-shown": AXIS.shown } as Css}>
+          <Outlines from={0} to={STONE.count - 1} />
+          <path d={inlayPath(0, STONE.count - 1)} strokeDasharray={DASH} strokeWidth="1.1" />
+        </g>
+      </Layer>
+      <Ring at={slabPoint(6, 1)} delay={600} />
     </>
   );
 }
@@ -157,17 +244,19 @@ export function BuildPlate({ uid }: PlateProps) {
   return (
     <>
       <Fades uid={uid} />
-      <Built>
+      <Layer kind="built" className="m-early">
         <FarPlinth uid={uid} />
-        <Slabs from={0} to={BUILT_TO} uid={uid} />
+      </Layer>
+      <Slabs from={0} to={BUILT_TO} uid={uid} />
+      <Layer kind="built" className="m-early">
         <NearBlock uid={uid} />
-        <Inlay from={0} to={BUILT_TO} />
-      </Built>
+      </Layer>
+      <Inlay from={0} to={BUILT_TO} />
       <Drawn>
         <Outlines from={BUILT_TO + 1} to={STONE.count - 1} nearCap={false} />
         <path d={inlayPath(BUILT_TO + 1, STONE.count - 1)} strokeDasharray={DASH} strokeWidth="1.1" />
       </Drawn>
-      <Ring at={slabPoint(BUILT_TO, 1)} />
+      <Ring at={slabPoint(BUILT_TO, 1)} delay={200} />
     </>
   );
 }
@@ -177,17 +266,21 @@ export function ImprovePlate({ uid }: PlateProps) {
   return (
     <>
       <Fades uid={uid} />
-      <Built>
+      <Layer kind="built" className="m-early">
         <FarPlinth uid={uid} />
-        <Slabs from={0} to={STONE.count - 1} uid={uid} />
+      </Layer>
+      <Slabs from={0} to={STONE.count - 1} uid={uid} />
+      <Layer kind="built" className="m-early">
         <NearBlock uid={uid} />
-        <Inlay from={0} to={STONE.count - 1} />
+      </Layer>
+      <Inlay from={0} to={STONE.count - 1} />
+      <Layer kind="built" className="svc-noclip m-wipe" style={{ "--at": "1250ms" }}>
         <path d={RULER.line} strokeWidth="1" />
         <path d={RULER.ticks} strokeWidth="1" />
-      </Built>
-      <Ring at={slabPoint(3)} />
-      <Ring at={slabPoint(7)} delay={120} />
-      <Ring at={slabPoint(11)} delay={240} />
+      </Layer>
+      <Ring at={slabPoint(3)} delay={650} />
+      <Ring at={slabPoint(7)} delay={770} />
+      <Ring at={slabPoint(11)} delay={890} />
     </>
   );
 }

@@ -3,35 +3,82 @@
  * then the built half sweeps out from the seam and its fills arrive. Content is
  * only ever hidden after the reveal runtime has marked the page (.js-reveal)
  * and never under reduced motion, so the finished diagram is the default.
+ *
+ * Plate clock (tokens.css): drawn 0, built --svc-t-built, fills --svc-t-fill
+ * (+ per-node --d), saffron accent --svc-t-accent. The figure is exempt from
+ * the generic Reveal rise: its own wipe is the reveal.
+ *
+ * Hooks for plates (generic helpers .rise-in .grow-y .pop .draw and the
+ * --i / --delay / .t-* contract are documented in styles/motion.css):
+ *   .svc-drawn / .svc-built   group wipes
+ *   .svc-fill                 opacity fade at --svc-t-fill + --d
+ *   .svc-noclip               on a drawn/built group: no wipe, so per-node
+ *                             motion inside it is not clipped
+ *   .draw (drawProps())       solid line draw-on; needs <PlateDiagram draw>,
+ *                             otherwise the line is simply static. Browsers
+ *                             without typed calc division (Firefox today) skip
+ *                             it and show the finished line.
  */
 .svc-fig svg * {
   vector-effect: non-scaling-stroke;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .js-reveal .svc-fig .svc-drawn,
-  .js-reveal .svc-fig .svc-built {
-    clip-path: inset(-6px -6px -6px -6px);
-    transition: clip-path 1000ms var(--ease-drawn);
+  /* The figure's wipe is its reveal, so it does not also fade and rise. */
+  .js-reveal [data-reveal].svc-fig:not([data-revealed]) {
+    opacity: 1;
+    translate: none;
   }
 
-  .js-reveal .svc-fig .svc-built {
-    transition-duration: 900ms;
-    transition-delay: 700ms;
+  .js-reveal .svc-fig .svc-drawn:not(.svc-noclip),
+  .js-reveal .svc-fig .svc-built:not(.svc-noclip) {
+    clip-path: inset(-6px -6px -6px -6px);
+    transition: clip-path var(--motion-draw) var(--ease-drawn);
+  }
+
+  .js-reveal .svc-fig .svc-built:not(.svc-noclip) {
+    transition-delay: var(--svc-t-built);
   }
 
   .js-reveal .svc-fig .svc-fill {
-    transition: opacity 600ms var(--ease-out-quart);
-    transition-delay: calc(1100ms + var(--d, 0ms));
+    transition: opacity var(--motion-slow) var(--ease-out-quart);
+    transition-delay: calc(var(--svc-t-fill) + var(--d, 0ms));
   }
 
-  .js-reveal .svc-fig:not([data-revealed]) .svc-drawn,
-  .js-reveal .svc-fig:not([data-revealed]) .svc-built {
+  .js-reveal .svc-fig:not([data-revealed]) .svc-drawn:not(.svc-noclip),
+  .js-reveal .svc-fig:not([data-revealed]) .svc-built:not(.svc-noclip) {
     clip-path: inset(-6px 100% -6px -6px);
   }
 
   .js-reveal .svc-fig:not([data-revealed]) .svc-fill {
     opacity: 0;
+  }
+}
+
+/*
+ * Solid-line draw-on inside a figure. The figure's non-scaling stroke makes a
+ * pathLength dash unreliable (verified: Chromium and Firefox draw it as dots),
+ * so the line opts out of it and the stroke width is re-expressed in user
+ * units: authored px * viewBox width / rendered width (the figure is the size
+ * container, so 100cqw is the rendered width). Only where typed calc division
+ * is supported; elsewhere the line stays static and fully drawn.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (stroke-width: calc(4 * 400 / (800px / 1px))) {
+    .js-reveal .svc-fig.draw-scope svg .draw {
+      vector-effect: none;
+      stroke-width: calc(var(--sw, 1.5) * var(--vbw) / (100cqw / 1px));
+      stroke-dasharray: 1;
+      transition: stroke-dashoffset var(--draw-duration, var(--motion-draw)) var(--ease-drawn);
+      transition-delay: var(
+        --draw-delay,
+        calc(var(--delay, 0ms) + min(var(--i, 0) * var(--stagger-step), var(--stagger-max)))
+      );
+    }
+
+    .js-reveal .svc-fig.draw-scope:not([data-revealed]) svg .draw {
+      stroke-dashoffset: 1;
+    }
   }
 }
 

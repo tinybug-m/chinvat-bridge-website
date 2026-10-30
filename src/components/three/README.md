@@ -97,4 +97,4 @@ export default scene;
   `triangles`, `calls`, `geometries`, `textures`, `contexts`.
 - The first frame logs `[three:id] tier, dpr, triangles, draw calls` with `console.info`.
 - Poster: `node scripts/poster/seam.mjs` (dev server running) writes
-  `public/hero/seam-poster.png` from `/?poster=1`; copy it for other scenes.
+  `public/hero/seam-poster-chrome.png` from `/?poster=1`; copy it for other scenes.

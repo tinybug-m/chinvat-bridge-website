@@ -14,11 +14,12 @@ import { ServicePlate, type PlateProps } from "./ServicePlate";
  * on purpose: the section clips the overhang. `tone` varies the text: scale,
  * tag layout, where the outcome sits and how the link looks.
  */
-const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "tone" | "layout">[] = [
+const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" | "layout">[] = [
   {
     slug: "ai",
     Diagram: AiDiagram,
     viewBox: "0 30 400 250",
+    draw: true,
     tone: { title: "heading", tags: "row", outcome: "inline", link: "text" },
     layout: {
       article: "mt-16 lg:mt-24",
@@ -55,6 +56,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "tone" | "layout
     slug: "seo",
     Diagram: SeoDiagram,
     viewBox: "0 40 400 240",
+    draw: true,
     tone: { title: "heading", tags: "stack", outcome: "inline", link: "text" },
     layout: {
       article: "mt-24 lg:mt-36",

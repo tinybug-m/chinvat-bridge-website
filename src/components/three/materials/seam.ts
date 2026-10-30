@@ -1,4 +1,5 @@
-import { Color, MeshPhysicalMaterial, MeshStandardMaterial, type Texture, Vector2 } from "three";
+import { Color, MeshPhysicalMaterial, MeshStandardMaterial, type Texture, Vector2, Vector4 } from "three";
+import { chromeTextureUv } from "./chrome";
 import { PALETTE_3D } from "./palette";
 
 /*
@@ -51,6 +52,14 @@ export interface SeamUniforms {
   uHalfDepth: { value: number };
   /** Diffuse multiplier at the back of the walls (fake ambient occlusion). */
   uWallShade: { value: number };
+  /** The real chrome crop. Null until it loads; uChromeMix stays 0 meanwhile. */
+  uChromeMap: { value: Texture | null };
+  /** 0 = procedural film, 1 = the photographed chrome. Animate it in when the texture arrives. */
+  uChromeMix: { value: number };
+  /** abs(x) scale, abs(x) offset, y scale, y offset: world xy to texture uv. */
+  uChromeUv: { value: Vector4 };
+  /** Emitted share of the chrome colour (it is already a lit photograph). */
+  uChromeGlow: { value: number };
 }
 
 const VERTEX_PARS = /* glsl */ `
@@ -84,6 +93,10 @@ uniform float uBuiltRoughness;
 uniform float uBuiltMetalness;
 uniform float uHalfDepth;
 uniform float uWallShade;
+uniform sampler2D uChromeMap;
+uniform float uChromeMix;
+uniform vec4 uChromeUv;
+uniform float uChromeGlow;
 varying vec3 vSeamPosition;
 
 // Cerulean -> cobalt -> azure -> saffron -> light saffron, played forwards
@@ -109,7 +122,19 @@ float seamFilmT = ( 1.0 - seamNdV ) * 1.4
   + dot( normal, vec3( 0.3, 0.6, 0.0 ) ) * 0.35
   + dot( vSeamPosition.xy, uFilmDirection )
   + uPhase;
-vec3 seamFilmColor = seamFilm( seamFilmT ) + pow( 1.0 - seamNdV, 5.0 ) * uFresnelColor;
+vec3 seamFilmColor = seamFilm( seamFilmT );
+float seamChromeGlow = uFilmGlow;
+if ( uChromeMix > 0.0 ) {
+  // The photographed chrome, mirrored about the axis. The bands drift a few
+  // pixels with the view angle and the film phase, like light across glass.
+  vec2 chromeUv = vec2( abs( vSeamPosition.x ) * uChromeUv.x + uChromeUv.y, vSeamPosition.y * uChromeUv.z + uChromeUv.w );
+  chromeUv += normal.xy * 0.012 + vec2( ( 1.0 - seamNdV ) * 0.02, ( uPhase - 0.06 ) * 0.045 );
+  chromeUv = clamp( chromeUv, vec2( 0.012 ), vec2( 0.988 ) );
+  vec3 chromeColor = texture2D( uChromeMap, chromeUv ).rgb;
+  seamFilmColor = mix( seamFilmColor, chromeColor, uChromeMix );
+  seamChromeGlow = mix( uFilmGlow, uChromeGlow, uChromeMix );
+}
+seamFilmColor += pow( 1.0 - seamNdV, 5.0 ) * uFresnelColor * ( 1.0 - 0.7 * uChromeMix );
 
 // Walls darken toward the back, where a card model would meet the paper.
 float seamWallLight = mix( uWallShade, 1.0, smoothstep( -uHalfDepth, uHalfDepth * 0.5, vSeamPosition.z ) );
@@ -117,7 +142,7 @@ float seamWallLight = mix( uWallShade, 1.0, smoothstep( -uHalfDepth, uHalfDepth 
 diffuseColor.rgb = mix( uMatteColor * seamWallLight, seamFilmColor, seamBuilt );
 roughnessFactor = mix( uMatteRoughness, uBuiltRoughness, seamBuilt );
 metalnessFactor = mix( 0.0, uBuiltMetalness, seamBuilt );
-totalEmissiveRadiance += seamFilmColor * uFilmGlow * seamBuilt * mix( 0.75, 1.0, seamWallLight );
+totalEmissiveRadiance += seamFilmColor * seamChromeGlow * seamBuilt * mix( 0.75, 1.0, seamWallLight );
 
 // At least ~1.5 px wide wherever it lands, so it never breaks into dots on the bevels.
 float seamLineHalf = max( uSeamLineWidth, seamAA * 0.75 );
@@ -151,6 +176,7 @@ function inject(source: string, anchor: string, code: string, where: "before" | 
 }
 
 export function createSeamMaterial({ envMap, tier, halfDepth = 0.6, seamX = 0 }: SeamMaterialOptions) {
+  const uv = chromeTextureUv();
   const uniforms: SeamUniforms = {
     uSeamX: { value: seamX },
     uSeamLineWidth: { value: 0.016 },
@@ -171,6 +197,10 @@ export function createSeamMaterial({ envMap, tier, halfDepth = 0.6, seamX = 0 }:
     uBuiltMetalness: { value: 0.7 },
     uHalfDepth: { value: halfDepth },
     uWallShade: { value: 0.72 },
+    uChromeMap: { value: null },
+    uChromeMix: { value: 0 },
+    uChromeUv: { value: new Vector4(uv.uScale, uv.uOffset, uv.vScale, uv.vOffset) },
+    uChromeGlow: { value: 0.55 },
   };
 
   const shared = { color: 0xffffff, roughness: 0.85, metalness: 0, envMap, envMapIntensity: 1 };

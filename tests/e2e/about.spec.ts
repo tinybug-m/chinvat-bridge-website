@@ -31,6 +31,14 @@ test.describe("about section", () => {
     await expect(section.locator("figcaption")).toHaveCount(0);
   });
 
+  test("the mark's two halves are tagged for the wipe", async ({ page }) => {
+    await page.goto("/");
+    const figure = page.locator("#about figure");
+    await expect(figure.locator('path[data-part="left"]')).toHaveCount(1);
+    // The right half is a group (chrome and classic materials inside), not a bare path.
+    await expect(figure.locator('[data-part="right"]')).toHaveCount(1);
+  });
+
   test("on small screens the quote comes first, then the origin note, with the mark between", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile", "stacked layout only");
     await page.goto("/");

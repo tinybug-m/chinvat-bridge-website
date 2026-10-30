@@ -64,10 +64,13 @@ function cleanRing(ring: Ring, minEdge = 0.75, maxSpikeEdge = 6): Point[] {
 /** [outer, ...holes] in source pixels, cleaned. */
 export const MARK_RINGS: Ring[] = MARK_POLYGONS[0].map((ring) => cleanRing(ring));
 
-/** Even-odd SVG path of the welded outline, in source pixels. */
-export const MARK_OUTLINE_PATH = MARK_RINGS.map(
+/** One closed SVG subpath per ring, in MARK_RINGS order: the outer ring first, then the holes. */
+export const MARK_RING_PATHS: string[] = MARK_RINGS.map(
   (ring) => "M" + ring.map(([x, y]) => `${Math.round(x * 10) / 10} ${Math.round(y * 10) / 10}`).join(" ") + "Z",
-).join("");
+);
+
+/** Even-odd SVG path of the welded outline, in source pixels: the ring paths joined. */
+export const MARK_OUTLINE_PATH = MARK_RING_PATHS.join("");
 
 /** Converts a source-pixel point to world units, centred on the mark, y up. */
 export function pxToWorld(x: number, y: number): [number, number] {

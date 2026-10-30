@@ -69,8 +69,9 @@ test.describe("services section", () => {
     await expect(page.locator("#services").getByText(/^(Drawn|Built)$/)).toHaveCount(0);
     const link = page.locator("#services-ai").getByRole("link", { name: /Read the article/ });
     await link.scrollIntoViewIfNeeded();
-    const box = await link.boundingBox();
-    expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+    // Layout height (offsetHeight), not the bounding box: the plate may still be rising into
+    // place, and a transform makes the box a hair under 44 (43.99997) from float rounding alone.
+    expect(await link.evaluate((el) => (el as HTMLElement).offsetHeight)).toBeGreaterThanOrEqual(44);
   });
 
   test("no horizontal overflow", async ({ page }) => {
@@ -85,8 +86,11 @@ test.describe("services section", () => {
     const page = await context.newPage();
     await page.goto("/");
     await expect(page.locator("#services-ai h3")).toBeVisible();
-    const opacity = await page.locator("#services-seo .svc-fill").first().evaluate((el) => getComputedStyle(el).opacity);
-    expect(opacity).toBe("1");
+    // The SEO plate has no .svc-fill group any more: its stems carry their own motion (.grow-y).
+    const stem = page.locator("#services-seo .grow-y").first();
+    // 0.5 is the stems' authored opacity: any other value means a motion state leaked into the static render.
+    expect(await stem.evaluate((el) => getComputedStyle(el).opacity)).toBe("0.5");
+    expect(await stem.evaluate((el) => getComputedStyle(el).scale)).toMatch(/^(none|1|1 1)$/);
     await context.close();
   });
 
@@ -94,11 +98,54 @@ test.describe("services section", () => {
     const context = await browser.newContext({ reducedMotion: "reduce" });
     const page = await context.newPage();
     await page.goto("/");
-    const fill = page.locator("#services-ai .svc-fill").first();
-    await fill.scrollIntoViewIfNeeded();
-    expect(await fill.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
-    expect(await page.locator("#services-ai .svc-built").evaluate((el) => getComputedStyle(el).clipPath)).toBe("none");
+    // The AI plate's nodes carry their own motion (.pop / .rise-in) inside noclip groups; all must be finished.
+    const moving = page.locator("#services-ai :is(.pop, .rise-in)");
+    await moving.first().scrollIntoViewIfNeeded();
+    for (const el of await moving.all()) {
+      expect(await el.evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
+      expect(await el.evaluate((node) => getComputedStyle(node).scale)).toMatch(/^(none|1|1 1)$/);
+    }
+    for (const el of await page.locator("#services-ai .svc-built").all()) {
+      expect(await el.evaluate((node) => getComputedStyle(node).clipPath)).toBe("none");
+    }
     await context.close();
+  });
+
+  test("plate loops play only when revealed and in view, never under reduced motion", async ({ browser }) => {
+    // CSS loop animations (CSSAnimation) on the AI plate; transitions have no animationName.
+    const loopAnimations = (page: import("@playwright/test").Page, state: "running" | "any") =>
+      page.locator("#services-ai .svc-fig .loop").evaluateAll(
+        (nodes, wanted) =>
+          nodes
+            .flatMap((n) => n.getAnimations())
+            .filter((a) => ((a as CSSAnimation).animationName ?? "").startsWith("ai-") && (wanted === "any" || a.playState === "running")).length,
+        state,
+      );
+
+    const reduced = await browser.newContext({ reducedMotion: "reduce" });
+    const rPage = await reduced.newPage();
+    await rPage.goto("/");
+    await rPage.locator("#services-ai .svc-fig").scrollIntoViewIfNeeded();
+    await rPage.waitForTimeout(1500);
+    expect(await rPage.locator("#services-ai .svc-fig").getAttribute("data-loop")).not.toBe("on");
+    expect(await loopAnimations(rPage, "any")).toBe(0);
+    await reduced.close();
+
+    const ctx = await browser.newContext({ reducedMotion: "no-preference" });
+    const page = await ctx.newPage();
+    await page.goto("/");
+    const fig = page.locator("#services-ai .svc-fig");
+    // Not in view yet: the loop is off and nothing runs.
+    expect(await fig.getAttribute("data-loop")).not.toBe("on");
+    expect(await loopAnimations(page, "running")).toBe(0);
+    await fig.scrollIntoViewIfNeeded();
+    await expect(fig).toHaveAttribute("data-loop", "on", { timeout: 6000 });
+    await expect.poll(() => loopAnimations(page, "running")).toBeGreaterThan(0);
+    // Scrolled away again: the controller pauses it.
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(fig).toHaveAttribute("data-loop", "off");
+    expect(await loopAnimations(page, "running")).toBe(0);
+    await ctx.close();
   });
 
   test("diagram draws in and builds on reveal", async ({ page }) => {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef, type MouseEvent, type RefObject } from "react";
+import { useRef, type CSSProperties, type MouseEvent, type RefObject } from "react";
 import { Lockup } from "@/components/brand/Lockup";
 import { ButtonLink } from "@/components/system/Button";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
@@ -66,13 +66,18 @@ export default function MobileMenuSheet({ open, onOpenChange, triggerRef }: Mobi
 
         <nav aria-label="Mobile" className="px-gutter pt-8">
           <ul>
-            {[...SECTION_LINKS, PRICING_LINK, LOGIN_LINK].map((link) => (
-              <li key={link.href}>
+            {[...SECTION_LINKS, PRICING_LINK, LOGIN_LINK].map((link, i) => (
+              // The rows rise in one after another once the sheet has begun to slide in; --i is the stagger index.
+              <li
+                key={link.href}
+                style={{ "--i": i } as CSSProperties}
+                className="motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 motion-safe:fill-mode-backwards motion-safe:duration-300 motion-safe:ease-out-quart motion-safe:[animation-delay:calc(120ms+var(--i)*60ms)]"
+              >
                 <SheetClose asChild>
                   <Link
                     href={link.href}
                     onClick={(event) => followAnchor(event, link.href)}
-                    className="flex min-h-14 items-center text-heading font-medium text-ink transition-colors duration-200 hover:text-cobalt-700"
+                    className="flex min-h-14 touch-manipulation items-center text-heading font-medium text-ink transition-[color,translate] duration-200 ease-out-quart hover:text-cobalt-700 active:translate-y-px motion-reduce:transition-none"
                   >
                     {link.label}
                   </Link>
@@ -96,7 +101,7 @@ export default function MobileMenuSheet({ open, onOpenChange, triggerRef }: Mobi
           </SheetClose>
           <a
             href={`mailto:${CONTACT_EMAIL}`}
-            className="text-small text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink"
+            className="text-small text-ink underline decoration-line-strong underline-offset-4 transition-[text-decoration-color] duration-200 ease-out-quart hover:decoration-ink motion-reduce:transition-none"
           >
             {CONTACT_EMAIL}
           </a>

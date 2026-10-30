@@ -73,7 +73,7 @@ function SheetContent({
       >
         {children}
         {showCloseButton && (
-          <SheetPrimitive.Close className="absolute top-3 right-3 inline-flex size-11 items-center justify-center rounded-[2px] text-ink transition-colors duration-200 hover:bg-haze disabled:pointer-events-none">
+          <SheetPrimitive.Close className="absolute top-3 right-3 inline-flex size-11 items-center justify-center rounded-[2px] text-ink touch-manipulation transition-[color,background-color,translate] duration-200 ease-out-quart hover:bg-haze active:translate-y-px motion-reduce:transition-none disabled:pointer-events-none">
             <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="size-4">
               <path d="m3.5 3.5 9 9m0-9-9 9" />
             </svg>

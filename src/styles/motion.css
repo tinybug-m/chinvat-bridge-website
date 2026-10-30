@@ -13,7 +13,7 @@
 
   .js-reveal [data-reveal]:not([data-revealed]) {
     opacity: 0;
-    translate: 0 0.75rem;
+    translate: 0 var(--rise-distance);
   }
 
   /*
@@ -29,6 +29,95 @@
 
 @keyframes intro-rise {
   from {
-    translate: 0 0.75rem;
+    translate: 0 var(--rise-distance);
+  }
+}
+
+/*
+ * Shared SVG motion helpers. Same grammar as the Services plates: lines draw
+ * first, solid forms settle next, the saffron accent lands last. Each helper
+ * hangs off any [data-reveal] ancestor (the Reveal wrapper, a PlateDiagram, a
+ * section), is one-shot, and only hides its element after the reveal runtime
+ * has marked the page, so the finished state is the default under reduced
+ * motion and without JavaScript.
+ *
+ * Timing contract (all optional, set via style or a class):
+ *   --i       index of the child, 0-based; delay += min(i * --stagger-step, --stagger-max)
+ *   --delay   base delay; phase classes .t-built / .t-fill / .t-accent set it
+ *             to --svc-t-built / --svc-t-fill / --svc-t-accent
+ *
+ *   .rise-in  fades in while translating up --rise-y (default 8px, user units
+ *             on an SVG node; this is a stone, bar or node, not text)
+ *   .grow-y   scaleY 0 -> 1 from --origin (default "0 0"; on SVG pass user
+ *             units such as "200px 176px"; the SVG default box is the viewBox)
+ *   .pop      scale 0.6 -> 1 with a fade, about the node's own centre
+ *   .draw     solid stroke drawing on; the element needs pathLength="1" and
+ *             delay via --draw-delay (default as above), duration via
+ *             --draw-duration (default --motion-draw). Use drawProps() from
+ *             components/motion/draw.ts. Never put it on dashed strokes. Use
+ *             butt caps: a round cap would dot the hidden start.
+ *             Inside .svc-fig see services.css (needs the plate's draw prop).
+ *
+ * A node inside a .svc-drawn / .svc-built group is clipped by that group's
+ * wipe; give the group .svc-noclip when its children carry their own motion.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .js-reveal [data-reveal] :is(.rise-in, .grow-y, .pop) {
+    transition-property: opacity, translate, scale;
+    transition-duration: var(--motion-slow);
+    transition-timing-function: var(--ease-out-expo);
+    transition-delay: calc(var(--delay, 0ms) + min(var(--i, 0) * var(--stagger-step), var(--stagger-max)));
+  }
+
+  .js-reveal [data-reveal] .pop {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .js-reveal [data-reveal] .grow-y {
+    transform-origin: var(--origin, 0 0);
+  }
+
+  .js-reveal [data-reveal]:not([data-revealed]) .rise-in {
+    opacity: 0;
+    translate: 0 var(--rise-y, 8px);
+  }
+
+  .js-reveal [data-reveal]:not([data-revealed]) .grow-y {
+    scale: 1 0;
+  }
+
+  .js-reveal [data-reveal]:not([data-revealed]) .pop {
+    opacity: 0;
+    scale: 0.6;
+  }
+
+  .js-reveal [data-reveal] .t-built {
+    --delay: var(--svc-t-built);
+  }
+
+  .js-reveal [data-reveal] .t-fill {
+    --delay: var(--svc-t-fill);
+  }
+
+  .js-reveal [data-reveal] .t-accent {
+    --delay: var(--svc-t-accent);
+  }
+
+  /*
+   * Solid-line draw-on outside a Services figure (a plain SVG has no
+   * non-scaling stroke, so a user-unit dash behaves the same in every engine).
+   */
+  .js-reveal [data-reveal] .draw:not(.svc-fig .draw) {
+    stroke-dasharray: 1;
+    transition: stroke-dashoffset var(--draw-duration, var(--motion-draw)) var(--ease-drawn);
+    transition-delay: var(
+      --draw-delay,
+      calc(var(--delay, 0ms) + min(var(--i, 0) * var(--stagger-step), var(--stagger-max)))
+    );
+  }
+
+  .js-reveal [data-reveal]:not([data-revealed]) .draw:not(.svc-fig .draw) {
+    stroke-dashoffset: 1;
   }
 }

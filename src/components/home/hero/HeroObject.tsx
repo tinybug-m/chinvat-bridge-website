@@ -4,6 +4,7 @@ import { SEAM_FRAME_ASPECT } from "@/components/three/scenes/seam/config";
 import { cn } from "@/lib/utils";
 import { HeroStage } from "./HeroStage";
 import { MarkDrawing } from "./MarkDrawing";
+import "@/components/brand/logo-material.css";
 
 /*
  * The hero object, in a box with the scene frame's aspect ratio, so the line
@@ -19,12 +20,17 @@ import { MarkDrawing } from "./MarkDrawing";
  *   resuming            the rest-pose poster: no WebGL, reduced motion, no
  *                       JS, or the context was released far offscreen. It
  *                       cross-fades out (after the canvas is in) on return.
+ *
+ * The built half is chrome or classic (the logo toggle): the drawing and the
+ * poster carry both, the canvas follows the choice through HeroStage.
  */
 
-export const POSTER_SRC = "/hero/seam-poster.png";
+export const POSTER_SRC = "/hero/seam-poster-chrome.png";
+/** The classic (cerulean / saffron) rest pose; only fetched once the visitor picks that material. */
+export const POSTER_CLASSIC_SRC = "/hero/seam-poster-classic.png";
 
 const drawingLayer = cn(
-  "absolute inset-0 opacity-0 transition-opacity delay-200 duration-[400ms] ease-out-quart",
+  "absolute inset-0 opacity-0 transition-opacity duration-[400ms] ease-out-quart",
   "group-data-[stage-state=idle]/stage:opacity-100 group-data-[stage-state=loading]/stage:opacity-100",
   "motion-reduce:hidden",
 );
@@ -53,7 +59,13 @@ export function HeroObject({ className, sizes, children }: HeroObjectProps) {
           <MarkDrawing />
         </div>
         <div data-layer="poster" className={posterLayer}>
-          <Image src={POSTER_SRC} alt="" fill sizes={sizes} className="object-contain" />
+          {/* Both rest poses; <html data-logo-material> picks one (logo-material.css). The classic one is display:none until chosen, so it is not fetched before. */}
+          <div data-material="chrome" className="absolute inset-0">
+            <Image src={POSTER_SRC} alt="" fill sizes={sizes} className="object-contain" />
+          </div>
+          <div data-material="classic" className="absolute inset-0">
+            <Image src={POSTER_CLASSIC_SRC} alt="" fill sizes={sizes} className="object-contain" />
+          </div>
         </div>
       </HeroStage>
       {children}

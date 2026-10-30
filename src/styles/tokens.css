@@ -97,6 +97,19 @@
   --motion-base: 320ms;
   --motion-slow: 600ms;
   --motion-intro: 1200ms;
+  --motion-draw: 950ms; /* a line or outline drawing on, with --ease-drawn */
+
+  /* Stagger: delay per indexed child (--i), capped so a long list never drags */
+  --stagger-step: 50ms;
+  --stagger-max: 700ms;
+
+  /* Services plate clock: drawn 0, built 700, fills 1100, saffron accent 1700 */
+  --svc-t-built: 700ms;
+  --svc-t-fill: 1100ms;
+  --svc-t-accent: 1700ms;
+
+  /* How far text rises into place on reveal */
+  --rise-distance: 0.75rem;
 }
 
 /* Semantic names the shadcn/Radix primitives in components/ui expect. */

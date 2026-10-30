@@ -6,7 +6,7 @@ export function TextLink({ className, ...props }: ComponentPropsWithoutRef<typeo
   return (
     <Link
       className={cn(
-        "text-cobalt-700 underline decoration-cobalt-700/35 decoration-1 underline-offset-[0.22em] transition-[text-decoration-color] duration-200 hover:decoration-cobalt-700",
+        "group/link text-cobalt-700 underline decoration-cobalt-700/35 decoration-1 underline-offset-[0.22em] transition-[text-decoration-color] duration-200 ease-out-quart hover:decoration-cobalt-700 motion-reduce:transition-none",
         className,
       )}
       {...props}

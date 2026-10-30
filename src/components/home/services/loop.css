@@ -1,0 +1,69 @@
+/*
+ * Services plate loop contract (owner request: each plate replays its
+ * before -> after story after the reveal; overrides the "no idle loops" rule
+ * for the four Services plates only).
+ *
+ * Controller: <PlateLoop /> (PlateLoop.tsx, rendered by PlateDiagram) sets
+ *   .svc-fig[data-loop="on"]  revealed AND on screen AND tab visible AND
+ *                             motion allowed
+ *   .svc-fig[data-loop="off"] otherwise (also the SSR / reduced-motion state:
+ *                             the attribute is simply absent or "off")
+ *
+ * Plates add animations ONLY with the .loop marker class on the node (or group)
+ * and this shape, inside @media (prefers-reduced-motion: no-preference):
+ *
+ *   .js-reveal .svc-fig .my-node.loop {
+ *     animation-name: my-keyframes;
+ *   }
+ *   (duration, easing, delay, iteration, fill, paused are set here, shared)
+ *
+ * Shared variables (override per plate/node on the .svc-fig or the node):
+ *   --loop-duration  cycle length, default 8s
+ *   --loop-start     start delay, default 2.8s: reveal total (accent at
+ *                    1.7s + its fade, plus tail). Paused animations do not
+ *                    advance, so it counts only once data-loop turns on.
+ *   --loop-ease      timing function, default var(--ease-drawn); keyframes may
+ *                    set animation-timing-function per step for expo/quart
+ *   --loop-d         optional per-node extra delay (e.g. 120ms) added to start
+ *                    to stagger nodes; keep each node's story in its own %.
+ *
+ * Keyframe percentage conventions (every plate uses the same clock so the
+ * cycle reads as one story; 0% and 100% MUST equal the settled static state):
+ *    0 - 10   rest (settled finished design)
+ *   10 - 35   BEFORE-side work: the mess/guesswork is worked on (x < 200)
+ *   35 - 50   the single saffron marker / highlight crosses the seam (x = 200)
+ *   50 - 80   AFTER-side response in sequence (nodes, bars, stems, boxes)
+ *   80 - 88   saffron accent (ring) lands last, then holds
+ *   88 - 100  ease back to rest, smoothly (no flash, no full blank)
+ * Grammar: construction lines first, solid structure next, saffron last.
+ * Only transform / opacity / stroke-dashoffset / clip-path; no filters, no
+ * SMIL, no will-change, <= ~30 nodes at once, animate the SEO noise lines as
+ * ONE group, never per line. Keep opacity dips partial (>= ~0.35) so nothing
+ * blanks. Horizontal translate must stay inside the plate box (390px mobile).
+ *
+ * Marker that must not show at rest: give it opacity 0 at 0% and 100%.
+ */
+.svc-fig {
+  --loop-duration: 8s;
+  --loop-start: 2.8s;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js-reveal .svc-fig .loop {
+    animation-duration: var(--loop-duration, 8s);
+    animation-timing-function: var(--loop-ease, var(--ease-drawn));
+    animation-delay: calc(var(--loop-start, 2.8s) + var(--loop-d, 0s));
+    animation-iteration-count: infinite;
+    /*
+     * Not "both": a backwards fill would apply the 0% keyframe during the start
+     * delay (and while paused before the loop starts), overriding the reveal's
+     * own hidden state (e.g. opacity 0 on a .pop ring) with the rest pose.
+     */
+    animation-fill-mode: forwards;
+    animation-play-state: paused;
+  }
+
+  .js-reveal .svc-fig[data-loop="on"] .loop {
+    animation-play-state: running;
+  }
+}

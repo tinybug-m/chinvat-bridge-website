@@ -82,6 +82,11 @@ test.describe("contact section", () => {
     await message.fill("Exactly twenty chars!");
     await page.getByRole("button", { name: "Send brief" }).click();
     await expect(page.getByText("Your email app should open. If it didn’t:")).toBeVisible();
+    // The sent tick is decorative and ends fully drawn.
+    const tick = page.locator('[aria-labelledby="brief-sent-title"] svg path');
+    await expect(tick).toHaveAttribute("pathLength", "1");
+    await expect(page.locator('[aria-labelledby="brief-sent-title"] svg')).toHaveAttribute("aria-hidden", "true");
+    await expect.poll(() => tick.evaluate((el) => getComputedStyle(el).strokeDashoffset)).toMatch(/^0(px)?$|^none$/);
   });
 
   test("opens the exact mailto URL for a filled brief", async ({ page }) => {

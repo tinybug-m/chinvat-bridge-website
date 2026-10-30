@@ -17,7 +17,7 @@ import {
   Scene,
   Vector3,
 } from "three";
-import { clamp, damp } from "../../core/motion";
+import { clamp } from "../../core/motion";
 import { devParam } from "../../core/switches";
 import type { SceneContext, SceneInstance, SceneModule, StageSize } from "../../core/types";
 import { PALETTE_3D } from "../../materials/palette";
@@ -184,9 +184,6 @@ export function createScene(context: SceneContext): SceneInstance {
   const captureBuilt = capture && devParam("bridge") === "built";
   let built = capture ? (captureBuilt ? 1 : 0) : context.input("built", 0.5);
   let laidOutFor = Number.NaN;
-  // The first frame lays out the seam as it is now, not as it was when the scene was created
-  // (the module can take a while to load, and the seam moves with the scroll meanwhile).
-  let settled = capture;
 
   /** Seam position across the stage, 0 (left edge) to 1 (right edge). */
   function seamFraction() {
@@ -258,18 +255,17 @@ export function createScene(context: SceneContext): SceneInstance {
     apply();
   }
 
-  function update(deltaMs: number) {
+  function update() {
     if (capture) {
       apply();
       return false;
     }
     const target = clamp(context.input("built", built));
-    built = settled ? damp(built, target, 8, deltaMs) : target;
-    settled = true;
-    const moving = Math.abs(built - target) > 1e-4;
-    if (!moving) built = target;
+    // No smoothing here: the page already eases the value (BridgeSeam), so the line, the handle,
+    // the posters and the slabs all show the same number.
+    built = target;
     apply();
-    return moving;
+    return false;
   }
 
   return { scene, camera, resize, update };

@@ -1,25 +1,47 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import { drawProps } from "@/components/motion/draw";
+import { cn } from "@/lib/utils";
+import "./diagrams.css";
+import "./loop-ai.css";
+import "./loop-automation.css";
+import "./loop-seo.css";
+import "./loop-software.css";
 
 /*
  * Four diagrams on a 400 x 300 board. Left of x = 200 is drawn (hairlines,
  * dashes, unfilled), right of it is built (solid ink, fills): the same
  * subject before and after. `svc-*` classes are animated by services.css.
+ *
+ * A group that carries per-node motion (grow, pop, draw) is `noclip`, so the
+ * group wipe does not cut its children. Per-node delays below are in ms on the
+ * plate clock: built 700, fill 1100, accent 1700 (the --svc-t-* tokens), and
+ * every plate ends with its saffron accent.
  */
 
 export const PAPER = "var(--color-paper)";
 export const SAFFRON = "var(--color-saffron-500)";
 
-export function Drawn({ children }: { children: ReactNode }) {
+interface GroupProps {
+  /** Drop the wipe, for a group whose children move on their own. */
+  noclip?: boolean;
+  className?: string;
+  children: ReactNode;
+}
+
+/** CSS custom properties on an SVG node. */
+const vars = (v: Record<string, string | number>) => v as CSSProperties;
+
+export function Drawn({ noclip, className, children }: GroupProps) {
   return (
-    <g className="svc-drawn text-control" fill="none" stroke="currentColor" strokeWidth="1">
+    <g className={cn("svc-drawn text-control", noclip && "svc-noclip", className)} fill="none" stroke="currentColor" strokeWidth="1">
       {children}
     </g>
   );
 }
 
-export function Built({ children }: { children: ReactNode }) {
+export function Built({ noclip, className, children }: GroupProps) {
   return (
-    <g className="svc-built text-ink" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <g className={cn("svc-built text-ink", noclip && "svc-noclip", className)} fill="none" stroke="currentColor" strokeWidth="1.5">
       {children}
     </g>
   );
@@ -77,40 +99,96 @@ const AI_RIM: [number, number][] = [
   [6, 0],
 ];
 
+/** Where each loose circle starts before it settles onto its guess line. */
+const AI_DRIFT: [number, number][] = [
+  [-5, 4],
+  [4, -5],
+  [-4, -4],
+  [5, 5],
+  [-5, -3],
+  [4, 5],
+  [-4, 4],
+  [5, -4],
+  [-5, 5],
+  [4, -5],
+];
+
 export function AiDiagram() {
+  const [hx, hy] = AI_HUB;
   return (
     <>
       <Drawn>
-        <g strokeDasharray={GUESS} className="text-line-strong">
+        <g strokeDasharray={GUESS} className="text-line-strong ai-guess loop">
           <path d="M172 148 L200 142" className="text-control" strokeDasharray={DASH} />
           {AI_GUESSES.map(([x1, y1, x2, y2]) => (
             <line key={`${x1}${y1}`} x1={x1} y1={y1} x2={x2} y2={y2} />
           ))}
         </g>
-        {AI_LOOSE.map(([x, y, r]) => (
-          <circle key={`${x}${y}`} cx={x} cy={y} r={r} fill={PAPER} />
+      </Drawn>
+      {/* The loose guesses settle onto their lines, staggered, once the lines are in. */}
+      <Drawn noclip>
+        {[0, 1].map((par) => (
+          <g key={par} className={par ? "ai-loose-b loop" : "ai-loose-a loop"}>
+            {AI_LOOSE.map(([x, y, r], i) =>
+              i % 2 === par ? (
+                <circle
+                  key={`${x}${y}`}
+                  className="drift"
+                  style={vars({ "--i": i, "--dx": `${AI_DRIFT[i][0]}px`, "--dy": `${AI_DRIFT[i][1]}px` })}
+                  cx={x}
+                  cy={y}
+                  r={r}
+                  fill={PAPER}
+                />
+              ) : null,
+            )}
+          </g>
         ))}
       </Drawn>
       <Built>
         <path d="M200 142 L234 138" />
-        {AI_GRAPH.map(([x, y]) => (
-          <line key={`h${x}${y}`} x1={AI_HUB[0]} y1={AI_HUB[1]} x2={x} y2={y} />
+      </Built>
+      {/* The graph builds from the hub: hub, spokes outward, nodes, rim, then the ring. */}
+      <Built noclip>
+        {AI_GRAPH.map(([x, y], i) => (
+          <g key={`h${x}${y}`} className="ai-spoke loop" style={vars({ "--loop-d": `${i * 0.12}s` })}>
+            <path d={`M${hx} ${hy} L${x} ${y}`} {...drawProps(1.5, { delay: 800 + i * 50, duration: 600 })} />
+          </g>
         ))}
         <g strokeWidth="1" opacity="0.55">
-          {AI_RIM.map(([a, b]) => (
-            <line key={`r${a}${b}`} x1={AI_GRAPH[a][0]} y1={AI_GRAPH[a][1]} x2={AI_GRAPH[b][0]} y2={AI_GRAPH[b][1]} />
+          {AI_RIM.map(([a, b], i) => (
+            <path
+              key={`r${a}${b}`}
+              d={`M${AI_GRAPH[a][0]} ${AI_GRAPH[a][1]} L${AI_GRAPH[b][0]} ${AI_GRAPH[b][1]}`}
+              {...drawProps(1, { delay: 1300 + i * 50, duration: 600 })}
+            />
           ))}
         </g>
       </Built>
-      <Fill>
-        <g fill="currentColor" className="text-ink" stroke="none">
-          {AI_GRAPH.map(([x, y, r]) => (
-            <circle key={`n${x}${y}`} cx={x} cy={y} r={r} />
-          ))}
-          <circle cx={AI_HUB[0]} cy={AI_HUB[1]} r="15" />
+      <g className="text-ink" fill="currentColor" stroke="none" style={vars({ "--delay": "1200ms" })}>
+        <g className="ai-hub loop">
+          <circle className="pop t-built" cx={hx} cy={hy} r="15" />
         </g>
-        <circle cx={AI_HUB[0]} cy={AI_HUB[1]} r="23" fill="none" stroke={SAFFRON} strokeWidth="1.5" />
-      </Fill>
+        {AI_GRAPH.map(([x, y, r], i) => (
+          <g key={`n${x}${y}`} className="ai-node loop" style={vars({ "--loop-d": `${i * 0.12}s` })}>
+            <circle className="pop" style={vars({ "--i": i })} cx={x} cy={y} r={r} />
+          </g>
+        ))}
+      </g>
+      <g className="ai-ring loop">
+        <circle
+          className="pop"
+          style={vars({ "--delay": "2000ms" })}
+          cx={hx}
+          cy={hy}
+          r="23"
+          fill="none"
+          stroke={SAFFRON}
+          strokeWidth="1.5"
+        />
+      </g>
+      {/* The loop's travelling saffron marker: hidden at rest, only plays in the loop. */}
+      <circle className="ai-marker loop" cx="172" cy="148" r="4" fill={SAFFRON} opacity="0" />
     </>
   );
 }
@@ -126,6 +204,8 @@ const AUTO_ZIGZAG: [number, number][] = [
   [166, 104],
 ];
 const AUTO_BOXES = [214, 274, 334];
+/** When the pulse (diagrams.css, 1.4s from the accent time) reaches each box, in ms from the reveal. */
+const AUTO_BOX_HIT = [1914, 2125, 2940];
 
 export function AutomationDiagram() {
   return (
@@ -157,8 +237,21 @@ export function AutomationDiagram() {
       </Built>
       <Fill>
         <g className="text-ink" fill="currentColor" stroke="none">
-          {AUTO_BOXES.map((x) => (
-            <rect key={`b${x}`} x={x} y="132" width="36" height="36" />
+          {AUTO_BOXES.map((x, i) => (
+            <g
+              key={`b${x}`}
+              className="loop auto-box-loop"
+              style={vars({ "--loop-d": `${i * 0.88}s` })}
+            >
+              <rect
+                className="auto-box"
+                style={vars({ "--pd": `${AUTO_BOX_HIT[i]}ms` })}
+                x={x}
+                y="132"
+                width="36"
+                height="36"
+              />
+            </g>
           ))}
           {AUTO_BOXES.map((x) => (
             <circle key={`d${x}`} cx={x + 18} cy="230" r="4" />
@@ -168,8 +261,24 @@ export function AutomationDiagram() {
           <circle cx="232" cy="150" r="4" />
           <path d="M283 145 H301 M283 155 H301" />
         </g>
-        <circle cx="352" cy="150" r="8" fill="none" stroke={SAFFRON} strokeWidth="2" />
       </Fill>
+      {/* The ring lands as the pulse arrives. The wrapper carries the loop's pulse. */}
+      <g className="loop auto-ring-loop">
+        <circle
+          className="pop"
+          style={vars({ "--delay": "2800ms" })}
+          cx="352"
+          cy="150"
+          r="8"
+          fill="none"
+          stroke={SAFFRON}
+          strokeWidth="2"
+        />
+      </g>
+      {/* One saffron dot runs the pipeline once, seam to ring (diagrams.css). */}
+      <circle className="auto-pulse" cx="200" cy="150" r="3.5" fill={SAFFRON} />
+      {/* Loop marker (loop-automation.css): wanders the zigzag, crosses the seam, runs the pipeline. Hidden at rest. */}
+      <circle className="loop auto-loop-dot" cx="28" cy="236" r="3.5" fill={SAFFRON} />
     </>
   );
 }
@@ -195,7 +304,7 @@ function Wire({ ox, built }: { ox: number; built: boolean }) {
       <rect x={content} y="136" width="46" height="46" />
       <rect x={content + 54} y="136" width="46" height="46" />
       {built ? null : (
-        <path d={`M${content} 136 L${content + 46} 182 M${content + 46} 136 L${content} 182`} strokeWidth="0.75" />
+        <path className="sw-x loop" d={`M${content} 136 L${content + 46} 182 M${content + 46} 136 L${content} 182`} strokeWidth="0.75" />
       )}
       <line x1={content} y1="252" x2={content + 100} y2="252" />
       {BARS.map((h, i) => (
@@ -211,7 +320,7 @@ export function SoftwareDiagram() {
   return (
     <>
       <Drawn>
-        <g strokeDasharray={DASH}>
+        <g className="sw-wire loop" strokeDasharray={DASH}>
           <Wire ox={24} built={false} />
         </g>
       </Drawn>
@@ -219,14 +328,22 @@ export function SoftwareDiagram() {
         <Wire ox={ox} built />
       </Built>
       <Fill>
-        <g className="text-ink" fill="currentColor" stroke="none">
+        <g className="text-ink t-fill" fill="currentColor" stroke="none">
           <rect x={ox} y="48" width="160" height="28" />
           <rect x={content} y="92" width="64" height="8" />
           <rect x={content} y="110" width="96" height="4" opacity="0.45" />
           <rect x={content} y="120" width="78" height="4" opacity="0.45" />
-          <rect x={content} y="136" width="46" height="46" />
+          <rect className="sw-tile loop" x={content} y="136" width="46" height="46" />
           {BARS.map((h, i) => (
-            <rect key={h} x={content + 2 + i * 20} y={252 - h} width="12" height={h} />
+            <rect
+              key={h}
+              className="grow-y grow-base sw-bar loop"
+              style={vars({ "--i": i, "--loop-d": `${i * 0.1}s` })}
+              x={content + 2 + i * 20}
+              y={252 - h}
+              width="12"
+              height={h}
+            />
           ))}
           {[92, 104, 116, 128].map((y, i) => (
             <rect key={y} x={ox + 8} y={y - 1.5} width={i === 0 ? 24 : 18} height="3" opacity="0.7" />
@@ -237,8 +354,18 @@ export function SoftwareDiagram() {
             <circle key={i} cx={ox + 12 + i * 10} cy="62" r="2.5" />
           ))}
         </g>
-        <circle cx={content + 77} cy="159" r="7" fill="none" stroke={SAFFRON} strokeWidth="1.5" />
+        <circle
+          className="pop sw-ring loop"
+          style={vars({ "--delay": "1900ms" })}
+          cx={content + 77}
+          cy="159"
+          r="7"
+          fill="none"
+          stroke={SAFFRON}
+          strokeWidth="1.5"
+        />
       </Fill>
+      <circle className="sw-marker loop" cx={76 + 23} cy="159" r="4" fill={SAFFRON} opacity="0" />
     </>
   );
 }
@@ -291,28 +418,81 @@ export function SeoDiagram() {
           ))}
           <line x1="24" y1={BASE_Y} x2="196" y2={BASE_Y} />
         </g>
-        {NOISE.map(([x1, y1, x2, y2]) => (
-          <line key={`${x1}${y1}`} x1={x1} y1={y1} x2={x2} y2={y2} />
-        ))}
+        <g className="seo-noise loop">
+          {NOISE.map(([x1, y1, x2, y2]) => (
+            <line key={`${x1}${y1}`} x1={x1} y1={y1} x2={x2} y2={y2} />
+          ))}
+        </g>
       </Drawn>
       <Built>
         {/* The baseline runs to the edge of the board, which the plate bleeds to the edge of the viewport. */}
         <line x1="204" y1={BASE_Y} x2="400" y2={BASE_Y} />
-        {SIGNAL.map(({ x, top }) => (
-          <line key={x} x1={x} y1={BASE_Y} x2={x} y2={top} strokeWidth="1.25" opacity="0.5" />
-        ))}
-        <polyline points={SIGNAL.map(({ x, top }) => `${x} ${top}`).join(" ")} />
-        <line x1={pick.x} y1={pick.top} x2={pick.x} y2={BASE_Y} strokeDasharray={DASH} />
       </Built>
-      <Fill>
-        <g className="text-ink" fill="currentColor" stroke="none">
-          {SIGNAL.map(({ x, top }) => (
-            <circle key={x} cx={x} cy={top} r="2.5" />
-          ))}
-          <circle cx={pick.x} cy={pick.top} r="5.5" />
-        </g>
-        <circle cx={pick.x} cy={pick.top} r="11" fill="none" stroke={SAFFRON} strokeWidth="1.5" />
-      </Fill>
+      {/*
+        The signal rises out of the noise: stems grow from the baseline, left to
+        right, the trace follows and the dots ride up with their stems (same
+        timing, so each dot stays on its stem top). Only vertical motion, so the
+        plate never widens past the viewport. The noise itself stays still.
+      */}
+      <Built noclip className="t-built">
+        {SIGNAL.map(({ x, top }, i) => (
+          <line
+            key={x}
+            className="grow-y grow-base seo-stem loop"
+            style={vars({ "--i": i, "--loop-d": `${i * 100}ms` })}
+            x1={x}
+            y1={BASE_Y}
+            x2={x}
+            y2={top}
+            strokeWidth="1.25"
+            opacity="0.5"
+          />
+        ))}
+        <path
+          d={`M${SIGNAL.map(({ x, top }) => `${x} ${top}`).join(" L")}`}
+          {...drawProps(1.5, { delay: 900, duration: 1000 })}
+          className="draw seo-trace loop"
+        />
+        <line
+          className="grow-y grow-base"
+          style={vars({ "--i": HIGHLIGHT })}
+          x1={pick.x}
+          y1={pick.top}
+          x2={pick.x}
+          y2={BASE_Y}
+          strokeDasharray={DASH}
+        />
+      </Built>
+      <g className="text-ink t-built" fill="currentColor" stroke="none">
+        {SIGNAL.map(({ x, top }, i) => (
+          <circle
+            key={x}
+            className="rise-in seo-dot loop"
+            style={vars({ "--i": i, "--rise-y": `${BASE_Y - top}px`, "--loop-d": `${i * 100}ms` })}
+            cx={x}
+            cy={top}
+            r="2.5"
+          />
+        ))}
+        <circle
+          className="rise-in seo-dot loop"
+          style={vars({ "--i": HIGHLIGHT, "--rise-y": `${BASE_Y - pick.top}px`, "--loop-d": `${HIGHLIGHT * 100}ms` })}
+          cx={pick.x}
+          cy={pick.top}
+          r="5.5"
+        />
+      </g>
+      <circle
+        className="pop seo-ring loop"
+        style={vars({ "--delay": "1900ms", "--rise-y": `${BASE_Y - pick.top}px`, "--loop-d": `${HIGHLIGHT * 100}ms` })}
+        cx={pick.x}
+        cy={pick.top}
+        r="11"
+        fill="none"
+        stroke={SAFFRON}
+        strokeWidth="1.5"
+      />
+      <circle className="seo-marker loop" cx="150" cy="176" r="3.5" fill={SAFFRON} stroke="none" opacity="0" />
     </>
   );
 }
@@ -327,22 +507,27 @@ export function SeoDiagram() {
 export function BalanceDiagram() {
   return (
     <>
-      <Drawn>
-        <g strokeDasharray={DASH}>
-          <line x1="140" y1="92" x2="200" y2="92" />
-          <path d="M140 92 L124 138 M140 92 L156 138" strokeWidth="0.75" />
-          <line x1="120" y1="138" x2="160" y2="138" />
-        </g>
-      </Drawn>
+      {/* The beam, hangers and pans swing together about the pivot, then settle level (diagrams.css). */}
+      <g className="bal-beam">
+        <Drawn>
+          <g strokeDasharray={DASH}>
+            <line x1="140" y1="92" x2="200" y2="92" />
+            <path d="M140 92 L124 138 M140 92 L156 138" strokeWidth="0.75" />
+            <line x1="120" y1="138" x2="160" y2="138" />
+          </g>
+        </Drawn>
+        <Built>
+          <line x1="200" y1="92" x2="260" y2="92" />
+          <path d="M260 92 L244 138 M260 92 L276 138" strokeWidth="1" />
+          <line x1="240" y1="138" x2="280" y2="138" />
+        </Built>
+      </g>
       <Built>
-        <line x1="200" y1="92" x2="260" y2="92" />
         <path d="M200 176 V92 M176 176 H224" />
-        <path d="M260 92 L244 138 M260 92 L276 138" strokeWidth="1" />
-        <line x1="240" y1="138" x2="280" y2="138" />
-        <Fill>
-          <circle cx="200" cy="92" r="5" stroke={SAFFRON} strokeWidth="1.5" fill={PAPER} />
-        </Fill>
       </Built>
+      <Fill>
+        <circle cx="200" cy="92" r="5" stroke={SAFFRON} strokeWidth="1.5" fill={PAPER} />
+      </Fill>
     </>
   );
 }

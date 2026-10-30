@@ -26,8 +26,12 @@ import { SeamSlider } from "./SeamSlider";
  * no JS never scroll-drive it.
  *
  * The fractional value lives in a ref and goes straight to --seam (the line,
- * the handle, the poster split) and the scene; React only hears about whole
- * steps, which is all the slider, the readout and the rows need.
+ * the handle, the poster split; set on the frame only) and the scene; React
+ * only hears about whole steps, which is all the slider, the readout and the
+ * rows need. There is exactly one ease: scroll and the slider both set a
+ * target and one rAF loop carries the value to it (quicker while the visitor
+ * is dragging, so the handle stays under the pointer). The scene takes that
+ * eased value as is and does not smooth it again.
  *
  * Without WebGL, under reduced motion or before the canvas is live, two
  * posters (all drawn, all built) are split at the seam with a clip-path, so
@@ -72,6 +76,8 @@ const HOLD_FADE = 320;
 const ROW_GATE = 0.8;
 /** Time constant (ms) of the ease that carries the seam to its scroll position, so wheel notches glide. */
 const FOLLOW_MS = 110;
+/** The same ease, tighter, while the slider is in use: the handle must stay close to the pointer. */
+const DRAG_FOLLOW_MS = 45;
 
 const seamOffset = (value: number) => `${100 - value}%`;
 
@@ -92,7 +98,7 @@ if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
 var f=s.previousElementSibling,r=f.getBoundingClientRect(),h=innerHeight,
 n=Math.max((${SWEEP_FROM}-${SWEEP_TO})*h,${SWEEP_MIN_PX}),
 v=Math.round(Math.min(1,Math.max(0,(${SWEEP_FROM}*h-(r.top+r.height/2))/n))*100);
-s.parentElement.parentElement.style.setProperty("--seam",(100-v)+"%");}catch(e){}})(document.currentScript)`;
+f.style.setProperty("--seam",(100-v)+"%");}catch(e){}})(document.currentScript)`;
 
 /** The two posters, split at --seam. Static, so scroll-driven re-renders skip it. */
 const Posters = memo(function Posters() {
@@ -126,6 +132,10 @@ export function BridgeSeam({ className }: { className?: string }) {
   /** How many rows have come into view; all of them until the scroll handler says otherwise. */
   const gate = useRef(ROW_COUNT);
   const sweepAt = useRef(() => BRIDGE_SEAM.initial as number);
+  /** Starts the ease toward target (set while the effect is live); null under reduced motion, where values apply at once. */
+  const startEase = useRef<((tau: number) => void) | null>(null);
+  /** True while the slider's own value, not the eased one, is what the slider and the rows show. */
+  const owned = useRef(false);
 
   // Rows follow the value, but (under scroll) only once they are in view; a visitor's own value flips them at once.
   const syncRows = useCallback(() => {
@@ -139,8 +149,10 @@ export function BridgeSeam({ className }: { className?: string }) {
     (next: number) => {
       if (next === fraction.current) return;
       fraction.current = next;
-      rootRef.current?.style.setProperty("--seam", seamOffset(next));
+      frameRef.current?.style.setProperty("--seam", seamOffset(next));
       handle.current?.set("built", next / 100);
+      // The slider's value was set when it moved; the eased fraction only catches up with it.
+      if (owned.current) return;
       // Whole steps only: the slider, the readout and the rows follow the rounded value.
       const rounded = Math.round(next);
       if (rounded === shown.current) return;
@@ -155,8 +167,13 @@ export function BridgeSeam({ className }: { className?: string }) {
     (next: number) => {
       manual.current = { at: window.scrollY, offset: next - sweepAt.current() };
       target.current = next;
-      drive(next);
+      // The slider and the rows take the visitor's value at once (a held key steps from it, not from the eased one).
+      owned.current = true;
+      shown.current = next;
+      setValue(next);
       syncRows();
+      if (startEase.current) startEase.current(DRAG_FOLLOW_MS);
+      else drive(next);
     },
     [drive, syncRows],
   );
@@ -182,16 +199,24 @@ export function BridgeSeam({ className }: { className?: string }) {
     let queued = 0;
     let easing = 0;
     let last = 0;
+    let tau = FOLLOW_MS;
     // Eases the fractional value toward the scroll position, so the line, the posters and the
     // scene all move smoothly together instead of in whole-percent jumps.
     const ease = (now: number) => {
       const dt = Math.min(64, now - last);
       last = now;
       const gap = target.current - fraction.current;
-      const next = Math.abs(gap) < 0.05 ? target.current : fraction.current + gap * (1 - Math.exp(-dt / FOLLOW_MS));
+      const next = Math.abs(gap) < 0.05 ? target.current : fraction.current + gap * (1 - Math.exp(-dt / tau));
       drive(next);
       easing = next === target.current ? 0 : requestAnimationFrame(ease);
     };
+    const begin = (time: number) => {
+      tau = time;
+      if (easing) return;
+      last = performance.now();
+      easing = requestAnimationFrame(ease);
+    };
+    startEase.current = begin;
     const follow = (jump = false) => {
       queued = 0;
       gate.current = Array.from(items).filter((item) => item.getBoundingClientRect().top < vh * ROW_GATE).length;
@@ -205,21 +230,19 @@ export function BridgeSeam({ className }: { className?: string }) {
         else next = Math.min(100, Math.max(0, next + held.offset * fade));
       }
       target.current = next;
+      owned.current = false;
       syncRows();
       if (jump) drive(next);
-      else if (!easing) {
-        last = performance.now();
-        easing = requestAnimationFrame(ease);
-      }
+      else begin(FOLLOW_MS);
     };
     const onScroll = () => {
       if (!queued) queued = requestAnimationFrame(() => follow());
     };
+    // Only a width change (a real re-layout) re-targets; a height-only resize is the phone's address bar.
     const onResize = () => {
-      if (window.innerWidth !== width) {
-        width = window.innerWidth;
-        vh = window.innerHeight;
-      }
+      if (window.innerWidth === width) return;
+      width = window.innerWidth;
+      vh = window.innerHeight;
       onScroll();
     };
 
@@ -246,6 +269,7 @@ export function BridgeSeam({ className }: { className?: string }) {
       listen(false);
       cancelAnimationFrame(queued);
       cancelAnimationFrame(easing);
+      startEase.current = null;
     };
   }, [drive, syncRows]);
 
@@ -253,7 +277,7 @@ export function BridgeSeam({ className }: { className?: string }) {
   const valueText = `${value}% modernised: ${count} of ${ROW_COUNT}`;
 
   return (
-    <div ref={rootRef} className={className} style={INITIAL_STYLE} suppressHydrationWarning>
+    <div ref={rootRef} className={className}>
       <figure className="m-0">
         <div aria-hidden="true" className="mb-4">
           <Container className="flex justify-between gap-4 text-small text-ink-muted">
@@ -261,7 +285,7 @@ export function BridgeSeam({ className }: { className?: string }) {
             <span className="text-right">Future direction</span>
           </Container>
         </div>
-        <div ref={frameRef} className="relative overflow-x-clip" data-seam-value={value}>
+        <div ref={frameRef} className="relative overflow-x-clip" data-seam-value={value} style={INITIAL_STYLE} suppressHydrationWarning>
           <ThreeStage
             id="bridge"
             load={loadBridgeScene}

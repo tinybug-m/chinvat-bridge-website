@@ -1,0 +1,19 @@
+/*
+ * About mark: after the figure has risen, the built (right) half wipes in from
+ * the axis outward and the left, drawn half is already there. The wipe is keyed
+ * on the Reveal wrapper like the rest of the reveals, so Mark stays a server
+ * component and the finished state is the default under reduced motion / no JS.
+ * The one-time sheen that follows is MarkSheen.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .js-reveal [data-reveal] .about-mark [data-part="right"] {
+    clip-path: inset(0 0 0 0) fill-box;
+    transition: clip-path var(--motion-draw) var(--ease-drawn);
+    /* starts once the rise is done: the wrapper's own reveal delay + --motion-slow */
+    transition-delay: calc(var(--reveal-delay, 0ms) + var(--motion-slow));
+  }
+
+  .js-reveal [data-reveal]:not([data-revealed]) .about-mark [data-part="right"] {
+    clip-path: inset(0 100% 0 0) fill-box;
+  }
+}

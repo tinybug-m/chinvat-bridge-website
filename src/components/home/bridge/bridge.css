@@ -1,0 +1,17 @@
+/*
+ * One-time hint on the seam handle: its two chevrons part by 1.5px and settle back, once, the
+ * first time the handle is on screen (SeamSlider sets data-hint). Fine pointers only: a touch
+ * visitor has no hover to learn from and the handle is already obvious there. Nothing is hidden
+ * before or left changed after, so reduced motion and no JS see the plain handle.
+ */
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  @keyframes seam-chevron-part {
+    40% {
+      translate: calc(var(--part) * 1.5px) 0;
+    }
+  }
+
+  [data-hint] .seam-chevron {
+    animation: seam-chevron-part var(--motion-slow) var(--ease-out-quart) 400ms 1;
+  }
+}

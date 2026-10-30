@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState, type FormEvent, type ReactNode } from "react";
+import { Reveal } from "@/components/motion/Reveal";
+import { drawProps } from "@/components/motion/draw";
 import { Button } from "@/components/system/Button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -235,9 +237,17 @@ export function ContactBrief() {
           role="group"
           className="relative border-t border-line-strong pt-7 outline-offset-4 sm:col-span-2"
         >
-          <p id="brief-sent-title" className="text-body font-medium text-ink">
-            Your email app should open. If it didn&rsquo;t:
-          </p>
+          <div className="flex items-start gap-3">
+            {/* A real state change: the tick is drawn once as the panel appears (the draw helper in motion.css). */}
+            <Reveal as="span" className="mt-0.5 shrink-0">
+              <svg aria-hidden="true" focusable="false" viewBox="0 0 16 16" fill="none" stroke="currentColor" className="size-5 text-cobalt-700">
+                <path d="M3 8.5l3.5 3.5L13 4.5" strokeLinecap="butt" strokeLinejoin="miter" {...drawProps(1.5, { duration: 400 })} />
+              </svg>
+            </Reveal>
+            <p id="brief-sent-title" className="text-body font-medium text-ink">
+              Your email app should open. If it didn&rsquo;t:
+            </p>
+          </div>
           <div className="mt-5 flex flex-wrap gap-3">
             <Button
               variant="secondary"

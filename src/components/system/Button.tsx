@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { ArrowIcon } from "./ArrowIcon";
 
 export const buttonVariants = cva(
-  "group/button inline-flex items-center justify-center gap-3 rounded-[2px] font-body font-medium leading-none tracking-[-0.005em] transition-[background-color,color,box-shadow] duration-200 ease-out-quart disabled:pointer-events-none disabled:opacity-50",
+  "group/button inline-flex items-center justify-center gap-3 rounded-[2px] font-body font-medium leading-none tracking-[-0.005em] touch-manipulation transition-[background-color,color,box-shadow,translate] duration-200 ease-out-quart active:translate-y-px motion-reduce:transition-none disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
@@ -35,10 +35,7 @@ function Inner({ arrow, children }: Pick<ButtonStyleProps, "arrow" | "children">
     <>
       <span>{children}</span>
       {arrow ? (
-        <ArrowIcon
-          direction={arrow}
-          className="transition-transform duration-200 ease-out-quart group-hover/button:translate-x-0.5 motion-reduce:transition-none"
-        />
+        <ArrowIcon direction={arrow} />
       ) : null}
     </>
   );
