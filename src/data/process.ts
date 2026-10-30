@@ -18,7 +18,7 @@ export const PROCESS_STEPS: ProcessStep[] = [
   {
     index: "III.",
     title: "Build",
-    description: "We design, develop and integrate the solution with care and engineering rigor.",
+    description: "We design, develop and integrate the solution with care and engineering rigour.",
   },
   {
     index: "IV.",

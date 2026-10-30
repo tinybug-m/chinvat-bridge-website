@@ -25,9 +25,6 @@ export function Method() {
           <SectionHeading id="method-title" size="display">
             How we work.
           </SectionHeading>
-          <p className="mt-6 max-w-measure text-lede text-pretty text-ink-soft">
-            No unnecessary complexity. No technology for technology’s sake.
-          </p>
         </Reveal>
 
         <ol className="mt-12 grid gap-x-8 gap-y-14 md:mt-16 md:grid-cols-2 lg:gap-x-10">

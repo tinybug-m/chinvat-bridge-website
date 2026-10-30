@@ -12,8 +12,8 @@ import { LogoMaterialToggle } from "./LogoMaterialToggle";
  * EXHIBIT layout. Text on the left (columns 1-7), the mark as an exhibit on
  * the right (columns 7-12, bleeding toward the edge) with the seam hairline
  * running through its axis and one callout where the seam leaves the object.
- * The discipline links sit quietly under the text. On small screens: text,
- * then the object, then the links as a 2 x 2 grid.
+ * The discipline links sit quietly under the text on wide screens only: on
+ * small screens Services follows straight after, so they would only repeat it.
  *
  * All text is server-rendered; .intro-rise only animates what is already
  * painted (and is off under reduced motion).
@@ -74,7 +74,7 @@ export function Hero() {
           </figcaption>
         </figure>
 
-        <DisciplineIndex className="pb-10 lg:col-span-12 lg:row-start-2 lg:pb-12" />
+        <DisciplineIndex className="hidden pb-10 lg:col-span-12 lg:block lg:row-start-2 lg:pb-12" />
       </Container>
     </section>
   );

@@ -12,6 +12,7 @@ export async function Pricing() {
       <SectionIntro
         eyebrow="SEO & Content Retainers"
         heading="SEO & Content Plans"
+        headingAs="h1"
         description="Ongoing content, technical SEO and link building — delivered on a predictable monthly retainer. For AI, automation or custom software work, get in touch for a scoped quote."
       />
 

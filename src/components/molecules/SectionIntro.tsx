@@ -10,6 +10,8 @@ interface SectionIntroProps {
   description?: ReactNode;
   right?: ReactNode;
   className?: string;
+  /** h1 when the intro opens the page. */
+  headingAs?: "h1" | "h2";
 }
 
 export function SectionIntro({
@@ -20,6 +22,7 @@ export function SectionIntro({
   description,
   right,
   className = "mb-12",
+  headingAs,
 }: SectionIntroProps) {
   return (
     <div
@@ -27,7 +30,7 @@ export function SectionIntro({
     >
       <div>
         <Eyebrow>{eyebrow}</Eyebrow>
-        <SectionHeading id={headingId}>{heading}</SectionHeading>
+        <SectionHeading id={headingId} as={headingAs}>{heading}</SectionHeading>
         {note ? <p className="font-serif-monument text-sm text-parchment-muted pt-1">{note}</p> : null}
       </div>
       {right ?? (description ? (

@@ -35,7 +35,7 @@ export function Footer() {
           <div className="md:col-span-3 space-y-2 font-mono text-[11px] tracking-technical">
             <span className="text-gold-400 uppercase block font-semibold">Chinvat Bridge</span>
             <p className="text-parchment-dim text-xs leading-relaxed">
-              UK Based &bull; Working Globally
+              UK Based // Working Globally
               <br />
               <EmailLink variant="underline" />
             </p>

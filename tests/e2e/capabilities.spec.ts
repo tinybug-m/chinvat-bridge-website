@@ -10,7 +10,8 @@ test.describe("capabilities section", () => {
     await expect(section.locator("h2")).toHaveAttribute("id", "capabilities-title");
     await expect(section.locator("#machines")).toHaveCount(1);
     await expect(section.locator("ul > li h3")).toHaveText(TITLES);
-    await expect(section).toContainText("Also: Digital Strategy · Data Integration · Analytics & BI · Technical Architecture");
+    // The supporting "Also:" line repeated names from the grid and is gone.
+    await expect(section).not.toContainText("Also:");
   });
 
   test("names only: the per-item descriptions are not rendered", async ({ page }) => {

@@ -20,8 +20,7 @@ export function Bridge() {
             From today to what’s next.
           </SectionHeading>
           <p className="max-w-measure text-lede text-pretty text-ink-soft lg:col-span-4 lg:col-start-9">
-            Technology creates the most value when it solves a real constraint. We help identify the gap, design the
-            right solution and build it.
+            Technology creates the most value when it solves a real constraint.
           </p>
         </div>
       </Container>

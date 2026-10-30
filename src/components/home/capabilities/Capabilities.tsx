@@ -1,10 +1,8 @@
-import { Fragment } from "react";
 import { Reveal } from "@/components/motion/Reveal";
 import { Container } from "@/components/system/Container";
 import { Section } from "@/components/system/Section";
 import { SectionHeading } from "@/components/system/SectionHeading";
 import { CAPABILITIES } from "@/data/capabilities";
-import { SUPPORTING_CAPABILITIES } from "@/data/services";
 
 /*
  * A type specimen, not a list of pitches. Services already says what each
@@ -13,8 +11,7 @@ import { SUPPORTING_CAPABILITIES } from "@/data/services";
  * columns from sm, three from lg). The rules carry the structure, so there
  * are no boxes and no descriptions. On a phone each cell turns into one index
  * line, title left and category right on a shared baseline, so the six stay
- * short. The supporting four close the set as one quiet line under the last
- * rule; each name keeps its trailing dot so a wrap never starts a line on one.
+ * short.
  */
 export function Capabilities() {
   return (
@@ -48,18 +45,6 @@ export function Capabilities() {
           ))}
         </ul>
 
-        <p className="mt-5 text-small text-ink-muted">
-          Also:{" "}
-          {SUPPORTING_CAPABILITIES.map((name, index) => {
-            const last = index === SUPPORTING_CAPABILITIES.length - 1;
-            return (
-              <Fragment key={name}>
-                <span className="whitespace-nowrap">{last ? name : `${name} ·`}</span>
-                {!last && " "}
-              </Fragment>
-            );
-          })}
-        </p>
       </Container>
     </Section>
   );

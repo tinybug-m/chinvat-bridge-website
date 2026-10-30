@@ -59,19 +59,25 @@ test.describe("hero", () => {
     await expect(hero.getByRole("link", { name: "Start a conversation" })).toHaveAttribute("href", "/#contact");
     await expect(hero.getByRole("link", { name: "Explore services" })).toHaveAttribute("href", "/#services");
 
-    const index = hero.getByRole("navigation", { name: "Disciplines" }).getByRole("link");
-    await expect(index).toHaveCount(4);
+    // Below lg the discipline links are hidden: Services follows straight after and would only repeat them.
+    const nav = hero.locator('nav[aria-label="Disciplines"]');
+    const wide = (page.viewportSize()?.width ?? 0) >= 1024;
+    if (!wide) await expect(nav).toBeHidden();
+    const index = nav.getByRole("link");
     const expected = [
       ["AI integration", "/#services-ai"],
       ["Automation & workflows", "/#services-automation"],
       ["Software & web", "/#services-software"],
       ["SEO & growth", "/#services-seo"],
     ];
-    for (const [i, [label, href]] of expected.entries()) {
-      await expect(index.nth(i)).toContainText(label);
-      await expect(index.nth(i)).toHaveAttribute("href", href);
-      const box = await index.nth(i).boundingBox();
-      expect(box!.height).toBeGreaterThanOrEqual(44);
+    if (wide) {
+      await expect(index).toHaveCount(4);
+      for (const [i, [label, href]] of expected.entries()) {
+        await expect(index.nth(i)).toContainText(label);
+        await expect(index.nth(i)).toHaveAttribute("href", href);
+        const box = await index.nth(i).boundingBox();
+        expect(box!.height).toBeGreaterThanOrEqual(44);
+      }
     }
     // One callout on the mark, where the seam leaves it; the figure's screen-reader caption names all three states.
     await expect(hero.locator("figure").getByText("Transition", { exact: true })).toBeVisible();

@@ -22,15 +22,18 @@ export default function InsightsIndexPage() {
         <SectionIntro
           eyebrow="Insights"
           heading="Ideas & Observations"
+          headingAs="h1"
+          // The intro's bottom rule is the list's top rule.
+          className="mb-0"
           description="Practical thinking about AI, software, automation and digital growth."
         />
 
-        <div className="divide-y divide-stone-border border-t border-b border-stone-border">
+        <div className="divide-y divide-stone-border border-b border-stone-border">
           {posts.map((post) => (
             <Link
               key={post.meta.slug}
               href={`/insights/${post.meta.slug}`}
-              className="group block py-6 px-4 hover:bg-obsidian-900/60 transition-colors"
+              className="group block py-6 hover:bg-obsidian-900/60 transition-colors"
             >
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div>
