@@ -25,6 +25,8 @@ test.describe("insights section", () => {
       await expect(row).not.toContainText("min read");
     }
     await expect(section.getByRole("link", { name: /All insights/ })).toHaveAttribute("href", "/insights");
+    // No summary line under the heading: the row categories already say what the writing covers.
+    await expect(section).not.toContainText("Practical thinking about");
   });
 
   test("rows and the footer link are large enough to tap, with no overflow", async ({ page }) => {

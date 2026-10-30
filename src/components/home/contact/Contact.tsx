@@ -5,7 +5,10 @@ import { SectionHeading } from "@/components/system/SectionHeading";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/lib/constants";
 import { ContactBrief } from "./ContactBrief";
 
-/* The closing section: no card or frame, the brief sits straight on the ground. */
+/*
+ * The closing section: no card or frame, the brief sits straight on the ground.
+ * One sentence of lede says what to send; the brief and the address do the rest.
+ */
 export function Contact() {
   return (
     <Section id="contact" labelledBy="contact-title" className="bg-haze">
@@ -14,9 +17,8 @@ export function Contact() {
           <Reveal>
             <SectionHeading id="contact-title">Build a better way forward.</SectionHeading>
             <p className="mt-6 max-w-measure text-pretty text-lede text-ink-soft">
-              Have a business problem worth solving? Tell us what&rsquo;s slowing your business down, where you&rsquo;re
-              trying to grow, or what you&rsquo;d like to build. We&rsquo;ll help you identify the most practical next
-              step.
+              Tell us what&rsquo;s slowing your business down, where you&rsquo;re trying to grow, or what you&rsquo;d
+              like to build.
             </p>
           </Reveal>
 

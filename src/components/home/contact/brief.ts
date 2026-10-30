@@ -26,9 +26,11 @@ export function validateBrief(values: BriefValues): BriefErrors {
   if (!values.email.trim()) errors.email = "Enter your email address.";
   else if (!EMAIL_PATTERN.test(values.email.trim())) errors.email = "Enter a valid email address, like name@company.com.";
   if (values.needs.length === 0) errors.needs = "Choose at least one option.";
+  // The running count is not repeated here: the hint under the field shows it
+  // and is read out with the error (aria-describedby).
   const length = values.message.trim().length;
   if (length === 0) errors.message = "Tell us a little about the project.";
-  else if (length < MIN_MESSAGE) errors.message = `Add a little more detail: at least ${MIN_MESSAGE} characters (${length} so far).`;
+  else if (length < MIN_MESSAGE) errors.message = `Add a little more detail: at least ${MIN_MESSAGE} characters.`;
   return errors;
 }
 

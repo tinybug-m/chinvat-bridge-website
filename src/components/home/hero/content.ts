@@ -7,7 +7,8 @@ export const HERO_COPY = {
   /** PROPOSED headline (was "Build a better way forward."): the drawn line, then the built line. */
   titleDrawn: "Same business.",
   titleBuilt: "Better systems.",
-  lede: "Chinvat Bridge helps businesses use AI, automation and modern software to reduce manual work, improve digital performance and build better ways of working.",
+  /** Shortened to its first clause; was "…to reduce manual work, improve digital performance and build better ways of working." */
+  lede: "Chinvat Bridge helps businesses use AI, automation and modern software to reduce manual work.",
   /** Sentence case; was "Start a Conversation". */
   primary: { label: "Start a conversation", href: "/#contact" },
   /** Was "Explore Our Services". */

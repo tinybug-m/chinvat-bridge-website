@@ -221,7 +221,7 @@ export function ContactBrief() {
           <Button type="submit" size="lg" arrow="right">
             Send brief
           </Button>
-          <p className="max-w-[28ch] text-small text-ink-muted">Opens your email app with the brief filled in.</p>
+          <p className="max-w-[36ch] text-small text-ink-muted">Opens your email app with the brief filled in.</p>
         </div>
       </div>
 

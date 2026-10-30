@@ -51,6 +51,11 @@ test.describe("hero", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Same business\.\s*Better systems\./);
     await expect(hero.getByText("UK Based // Working Globally")).toBeVisible();
+    // The lede is cut to its first clause.
+    await expect(hero.getByText(/^Chinvat Bridge helps businesses/)).toHaveText(
+      "Chinvat Bridge helps businesses use AI, automation and modern software to reduce manual work.",
+    );
+    await expect(hero).not.toContainText("improve digital performance");
     await expect(hero.getByRole("link", { name: "Start a conversation" })).toHaveAttribute("href", "/#contact");
     await expect(hero.getByRole("link", { name: "Explore services" })).toHaveAttribute("href", "/#services");
 
@@ -83,9 +88,9 @@ test.describe("hero", () => {
     expect(errors).toEqual([]);
   });
 
-  // The H1 is the LCP on desktop. On narrow screens the four-line lede covers
-  // more area than the two-line H1, so it may win there; either way the LCP is
-  // server-rendered hero text, never the poster or the canvas.
+  // The H1 is the LCP on desktop. On narrow screens the three-line lede can
+  // cover more area than the two-line H1, so it may win there; either way the
+  // LCP is server-rendered hero text, never the poster or the canvas.
   test("the largest contentful paint is the hero text", async ({ page }, testInfo) => {
     await page.goto("/");
     await page.waitForTimeout(1500);

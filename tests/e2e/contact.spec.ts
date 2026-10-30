@@ -29,6 +29,13 @@ test.describe("contact section", () => {
     await expect(section.getByRole("heading", { level: 2 })).toHaveText("Build a better way forward.");
     await expect(section.getByRole("link", { name: EMAIL })).toHaveAttribute("href", `mailto:${EMAIL}`);
     await expect(section).not.toContainText("Working Globally");
+    // The lede is one sentence: the question before it and the promise after it were cut.
+    await expect(section.getByText(/^Tell us what’s slowing your business down/)).toHaveText(
+      "Tell us what’s slowing your business down, where you’re trying to grow, or what you’d like to build.",
+    );
+    await expect(section).not.toContainText("Have a business problem worth solving?");
+    await expect(section).not.toContainText("most practical next step");
+    await expect(section.getByText("Opens your email app with the brief filled in.")).toBeVisible();
     await expect(section.getByRole("group", { name: "What do you need?" }).getByRole("button")).toHaveCount(5);
     await expect(section.getByRole("radiogroup", { name: /Timeline/ }).getByRole("radio")).toHaveCount(4);
     await expect(section.getByRole("button", { name: "Send brief" })).toBeVisible();
@@ -70,7 +77,10 @@ test.describe("contact section", () => {
     await email.fill("not-an-email");
     await expect(page.locator("#brief-email-error")).toContainText("valid email");
     await message.fill("Too short");
-    await expect(page.locator("#brief-message-error")).toContainText("at least 20 characters");
+    // The error states the rule only; the running count lives in the hint beside it.
+    await expect(page.locator("#brief-message-error")).toHaveText("Add a little more detail: at least 20 characters.");
+    await expect(page.locator("#brief-message-hint")).toHaveText("9 / 20 minimum");
+    await expect(message).toHaveAttribute("aria-describedby", "brief-message-error brief-message-hint");
     await page.getByRole("button", { name: "Software & Web" }).click();
     await expect(page.locator("#brief-needs-error")).toBeHidden();
     await expect(count).toHaveText("2 fields need attention");

@@ -10,6 +10,8 @@ import { getAllPosts } from "@/lib/blog";
 /*
  * Calmer and tighter than Capabilities: a narrow heading column beside a
  * compact index. Rows keep the hairline, since there the rule is the pattern.
+ * No summary line under the heading: each row's category already says what
+ * the writing covers.
  */
 export function Insights() {
   const posts = getAllPosts();
@@ -21,10 +23,7 @@ export function Insights() {
           <SectionHeading id="insights-title" measure="max-w-[12ch]">
             Ideas and observations.
           </SectionHeading>
-          <p className="mt-5 max-w-[26rem] text-pretty text-body text-ink-soft">
-            Practical thinking about AI, software, automation and digital growth.
-          </p>
-          <TextLink href="/insights" className="mt-4 inline-flex min-h-11 items-center gap-2 text-body">
+          <TextLink href="/insights" className="mt-6 inline-flex min-h-11 items-center gap-2 text-body">
             All insights
             <ArrowIcon />
           </TextLink>
