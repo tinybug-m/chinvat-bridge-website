@@ -8,11 +8,11 @@ import { ServicePlate, type PlateProps } from "./ServicePlate";
 
 /*
  * One entry per service, in the same order as SERVICES. The plates differ on
- * purpose: AI is large and bleeds off the left edge, Automation is compact and
- * dropped below its text, Software sits wide on the left on a full-bleed haze
- * band, SEO bleeds off the right edge. `svc-bleed-*` run to the viewport edge
- * on purpose: the section clips the overhang. `tone` varies the text: scale,
- * tag layout, where the outcome sits and how the link looks.
+ * purpose: AI is large and bleeds off the left edge, Automation's diagram is
+ * compact and dropped level with its description, Software sits wide on the
+ * left on a full-bleed haze band, SEO bleeds off the right edge. `svc-bleed-*`
+ * run to the viewport edge on purpose: the section clips the overhang. `tone`
+ * varies the text: title scale, description size and how the link looks.
  */
 const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" | "layout">[] = [
   {
@@ -20,7 +20,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
     Diagram: AiDiagram,
     viewBox: "0 30 400 250",
     draw: true,
-    tone: { title: "heading", tags: "row", outcome: "inline", link: "text" },
+    tone: { title: "heading", link: "text" },
     layout: {
       article: "mt-16 lg:mt-24",
       grid: "lg:items-end",
@@ -32,7 +32,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
     slug: "automation",
     Diagram: AutomationDiagram,
     viewBox: "0 50 400 230",
-    tone: { title: "title", tags: "row", outcome: "lead", link: "text" },
+    tone: { title: "title", link: "text" },
     layout: {
       article: "mt-24 lg:mt-36",
       grid: "lg:items-start",
@@ -44,7 +44,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
     slug: "software",
     Diagram: SoftwareDiagram,
     viewBox: "0 36 400 244",
-    tone: { title: "heading", lede: true, tags: "row", outcome: "closing", link: "button", band: true },
+    tone: { title: "heading", lede: true, link: "button", band: true },
     layout: {
       article: "mt-20 lg:mt-40",
       grid: "lg:items-center",
@@ -57,7 +57,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
     Diagram: SeoDiagram,
     viewBox: "0 40 400 240",
     draw: true,
-    tone: { title: "heading", tags: "stack", outcome: "inline", link: "text" },
+    tone: { title: "heading", link: "text" },
     layout: {
       article: "mt-24 lg:mt-36",
       grid: "lg:items-start",

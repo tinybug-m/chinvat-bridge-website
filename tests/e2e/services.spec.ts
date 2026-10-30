@@ -22,13 +22,18 @@ test.describe("services section", () => {
     await expect(section).not.toContainText("Also:");
   });
 
-  test("tags carry no separator glyphs and plates are not stamped copies", async ({ page }) => {
+  test("plates are cut to strapline, title, description and link", async ({ page }) => {
     await page.goto("/");
-    const article = page.locator("#services-ai");
-    await expect(article.locator("ul > li")).toHaveText(["AI strategy", "LLM applications", "Automated workflows", "Internal AI tools"]);
-    // No generated content on a tag, so a wrapped line never starts on a separator.
-    const before = await article.locator("ul > li").first().evaluate((el) => getComputedStyle(el, "::before").content);
-    expect(["none", "normal"]).toContain(before);
+    const section = page.locator("#services");
+    // The tags and the "Outcome —" line live in SERVICES but are not shown on the homepage.
+    await expect(section.locator("article ul")).toHaveCount(0);
+    await expect(section).not.toContainText("Outcome");
+    for (const removed of ["AI strategy", "Practical adoption", "Workflow automation", "Built around you", "Technical SEO"]) {
+      await expect(section).not.toContainText(removed);
+    }
+    const ai = page.locator("#services-ai");
+    await expect(ai.getByText("AI that serves the business")).toBeVisible();
+    await expect(ai.getByText(/practical AI opportunities/)).toBeVisible();
     // Plates differ in type scale and in how the link is set.
     const sizes = await page.locator("#services article h3").evaluateAll((els) => els.map((el) => getComputedStyle(el).fontSize));
     expect(new Set(sizes).size).toBeGreaterThan(1);
