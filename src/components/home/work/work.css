@@ -40,6 +40,18 @@
     transition-property: translate, opacity;
   }
 
+  /*
+   * The preview lands over the hovered row's context column; that line steps out of the way
+   * rather than leaving its first letters peeking past the screenshot's edge.
+   */
+  .work-context {
+    transition: opacity var(--motion-quick) var(--ease-out-quart);
+  }
+
+  .work-row[data-current] .work-context {
+    opacity: 0;
+  }
+
   .work-arrow {
     opacity: 0;
     translate: -0.5rem 0.25rem;
@@ -84,7 +96,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .work-name,
-  .work-arrow {
+  .work-arrow,
+  .work-context {
     transition: none;
   }
 }

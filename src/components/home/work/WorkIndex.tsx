@@ -268,7 +268,7 @@ export function WorkIndex({ projects }: { projects: Project[] }) {
                 <span className="sr-only"> (opens in a new tab)</span>
               </a>
             </h3>
-            <p className="max-w-[30ch] text-balance text-body text-ink-soft md:col-span-4 md:col-start-9 md:pt-3">
+            <p className="work-context max-w-[30ch] text-balance text-body text-ink-soft md:col-span-4 md:col-start-9 md:pt-3">
               {project.context}
             </p>
           </div>
