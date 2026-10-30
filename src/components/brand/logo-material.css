@@ -115,8 +115,12 @@
 
 :root:not([data-logo-material="classic"]) .logo-toggle [data-option="chrome"],
 :root[data-logo-material="classic"] .logo-toggle [data-option="classic"] {
-  background: var(--color-ink);
-  color: var(--color-paper);
+  background-color: var(--color-ink);
+  background-image: var(--material-fill);
+  background-size: 180% 100%;
+  background-position: 0% 50%;
+  box-shadow: var(--material-edge);
+  color: var(--material-ink);
 }
 
 @media (prefers-reduced-motion: reduce) {

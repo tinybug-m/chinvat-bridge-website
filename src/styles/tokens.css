@@ -110,6 +110,69 @@
 
   /* How far text rises into place on reveal */
   --rise-distance: 0.75rem;
+
+  /*
+   * The primary fill is the logo's material, so it follows the Chrome /
+   * Classic toggle under the hero mark. Chrome is the mark's liquid chrome:
+   * gunmetal with oil-slick blue, cyan, amber and a trace of violet, layered
+   * as soft pools. Drawn at 180% width: rest shows the left part, hover
+   * slides the pools across. The pools stay deep enough for paper text.
+   */
+  --material-fill:
+    radial-gradient(16% 85% at 9% 100%, rgb(30 130 255 / 0.95), transparent 70%),
+    radial-gradient(14% 75% at 21% 0%, rgb(110 215 255 / 0.85), transparent 70%),
+    radial-gradient(10% 60% at 33% 70%, rgb(225 95 165 / 0.35), transparent 70%),
+    radial-gradient(16% 85% at 42% 100%, rgb(245 145 35 / 0.95), transparent 70%),
+    radial-gradient(12% 70% at 50% 0%, rgb(255 205 120 / 0.7), transparent 70%),
+    radial-gradient(16% 85% at 64% 0%, rgb(30 130 255 / 0.95), transparent 70%),
+    radial-gradient(16% 85% at 79% 100%, rgb(245 145 35 / 0.9), transparent 70%),
+    radial-gradient(14% 75% at 94% 0%, rgb(110 215 255 / 0.85), transparent 70%),
+    linear-gradient(
+      100deg,
+      #05070a 0%,
+      #3a414a 9%,
+      #06080b 16%,
+      #2a3038 27%,
+      #05070a 37%,
+      #3a414a 52%,
+      #06080b 66%,
+      #2a3038 84%,
+      #05070a 100%
+    );
+  --material-ink: var(--color-paper);
+  --material-edge:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    inset 0 -1px 0 rgb(0 0 0 / 0.5);
+}
+
+/* Classic: deep cerulean with an azure sheen and a saffron glint, paper text. */
+:root[data-logo-material="classic"] {
+  --material-fill: linear-gradient(
+    110deg,
+    #0b263c 0%,
+    #0f557d 14%,
+    #0b263c 27%,
+    #1d75a3 41%,
+    #0f557d 50%,
+    #0b263c 62%,
+    #5e4019 76%,
+    #8e5a1e 90%,
+    #ebc26b 100%
+  );
+  --material-ink: var(--color-paper);
+  --material-edge:
+    inset 0 1px 0 rgb(255 255 255 / 0.16),
+    inset 0 -1px 0 rgb(0 0 0 / 0.35);
+}
+
+@utility bg-material {
+  background-color: var(--color-ink);
+  background-image: var(--material-fill);
+  background-size: 180% 100%;
+  background-position: 0% 50%;
+  box-shadow: var(--material-edge);
+  color: var(--material-ink);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.55);
 }
 
 /* Semantic names the shadcn/Radix primitives in components/ui expect. */
