@@ -138,3 +138,30 @@ Middle Persian for Rashn's balance, later Pahlavi for the bridge's width.
 
 Revert: delete the three Approach additions and the article, restore the two row
 headings and the old description and alt text.
+
+## Declutter pass (owner request, 2026-10-30)
+
+The owner said the homepage is too text heavy, that the Recent work section
+looked odd, and that the scattered mythology quotes and source labels read as
+random text. Cutting copy was approved; nothing below is reworded except by
+shortening, and no new claims were added. The full sourced origin story stays in
+the article "Where the Name Chinvat Bridge Comes From", now linked from About.
+
+| Where | Old | New | Why |
+|---|---|---|---|
+| Work | Lead screenshot plus a "Concepts" heading, the note "Two concepts. Speculative, not client work." and three "Visit the site" links | An index of three names, each labelled "Client project" or "Concept", with one context line; the whole row links to the site. The screenshot appears beside the pointer on hover or focus (inline on touch screens) | The owner asked for names with a hover preview. Labels stay truthful. |
+| Work, Scornik context | "London law firm." and "We designed and built their website." on separate lines | "London law firm. We designed and built their website." | Same words, one line. |
+| Approach header | "In the Middle Persian texts, Rashn's balance "renders no favour." We begin the same way, by weighing where things really stand." with the "Mainyo-i Khrad 2" label and the balance drawing | (removed) | Read as random text. |
+| Approach, under the stage | "A later Pahlavi tradition describes the bridge as narrow as a razor or nine lances wide…" with "Later tradition: Dadestan i Denig 21.5; Denkard 809" | (removed) | Same. |
+| Approach rows | Five rows of today and next labels with status lines ("High human overhead", "Reliable & fast"…) and the row captions "Where it stands" / "What we build" | One live line under the stage naming the pair the seam is crossing, e.g. "Disconnected tools → Connected systems" (existing labels, verbatim). Status lines are no longer shown | Too pale and too much text. |
+| Approach readout | "Everything as it is today" / "Partly improved" / "Everything improved" | (replaced by the live line) | |
+| Approach slider valuetext | "40% modernised: 2 of 5" | "40% modernised: Poor search visibility to Stronger organic visibility" | Says what the value means. |
+| Services, all four plates | Tag lists (e.g. "AI strategy · LLM applications · …") and "Outcome — …" lines | (removed) | Each plate is now strapline, title, description and link. Data kept in src/data/services.ts. |
+| Capabilities | One description sentence per capability, in six staggered rows | A ruled grid of category and title only; the "Also: …" line stays | Repeated the Services copy. Data kept in src/data/capabilities.ts. |
+| About | Lede "Chinvat Bridge helps identify where technology can remove friction…" | (removed) | Repeats the hero. |
+| About | "In the Gathas, the oldest Zoroastrian texts…" and "Sources: Yasna 46.10–11, 51.13; Mainyo-i Khrad 2" | Link "Where the name comes from" to the article | The sourced story lives in the article. |
+| About | Pillars "Strategy / Engineering / Automation / Measurable Outcomes" | (removed) | Filler. |
+| Hero lede | "…to reduce manual work, improve digital performance and build better ways of working." | "Chinvat Bridge helps businesses use AI, automation and modern software to reduce manual work." | Shorter; the discipline links under it name the rest. |
+| Insights | "Practical thinking about AI, software, automation and digital growth." | (removed) | Each row already shows its category. |
+| Contact lede | "Have a business problem worth solving? Tell us what's slowing your business down, where you're trying to grow, or what you'd like to build. We'll help you identify the most practical next step." | "Tell us what's slowing your business down, where you're trying to grow, or what you'd like to build." | One sentence, verbatim. |
+| Contact form error | "Add a little more detail: at least 20 characters (N so far)." | "Add a little more detail: at least 20 characters." | The running count is already shown under the field. |
