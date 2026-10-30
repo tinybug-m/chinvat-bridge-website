@@ -1,0 +1,50 @@
+/*
+ * The 404 bridge (BrokenBridge.tsx). Rendered broken; with motion the
+ * component marks it standing, then breaking, then broken. Until it does,
+ * the figure stays hidden under .js-reveal so the broken picture never
+ * flashes before the bridge stands; if the script never runs, the fallback
+ * shows it anyway.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .broken-bridge {
+    transition: opacity var(--motion-slow) var(--ease-out-quart);
+  }
+
+  .js-reveal .broken-bridge:not([data-phase]) {
+    opacity: 0;
+    animation: broken-bridge-fallback 0s 2.5s forwards;
+  }
+
+  .broken-bridge :is(.bb-plan, .bb-gauge) {
+    transition: opacity var(--motion-slow) var(--ease-out-quart);
+    transition-delay: 150ms;
+  }
+
+  .broken-bridge .bb-gauge {
+    transition-delay: 450ms;
+  }
+
+  .broken-bridge .bb-ring {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition:
+      opacity var(--motion-base) var(--ease-out-expo),
+      scale var(--motion-base) var(--ease-out-expo);
+  }
+
+  .broken-bridge:is([data-phase="standing"], [data-phase="breaking"]) :is(.bb-plan, .bb-gauge) {
+    opacity: 0;
+    transition-delay: 0ms;
+  }
+
+  .broken-bridge:is([data-phase="standing"], [data-phase="breaking"]) .bb-ring {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
+@keyframes broken-bridge-fallback {
+  to {
+    opacity: 1;
+  }
+}

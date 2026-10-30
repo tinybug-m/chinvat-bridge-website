@@ -164,7 +164,7 @@ const coord = (point: Point) => toBoard(point).map(fix).join(" ");
 const polygon = (face: Face) => `M${face.map(coord).join(" L")} Z`;
 const stroke = (points: Point[]) => `M${points.map(coord).join(" L")}`;
 
-export const STONE_BOARD = { viewBox: `0 0 ${BOARD_WIDTH} ${BOARD_HEIGHT}` } as const;
+export const STONE_BOARD = { viewBox: `0 0 ${BOARD_WIDTH} ${BOARD_HEIGHT}`, width: BOARD_WIDTH, height: BOARD_HEIGHT } as const;
 
 /** One piece as path data for each of its visible faces. */
 export interface StoneFaces {
@@ -243,3 +243,67 @@ export const RULER = {
   line: stroke(Array.from({ length: layout.count }, (_, index) => rulerPoint(index, RULER_DOWN))),
   ticks: rulerMarks.map((index) => stroke([rulerPoint(index, RULER_DOWN - 0.14), rulerPoint(index, RULER_DOWN + 0.14)])).join(" "),
 };
+
+// --- Loose bodies (the 404's broken span) --------------------------------------------
+
+export type { Pose };
+
+/** Where slab `index` sits in the built deck. */
+export const builtPose = (index: number): Pose => ({ ...layout.slabs[index].built });
+
+/**
+ * Slab `index` swung by `angle` (radians about the path's cross axis; negative
+ * drops its far end) about one top edge, which stays put: the near one (the
+ * joint with the slab before it) by default, the far one with `end` 1.
+ */
+export function hingedPose(index: number, angle: number, end: -1 | 1 = -1): Pose {
+  const built = layout.slabs[index].built;
+  const hinge: Vec = [(end * P.length) / 2, P.thickness / 2, 0];
+  const swung = { ...built, roll: built.roll + angle };
+  const before = place(built, hinge);
+  const after = place(swung, hinge);
+  return { ...swung, x: swung.x + before[0] - after[0], y: swung.y + before[1] - after[1], z: swung.z + before[2] - after[2] };
+}
+
+export type FaceRole = "top" | "face" | "end";
+
+/** The six faces, each wound so its normal points out, with the colour role it keeps as it turns. */
+const BOX_FACES: { role: FaceRole; corners: [number, number, number][] }[] = [
+  { role: "top", corners: [[-1, 1, 1], [1, 1, 1], [1, 1, -1], [-1, 1, -1]] },
+  { role: "face", corners: [[-1, -1, -1], [1, -1, -1], [1, -1, 1], [-1, -1, 1]] },
+  { role: "face", corners: [[-1, 1, 1], [-1, -1, 1], [1, -1, 1], [1, 1, 1]] },
+  { role: "face", corners: [[1, 1, -1], [1, -1, -1], [-1, -1, -1], [-1, 1, -1]] },
+  { role: "end", corners: [[-1, 1, -1], [-1, -1, -1], [-1, -1, 1], [-1, 1, 1]] },
+  { role: "end", corners: [[1, 1, 1], [1, -1, 1], [1, -1, -1], [1, 1, -1]] },
+];
+
+const SLAB_SIZE: Vec = [P.length, P.thickness, P.depth];
+
+/** Does the face through these world points (wound outward) turn toward the camera? */
+function facesEye(points: Vec[]) {
+  const normal = cross(sub(points[1], points[0]), sub(points[2], points[1]));
+  return dot(normal, sub(eye, points[0])) > 0;
+}
+
+/**
+ * Any box on the path in any pose, as the faces the camera sees (a box is
+ * convex, so they never overlap and need no order). Defaults to a slab.
+ */
+export function solidFaces(pose: Pose, size: Vec = SLAB_SIZE): { role: FaceRole; d: string }[] {
+  const half: Vec = [size[0] / 2, size[1] / 2, size[2] / 2];
+  return BOX_FACES.flatMap(({ role, corners }) => {
+    const world = corners.map(([x, y, z]) => place(pose, [x * half[0], y * half[1], z * half[2]]));
+    return facesEye(world) ? [{ role, d: polygon(world.map(project)) }] : [];
+  });
+}
+
+/** The saffron inlay on a slab in any pose, or null while its top faces away. */
+export function inlayAt(pose: Pose): string | null {
+  const top = BOX_FACES[0].corners.map(([x, , z]) => place(pose, [(x * P.length) / 2, P.thickness / 2, (z * P.depth) / 2]));
+  return facesEye(top) ? stroke(inlay(pose)) : null;
+}
+
+/** A point given in a slab's own frame (world units from its centre), on the board. */
+export const boardPoint = (pose: Pose, local: Vec): Point => toBoard(project(place(pose, local))).map(fix) as Point;
+
+export const SLAB_DIMENSIONS = { length: P.length, thickness: P.thickness, depth: P.depth } as const;

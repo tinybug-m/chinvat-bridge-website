@@ -50,7 +50,7 @@ function Layer({
   );
 }
 
-const SLAB = {
+export const SLAB = {
   top: "var(--color-slab-top)",
   end: "var(--color-slab-end)",
   face: "var(--color-slab-face)",
@@ -78,7 +78,7 @@ const AXIS = (() => {
 const farToNear = Array.from({ length: STONE.count }, (_, index) => STONE.count - 1 - index);
 
 /** A slab or plinth: top, front and, where the camera sees it, the end. */
-function Stone({ faces, front, end }: { faces: StoneFaces; front?: string; end?: string | false }) {
+export function Stone({ faces, front, end }: { faces: StoneFaces; front?: string; end?: string | false }) {
   return (
     <g stroke={SLAB.edge} strokeWidth="1" strokeLinejoin="round">
       {end !== false && <path d={faces.end} fill={end ?? SLAB.end} stroke={end ? "none" : SLAB.edge} />}
@@ -89,7 +89,7 @@ function Stone({ faces, front, end }: { faces: StoneFaces; front?: string; end?:
 }
 
 /** Plinth faces dissolve downward into the page, as they do in the 3D scene. */
-function Fades({ uid }: PlateProps) {
+export function Fades({ uid }: PlateProps) {
   const gradient = (id: string, [from, to]: [number, number], colour: string) => (
     <linearGradient id={`${uid}-${id}`} gradientUnits="userSpaceOnUse" x1="0" x2="0" y1={from} y2={to}>
       <stop offset="0.05" stopColor={colour} />
@@ -107,15 +107,15 @@ function Fades({ uid }: PlateProps) {
   );
 }
 
-const FarPlinth = ({ uid }: PlateProps) => (
+export const FarPlinth = ({ uid }: PlateProps) => (
   <>
     <Stone faces={STONE.farBlock} front={`url(#${uid}-far-front)`} end={`url(#${uid}-far-end)`} />
     <Stone faces={STONE.farStep} front={`url(#${uid}-far-front)`} end={false} />
   </>
 );
 
-const NearStep = ({ uid }: PlateProps) => <Stone faces={STONE.nearStep} front={`url(#${uid}-near-front)`} end={false} />;
-const NearBlock = ({ uid }: PlateProps) => (
+export const NearStep = ({ uid }: PlateProps) => <Stone faces={STONE.nearStep} front={`url(#${uid}-near-front)`} end={false} />;
+export const NearBlock = ({ uid }: PlateProps) => (
   <Stone faces={STONE.nearBlock} front={`url(#${uid}-near-front)`} end={`url(#${uid}-near-end)`} />
 );
 
