@@ -4,10 +4,10 @@ export interface FooterLink {
 }
 
 export const DISCIPLINE_LINKS: FooterLink[] = [
-  { label: "AI & Automation", href: "/#services" },
-  { label: "Workflows", href: "/#services" },
-  { label: "Software & Web", href: "/#services" },
-  { label: "SEO & Growth", href: "/#services" },
+  { label: "AI & Automation", href: "/#services-ai" },
+  { label: "Workflows", href: "/#services-automation" },
+  { label: "Software & Web", href: "/#services-software" },
+  { label: "SEO & Growth", href: "/#services-seo" },
 ];
 
 export const SECTION_NAV_LINKS: FooterLink[] = [

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Lockup } from "@/components/brand/Lockup";
 import { Container } from "@/components/system/Container";
 import { CONTACT_EMAIL } from "@/lib/constants";
-import { CONTACT_LINK, DISCIPLINE_LINKS, LOGIN_LINK, PRICING_LINK, SECTION_LINKS, type SiteLink } from "./nav";
+import { CONTACT_LINK, DISCIPLINE_LINKS, LOGIN_LINK, PRICING_LINK, SECTION_LINKS, prefetchFor, type SiteLink } from "./nav";
 
 /*
  * On small screens Explore runs the full height of the first column and
@@ -47,6 +47,7 @@ export function SiteFooter() {
                   <li key={link.href + link.label}>
                     <Link
                       href={link.href}
+                      prefetch={prefetchFor(link.href)}
                       className="inline-flex min-h-11 items-center text-small text-ink-soft transition-[color,text-decoration-color] duration-200 ease-out-quart hover:text-ink motion-reduce:transition-none lg:min-h-9"
                     >
                       {link.label}
@@ -63,10 +64,10 @@ export function SiteFooter() {
         <p>UK Based // Working Globally</p>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
           <p>&copy; {year} Chinvat Bridge Ltd. All rights reserved.</p>
-          <Link href="/privacy" className="inline-flex min-h-11 items-center transition-[color,text-decoration-color] duration-200 ease-out-quart hover:text-ink motion-reduce:transition-none">
+          <Link href="/privacy" prefetch={false} className="inline-flex min-h-11 items-center transition-[color,text-decoration-color] duration-200 ease-out-quart hover:text-ink motion-reduce:transition-none">
             Privacy Policy
           </Link>
-          <Link href="/terms" className="inline-flex min-h-11 items-center transition-[color,text-decoration-color] duration-200 ease-out-quart hover:text-ink motion-reduce:transition-none">
+          <Link href="/terms" prefetch={false} className="inline-flex min-h-11 items-center transition-[color,text-decoration-color] duration-200 ease-out-quart hover:text-ink motion-reduce:transition-none">
             Terms of Service
           </Link>
         </div>

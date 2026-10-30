@@ -12,8 +12,8 @@
  * every live one into a single shared canvas each frame.
  */
 
-/** Size of one grain in CSS pixels. */
-const GRAIN = 5;
+/** Size of one grain in CSS pixels; coarser on low-power devices, where each grain is a draw call. */
+const GRAIN = typeof navigator !== "undefined" && navigator.hardwareConcurrency <= 4 ? 7 : 5;
 /** Share of the timeline over which grain start times are spread. */
 const SPREAD = 0.5;
 /** The ghost is the image drawn at 1/GHOST size and scaled back up, which blurs it in every browser. */
@@ -115,6 +115,8 @@ export class Powder {
   private img: HTMLImageElement | null = null;
   private ghost: HTMLCanvasElement | null = null;
   private grains: Grains | null = null;
+  /** The image failed to load: nothing will ever draw, so nothing should animate. */
+  private failed = false;
   /** Scratch canvas for masking the ghost to the front. */
   private layer: HTMLCanvasElement | null = null;
 
@@ -128,10 +130,17 @@ export class Powder {
     loadImage(src)
       .then((img) => {
         this.img = img;
-        this.ghost = blurred(img, width, height);
-        this.grains = sample(img, width, height);
+        // Sampling builds thousands of grains: do it when the main thread is idle.
+        const prepare = () => {
+          this.ghost = blurred(img, width, height);
+          this.grains = sample(img, width, height);
+        };
+        if ("requestIdleCallback" in window) requestIdleCallback(prepare, { timeout: 200 });
+        else prepare();
       })
-      .catch(() => {});
+      .catch(() => {
+        this.failed = true;
+      });
   }
 
   enter() {
@@ -151,7 +160,7 @@ export class Powder {
   /** Moves progress toward the target; returns true while there is still somewhere to go. */
   step(dt: number, duration: number) {
     // Nothing to animate until the image has decoded; keep the loop alive so it starts when it has.
-    if (!this.grains) return this.target === 1;
+    if (!this.grains) return !this.failed && this.target === 1;
     const delta = dt / duration;
     // Blowing away is quicker than gathering.
     if (this.progress < this.target) this.progress = Math.min(this.target, this.progress + delta);

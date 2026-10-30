@@ -52,8 +52,13 @@ export function ContactBrief() {
 
   const errors = attempted ? validateBrief(values) : {};
   const errorCount = Object.keys(errors).length;
-  const set = <K extends keyof BriefValues>(key: K, value: BriefValues[K]) =>
+  // Editing after a send drops the "email app should open" panel, so its copy buttons never hold a stale brief.
+  const set = <K extends keyof BriefValues>(key: K, value: BriefValues[K]) => {
     setValues((current) => ({ ...current, [key]: value }));
+    setSent(null);
+    setCopyStatus("");
+    setManual(null);
+  };
 
   const aria = (field: BriefField) =>
     errors[field] ? { "aria-invalid": true as const, "aria-describedby": `brief-${field}-error` } : {};

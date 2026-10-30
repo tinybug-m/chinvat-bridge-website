@@ -8,7 +8,7 @@ import { ButtonLink } from "@/components/system/Button";
 import { Container } from "@/components/system/Container";
 import { cn } from "@/lib/utils";
 import { MobileMenu } from "./MobileMenu";
-import { CONTACT_LINK, LOGIN_LINK, PRICING_LINK, SECTION_LINKS } from "./nav";
+import { CONTACT_LINK, LOGIN_LINK, PRICING_LINK, SECTION_LINKS, prefetchFor } from "./nav";
 import { useActiveSection } from "./useActiveSection";
 
 const SECTION_IDS = SECTION_LINKS.map((link) => link.href.split("#")[1]);
@@ -89,6 +89,7 @@ export function SiteHeader() {
                       else links.current.delete(link.href);
                     }}
                     href={link.href}
+                    prefetch={prefetchFor(link.href)}
                     data-active={isActive || undefined}
                     aria-current={isActive ? (link.href === PRICING_LINK.href ? "page" : "location") : undefined}
                     className="relative inline-flex min-h-11 items-center px-2 text-small text-ink-soft transition-colors duration-200 ease-out-quart after:absolute after:inset-x-2 after:bottom-[7px] after:h-px after:origin-left after:scale-x-0 after:bg-ink after:transition-transform after:duration-150 after:ease-out-quart hover:text-ink hover:after:scale-x-100 data-active:text-ink data-active:after:hidden motion-reduce:transition-none motion-reduce:after:transition-none xl:px-3 xl:after:inset-x-3"
@@ -113,6 +114,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           <Link
             href={LOGIN_LINK.href}
+            prefetch={false}
             className={cn(
               "hidden min-h-11 items-center px-2 text-small whitespace-nowrap text-ink-soft transition-colors duration-200 hover:text-ink lg:inline-flex xl:px-3",
             )}

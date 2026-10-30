@@ -12,6 +12,13 @@ export const SECTION_LINKS: SiteLink[] = [
   { label: "Insights", href: "/#insights" },
 ];
 
+/**
+ * Prefetch setting for links in the new header, menu and footer: off. A hash link on the homepage
+ * would prefetch the page onto itself, and every other route still lives in the (legacy) group,
+ * whose old stylesheet and fonts a prefetch would pull onto this page.
+ */
+export const prefetchFor = (href: string) => (href.startsWith("/#") || href !== "/" ? false : undefined);
+
 export const PRICING_LINK: SiteLink = { label: "Pricing", href: "/pricing" };
 export const LOGIN_LINK: SiteLink = { label: "Client login", href: "/login" };
 export const CONTACT_LINK: SiteLink = { label: "Start a conversation", href: "/#contact" };

@@ -28,6 +28,11 @@ const FOLLOW_MS = 95;
 /** Duration (ms) of a full assemble from powder; reduced motion uses a short fade. */
 const ASSEMBLE_MS = 1150;
 const FADE_MS = 200;
+/** The fixed header's height plus a gap; the preview never tucks under it. */
+const HEADER_CLEAR = 88;
+
+/** The optimised screenshot at 1080px (the preview is 880 device px at 2x), not the 2000px original. */
+const previewSrc = (src: string) => `/_next/image?url=${encodeURIComponent(src)}&w=1080&q=75`;
 
 /** A name split before its last word, so the arrow can be kept with that word. */
 const head = (name: string) => name.slice(0, name.lastIndexOf(" ") + 1);
@@ -65,7 +70,7 @@ export function WorkIndex({ projects }: { projects: Project[] }) {
       if (!powder) {
         const project = projects.find((p) => p.key === key);
         if (!project) return null;
-        powder = new Powder(project.key, project.src, PREVIEW_W, PREVIEW_H);
+        powder = new Powder(project.key, previewSrc(project.src), PREVIEW_W, PREVIEW_H);
         powders.set(key, powder);
       }
       return powder;
@@ -78,12 +83,28 @@ export function WorkIndex({ projects }: { projects: Project[] }) {
     let raf = 0;
     let last = 0;
 
-    /** Top-left of the frame for a pointer at (x, y): to its right, flipped to the left near the edge. */
+    /** Right edge of the current name: the preview starts past it, so it never sits on the name. */
+    let nameRight = 0;
+    const measureName = (key: string | null) => {
+      const name = key ? list.querySelector(`[data-project="${key}"] [data-name]`) : null;
+      nameRight = name ? name.getBoundingClientRect().right : 0;
+    };
+
+    /**
+     * Top-left of the frame for a pointer at (x, y): right of the pointer and of the name, held
+     * inside the viewport, and below the fixed header.
+     */
     const anchor = (x: number, y: number) => {
-      const flip = x + OFFSET + PREVIEW_W > window.innerWidth - 16;
+      if (focusRow) {
+        const below = focusRow.bottom + 12;
+        return {
+          x: Math.min(window.innerWidth - PREVIEW_W - 16, x),
+          y: below + PREVIEW_H < window.innerHeight - 16 ? below : Math.max(HEADER_CLEAR, focusRow.top - 12 - PREVIEW_H),
+        };
+      }
       return {
-        x: flip ? x - OFFSET - PREVIEW_W : x + OFFSET,
-        y: Math.min(window.innerHeight - PREVIEW_H - 16, Math.max(16, y - PREVIEW_H / 2)),
+        x: Math.min(window.innerWidth - PREVIEW_W - 16, Math.max(x, nameRight) + OFFSET),
+        y: Math.min(window.innerHeight - PREVIEW_H - 16, Math.max(HEADER_CLEAR, y - PREVIEW_H / 2)),
       };
     };
 
@@ -148,30 +169,57 @@ export function WorkIndex({ projects }: { projects: Project[] }) {
       if (event.pointerType !== "mouse" || !fine.matches) return;
       pointer.x = event.clientX;
       pointer.y = event.clientY;
-      show(rowKey(event.target));
+      focusRow = null;
+      const key = rowKey(event.target);
+      show(key);
+      measureName(key);
       run();
     };
     const onLeave = () => show(null);
+    /** Puts the pointer stand-in at the focused name, so the preview sits beside it. */
+    // Keyboard: the preview goes below the focused row (above it near the bottom of the screen),
+    // lined up with the name, so it never covers the row or its focus ring.
+    let focusRow: DOMRect | null = null;
+    const aimAtFocus = (link: Element) => {
+      const row = link.closest("[data-project]");
+      const name = link.querySelector("[data-name]") ?? link;
+      if (!row) return;
+      focusRow = row.getBoundingClientRect();
+      pointer.x = name.getBoundingClientRect().left;
+      nameRight = 0;
+    };
     const onFocus = (event: FocusEvent) => {
-      if (!fine.matches || !(event.target instanceof HTMLAnchorElement) || !event.target.matches(":focus-visible")) return;
-      const rect = (event.target.querySelector("[data-name]") ?? event.target).getBoundingClientRect();
-      pointer.x = rect.right;
-      pointer.y = rect.top + rect.height / 2;
+      const link = event.target;
+      if (!fine.matches || !(link instanceof HTMLAnchorElement) || !link.matches(":focus-visible")) return;
       placed = false;
-      show(rowKey(event.target));
+      show(rowKey(link));
+      // Measure after the browser has scrolled the focused row into view.
+      requestAnimationFrame(() => {
+        aimAtFocus(link);
+        run();
+      });
     };
     const onBlur = (event: FocusEvent) => {
-      if (!list.contains(event.relatedTarget as Node | null)) show(null);
+      if (!list.contains(event.relatedTarget as Node | null)) {
+        focusRow = null;
+        show(null);
+      }
     };
     // The page scrolling under a still pointer moves the rows, not the pointer: re-read the row under it.
     const onScroll = () => {
       if (!active) return;
-      if (list.contains(document.activeElement) && document.activeElement?.matches(":focus-visible")) return;
+      const focused = document.activeElement;
+      if (focused && list.contains(focused) && focused.matches(":focus-visible")) {
+        aimAtFocus(focused);
+        run();
+        return;
+      }
+      measureName(active);
       const under = document.elementFromPoint(pointer.x, pointer.y);
       show(under && list.contains(under) ? rowKey(under) : null);
     };
     // Fetch and decode the screenshots the first time the pointer comes near, so the first hover is ready.
-    const warm = () => projects.forEach((project) => void loadImage(project.src).catch(() => {}));
+    const warm = () => projects.forEach((project) => void loadImage(previewSrc(project.src)).catch(() => {}));
 
     list.addEventListener("pointerenter", warm, { once: true });
     list.addEventListener("pointermove", onMove);

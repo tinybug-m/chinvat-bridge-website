@@ -76,7 +76,7 @@ test.describe("approach (bridge)", () => {
     await expect(pairLine(page)).toHaveAttribute("data-state", "drawn");
     await expect(shownPair(page)).toHaveText(/^Repetitive manual work\s*→\s*to\s*Automated workflows$/);
     // Readable, not pale: today in ink and medium weight, the next state in soft ink, at heading size.
-    const [today, next] = [shownPair(page).locator(":scope > span").first(), shownPair(page).locator(":scope > span").last()];
+    const [today, next] = [shownPair(page).locator(":scope > span").first(), shownPair(page).locator(":scope > span").last().locator(":scope > span").last()];
     await expect(today).toHaveCSS("color", "rgb(11, 26, 38)");
     await expect(today).toHaveCSS("font-weight", "500");
     await expect(next).toHaveCSS("color", "rgb(51, 65, 76)");

@@ -54,6 +54,7 @@ export function About() {
           </p>
           <TextLink
             href="/insights/where-the-name-chinvat-bridge-comes-from"
+            prefetch={false}
             className="mt-6 inline-flex min-h-11 items-center gap-2 text-body text-paper decoration-paper/50 hover:decoration-paper focus-visible:outline-paper"
           >
             Where the name comes from

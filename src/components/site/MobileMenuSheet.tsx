@@ -7,7 +7,7 @@ import { Lockup } from "@/components/brand/Lockup";
 import { ButtonLink } from "@/components/system/Button";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { CONTACT_EMAIL } from "@/lib/constants";
-import { CONTACT_LINK, LOGIN_LINK, PRICING_LINK, SECTION_LINKS } from "./nav";
+import { CONTACT_LINK, LOGIN_LINK, PRICING_LINK, SECTION_LINKS, prefetchFor } from "./nav";
 
 interface MobileMenuSheetProps {
   open: boolean;
@@ -76,6 +76,7 @@ export default function MobileMenuSheet({ open, onOpenChange, triggerRef }: Mobi
                 <SheetClose asChild>
                   <Link
                     href={link.href}
+                    prefetch={prefetchFor(link.href)}
                     onClick={(event) => followAnchor(event, link.href)}
                     className="flex min-h-14 touch-manipulation items-center text-heading font-medium text-ink transition-[color,translate] duration-200 ease-out-quart hover:text-cobalt-700 active:translate-y-px motion-reduce:transition-none"
                   >
@@ -101,7 +102,7 @@ export default function MobileMenuSheet({ open, onOpenChange, triggerRef }: Mobi
           </SheetClose>
           <a
             href={`mailto:${CONTACT_EMAIL}`}
-            className="text-small text-ink underline decoration-line-strong underline-offset-4 transition-[text-decoration-color] duration-200 ease-out-quart hover:decoration-ink motion-reduce:transition-none"
+            className="inline-flex min-h-11 items-center text-small text-ink underline decoration-line-strong underline-offset-4 transition-[text-decoration-color] duration-200 ease-out-quart hover:decoration-ink motion-reduce:transition-none"
           >
             {CONTACT_EMAIL}
           </a>

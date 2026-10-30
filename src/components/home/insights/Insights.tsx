@@ -24,7 +24,7 @@ export function Insights() {
           <SectionHeading id="insights-title" measure="max-w-[12ch]">
             Ideas and observations.
           </SectionHeading>
-          <TextLink href="/insights" className="mt-6 inline-flex min-h-11 items-center gap-2 text-body">
+          <TextLink href="/insights" prefetch={false} className="mt-6 inline-flex min-h-11 items-center gap-2 text-body">
             All insights
             <ArrowIcon />
           </TextLink>
@@ -36,6 +36,7 @@ export function Insights() {
               <li key={post.meta.slug} className="border-t border-line">
                 <Link
                   href={`/insights/${post.meta.slug}`}
+                  prefetch={false}
                   className="group/row relative grid min-h-16 grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 py-4 md:grid-cols-[1fr_auto_1rem] md:gap-x-6"
                 >
                   {/* The seam sweeps the row's top rule on hover or focus. */}
