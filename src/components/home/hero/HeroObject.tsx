@@ -61,7 +61,8 @@ export function HeroObject({ className, sizes, children }: HeroObjectProps) {
         <div data-layer="poster" className={posterLayer}>
           {/* Both rest poses; <html data-logo-material> picks one (logo-material.css). The classic one is display:none until chosen, so it is not fetched before. */}
           <div data-material="chrome" className="absolute inset-0">
-            <Image src={POSTER_SRC} alt="" fill sizes={sizes} className="object-contain" />
+            {/* Eager: under reduced motion or without WebGL this poster is the hero's main image. */}
+            <Image src={POSTER_SRC} alt="" fill sizes={sizes} loading="eager" className="object-contain" />
           </div>
           <div data-material="classic" className="absolute inset-0">
             <Image src={POSTER_CLASSIC_SRC} alt="" fill sizes={sizes} className="object-contain" />

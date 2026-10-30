@@ -29,6 +29,10 @@ const FOLLOW_MS = 95;
 const ASSEMBLE_MS = 1150;
 const FADE_MS = 200;
 
+/** A name split before its last word, so the arrow can be kept with that word. */
+const head = (name: string) => name.slice(0, name.lastIndexOf(" ") + 1);
+const tail = (name: string) => name.slice(name.lastIndexOf(" ") + 1);
+
 export function WorkIndex({ projects }: { projects: Project[] }) {
   const listRef = useRef<HTMLOListElement>(null);
 
@@ -191,29 +195,32 @@ export function WorkIndex({ projects }: { projects: Project[] }) {
     <ol ref={listRef} className="work-index border-b border-line">
       {projects.map((project) => (
         <li key={project.key} data-project={project.key} className="work-row relative border-t border-line">
-          <div className="grid grid-cols-1 gap-y-2 py-6 md:grid-cols-12 md:items-baseline md:gap-x-6 md:py-8 lg:py-10">
-            <p data-label className="text-small font-medium text-ink-muted md:col-span-2">
+          <div className="grid grid-cols-1 gap-y-2 py-6 md:grid-cols-12 md:items-start md:gap-x-6 md:py-8 lg:py-10">
+            <p data-label className="text-small font-medium text-ink-muted md:col-span-12 lg:col-span-2 lg:pt-[0.7em]">
               {project.label}
             </p>
-            <h3 id={`work-${project.key}`} className="md:col-span-6 md:col-start-3">
+            <h3 id={`work-${project.key}`} className="md:col-span-8 lg:col-span-6 lg:col-start-3">
               <a
                 href={project.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="work-link outline-none after:absolute after:inset-0 after:content-['']"
               >
-                {/* The arrow is inline, so on a wrapped name it follows the last word. */}
+                {/* The arrow is glued to the last word, so a wrapped name never leaves it on a line of its own. */}
                 <span
                   data-name
                   className="work-name inline-block text-balance font-display text-[length:clamp(2rem,1.2rem+3.4vw,4.25rem)] leading-[1.02] font-medium tracking-[-0.02em] [font-stretch:100%] lg:[font-stretch:112%]"
                 >
-                  {project.name}
-                  <ArrowIcon direction="up-right" className="work-arrow ml-[0.25em] inline-block size-[0.4em] align-[0.1em]" />
+                  {head(project.name)}
+                  <span className="whitespace-nowrap">
+                    {tail(project.name)}
+                    <ArrowIcon direction="up-right" className="work-arrow ml-[0.25em] inline-block size-[0.4em] align-[0.1em]" />
+                  </span>
                 </span>
                 <span className="sr-only"> (opens in a new tab)</span>
               </a>
             </h3>
-            <p className="max-w-[34ch] text-pretty text-body text-ink-soft md:col-span-4 md:col-start-9 md:justify-self-end md:text-right">
+            <p className="max-w-[30ch] text-balance text-body text-ink-soft md:col-span-4 md:col-start-9 md:pt-3">
               {project.context}
             </p>
           </div>

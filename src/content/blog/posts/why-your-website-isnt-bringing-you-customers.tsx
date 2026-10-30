@@ -3,7 +3,7 @@ import type { PostMeta } from "@/lib/blog";
 
 export const meta: PostMeta = {
   slug: "why-your-website-isnt-bringing-you-customers",
-  title: "Why Your Website Isn't Bringing You Enough Customers",
+  title: "Why Your Website Isn’t Bringing You Enough Customers",
   description:
     "The most common, checkable reasons a UK small business website gets visitors but not enquiries — and what to check first before assuming you need more traffic.",
   date: "2026-09-15",

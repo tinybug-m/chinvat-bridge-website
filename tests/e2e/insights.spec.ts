@@ -1,21 +1,20 @@
 import { expect, test } from "@playwright/test";
 
 const ROWS = [
-  { slug: "where-the-name-chinvat-bridge-comes-from", title: "Where the Name Chinvat Bridge Comes From", category: "Our Name" },
   { slug: "where-ai-can-save-your-business-time", title: "Where AI Can Actually Save Your Business Time", category: "AI & Workflows" },
   { slug: "what-should-you-automate-first", title: "What Should You Automate First?", category: "Process Automation" },
-  { slug: "why-your-website-isnt-bringing-you-customers", title: "Why Your Website Isn't Bringing You Enough Customers", category: "SEO & Discovery" },
+  { slug: "why-your-website-isnt-bringing-you-customers", title: "Why Your Website Isn’t Bringing You Enough Customers", category: "SEO & Discovery" },
   { slug: "when-should-a-business-build-custom-software", title: "When Should a Business Build Custom Software?", category: "Software Strategy" },
 ];
 
 test.describe("insights section", () => {
-  test("five index rows link to their articles", async ({ page }) => {
+  test("four index rows link to their articles; the origin article is left to About", async ({ page }) => {
     await page.goto("/");
     const section = page.locator("#insights");
     await expect(section.getByRole("heading", { level: 2 })).toHaveText("Ideas and observations.");
     await expect(section).toHaveAttribute("aria-labelledby", "insights-title");
     const rows = section.locator("ol > li");
-    await expect(rows).toHaveCount(5);
+    await expect(rows).toHaveCount(4);
     for (const [index, { slug, title, category }] of ROWS.entries()) {
       const row = rows.nth(index);
       await expect(row.getByRole("heading", { level: 3 })).toHaveText(title);
@@ -27,6 +26,7 @@ test.describe("insights section", () => {
     await expect(section.getByRole("link", { name: /All insights/ })).toHaveAttribute("href", "/insights");
     // No summary line under the heading: the row categories already say what the writing covers.
     await expect(section).not.toContainText("Practical thinking about");
+    await expect(section.locator('a[href="/insights/where-the-name-chinvat-bridge-comes-from"]')).toHaveCount(0);
   });
 
   test("rows and the footer link are large enough to tap, with no overflow", async ({ page }) => {
@@ -60,7 +60,7 @@ test.describe("insights section", () => {
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
     await page.goto("/");
-    await expect(page.locator("#insights ol > li")).toHaveCount(5);
+    await expect(page.locator("#insights ol > li")).toHaveCount(4);
     await expect(page.locator("#insights ol a").first()).toBeVisible();
     await context.close();
   });

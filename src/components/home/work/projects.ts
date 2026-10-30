@@ -28,7 +28,7 @@ export const PROJECTS: Project[] = [
   {
     key: "benedict",
     name: "Benedict Funeral Directors",
-    context: "Funeral directors, Henlow Camp, Bedfordshire.",
+    context: "Funeral directors, Henlow\u00a0Camp, Bedfordshire.",
     label: "Concept",
     href: "https://benedict-funeral.vercel.app/",
     src: "/work/benedict.jpg",

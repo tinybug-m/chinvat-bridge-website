@@ -161,17 +161,20 @@ const PairLine = memo(function PairLine({ index, built }: { index: number; built
             >
               {today.label}
             </span>
-            <span aria-hidden="true" className="text-subheading text-ink-muted">
-              &rarr;
-            </span>
-            <span className="sr-only">to</span>
-            <span
-              className={cn(
-                "font-display text-heading transition-colors duration-200",
-                done ? "font-medium text-ink" : "text-ink-soft",
-              )}
-            >
-              {FUTURE_STATE_ITEMS[i].label}
+            {/* The arrow travels with the next label, so a wrapped pair reads "today" / "→ next". */}
+            <span className="inline-flex items-baseline gap-x-3">
+              <span aria-hidden="true" className="text-subheading text-ink-muted">
+                &rarr;
+              </span>
+              <span className="sr-only">to</span>
+              <span
+                className={cn(
+                  "font-display text-heading transition-colors duration-200",
+                  done ? "font-medium text-ink" : "text-ink-soft",
+                )}
+              >
+                {FUTURE_STATE_ITEMS[i].label}
+              </span>
             </span>
           </span>
         );

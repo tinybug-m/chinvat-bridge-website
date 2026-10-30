@@ -47,7 +47,7 @@ export function About() {
 
         <Reveal delay={80} className="lg:col-span-7 lg:col-start-1">
           <h3 className="text-small font-medium text-paper/70">The Name &amp; Origin</h3>
-          <p className="mt-4 max-w-[34ch] text-pretty font-display text-subheading font-medium lg:text-[clamp(1.5rem,1.1rem+0.9vw,2rem)] lg:leading-[1.25]">
+          <p className="mt-4 max-w-measure text-pretty text-lede text-paper">
             Chinvat Bridge is inspired by the ancient Persian concept of a bridge &mdash; a passage between one state
             and another. For us, it represents the transition from how a business works today to how it could work
             tomorrow.

@@ -18,11 +18,10 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
   {
     slug: "ai",
     Diagram: AiDiagram,
-    viewBox: "0 30 400 250",
-    draw: true,
+    viewBox: "0 24 400 270",
     tone: { title: "heading", link: "text" },
     layout: {
-      article: "mt-16 lg:mt-24",
+      article: "mt-10 lg:mt-12",
       grid: "lg:items-end",
       text: "lg:col-span-4 lg:col-start-9 lg:pb-8",
       figure: "svc-bleed-l lg:col-span-8 lg:col-start-1",

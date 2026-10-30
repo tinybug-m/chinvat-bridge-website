@@ -30,7 +30,7 @@ export function Method() {
           </p>
         </Reveal>
 
-        <ol className="mt-12 grid gap-x-10 gap-y-14 md:mt-16 lg:grid-cols-2">
+        <ol className="mt-12 grid gap-x-8 gap-y-14 md:mt-16 md:grid-cols-2 lg:gap-x-10">
           {PROCESS_STEPS.map((step, index) => {
             const Plate = METHOD_PLATES[index];
             return (

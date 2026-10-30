@@ -25,9 +25,11 @@ export function Contact() {
           <Reveal delay={80} className="mt-12 lg:mt-16">
             <a
               href={CONTACT_MAILTO}
-              className="block min-h-11 break-words text-heading font-medium leading-tight text-ink underline decoration-line-strong decoration-1 underline-offset-[0.2em] transition-[color,text-decoration-color] duration-200 hover:text-cobalt-700 hover:decoration-cobalt-700 sm:text-[clamp(1.5rem,1.1rem+1.2vw,2rem)] [overflow-wrap:anywhere]"
+              className="block min-h-11 break-normal text-heading font-medium leading-tight text-ink underline decoration-line-strong decoration-1 underline-offset-[0.2em] transition-[color,text-decoration-color] duration-200 hover:text-cobalt-700 hover:decoration-cobalt-700 sm:text-[clamp(1.5rem,1.1rem+1.2vw,2rem)] lg:text-[clamp(1.5rem,0.2rem+2.2vw,2rem)]"
             >
-              {CONTACT_EMAIL}
+              {/* A narrow screen may only break the address after the @. */}
+              {CONTACT_EMAIL.split("@")[0]}@<wbr />
+              {CONTACT_EMAIL.split("@")[1]}
             </a>
           </Reveal>
         </div>

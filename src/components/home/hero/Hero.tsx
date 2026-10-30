@@ -24,12 +24,12 @@ const rise = (delay: number) => ({ "--intro-delay": `${delay}ms` }) as CSSProper
 export function Hero() {
   return (
     <section data-hero aria-labelledby="hero-title" className="relative overflow-x-clip">
-      <Container className="relative grid grid-cols-1 lg:min-h-[max(100svh,46rem)] lg:grid-cols-12 lg:grid-rows-[1fr_auto] lg:gap-x-6">
+      <Container className="relative grid grid-cols-1 lg:min-h-[clamp(46rem,100svh,60rem)] lg:grid-cols-12 lg:grid-rows-[1fr_auto] lg:gap-x-6">
         <div className="pt-[calc(4rem+2.25rem)] lg:col-span-7 lg:col-start-1 lg:row-start-1 lg:self-center lg:pt-[calc(4.5rem+2rem)] lg:pb-12">
           <p className="intro-rise text-small text-ink-muted">{HERO_COPY.eyebrow}</p>
           <h1
             id="hero-title"
-            className="intro-rise mt-5 font-display text-display font-medium text-balance [font-stretch:100%] lg:mt-7 lg:[font-stretch:112%]"
+            className="intro-rise mt-5 font-display text-display font-medium text-balance [font-stretch:100%] lg:mt-7 xl:[font-stretch:112%]"
             style={rise(80)}
           >
             <span className="block font-normal lg:whitespace-nowrap">{HERO_COPY.titleDrawn}</span>{" "}
@@ -61,7 +61,7 @@ export function Hero() {
           {/* The seam: the object's axis, from the top of the hero to the foot of the figure. */}
           <span aria-hidden="true" className="absolute inset-y-0 left-1/2 w-px bg-line-strong lg:top-18 lg:left-[calc(50%+1.5rem)]" />
           <HeroObject
-            className="h-[38svh] max-h-[26rem] min-h-[17rem] lg:h-[min(40rem,calc(100svh-15rem))] lg:max-h-none lg:min-h-[28rem]"
+            className="h-[38svh] max-h-[26rem] min-h-[17rem] lg:h-[min(34rem,calc(100svh-15rem))] xl:h-[min(40rem,calc(100svh-15rem))] lg:max-h-none lg:min-h-[28rem]"
             sizes="(min-width: 64rem) 40rem, 26rem"
           >
             <SeamCaption />

@@ -18,7 +18,7 @@ import { SUPPORTING_CAPABILITIES } from "@/data/services";
  */
 export function Capabilities() {
   return (
-    <Section id="capabilities" labelledBy="capabilities-title">
+    <Section id="capabilities" labelledBy="capabilities-title" className="pt-12 lg:pt-16">
       <span id="machines" aria-hidden="true" className="absolute -top-px block scroll-mt-20" />
       <Container>
         <div className="grid gap-x-6 gap-y-6 lg:grid-cols-12 lg:items-end">
@@ -32,16 +32,16 @@ export function Capabilities() {
           </Reveal>
         </div>
 
-        <ul className="mt-12 grid list-none gap-x-6 border-b border-line sm:grid-cols-2 md:mt-16 lg:grid-cols-3">
+        <ul className="mt-12 grid list-none border-b border-line sm:grid-cols-2 md:mt-16 lg:grid-cols-3">
           {CAPABILITIES.map((capability, index) => (
             <Reveal
               as="li"
               key={capability.title}
               delay={(index % 3) * 60}
-              className="flex flex-row-reverse items-baseline justify-between gap-x-4 border-t border-line py-4 sm:block sm:pt-5 sm:pb-12"
+              className="flex flex-row-reverse items-baseline justify-between gap-x-4 border-t border-line py-4 sm:block sm:pt-5 sm:pr-6 sm:pb-12"
             >
               <p className="text-small text-ink-muted">{capability.category}</p>
-              <h3 className="text-balance sm:mt-1 font-display text-[length:clamp(1.75rem,1.3rem+1.8vw,2.75rem)] font-medium leading-[1.04] tracking-[-0.015em]">
+              <h3 className="text-balance sm:mt-1 font-display text-[length:clamp(1.5rem,1.2rem+1.2vw,2.25rem)] font-medium leading-[1.04] tracking-[-0.015em]">
                 {capability.title}
               </h3>
             </Reveal>

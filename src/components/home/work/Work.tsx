@@ -13,7 +13,7 @@ import "./work.css";
  */
 export function Work() {
   return (
-    <Section id="work" labelledBy="work-title" className="py-16 md:py-20 lg:py-24">
+    <Section id="work" labelledBy="work-title" className="pt-10 pb-16 md:pt-12 md:pb-20 lg:pt-14 lg:pb-24">
       <Container>
         <Reveal>
           <SectionHeading id="work-title" measure="max-w-[12ch]">

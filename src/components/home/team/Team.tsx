@@ -48,7 +48,7 @@ export function Team() {
                   {person.name}
                 </span>
                 <span className="sr-only">, </span>
-                <span className="text-subheading font-medium text-cobalt-700 lg:col-span-3 lg:col-start-10">
+                <span className="text-subheading font-medium text-ink-soft lg:col-span-3 lg:col-start-10">
                   {person.role}
                 </span>
               </div>

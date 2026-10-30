@@ -66,7 +66,7 @@ export function ServicePlate({ service, slug, Diagram, viewBox, draw, tone, layo
               id={headingId}
               className={cn(
                 "mt-3 text-balance font-display font-medium [font-stretch:100%] lg:[font-stretch:112%]",
-                tone.title === "title" ? "max-w-[12ch] text-title" : "max-w-[16ch] text-heading",
+                tone.title === "title" ? "max-w-[12ch] text-[length:clamp(2.25rem,1.6rem+1.8vw,3rem)] leading-[1.04] tracking-[-0.02em]" : "max-w-[20ch] text-heading",
               )}
             >
               {service.title}
