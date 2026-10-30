@@ -42,7 +42,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
   {
     slug: "software",
     Diagram: SoftwareDiagram,
-    viewBox: "0 36 400 244",
+    viewBox: "16 40 368 232",
     tone: { title: "heading", lede: true, link: "button", band: true },
     layout: {
       article: "mt-20 lg:mt-40",
@@ -55,7 +55,6 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
     slug: "seo",
     Diagram: SeoDiagram,
     viewBox: "0 40 400 240",
-    draw: true,
     tone: { title: "heading", link: "text" },
     layout: {
       article: "mt-24 lg:mt-36",

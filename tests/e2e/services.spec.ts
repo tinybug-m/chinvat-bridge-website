@@ -91,11 +91,11 @@ test.describe("services section", () => {
     const page = await context.newPage();
     await page.goto("/");
     await expect(page.locator("#services-ai h3")).toBeVisible();
-    // The SEO plate has no .svc-fill group any more: its stems carry their own motion (.grow-y).
-    const stem = page.locator("#services-seo .grow-y").first();
+    // The diagrams are authored in their END state; the START pose only exists in the loop.
+    const stem = page.locator("#services-seo .seo-stem").first();
     // 0.5 is the stems' authored opacity: any other value means a motion state leaked into the static render.
     expect(await stem.evaluate((el) => getComputedStyle(el).opacity)).toBe("0.5");
-    expect(await stem.evaluate((el) => getComputedStyle(el).scale)).toMatch(/^(none|1|1 1)$/);
+    expect(await stem.evaluate((el) => getComputedStyle(el).transform)).toBe("none");
     await context.close();
   });
 
@@ -113,6 +113,16 @@ test.describe("services section", () => {
       expect(await el.evaluate((node) => getComputedStyle(node).opacity)).toBe("0");
     }
     for (const el of await page.locator("#services-ai .ai-travel").all()) {
+      expect(await el.evaluate((node) => getComputedStyle(node).transform)).toBe("none");
+    }
+    // The other three plates share the .mx-* morph and must sit in END too.
+    for (const el of await page.locator("#services :is(.mx-end, .mx-in, .mx-grow, .mx-accent)").all()) {
+      expect(await el.evaluate((node) => getComputedStyle(node).opacity)).not.toBe("0");
+    }
+    for (const el of await page.locator("#services :is(.mx-start, .mx-guess)").all()) {
+      expect(await el.evaluate((node) => getComputedStyle(node).opacity)).toBe("0");
+    }
+    for (const el of await page.locator("#services :is(.mx-travel, .mx-grow)").all()) {
       expect(await el.evaluate((node) => getComputedStyle(node).transform)).toBe("none");
     }
     await context.close();
@@ -155,11 +165,26 @@ test.describe("services section", () => {
     await ctx.close();
   });
 
-  test("diagram draws in and builds on reveal", async ({ page }) => {
+  test("each diagram opens on its START pose and morphs to END", async ({ page }) => {
     await page.goto("/");
-    const fill = page.locator("#services-software .svc-fill").first();
-    // On narrow screens the diagram sits below the text, so scroll to it directly.
-    await page.locator("#services-software .svc-fig").scrollIntoViewIfNeeded();
-    await expect.poll(() => fill.evaluate((el) => getComputedStyle(el).opacity), { timeout: 5000 }).toBe("1");
+    for (const slug of ["ai", "automation", "software", "seo"]) {
+      const fig = page.locator(`#services-${slug} .svc-fig`);
+      // On narrow screens the diagram sits below the text, so scroll to it directly.
+      await fig.scrollIntoViewIfNeeded();
+      await expect(fig).toHaveAttribute("data-loop", "on", { timeout: 6000 });
+      // Seek every loop animation to 0% and to the END hold (80%): START shows its scaffolding, END its built detail.
+      const at = (pct: number) =>
+        fig.evaluate((el, pct) => {
+          for (const a of el.getAnimations({ subtree: true })) {
+            a.pause();
+            a.currentTime = Number(a.effect?.getTiming().delay ?? 0) + (pct / 100) * 10000;
+          }
+          const start = el.querySelector(".mx-guess, .mx-start, .ai-guess") as Element;
+          const end = el.querySelector(".mx-in, .ai-spoke") as Element;
+          return [getComputedStyle(start).opacity, getComputedStyle(end).opacity];
+        }, pct);
+      expect(await at(0)).toEqual(["1", "0"]);
+      expect(await at(80)).toEqual(["0", "1"]);
+    }
   });
 });

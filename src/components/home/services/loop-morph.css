@@ -1,0 +1,80 @@
+/*
+ * START -> END morph for the Automation, Software and SEO plates (the AI
+ * plate has its own, loop-ai.css, on the same clock). See loop.css for the
+ * loop contract; the one difference is that 0% / 100% here are the START
+ * state, not the settled design. The SVG is authored in the END state, and
+ * the fill also runs backwards, so the plate shows START from first paint
+ * while the loop is paused and the morph is the first thing it plays.
+ * Reduced motion and no-JS never get here and keep the authored END state.
+ * The node classes are described in diagrams.tsx (Shared morph).
+ *
+ *    0 - 14   START holds
+ *   12 - 24   START-only scaffolding fades
+ *   14 - 48   nodes travel into place
+ *   34 - 46   drawn faces give way to built ones
+ *   50 - 66   END-only detail arrives (bars grow)
+ *   70 - 80   saffron accent lands last
+ *   80 - 84   END holds
+ *   82 - 100  ease back to START
+ */
+.svc-fig .mx {
+  --loop-duration: 10s;
+  --loop-start: 0.6s;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js-reveal .svc-fig .mx .loop { animation-fill-mode: both; }
+  .js-reveal .svc-fig .mx-guess.loop { animation-name: mx-guess; }
+  .js-reveal .svc-fig .mx-travel.loop { animation-name: mx-travel; transform-box: fill-box; transform-origin: center; }
+  .js-reveal .svc-fig .mx-start.loop { animation-name: mx-start; }
+  .js-reveal .svc-fig .mx-end.loop { animation-name: mx-end; }
+  .js-reveal .svc-fig .mx-in.loop { animation-name: mx-in; }
+  .js-reveal .svc-fig .mx-grow.loop { animation-name: mx-grow; transform-box: fill-box; transform-origin: var(--o, 50% 100%); }
+  .js-reveal .svc-fig .mx-accent.loop { animation-name: mx-accent; transform-box: fill-box; transform-origin: center; }
+  .js-reveal .svc-fig .auto-pulse.loop { animation-name: auto-pulse; }
+}
+
+@keyframes mx-guess {
+  0%, 12% { opacity: 1; }
+  24%, 92% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes mx-travel {
+  0%, 14% { transform: translate(var(--sx), var(--sy)) rotate(var(--sr)) scale(1, var(--ssy)); }
+  48%, 82% { transform: translate(0, 0) rotate(0deg) scale(1, 1); }
+  100% { transform: translate(var(--sx), var(--sy)) rotate(var(--sr)) scale(1, var(--ssy)); }
+}
+@keyframes mx-start {
+  0%, 34% { opacity: 1; }
+  46%, 86% { opacity: 0; }
+  96%, 100% { opacity: 1; }
+}
+@keyframes mx-end {
+  0%, 34% { opacity: 0; }
+  46%, 86% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+@keyframes mx-in {
+  0%, 50% { opacity: 0; }
+  60%, 82% { opacity: 1; }
+  90%, 100% { opacity: 0; }
+}
+@keyframes mx-grow {
+  0%, 52% { opacity: 0; transform: scale(1, 0); animation-timing-function: var(--ease-out-quart); }
+  54% { opacity: 1; }
+  66%, 82% { opacity: 1; transform: scale(1, 1); animation-timing-function: var(--ease-drawn); }
+  90%, 100% { opacity: 0; transform: scale(1, 0); }
+}
+@keyframes mx-accent {
+  0%, 70% { opacity: 0; transform: scale(0.85); animation-timing-function: var(--ease-out-expo); }
+  76% { opacity: 1; transform: scale(1.06); animation-timing-function: var(--ease-drawn); }
+  80%, 84% { opacity: 1; transform: scale(1); }
+  90%, 100% { opacity: 0; transform: scale(0.85); }
+}
+/* Automation: the pulse runs the built pipeline (--run) and arrives with the ring. */
+@keyframes auto-pulse {
+  0%, 60% { opacity: 0; transform: translate(0, 0); }
+  62% { opacity: 1; transform: translate(0, 0); animation-timing-function: var(--ease-drawn); }
+  75% { opacity: 1; transform: translate(var(--run), 0); }
+  78%, 100% { opacity: 0; transform: translate(var(--run), 0); }
+}

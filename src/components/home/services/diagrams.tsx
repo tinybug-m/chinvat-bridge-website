@@ -1,21 +1,18 @@
 import type { CSSProperties, ReactNode } from "react";
-import { drawProps } from "@/components/motion/draw";
 import { cn } from "@/lib/utils";
 import "./diagrams.css";
 import "./loop-ai.css";
-import "./loop-automation.css";
-import "./loop-seo.css";
-import "./loop-software.css";
+import "./loop-morph.css";
 
 /*
- * Four diagrams on a 400 x 300 board. Left of x = 200 is drawn (hairlines,
- * dashes, unfilled), right of it is built (solid ink, fills): the same
- * subject before and after. `svc-*` classes are animated by services.css.
+ * Four diagrams on a 400 x 300 board. Each is one composition that morphs
+ * from a START state (drawn: hairlines, dashes, loose and unfilled) into an
+ * END state (built: solid ink, fills, the saffron accent last) and back, on
+ * the Services loop (loop.css). Nodes are authored at END, so reduced
+ * motion and no-JS show the finished design.
  *
- * A group that carries per-node motion (grow, pop, draw) is `noclip`, so the
- * group wipe does not cut its children. Per-node delays below are in ms on the
- * plate clock: built 700, fill 1100, accent 1700 (the --svc-t-* tokens), and
- * every plate ends with its saffron accent.
+ * Drawn / Built / Fill are shared with the Method plates, which still wipe
+ * in on reveal (services.css).
  */
 
 export const PAPER = "var(--color-paper)";
@@ -193,180 +190,232 @@ export function AiDiagram() {
   );
 }
 
+/* ----------------------------------------------------- Shared morph */
+
+/*
+ * Automation, Software and SEO morph START -> END the same way, on the
+ * shared clock in loop-morph.css. Every node is authored at its END place;
+ * the loop poses it at START:
+ *   .mx-travel  a group that travels from START (--sx, --sy, --sr, --ssy) to END
+ *   .mx-start   the START face of a node (authored hidden)
+ *   .mx-end     its END face
+ *   .mx-guess   START-only scaffolding (authored hidden)
+ *   .mx-in      END-only detail that arrives once the nodes have landed
+ *   .mx-grow    END-only bar or line growing from --o (default its base)
+ *   .mx-accent  the saffron accent, which lands last
+ */
+
+/** A travelling group: CSS start offset, rotation and vertical stretch. */
+function travel(sx: number, sy: number, sr = 0, ssy = 1) {
+  return vars({ "--sx": `${sx}px`, "--sy": `${sy}px`, "--sr": `${sr}deg`, "--ssy": ssy });
+}
+
+/** A node with a drawn START face and a built END face, travelling as one. */
+function Node({ from, start, end }: { from: CSSProperties; start: ReactNode; end: ReactNode }) {
+  return (
+    <g className="mx-travel loop" style={from}>
+      <g className="mx-start loop text-control" fill={PAPER} stroke="currentColor" strokeWidth="1" opacity="0">
+        {start}
+      </g>
+      <g className="mx-end loop">{end}</g>
+    </g>
+  );
+}
+
 /* -------------------------------------------------------- Automation */
 
-const AUTO_ZIGZAG: [number, number][] = [
-  [28, 236],
-  [124, 214],
-  [40, 184],
-  [150, 166],
-  [56, 128],
-  [166, 104],
+/** The pipeline: three boxes (x of the left edge), triggers above, outputs below. */
+const AUTO_BOXES = [122, 182, 242];
+const AUTO_Y = 150;
+/** The manual steps: a zigzag over the board, each landing on a trigger (t) or a box (b). */
+const AUTO_STEPS: { at: [number, number]; to: ["t" | "b", number]; r: number }[] = [
+  { at: [48, 236], to: ["b", 0], r: -10 },
+  { at: [300, 214], to: ["b", 2], r: 12 },
+  { at: [76, 184], to: ["t", 0], r: 8 },
+  { at: [332, 166], to: ["t", 2], r: -14 },
+  { at: [104, 128], to: ["b", 1], r: 6 },
+  { at: [316, 100], to: ["t", 1], r: -8 },
 ];
-const AUTO_BOXES = [214, 274, 334];
-/** When the pulse (diagrams.css, 1.4s from the accent time) reaches each box, in ms from the reveal. */
-const AUTO_BOX_HIT = [1914, 2125, 2940];
+const arrow = (x1: number, x2: number) => `M${x1} ${AUTO_Y} H${x2} M${x2 - 5} ${AUTO_Y - 5} L${x2} ${AUTO_Y} L${x2 - 5} ${AUTO_Y + 5}`;
 
 export function AutomationDiagram() {
+  const last = AUTO_BOXES[2] + 18;
   return (
-    <>
-      <Drawn>
-        <polyline points={[...AUTO_ZIGZAG, [200, 150]].map((p) => p.join(" ")).join(" ")} strokeDasharray={DASH} />
-        {AUTO_ZIGZAG.map(([x, y]) => (
-          <rect key={`${x}${y}`} x={x - 5} y={y - 5} width="10" height="10" fill={PAPER} />
-        ))}
-        <g className="text-line-strong" strokeDasharray={DASH}>
-          <line x1="24" y1="272" x2="196" y2="272" />
-          <line x1="24" y1="60" x2="196" y2="60" />
+    <g className="mx">
+      <g className="mx-guess loop text-control" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray={DASH} opacity="0">
+        <polyline points={AUTO_STEPS.map(({ at }) => at.join(" ")).join(" ")} />
+        <g className="text-line-strong">
+          <line x1="24" y1="272" x2="376" y2="272" />
+          <line x1="24" y1="60" x2="376" y2="60" />
         </g>
-      </Drawn>
-      <Built>
-        <path d="M200 150 H212 M210 145 L215 150 L210 155" />
-        {AUTO_BOXES.slice(0, 2).map((x) => (
-          <path key={x} d={`M${x + 36} 150 H${x + 58} M${x + 53} 145 L${x + 58} 150 L${x + 53} 155`} />
+      </g>
+      {/* The wiring arrives once the steps have landed. */}
+      <g className="text-ink" fill="none" stroke="currentColor" strokeWidth="1.5">
+        {[[96, AUTO_BOXES[0] - 2], ...AUTO_BOXES.slice(0, 2).map((x) => [x + 38, x + 58])].map(([x1, x2], i) => (
+          <path key={x1} className="mx-in loop" style={vars({ "--loop-d": `${i * 0.1}s` })} d={arrow(x1, x2)} />
         ))}
-        {AUTO_BOXES.map((x) => (
-          <g key={`s${x}`} strokeWidth="1" opacity="0.55">
+        {AUTO_BOXES.map((x, i) => (
+          <g key={`s${x}`} className="mx-in loop" style={vars({ "--loop-d": `${i * 0.1}s` })} strokeWidth="1" opacity="0.55">
             <line x1={x + 18} y1="82" x2={x + 18} y2="132" />
             <line x1={x + 18} y1="168" x2={x + 18} y2="226" />
           </g>
         ))}
-        {AUTO_BOXES.map((x) => (
-          <rect key={`t${x}`} x={x + 11} y="68" width="14" height="14" fill={PAPER} strokeWidth="1.2" />
-        ))}
-      </Built>
-      <Fill>
-        <g className="text-ink" fill="currentColor" stroke="none">
-          {AUTO_BOXES.map((x, i) => (
-            <g
-              key={`b${x}`}
-              className="loop auto-box-loop"
-              style={vars({ "--loop-d": `${i * 0.88}s` })}
-            >
-              <rect
-                className="auto-box"
-                style={vars({ "--pd": `${AUTO_BOX_HIT[i]}ms` })}
-                x={x}
-                y="132"
-                width="36"
-                height="36"
-              />
-            </g>
-          ))}
-          {AUTO_BOXES.map((x) => (
-            <circle key={`d${x}`} cx={x + 18} cy="230" r="4" />
-          ))}
-        </g>
-        <g stroke={PAPER} strokeWidth="1.5" fill="none">
-          <circle cx="232" cy="150" r="4" />
-          <path d="M283 145 H301 M283 155 H301" />
-        </g>
-      </Fill>
-      {/* The ring lands as the pulse arrives. The wrapper carries the loop's pulse. */}
-      <g className="loop auto-ring-loop">
-        <circle
-          className="pop"
-          style={vars({ "--delay": "2800ms" })}
-          cx="352"
-          cy="150"
-          r="8"
-          fill="none"
-          stroke={SAFFRON}
-          strokeWidth="2"
-        />
       </g>
-      {/* One saffron dot runs the pipeline once, seam to ring (diagrams.css). */}
-      <circle className="auto-pulse" cx="200" cy="150" r="3.5" fill={SAFFRON} />
-      {/* Loop marker (loop-automation.css): wanders the zigzag, crosses the seam, runs the pipeline. Hidden at rest. */}
-      <circle className="loop auto-loop-dot" cx="28" cy="236" r="3.5" fill={SAFFRON} />
-    </>
+      {AUTO_STEPS.map(({ at: [sx, sy], to: [kind, i], r }) => {
+        const cx = AUTO_BOXES[i] + 18;
+        const cy = kind === "b" ? AUTO_Y : 75;
+        return (
+          <Node
+            key={`${sx}${sy}`}
+            from={travel(sx - cx, sy - cy, r)}
+            start={<rect x={cx - 5} y={cy - 5} width="10" height="10" />}
+            end={
+              kind === "b" ? (
+                <rect className="text-ink" x={cx - 18} y={cy - 18} width="36" height="36" fill="currentColor" />
+              ) : (
+                <rect className="text-ink" x={cx - 7} y={cy - 7} width="14" height="14" fill={PAPER} stroke="currentColor" strokeWidth="1.2" />
+              )
+            }
+          />
+        );
+      })}
+      <g className="text-ink" fill="currentColor" stroke="none">
+        {AUTO_BOXES.map((x, i) => (
+          <circle key={`d${x}`} className="mx-in loop" style={vars({ "--loop-d": `${i * 0.1}s` })} cx={x + 18} cy="230" r="4" />
+        ))}
+      </g>
+      <g className="mx-in loop" stroke={PAPER} strokeWidth="1.5" fill="none">
+        <circle cx={AUTO_BOXES[0] + 18} cy={AUTO_Y} r="4" />
+        <path d={`M${AUTO_BOXES[1] + 9} 145 H${AUTO_BOXES[1] + 27} M${AUTO_BOXES[1] + 9} 155 H${AUTO_BOXES[1] + 27}`} />
+      </g>
+      {/* A saffron pulse runs the finished pipeline; the ring lands as it arrives. */}
+      <circle
+        className="auto-pulse loop"
+        style={vars({ "--run": `${last - 96}px` })}
+        cx="96"
+        cy={AUTO_Y}
+        r="3.5"
+        fill={SAFFRON}
+        opacity="0"
+      />
+      <circle className="mx-accent loop" cx={last} cy={AUTO_Y} r="8" fill="none" stroke={SAFFRON} strokeWidth="2" />
+    </g>
   );
 }
 
 /* ---------------------------------------------------------- Software */
 
+/** One interface, x 120 to 280: frame, sidebar (40 wide) and a content column. */
+const SW_X = 120;
+const SW_C = SW_X + 52;
 const BARS = [24, 40, 32, 54, 44];
+const SW_NAV = [92, 104, 116, 128];
 
-/** One interface layout, drawn at x = 24 and built at x = 216. */
-function Wire({ ox, built }: { ox: number; built: boolean }) {
-  const content = ox + 52;
-  return (
-    <>
-      <rect x={ox} y="48" width="160" height="216" fill={built ? "var(--color-paper-raised)" : "none"} />
-      <line x1={ox} y1="76" x2={ox + 160} y2="76" />
-      <rect x={ox} y="76" width="40" height="188" fill={built ? "var(--color-haze)" : "none"} />
-      {[92, 104, 116, 128].map((y) => (
-        <line key={y} x1={ox + 8} y1={y} x2={ox + 32} y2={y} />
-      ))}
-      <rect x={content} y="92" width="64" height="8" />
-      <line x1={content} y1="112" x2={content + 96} y2="112" />
-      <line x1={content} y1="122" x2={content + 78} y2="122" />
-      <rect x={content} y="136" width="46" height="46" />
-      <rect x={content + 54} y="136" width="46" height="46" />
-      {built ? null : (
-        <path className="sw-x loop" d={`M${content} 136 L${content + 46} 182 M${content + 46} 136 L${content} 182`} strokeWidth="0.75" />
-      )}
-      <line x1={content} y1="252" x2={content + 100} y2="252" />
-      {BARS.map((h, i) => (
-        <rect key={h} x={content + 2 + i * 20} y={252 - h} width="12" height={h} />
-      ))}
-    </>
-  );
-}
+/**
+ * The interface in pieces, each scattered at START (dx, dy, rotation) and
+ * assembled at END. `draw` renders the piece; `built` is false for the
+ * dashed START face.
+ */
+const SW_PIECES: { from: [number, number, number]; draw: (built: boolean) => ReactNode }[] = [
+  {
+    from: [-6, 6, -2],
+    draw: (built) => (
+      <rect x={SW_X} y="48" width="160" height="216" fill={built ? "var(--color-paper-raised)" : "none"} />
+    ),
+  },
+  { from: [-40, -6, -6], draw: () => <rect x={SW_X} y="48" width="160" height="28" fill="none" /> },
+  {
+    from: [-84, 8, 5],
+    draw: (built) => (
+      <>
+        <rect x={SW_X} y="76" width="40" height="188" fill={built ? "var(--color-haze)" : "none"} />
+        {SW_NAV.map((y) => (
+          <line key={y} x1={SW_X + 8} y1={y} x2={SW_X + 32} y2={y} />
+        ))}
+      </>
+    ),
+  },
+  { from: [120, -30, 8], draw: () => <rect x={SW_C} y="92" width="64" height="8" fill="none" /> },
+  {
+    from: [110, 10, -5],
+    draw: () => (
+      <>
+        <line x1={SW_C} y1="112" x2={SW_C + 96} y2="112" />
+        <line x1={SW_C} y1="122" x2={SW_C + 78} y2="122" />
+      </>
+    ),
+  },
+  {
+    from: [-120, 40, -10],
+    draw: (built) => (
+      <>
+        <rect x={SW_C} y="136" width="46" height="46" fill="none" />
+        {built ? null : (
+          <path d={`M${SW_C} 136 L${SW_C + 46} 182 M${SW_C + 46} 136 L${SW_C} 182`} strokeWidth="0.75" />
+        )}
+      </>
+    ),
+  },
+  { from: [100, 60, 9], draw: () => <rect x={SW_C + 54} y="136" width="46" height="46" fill="none" /> },
+  {
+    from: [-110, 6, 6],
+    draw: () => (
+      <>
+        <line x1={SW_C} y1="252" x2={SW_C + 100} y2="252" />
+        {BARS.map((h, i) => (
+          <rect key={h} x={SW_C + 2 + i * 20} y={252 - h} width="12" height={h} fill="none" />
+        ))}
+      </>
+    ),
+  },
+];
 
 export function SoftwareDiagram() {
-  const ox = 216;
-  const content = ox + 52;
   return (
-    <>
-      <Drawn>
-        <g className="sw-wire loop" strokeDasharray={DASH}>
-          <Wire ox={24} built={false} />
+    <g className="mx">
+      {SW_PIECES.map(({ from: [dx, dy, r], draw }, i) => (
+        <g key={i} className="mx-travel loop" style={{ ...travel(dx, dy, r), ...vars({ "--loop-d": `${(i % 3) * 0.08}s` }) }}>
+          <g className="mx-start loop text-control" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray={DASH} opacity="0">
+            {draw(false)}
+          </g>
+          <g className="mx-end loop text-ink" fill="none" stroke="currentColor" strokeWidth="1.5">
+            {draw(true)}
+          </g>
         </g>
-      </Drawn>
-      <Built>
-        <Wire ox={ox} built />
-      </Built>
-      <Fill>
-        <g className="text-ink t-fill" fill="currentColor" stroke="none">
-          <rect x={ox} y="48" width="160" height="28" />
-          <rect x={content} y="92" width="64" height="8" />
-          <rect x={content} y="110" width="96" height="4" opacity="0.45" />
-          <rect x={content} y="120" width="78" height="4" opacity="0.45" />
-          <rect className="sw-tile loop" x={content} y="136" width="46" height="46" />
-          {BARS.map((h, i) => (
-            <rect
-              key={h}
-              className="grow-y grow-base sw-bar loop"
-              style={vars({ "--i": i, "--loop-d": `${i * 0.1}s` })}
-              x={content + 2 + i * 20}
-              y={252 - h}
-              width="12"
-              height={h}
-            />
-          ))}
-          {[92, 104, 116, 128].map((y, i) => (
-            <rect key={y} x={ox + 8} y={y - 1.5} width={i === 0 ? 24 : 18} height="3" opacity="0.7" />
+      ))}
+      {/* Fills arrive once the pieces have assembled; the bars grow last. */}
+      <g className="text-ink" fill="currentColor" stroke="none">
+        <g className="mx-in loop">
+          <rect x={SW_X} y="48" width="160" height="28" />
+          <g fill={PAPER}>
+            {[0, 1, 2].map((i) => (
+              <circle key={i} cx={SW_X + 12 + i * 10} cy="62" r="2.5" />
+            ))}
+          </g>
+        </g>
+        <g className="mx-in loop" style={vars({ "--loop-d": "0.1s" })}>
+          <rect x={SW_C} y="92" width="64" height="8" />
+          <rect x={SW_C} y="110" width="96" height="4" opacity="0.45" />
+          <rect x={SW_C} y="120" width="78" height="4" opacity="0.45" />
+          {SW_NAV.map((y, i) => (
+            <rect key={y} x={SW_X + 8} y={y - 1.5} width={i === 0 ? 24 : 18} height="3" opacity="0.7" />
           ))}
         </g>
-        <g fill={PAPER} stroke="none">
-          {[0, 1, 2].map((i) => (
-            <circle key={i} cx={ox + 12 + i * 10} cy="62" r="2.5" />
-          ))}
-        </g>
-        <circle
-          className="pop sw-ring loop"
-          style={vars({ "--delay": "1900ms" })}
-          cx={content + 77}
-          cy="159"
-          r="7"
-          fill="none"
-          stroke={SAFFRON}
-          strokeWidth="1.5"
-        />
-      </Fill>
-      <circle className="sw-marker loop" cx={76 + 23} cy="159" r="4" fill={SAFFRON} opacity="0" />
-    </>
+        <rect className="mx-in loop" style={vars({ "--loop-d": "0.2s" })} x={SW_C} y="136" width="46" height="46" />
+        {BARS.map((h, i) => (
+          <rect
+            key={h}
+            className="mx-grow loop"
+            style={vars({ "--loop-d": `${0.2 + i * 0.08}s` })}
+            x={SW_C + 2 + i * 20}
+            y={252 - h}
+            width="12"
+            height={h}
+          />
+        ))}
+      </g>
+      <circle className="mx-accent loop" cx={SW_C + 77} cy="159" r="7" fill="none" stroke={SAFFRON} strokeWidth="1.5" />
+    </g>
   );
 }
 
@@ -383,17 +432,17 @@ function rng(seed: number) {
   };
 }
 
+const round = (n: number) => Math.round(n * 10) / 10;
+
+/** Noise strokes over the whole board: centre, angle (deg) and length. */
 const NOISE = (() => {
   const next = rng(7);
-  return Array.from({ length: 44 }, () => {
-    const x = 28 + next() * 150;
-    const y = 62 + next() * 186;
-    const angle = next() * Math.PI;
-    const half = 4 + next() * 5;
-    const dx = Math.cos(angle) * half;
-    const dy = Math.sin(angle) * half;
-    return [x - dx, y - dy, x + dx, y + dy].map((n) => Math.round(n * 10) / 10) as [number, number, number, number];
-  });
+  return Array.from({ length: 44 }, () => ({
+    x: round(28 + next() * 344),
+    y: round(62 + next() * 186),
+    angle: round(next() * 180),
+    length: round(8 + next() * 10),
+  }));
 })();
 
 const BASE_Y = 256;
@@ -401,7 +450,7 @@ const SIGNAL = Array.from({ length: 15 }, (_, i) => {
   const t = i / 14;
   const wobble = [0, 6, -4, 5, -3, 4, -5, 3, -2, 3, -1, 2, 0, 1, 0][i];
   return {
-    x: 218 + i * 11.5,
+    x: 74 + i * 18,
     top: Math.round(BASE_Y - (14 + 168 * t ** 1.6 + wobble)),
   };
 });
@@ -409,90 +458,64 @@ const HIGHLIGHT = 11;
 
 export function SeoDiagram() {
   const pick = SIGNAL[HIGHLIGHT];
+  const rest = NOISE.slice(SIGNAL.length);
   return (
-    <>
-      <Drawn>
+    <g className="mx">
+      <g className="mx-guess loop text-control" fill="none" stroke="currentColor" strokeWidth="1" opacity="0">
         <g className="text-line-strong" strokeDasharray={DASH}>
-          {[96, 156, 216].map((y) => (
-            <line key={y} x1="24" y1={y} x2="196" y2={y} />
-          ))}
-          <line x1="24" y1={BASE_Y} x2="196" y2={BASE_Y} />
-        </g>
-        <g className="seo-noise loop">
-          {NOISE.map(([x1, y1, x2, y2]) => (
-            <line key={`${x1}${y1}`} x1={x1} y1={y1} x2={x2} y2={y2} />
+          {[96, 156, 216, BASE_Y].map((y) => (
+            <line key={y} x1="24" y1={y} x2="376" y2={y} />
           ))}
         </g>
-      </Drawn>
-      <Built>
-        {/* The baseline runs to the edge of the board, which the plate bleeds to the edge of the viewport. */}
-        <line x1="204" y1={BASE_Y} x2="400" y2={BASE_Y} />
+        {/* The noise that is not picked up fades as ONE group. */}
+        {rest.map(({ x, y, angle, length }) => {
+          const dx = round((Math.cos((angle * Math.PI) / 180) * length) / 2);
+          const dy = round((Math.sin((angle * Math.PI) / 180) * length) / 2);
+          return <line key={`${x}${y}`} x1={x - dx} y1={y - dy} x2={x + dx} y2={y + dy} />;
+        })}
+      </g>
+      {/* The baseline runs to the edge of the board, which the plate bleeds to the edge of the viewport. */}
+      <Built noclip>
+        <line className="mx-in loop" x1="24" y1={BASE_Y} x2="400" y2={BASE_Y} />
       </Built>
-      {/*
-        The signal rises out of the noise: stems grow from the baseline, left to
-        right, the trace follows and the dots ride up with their stems (same
-        timing, so each dot stays on its stem top). Only vertical motion, so the
-        plate never widens past the viewport. The noise itself stays still.
-      */}
-      <Built noclip className="t-built">
-        {SIGNAL.map(({ x, top }, i) => (
-          <line
-            key={x}
-            className="grow-y grow-base seo-stem loop"
-            style={vars({ "--i": i, "--loop-d": `${i * 100}ms` })}
-            x1={x}
-            y1={BASE_Y}
-            x2={x}
-            y2={top}
-            strokeWidth="1.25"
-            opacity="0.5"
-          />
-        ))}
-        <path
-          d={`M${SIGNAL.map(({ x, top }) => `${x} ${top}`).join(" L")}`}
-          {...drawProps(1.5, { delay: 900, duration: 1000 })}
-          className="draw seo-trace loop"
-        />
+      {/* Each stem starts as a noise stroke: it travels, turns upright and stretches to its height. */}
+      <g className="text-ink" stroke="currentColor" strokeWidth="1.25">
+        {SIGNAL.map(({ x, top }, i) => {
+          const n = NOISE[i];
+          const h = BASE_Y - top;
+          return (
+            <line
+              key={x}
+              className="seo-stem mx-travel loop"
+              style={{ ...travel(n.x - x, n.y - (BASE_Y + top) / 2, n.angle - 90, n.length / h), ...vars({ "--loop-d": `${i * 0.04}s` }) }}
+              x1={x}
+              y1={BASE_Y}
+              x2={x}
+              y2={top}
+              opacity="0.5"
+            />
+          );
+        })}
+      </g>
+      <g className="text-ink" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path className="mx-in loop" d={`M${SIGNAL.map(({ x, top }) => `${x} ${top}`).join(" L")}`} />
         <line
-          className="grow-y grow-base"
-          style={vars({ "--i": HIGHLIGHT })}
+          className="mx-in loop"
+          style={vars({ "--loop-d": "0.3s" })}
           x1={pick.x}
           y1={pick.top}
           x2={pick.x}
           y2={BASE_Y}
           strokeDasharray={DASH}
         />
-      </Built>
-      <g className="text-ink t-built" fill="currentColor" stroke="none">
-        {SIGNAL.map(({ x, top }, i) => (
-          <circle
-            key={x}
-            className="rise-in seo-dot loop"
-            style={vars({ "--i": i, "--rise-y": `${BASE_Y - top}px`, "--loop-d": `${i * 100}ms` })}
-            cx={x}
-            cy={top}
-            r="2.5"
-          />
-        ))}
-        <circle
-          className="rise-in seo-dot loop"
-          style={vars({ "--i": HIGHLIGHT, "--rise-y": `${BASE_Y - pick.top}px`, "--loop-d": `${HIGHLIGHT * 100}ms` })}
-          cx={pick.x}
-          cy={pick.top}
-          r="5.5"
-        />
       </g>
-      <circle
-        className="pop seo-ring loop"
-        style={vars({ "--delay": "1900ms", "--rise-y": `${BASE_Y - pick.top}px`, "--loop-d": `${HIGHLIGHT * 100}ms` })}
-        cx={pick.x}
-        cy={pick.top}
-        r="11"
-        fill="none"
-        stroke={SAFFRON}
-        strokeWidth="1.5"
-      />
-      <circle className="seo-marker loop" cx="150" cy="176" r="3.5" fill={SAFFRON} stroke="none" opacity="0" />
-    </>
+      <g className="text-ink" fill="currentColor" stroke="none">
+        {SIGNAL.map(({ x, top }, i) => (
+          <circle key={x} className="mx-in loop" style={vars({ "--loop-d": `${i * 0.03}s` })} cx={x} cy={top} r="2.5" />
+        ))}
+        <circle className="mx-in loop" style={vars({ "--loop-d": "0.3s" })} cx={pick.x} cy={pick.top} r="5.5" />
+      </g>
+      <circle className="mx-accent loop" cx={pick.x} cy={pick.top} r="11" fill="none" stroke={SAFFRON} strokeWidth="1.5" />
+    </g>
   );
 }

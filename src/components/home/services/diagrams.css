@@ -1,9 +1,6 @@
 /*
- * Per-plate motion for diagrams.tsx, on the plate clock in services.css (the
- * generic helpers are in styles/motion.css). Everything that hides or moves a
- * node sits under no-preference and waits for [data-revealed], so the finished
- * plate is the default under reduced motion and without JavaScript. One-shot,
- * no loops.
+ * Shared figure styles for diagrams.tsx (the generic helpers are in
+ * styles/motion.css; the Services loops are in loop*.css).
  */
 
 /* Bars and stems grow from their own base: bottom centre of the node's box. */
@@ -15,72 +12,4 @@
 /* .draw lines in a figure compensate their stroke against the figure's width. */
 .svc-fig.draw-scope {
   container-type: inline-size;
-}
-
-/* Automation: the pulse starts hidden, so the settled plate does not show it. */
-.auto-pulse {
-  opacity: 0;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  /* AI: a loose circle settles onto its line from --dx / --dy. */
-  .js-reveal [data-reveal] .drift {
-    transition:
-      opacity var(--motion-slow) var(--ease-out-quart),
-      translate var(--motion-slow) var(--ease-out-expo);
-    transition-delay: calc(var(--delay, 0ms) + min(var(--i, 0) * var(--stagger-step), var(--stagger-max)));
-  }
-
-  .js-reveal [data-reveal]:not([data-revealed]) .drift {
-    opacity: 0;
-    translate: var(--dx, 0px) var(--dy, 0px);
-  }
-
-  /*
-   * Automation: the dot runs x 200 -> 352 (the 152px) with the drawn easing
-   * while its opacity is a separate, linear animation (a keyframed ease would
-   * restart at every stop). Each box swells as the dot passes (--pd).
-   */
-  .js-reveal .svc-fig[data-revealed] .auto-pulse {
-    animation:
-      auto-pulse-run 1400ms var(--ease-drawn) var(--svc-t-accent) both,
-      auto-pulse-fade 1400ms linear var(--svc-t-accent) both;
-  }
-
-  .js-reveal .svc-fig[data-revealed] .auto-box {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: auto-box-swell var(--motion-base) var(--ease-out-quart) var(--pd, 0ms) both;
-  }
-}
-
-@keyframes auto-pulse-run {
-  from {
-    translate: 0 0;
-  }
-
-  to {
-    translate: 152px 0;
-  }
-}
-
-@keyframes auto-pulse-fade {
-  0% {
-    opacity: 0;
-  }
-
-  8%,
-  90% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes auto-box-swell {
-  50% {
-    scale: 1.06;
-  }
 }
