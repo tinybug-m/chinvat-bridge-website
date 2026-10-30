@@ -9,26 +9,29 @@ import type { StageHandle } from "@/components/three/core/types";
 import { BRIDGE_POSTERS, BRIDGE_SEAM } from "@/components/three/scenes/bridge/config";
 import { CURRENT_STATE_ITEMS, FUTURE_STATE_ITEMS } from "@/data/transition";
 import { cn } from "@/lib/utils";
-import { BridgeRows } from "./BridgeRows";
 import { SeamSlider } from "./SeamSlider";
 
 /*
- * The seam, its stage and the rows that follow it. The value is the share
- * modernised (0..100); the seam sits at (100 - value)% of the stage width,
- * loose stone slabs on its left, one level deck on its right.
+ * The seam, its stage and the caption that follows it. The value is the
+ * share modernised (0..100); the seam sits at (100 - value)% of the stage
+ * width, loose stone slabs on its left, one level deck on its right.
  *
  * Scrolling moves it: as the stage rises through the viewport the seam
  * sweeps from today (0) to the future (100), and back as the page scrolls
  * up. The slider is a manual override: the value the visitor sets fades back
  * into the scroll position over the next stretch of scrolling (never a snap),
- * and a keyboard user on the handle is left alone. The rows under the stage
- * flip as they come into view, not while still off screen. Reduced motion and
- * no JS never scroll-drive it.
+ * and a keyboard user on the handle is left alone. Reduced motion and no JS
+ * never scroll-drive it.
+ *
+ * The caption under the stage names the one pair the seam is crossing (see
+ * crossing()), so the five comparisons are read one at a time as the seam
+ * sweeps instead of as a list. It sits right under the stage, so it follows
+ * the value directly and needs no gate of its own.
  *
  * The fractional value lives in a ref and goes straight to --seam (the line,
  * the handle, the poster split; set on the frame only) and the scene; React
- * only hears about whole steps, which is all the slider, the readout and the
- * rows need. There is exactly one ease: scroll and the slider both set a
+ * only hears about whole steps, which is all the slider and the caption
+ * need. There is exactly one ease: scroll and the slider both set a
  * target and one rAF loop carries the value to it (quicker while the visitor
  * is dragging, so the handle stays under the pointer). The scene takes that
  * eased value as is and does not smooth it again.
@@ -43,11 +46,23 @@ const loadBridgeScene = () => import("@/components/three/scenes/bridge");
 
 const ROW_COUNT = CURRENT_STATE_ITEMS.length;
 
-/** Row i flips once the seam has passed (i + 0.5) / 5. */
+/** Pair i is built once the seam has passed (i + 0.5) / 5. */
 export function modernisedCount(value: number) {
   let count = 0;
   for (let i = 0; i < ROW_COUNT; i++) if (value / 100 + 1e-6 >= (i + 0.5) / ROW_COUNT) count++;
   return count;
+}
+
+/**
+ * The pair the seam is crossing. Each pair owns one fifth of the sweep (pair i from i * 20 to
+ * (i + 1) * 20) and is built at its midpoint, the same point modernisedCount counts it: so at 0 the
+ * caption shows the first pair as it is today, at 10 that pair turns built, at 20 the next pair
+ * comes in as it is today, and so on to 100, where the last pair is built. Every pair is seen in
+ * both states on the way across, and scrolling back plays it in reverse.
+ */
+export function crossing(value: number) {
+  const index = Math.min(ROW_COUNT - 1, Math.floor((value * ROW_COUNT) / 100));
+  return { index, built: modernisedCount(value) > index };
 }
 
 const posterLayer = cn(
@@ -72,8 +87,6 @@ const SWEEP_TO = 0.45;
 const SWEEP_MIN_PX = 420;
 /** A value the visitor set fades back into the scroll position over this much scrolling (px). */
 const HOLD_FADE = 320;
-/** A row flips once its top is above this share of the viewport height. */
-const ROW_GATE = 0.8;
 /** Time constant (ms) of the ease that carries the seam to its scroll position, so wheel notches glide. */
 const FOLLOW_MS = 110;
 /** The same ease, tighter, while the slider is in use: the handle must stay close to the pointer. */
@@ -114,36 +127,77 @@ const Posters = memo(function Posters() {
   );
 });
 
+/*
+ * The live line under the stage: today -> next for the pair the seam is crossing. All five pairs
+ * sit in one grid cell, so the line keeps the height of the tallest (two lines on a phone) and the
+ * page never shifts when the pair changes; only the current one is visible, the rest are hidden
+ * from assistive tech too. Until the seam passes the pair's midpoint, today carries the weight and
+ * the next state waits in soft ink; past it, today is struck through and the next state is set in
+ * ink. A change of pair is a short crossfade, the old line leaving upwards as the seam builds (and
+ * downwards on the way back); under reduced motion it simply swaps.
+ */
+const PairLine = memo(function PairLine({ index, built }: { index: number; built: boolean }) {
+  return (
+    <p data-testid="approach-pair" data-pair={index} data-state={built ? "built" : "drawn"} className="mt-3 grid">
+      {CURRENT_STATE_ITEMS.map((today, i) => {
+        const done = i < index || (i === index && built);
+        return (
+          <span
+            key={today.label}
+            aria-hidden={i === index ? undefined : true}
+            className={cn(
+              "col-start-1 row-start-1 flex flex-wrap items-baseline gap-x-3 gap-y-1",
+              "ease-out-quart motion-safe:transition-[opacity,translate,visibility] motion-safe:duration-[320ms]",
+              i === index ? "opacity-100" : "invisible opacity-0",
+              i < index && "motion-safe:-translate-y-2",
+              i > index && "motion-safe:translate-y-2",
+            )}
+          >
+            <span
+              className={cn(
+                "text-subheading transition-colors duration-200",
+                done ? "text-ink-soft line-through decoration-ink-muted decoration-1" : "font-medium text-ink",
+              )}
+            >
+              {today.label}
+            </span>
+            <span aria-hidden="true" className="text-subheading text-ink-muted">
+              &rarr;
+            </span>
+            <span className="sr-only">to</span>
+            <span
+              className={cn(
+                "font-display text-heading transition-colors duration-200",
+                done ? "font-medium text-ink" : "text-ink-soft",
+              )}
+            >
+              {FUTURE_STATE_ITEMS[i].label}
+            </span>
+          </span>
+        );
+      })}
+    </p>
+  );
+});
+
 /** Server render; constant, so React never rewrites what drive() sets. */
 const INITIAL_STYLE = { "--seam": seamOffset(BRIDGE_SEAM.initial) } as CSSProperties;
 
 export function BridgeSeam({ className }: { className?: string }) {
   const [value, setValue] = useState<number>(BRIDGE_SEAM.initial);
-  const [rows, setRows] = useState(() => modernisedCount(BRIDGE_SEAM.initial));
   const handle = useRef<StageHandle>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const fraction = useRef<number>(BRIDGE_SEAM.initial);
   const shown = useRef<number>(BRIDGE_SEAM.initial);
-  const shownRows = useRef(rows);
   const target = useRef<number>(BRIDGE_SEAM.initial);
   /** The visitor's last value, as its distance from the scroll position at the time, and where the page was. */
   const manual = useRef<{ at: number; offset: number } | null>(null);
-  /** How many rows have come into view; all of them until the scroll handler says otherwise. */
-  const gate = useRef(ROW_COUNT);
   const sweepAt = useRef(() => BRIDGE_SEAM.initial as number);
   /** Starts the ease toward target (set while the effect is live); null under reduced motion, where values apply at once. */
   const startEase = useRef<((tau: number) => void) | null>(null);
-  /** True while the slider's own value, not the eased one, is what the slider and the rows show. */
+  /** True while the slider's own value, not the eased one, is what the slider and the caption show. */
   const owned = useRef(false);
-
-  // Rows follow the value, but (under scroll) only once they are in view; a visitor's own value flips them at once.
-  const syncRows = useCallback(() => {
-    const next = manual.current ? modernisedCount(shown.current) : Math.min(modernisedCount(shown.current), gate.current);
-    if (next === shownRows.current) return;
-    shownRows.current = next;
-    setRows(next);
-  }, []);
 
   const drive = useCallback(
     (next: number) => {
@@ -153,29 +207,27 @@ export function BridgeSeam({ className }: { className?: string }) {
       handle.current?.set("built", next / 100);
       // The slider's value was set when it moved; the eased fraction only catches up with it.
       if (owned.current) return;
-      // Whole steps only: the slider, the readout and the rows follow the rounded value.
+      // Whole steps only: the slider and the caption follow the rounded value.
       const rounded = Math.round(next);
       if (rounded === shown.current) return;
       shown.current = rounded;
       setValue(rounded);
-      syncRows();
     },
-    [syncRows],
+    [],
   );
 
   const slide = useCallback(
     (next: number) => {
       manual.current = { at: window.scrollY, offset: next - sweepAt.current() };
       target.current = next;
-      // The slider and the rows take the visitor's value at once (a held key steps from it, not from the eased one).
+      // The slider and the caption take the visitor's value at once (a held key steps from it, not from the eased one).
       owned.current = true;
       shown.current = next;
       setValue(next);
-      syncRows();
       if (startEase.current) startEase.current(DRAG_FOLLOW_MS);
       else drive(next);
     },
-    [drive, syncRows],
+    [drive],
   );
 
   useEffect(() => {
@@ -185,7 +237,6 @@ export function BridgeSeam({ className }: { className?: string }) {
     const frame = frameRef.current;
     if (!root || !frame) return;
     const thumb = frame.querySelector<HTMLElement>("[role=slider]");
-    const items = root.querySelectorAll("ol > li");
 
     // The height is kept until the width changes: a phone's address bar growing or shrinking
     // resizes the window height and would otherwise move the seam with no scrolling.
@@ -219,9 +270,8 @@ export function BridgeSeam({ className }: { className?: string }) {
     startEase.current = begin;
     const follow = (jump = false) => {
       queued = 0;
-      gate.current = Array.from(items).filter((item) => item.getBoundingClientRect().top < vh * ROW_GATE).length;
       // Someone using the keyboard on the handle owns the value (focusing it can scroll the page a long way).
-      if (thumb?.matches(":focus-visible")) return syncRows();
+      if (thumb?.matches(":focus-visible")) return;
       let next = sweepAt.current();
       const held = manual.current;
       if (held) {
@@ -231,7 +281,6 @@ export function BridgeSeam({ className }: { className?: string }) {
       }
       target.current = next;
       owned.current = false;
-      syncRows();
       if (jump) drive(next);
       else begin(FOLLOW_MS);
     };
@@ -246,7 +295,7 @@ export function BridgeSeam({ className }: { className?: string }) {
       onScroll();
     };
 
-    // Only listen while the stage or its rows are near the screen; the last call on the way out settles the end value.
+    // Only listen while the stage is near the screen; the last call on the way out settles the end value.
     let listening = false;
     const listen = (on: boolean) => {
       if (on === listening) return;
@@ -271,10 +320,11 @@ export function BridgeSeam({ className }: { className?: string }) {
       cancelAnimationFrame(easing);
       startEase.current = null;
     };
-  }, [drive, syncRows]);
+  }, [drive]);
 
   const count = modernisedCount(value);
-  const valueText = `${value}% modernised: ${count} of ${ROW_COUNT}`;
+  const pair = crossing(value);
+  const valueText = `${value}% modernised: ${CURRENT_STATE_ITEMS[pair.index].label} to ${FUTURE_STATE_ITEMS[pair.index].label}`;
 
   return (
     <div ref={rootRef} className={className}>
@@ -313,26 +363,28 @@ export function BridgeSeam({ className }: { className?: string }) {
         </div>
         <script dangerouslySetInnerHTML={{ __html: FIRST_SEAM }} />
 
-        <Container as="figcaption" className="mt-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 text-small">
-          <span id="approach-seam-label" className="font-medium text-ink">
-            Move the seam
-          </span>
-          <span className="text-ink-muted" data-testid="approach-readout">
-            {count === 0 ? "Everything as it is today" : count === ROW_COUNT ? "Everything improved" : "Partly improved"}
-          </span>
+        {/*
+          * The caption: the slider's label, five ticks (one per pair, ink once built; decorative, the
+          * valuetext and the line below carry it), then the live line naming the pair being crossed.
+          * It replaces the old count readout; no aria-live, it would chatter all through a scroll.
+          */}
+        <Container as="figcaption" className="mt-5 md:mt-6">
+          <div className="flex items-center justify-between gap-6 text-small">
+            <span id="approach-seam-label" className="font-medium text-ink">
+              Move the seam
+            </span>
+            <span aria-hidden="true" className="flex gap-1.5">
+              {CURRENT_STATE_ITEMS.map((item, i) => (
+                <span
+                  key={item.label}
+                  className={cn("h-0.5 w-5 transition-colors duration-200", i < count ? "bg-ink" : "bg-line-strong")}
+                />
+              ))}
+            </span>
+          </div>
+          <PairLine index={pair.index} built={pair.built} />
         </Container>
       </figure>
-
-      <Container>
-        <p className="mt-6 max-w-measure text-pretty text-small text-ink-muted">
-          A later Pahlavi tradition describes the bridge as narrow as a razor or nine lances wide, depending on who
-          crosses. We borrow only the picture: friction narrows the way, better systems widen it.
-          <span className="mt-1.5 block font-label text-label uppercase">
-            Later tradition: Dadestan i Denig 21.5; Denkard 809
-          </span>
-        </p>
-        <BridgeRows current={CURRENT_STATE_ITEMS} next={FUTURE_STATE_ITEMS} count={rows} className="mt-14 md:mt-20" />
-      </Container>
     </div>
   );
 }

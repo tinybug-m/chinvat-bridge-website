@@ -52,17 +52,6 @@
     transform-origin: center;
     animation: auto-box-swell var(--motion-base) var(--ease-out-quart) var(--pd, 0ms) both;
   }
-
-  /* Balance: the beam starts tilted and settles level about the pivot, the top centre of its box. */
-  .js-reveal .svc-fig .bal-beam {
-    transform-box: fill-box;
-    transform-origin: 50% 0;
-    transition: rotate var(--motion-intro) var(--ease-out-expo) var(--svc-t-fill);
-  }
-
-  .js-reveal .svc-fig:not([data-revealed]) .bal-beam {
-    rotate: 3deg;
-  }
 }
 
 @keyframes auto-pulse-run {

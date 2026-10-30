@@ -496,38 +496,3 @@ export function SeoDiagram() {
     </>
   );
 }
-
-/* ------------------------------------------------------------ Balance */
-
-/*
- * Rashn's balance, level: a beam on a post at the seam, drawn (dashed) on the
- * left and built (solid) on the right. Both pans hang at the same height
- * because the balance favours no one. Cropped by the caller to 110 80 180 110.
- */
-export function BalanceDiagram() {
-  return (
-    <>
-      {/* The beam, hangers and pans swing together about the pivot, then settle level (diagrams.css). */}
-      <g className="bal-beam">
-        <Drawn>
-          <g strokeDasharray={DASH}>
-            <line x1="140" y1="92" x2="200" y2="92" />
-            <path d="M140 92 L124 138 M140 92 L156 138" strokeWidth="0.75" />
-            <line x1="120" y1="138" x2="160" y2="138" />
-          </g>
-        </Drawn>
-        <Built>
-          <line x1="200" y1="92" x2="260" y2="92" />
-          <path d="M260 92 L244 138 M260 92 L276 138" strokeWidth="1" />
-          <line x1="240" y1="138" x2="280" y2="138" />
-        </Built>
-      </g>
-      <Built>
-        <path d="M200 176 V92 M176 176 H224" />
-      </Built>
-      <Fill>
-        <circle cx="200" cy="92" r="5" stroke={SAFFRON} strokeWidth="1.5" fill={PAPER} />
-      </Fill>
-    </>
-  );
-}
