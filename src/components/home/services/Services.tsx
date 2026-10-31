@@ -7,36 +7,37 @@ import { AiDiagram, AutomationDiagram, SeoDiagram, SoftwareDiagram } from "./dia
 import { ServicePlate, type PlateProps } from "./ServicePlate";
 
 /*
- * One entry per service, in the same order as SERVICES. The plates differ on
- * purpose: AI is large and bleeds off the left edge, Automation's diagram is
- * compact and dropped level with its description, Software sits wide on the
- * left on a full-bleed haze band, SEO bleeds off the right edge. `svc-bleed-*`
- * run to the viewport edge on purpose: the section clips the overhang. `tone`
- * varies the text: title scale, description size and how the link looks.
+ * One entry per service, in the same order as SERVICES. The plates vary
+ * their placement (AI and Software on the left, Automation dropped below its
+ * title on the right, SEO bleeding off the right edge; the section clips the
+ * overhang) but every diagram draws at one scale: six columns on desktop
+ * and a crop about 368 units wide (SEO's 400 includes its bleed), at most
+ * 40rem below lg. `tone` varies the text: title scale, description size and
+ * how the link looks.
  */
 const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" | "layout">[] = [
   {
     slug: "ai",
     Diagram: AiDiagram,
-    viewBox: "0 24 400 270",
+    viewBox: "16 24 368 270",
     tone: { title: "heading", link: "text" },
     layout: {
       article: "mt-10 lg:mt-12",
       grid: "lg:items-end",
       text: "lg:col-span-4 lg:col-start-9 lg:pb-8",
-      figure: "svc-bleed-l lg:col-span-8 lg:col-start-1",
+      figure: "max-w-[40rem] lg:col-span-6 lg:col-start-2 lg:max-w-none",
     },
   },
   {
     slug: "automation",
     Diagram: AutomationDiagram,
-    viewBox: "0 50 400 230",
+    viewBox: "16 66 368 168",
     tone: { title: "title", link: "text" },
     layout: {
       article: "mt-24 lg:mt-36",
       grid: "lg:items-start",
       text: "lg:col-span-5 lg:col-start-1",
-      figure: "w-[85%] justify-self-end lg:col-span-4 lg:col-start-8 lg:mt-40 lg:w-auto lg:justify-self-auto",
+      figure: "max-w-[40rem] lg:col-span-6 lg:col-start-7 lg:mt-32 lg:max-w-none",
     },
   },
   {
@@ -48,7 +49,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
       article: "mt-20 lg:mt-40",
       grid: "lg:items-center",
       text: "lg:col-span-4 lg:col-start-8",
-      figure: "lg:col-span-6 lg:col-start-1",
+      figure: "max-w-[40rem] lg:col-span-6 lg:col-start-1 lg:max-w-none",
     },
   },
   {
@@ -60,7 +61,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
       article: "mt-24 lg:mt-36",
       grid: "lg:items-start",
       text: "lg:col-span-4 lg:col-start-1 lg:pt-12",
-      figure: "svc-bleed-r lg:col-span-7 lg:col-start-6",
+      figure: "svc-bleed-r lg:col-span-6 lg:col-start-7",
     },
   },
 ];

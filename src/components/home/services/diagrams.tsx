@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import "./diagrams.css";
 import "./loop-ai.css";
 import "./loop-morph.css";
+import "./explore.css";
 
 /*
  * Four diagrams on a 400 x 300 board. Each is one composition that morphs
@@ -186,6 +187,32 @@ export function AiDiagram() {
         );
       })}
       <circle className="ai-ring loop" cx={hx} cy={hy} r={hr + 9} fill="none" stroke={SAFFRON} strokeWidth="1.5" />
+      {/* Explore: signal flows from every node into the hub; a hovered node lights its own spoke. */}
+      <g fill="none" stroke={SAFFRON} strokeLinecap="round">
+        {AI_GRAPH.map(([x, y, r], i) => {
+          // Run edge to edge: from the node's rim to the hub's.
+          const len = Math.hypot(x - hx, y - hy);
+          const at = (k: number) => `${round(hx + (x - hx) * k)} ${round(hy + (y - hy) * k)}`;
+          const d = `M${at(1 - (r + 2) / len)} L${at((hr + 2) / len)}`;
+          return (
+            <g key={`p${x}${y}`} className="pick">
+              <path
+                className="xp-flow"
+                style={vars({ "--xp-d": `${i * 0.32}s` })}
+                d={d}
+                pathLength="100"
+                strokeWidth="2.5"
+                strokeDasharray="10 100"
+              />
+              <g className="pick-hl">
+                <path d={d} strokeWidth="1.5" />
+                <circle cx={x} cy={y} r={r + 6} strokeWidth="1.5" />
+              </g>
+              <circle className="pick-hit" cx={x} cy={y} r="22" />
+            </g>
+          );
+        })}
+      </g>
     </g>
   );
 }
@@ -224,81 +251,216 @@ function Node({ from, start, end }: { from: CSSProperties; start: ReactNode; end
 
 /* -------------------------------------------------------- Automation */
 
-/** The pipeline: three boxes (x of the left edge), triggers above, outputs below. */
-const AUTO_BOXES = [122, 182, 242];
+/*
+ * A workflow on a dotted canvas: trigger, step, a branch, two paths that
+ * merge into one result. At START the same six nodes are loose manual tasks
+ * scattered over the board, joined by a dashed hand-off trail.
+ */
 const AUTO_Y = 150;
-/** The manual steps: a zigzag over the board, each landing on a trigger (t) or a box (b). */
-const AUTO_STEPS: { at: [number, number]; to: ["t" | "b", number]; r: number }[] = [
-  { at: [48, 236], to: ["b", 0], r: -10 },
-  { at: [300, 214], to: ["b", 2], r: 12 },
-  { at: [76, 184], to: ["t", 0], r: 8 },
-  { at: [332, 166], to: ["t", 2], r: -14 },
-  { at: [104, 128], to: ["b", 1], r: 6 },
-  { at: [316, 100], to: ["t", 1], r: -8 },
+const CARD = "var(--color-paper-raised)";
+/** Node centres at END. */
+const AUTO = {
+  trigger: [52, AUTO_Y],
+  step: [134, AUTO_Y],
+  branch: [200, AUTO_Y],
+  top: [281, 98],
+  bottom: [281, 202],
+  done: [354, AUTO_Y],
+} as const;
+type AutoNode = keyof typeof AUTO;
+/** Where each node starts as a manual task (centre and tilt), in hand-off order. */
+const AUTO_LOOSE: { node: AutoNode; at: [number, number]; r: number }[] = [
+  { node: "trigger", at: [60, 212], r: -10 },
+  { node: "branch", at: [96, 104], r: 8 },
+  { node: "bottom", at: [172, 218], r: 6 },
+  { node: "done", at: [234, 92], r: -8 },
+  { node: "step", at: [300, 206], r: 12 },
+  { node: "top", at: [344, 126], r: -14 },
 ];
-const arrow = (x1: number, x2: number) => `M${x1} ${AUTO_Y} H${x2} M${x2 - 5} ${AUTO_Y - 5} L${x2} ${AUTO_Y} L${x2 - 5} ${AUTO_Y + 5}`;
+
+/** Connectors, port to port; rounded orthogonal elbows at the split and the merge. */
+const elbow = (x1: number, y1: number, xm: number, x2: number, y2: number) => {
+  const s = Math.sign(y2 - y1) * 6;
+  return `M${x1} ${y1} H${xm - 6} Q${xm} ${y1} ${xm} ${y1 + s} V${y2 - s} Q${xm} ${y2} ${xm + 6} ${y2} H${x2}`;
+};
+/** Connectors; `branch` marks the two either side of a branch card (explore.css swaps which is idle). */
+const AUTO_LINKS: { d: string; branch?: "a" | "b" }[] = [
+  { d: `M79 ${AUTO_Y} H101` },
+  { d: `M167 ${AUTO_Y} H186` },
+  { d: elbow(214, AUTO_Y, 232, 248, 98), branch: "a" },
+  { d: elbow(214, AUTO_Y, 232, 248, 202), branch: "b" },
+  { d: elbow(314, 98, 328, 341, AUTO_Y), branch: "a" },
+  { d: elbow(314, 202, 328, 341, AUTO_Y), branch: "b" },
+];
+/** The route a run takes from the trigger to the result, through the branch card at y. */
+const route = (y: number) =>
+  `M76 ${AUTO_Y} H214 ${elbow(214, AUTO_Y, 232, 314, y).slice(`M214 ${AUTO_Y}`.length)} ${elbow(314, y, 328, 341, AUTO_Y).slice(`M314 ${y}`.length)}`;
+const AUTO_RUN = route(98);
+/** Ports on the card edges. */
+const AUTO_PORTS: [number, number][] = [
+  [76, AUTO_Y],
+  [104, AUTO_Y],
+  [164, AUTO_Y],
+  [251, 98],
+  [311, 98],
+  [251, 202],
+  [311, 202],
+];
+
+/** A step card (60 x 32 or 36), with an icon and two lines of label. */
+function StepCard({ cx, cy, h = 32, icon }: { cx: number; cy: number; h?: number; icon: ReactNode }) {
+  const x = cx - 30;
+  return (
+    <g className="text-ink">
+      <rect x={x} y={cy - h / 2} width="60" height={h} rx="4" fill={CARD} stroke="currentColor" strokeWidth="1.25" />
+      <g fill="currentColor">
+        {icon}
+        <rect x={x + 26} y={cy - 4.5} width="26" height="3" rx="1.5" />
+        <rect x={x + 26} y={cy + 1.5} width="18" height="3" rx="1.5" opacity="0.4" />
+      </g>
+    </g>
+  );
+}
+
+const AUTO_FACES: Record<AutoNode, ReactNode> = {
+  trigger: (
+    <g className="text-ink">
+      <rect x="28" y={AUTO_Y - 18} width="48" height="36" rx="18" fill="currentColor" />
+      <path d={`M54 ${AUTO_Y - 10} L45 ${AUTO_Y + 1} H51 L49 ${AUTO_Y + 10} L58 ${AUTO_Y - 2} H52 Z`} fill={PAPER} />
+    </g>
+  ),
+  step: <StepCard cx={134} cy={AUTO_Y} h={36} icon={<rect x="112" y={AUTO_Y - 7} width="14" height="14" rx="2" />} />,
+  branch: (
+    <g className="text-ink">
+      <path
+        d={`M200 ${AUTO_Y - 14} L214 ${AUTO_Y} L200 ${AUTO_Y + 14} L186 ${AUTO_Y} Z`}
+        fill={CARD}
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinejoin="round"
+      />
+      <path d={`M200 ${AUTO_Y - 4} L204 ${AUTO_Y} L200 ${AUTO_Y + 4} L196 ${AUTO_Y} Z`} fill="currentColor" />
+    </g>
+  ),
+  top: (
+    <g className="auto-a">
+      <StepCard cx={281} cy={98} icon={<circle cx="265" cy="98" r="7" />} />
+    </g>
+  ),
+  bottom: (
+    <g className="auto-b">
+      <StepCard
+        cx={281}
+        cy={202}
+        icon={<rect x="258.5" y="195.5" width="13" height="13" rx="2" fill="none" stroke="currentColor" strokeWidth="1.25" />}
+      />
+    </g>
+  ),
+  done: (
+    <g className="text-ink">
+      <circle cx="354" cy={AUTO_Y} r="13" fill="currentColor" />
+      <path
+        d={`M348 ${AUTO_Y} L352 ${AUTO_Y + 4} L360 ${AUTO_Y - 4}`}
+        fill="none"
+        stroke={PAPER}
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+  ),
+};
 
 export function AutomationDiagram() {
-  const last = AUTO_BOXES[2] + 18;
   return (
     <g className="mx">
+      <defs>
+        <pattern id="auto-dots" width="14" height="14" patternUnits="userSpaceOnUse">
+          <circle cx="7" cy="7" r="0.8" fill="currentColor" />
+        </pattern>
+        <radialGradient id="auto-fade">
+          <stop offset="0.55" stopColor="#fff" />
+          <stop offset="1" stopColor="#fff" stopOpacity="0" />
+        </radialGradient>
+        <mask id="auto-canvas">
+          <rect x="12" y="62" width="376" height="176" fill="url(#auto-fade)" />
+        </mask>
+      </defs>
+      {/* The canvas the workflow is laid out on; it holds through the loop. */}
+      <rect
+        className="text-line-strong"
+        x="12"
+        y="62"
+        width="376"
+        height="176"
+        fill="url(#auto-dots)"
+        mask="url(#auto-canvas)"
+        opacity="0.6"
+      />
       <g className="mx-guess loop text-control" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray={DASH} opacity="0">
-        <polyline points={AUTO_STEPS.map(({ at }) => at.join(" ")).join(" ")} />
-        <g className="text-line-strong">
-          <line x1="24" y1="272" x2="376" y2="272" />
-          <line x1="24" y1="60" x2="376" y2="60" />
-        </g>
+        <polyline points={AUTO_LOOSE.map(({ at }) => at.join(" ")).join(" ")} />
       </g>
-      {/* The wiring arrives once the steps have landed. */}
-      <g className="text-ink" fill="none" stroke="currentColor" strokeWidth="1.5">
-        {[[96, AUTO_BOXES[0] - 2], ...AUTO_BOXES.slice(0, 2).map((x) => [x + 38, x + 58])].map(([x1, x2], i) => (
-          <path key={x1} className="mx-in loop" style={vars({ "--loop-d": `${i * 0.1}s` })} d={arrow(x1, x2)} />
-        ))}
-        {AUTO_BOXES.map((x, i) => (
-          <g key={`s${x}`} className="mx-in loop" style={vars({ "--loop-d": `${i * 0.1}s` })} strokeWidth="1" opacity="0.55">
-            <line x1={x + 18} y1="82" x2={x + 18} y2="132" />
-            <line x1={x + 18} y1="168" x2={x + 18} y2="226" />
+      {/* The connectors arrive once the nodes have landed; the branch not taken stays quiet. */}
+      <g className="text-ink" fill="none" stroke="currentColor" strokeWidth="1.25">
+        {AUTO_LINKS.map(({ d, branch }, i) => (
+          <g key={d} className={branch && `auto-${branch}-link`}>
+            <path className="mx-in loop" style={vars({ "--loop-d": `${(i >> 1) * 0.1}s` })} d={d} />
           </g>
         ))}
       </g>
-      {AUTO_STEPS.map(({ at: [sx, sy], to: [kind, i], r }) => {
-        const cx = AUTO_BOXES[i] + 18;
-        const cy = kind === "b" ? AUTO_Y : 75;
+      {/* A run travels the taken route, behind the cards, and arrives with the ring. */}
+      <path
+        className="auto-pulse loop"
+        d={AUTO_RUN}
+        pathLength="100"
+        fill="none"
+        stroke={SAFFRON}
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeDasharray="8 100"
+        opacity="0"
+      />
+      {/* Explore: runs keep flowing; hovering the other branch card sends them that way. */}
+      <g fill="none" stroke={SAFFRON} strokeWidth="3" strokeLinecap="round" strokeDasharray="8 100">
+        {[98, 202].map((y) => (
+          <g key={y} className={y === 98 ? "auto-run-a" : "auto-run-b"}>
+            {[0, 1].map((n) => (
+              <path key={n} className="xp-flow" style={vars({ "--xp-d": `${n * 1.1}s`, "--xp-t": "2.2s" })} d={route(y)} pathLength="100" />
+            ))}
+          </g>
+        ))}
+      </g>
+      {AUTO_LOOSE.map(({ node, at: [sx, sy], r }) => {
+        const [cx, cy] = AUTO[node];
         return (
           <Node
-            key={`${sx}${sy}`}
+            key={node}
             from={travel(sx - cx, sy - cy, r)}
-            start={<rect x={cx - 5} y={cy - 5} width="10" height="10" />}
-            end={
-              kind === "b" ? (
-                <rect className="text-ink" x={cx - 18} y={cy - 18} width="36" height="36" fill="currentColor" />
-              ) : (
-                <rect className="text-ink" x={cx - 7} y={cy - 7} width="14" height="14" fill={PAPER} stroke="currentColor" strokeWidth="1.2" />
-              )
-            }
+            start={<rect x={cx - 8} y={cy - 6} width="16" height="12" rx="1" />}
+            end={AUTO_FACES[node]}
           />
         );
       })}
-      <g className="text-ink" fill="currentColor" stroke="none">
-        {AUTO_BOXES.map((x, i) => (
-          <circle key={`d${x}`} className="mx-in loop" style={vars({ "--loop-d": `${i * 0.1}s` })} cx={x + 18} cy="230" r="4" />
+      <g className="mx-in loop text-ink" fill={CARD} stroke="currentColor" strokeWidth="1.25">
+        {AUTO_PORTS.map(([x, y]) => (
+          <circle key={`${x}${y}`} className={y > AUTO_Y ? "auto-b-port" : undefined} cx={x} cy={y} r="2.5" />
         ))}
       </g>
-      <g className="mx-in loop" stroke={PAPER} strokeWidth="1.5" fill="none">
-        <circle cx={AUTO_BOXES[0] + 18} cy={AUTO_Y} r="4" />
-        <path d={`M${AUTO_BOXES[1] + 9} 145 H${AUTO_BOXES[1] + 27} M${AUTO_BOXES[1] + 9} 155 H${AUTO_BOXES[1] + 27}`} />
+      <circle className="mx-accent loop" cx={AUTO.done[0]} cy={AUTO_Y} r="20" fill="none" stroke={SAFFRON} strokeWidth="1.5" />
+      {/* Hovering a card outlines it; the bottom card also takes the run. */}
+      <g fill="none" stroke={SAFFRON} strokeWidth="1.5">
+        {[
+          { x: 24, y: AUTO_Y - 22, w: 56, h: 44, rx: 22 },
+          { x: 100, y: AUTO_Y - 22, w: 68, h: 44, rx: 7 },
+          { x: 247, y: 78, w: 68, h: 40, rx: 7 },
+          { x: 247, y: 182, w: 68, h: 40, rx: 7, b: true },
+        ].map(({ x, y, w, h, rx, b }) => (
+          <g key={x + y} className={cn("pick", b && "auto-b-hit")}>
+            <rect className="pick-hl" x={x} y={y} width={w} height={h} rx={rx} />
+            <rect className="pick-hit" x={x} y={y} width={w} height={h} />
+          </g>
+        ))}
       </g>
-      {/* A saffron pulse runs the finished pipeline; the ring lands as it arrives. */}
-      <circle
-        className="auto-pulse loop"
-        style={vars({ "--run": `${last - 96}px` })}
-        cx="96"
-        cy={AUTO_Y}
-        r="3.5"
-        fill={SAFFRON}
-        opacity="0"
-      />
-      <circle className="mx-accent loop" cx={last} cy={AUTO_Y} r="8" fill="none" stroke={SAFFRON} strokeWidth="2" />
     </g>
   );
 }
@@ -329,21 +491,21 @@ const SW_PIECES: { from: [number, number, number]; draw: (built: boolean) => Rea
     draw: (built) => (
       <>
         <rect x={SW_X} y="76" width="40" height="188" fill={built ? "var(--color-haze)" : "none"} />
-        {SW_NAV.map((y) => (
-          <line key={y} x1={SW_X + 8} y1={y} x2={SW_X + 32} y2={y} />
-        ))}
+        {/* Built, the nav and the text are the fills that arrive after (mx-in). */}
+        {built ? null : SW_NAV.map((y) => <line key={y} x1={SW_X + 8} y1={y} x2={SW_X + 32} y2={y} />)}
       </>
     ),
   },
   { from: [120, -30, 8], draw: () => <rect x={SW_C} y="92" width="64" height="8" fill="none" /> },
   {
     from: [110, 10, -5],
-    draw: () => (
-      <>
-        <line x1={SW_C} y1="112" x2={SW_C + 96} y2="112" />
-        <line x1={SW_C} y1="122" x2={SW_C + 78} y2="122" />
-      </>
-    ),
+    draw: (built) =>
+      built ? null : (
+        <>
+          <line x1={SW_C} y1="112" x2={SW_C + 96} y2="112" />
+          <line x1={SW_C} y1="122" x2={SW_C + 78} y2="122" />
+        </>
+      ),
   },
   {
     from: [-120, 40, -10],
@@ -415,6 +577,26 @@ export function SoftwareDiagram() {
         ))}
       </g>
       <circle className="mx-accent loop" cx={SW_C + 77} cy="159" r="7" fill="none" stroke={SAFFRON} strokeWidth="1.5" />
+      {/* Explore: the metric pings; a hovered bar reads off against the axis, a hovered row lights up. */}
+      <circle className="xp-ping" cx={SW_C + 77} cy="159" r="7" fill="none" stroke={SAFFRON} strokeWidth="1.5" />
+      {SW_NAV.map((y) => (
+        <g key={y} className="pick">
+          <rect className="pick-hl" x={SW_X + 4} y={y - 5} width="32" height="10" rx="2" fill={SAFFRON} fillOpacity="0.25" />
+          <rect className="pick-hit" x={SW_X} y={y - 6} width="40" height="12" />
+        </g>
+      ))}
+      {BARS.map((h, i) => {
+        const x = SW_C + 2 + i * 20;
+        return (
+          <g key={h} className="pick">
+            <g className="pick-hl" fill={SAFFRON} stroke={SAFFRON}>
+              <line x1={SW_C} y1={252 - h} x2={SW_C + 100} y2={252 - h} strokeWidth="1" strokeDasharray="2 3" />
+              <rect x={x} y={252 - h} width="12" height={h} stroke="none" />
+            </g>
+            <rect className="pick-hit" x={x - 4} y="190" width="20" height="62" />
+          </g>
+        );
+      })}
     </g>
   );
 }
@@ -455,6 +637,7 @@ const SIGNAL = Array.from({ length: 15 }, (_, i) => {
   };
 });
 const HIGHLIGHT = 11;
+const TRACE = `M${SIGNAL.map(({ x, top }) => `${x} ${top}`).join(" L")}`;
 
 export function SeoDiagram() {
   const pick = SIGNAL[HIGHLIGHT];
@@ -487,7 +670,10 @@ export function SeoDiagram() {
             <line
               key={x}
               className="seo-stem mx-travel loop"
-              style={{ ...travel(n.x - x, n.y - (BASE_Y + top) / 2, n.angle - 90, n.length / h), ...vars({ "--loop-d": `${i * 0.04}s` }) }}
+              style={{
+                ...travel(n.x - x, n.y - (BASE_Y + top) / 2, n.angle - 90, n.length / h),
+                ...vars({ "--loop-d": `${i * 0.04}s` }),
+              }}
               x1={x}
               y1={BASE_Y}
               x2={x}
@@ -497,25 +683,61 @@ export function SeoDiagram() {
           );
         })}
       </g>
-      <g className="text-ink" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path className="mx-in loop" d={`M${SIGNAL.map(({ x, top }) => `${x} ${top}`).join(" L")}`} />
+      <path className="mx-in loop text-ink" d={TRACE} fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <g className="text-ink" fill="currentColor" stroke="none">
+        {SIGNAL.map(({ x, top }, i) => (
+          <circle key={x} className="mx-in loop" style={vars({ "--loop-d": `${i * 0.03}s` })} cx={x} cy={top} r="2.5" />
+        ))}
+      </g>
+      {/* Explore: a run climbs the trace. */}
+      <path
+        className="xp-flow"
+        style={vars({ "--xp-t": "3s" })}
+        d={TRACE}
+        pathLength="100"
+        fill="none"
+        stroke={SAFFRON}
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeDasharray="6 100"
+      />
+      {/* The highlighted result; it steps back while another point is read off. */}
+      <g className="seo-pick">
         <line
-          className="mx-in loop"
+          className="mx-in loop text-ink"
           style={vars({ "--loop-d": "0.3s" })}
           x1={pick.x}
           y1={pick.top}
           x2={pick.x}
           y2={BASE_Y}
+          stroke="currentColor"
+          strokeWidth="1.5"
           strokeDasharray={DASH}
         />
+        <circle
+          className="mx-in loop text-ink"
+          style={vars({ "--loop-d": "0.3s" })}
+          cx={pick.x}
+          cy={pick.top}
+          r="5.5"
+          fill="currentColor"
+        />
+        <circle className="mx-accent loop" cx={pick.x} cy={pick.top} r="11" fill="none" stroke={SAFFRON} strokeWidth="1.5" />
       </g>
-      <g className="text-ink" fill="currentColor" stroke="none">
-        {SIGNAL.map(({ x, top }, i) => (
-          <circle key={x} className="mx-in loop" style={vars({ "--loop-d": `${i * 0.03}s` })} cx={x} cy={top} r="2.5" />
-        ))}
-        <circle className="mx-in loop" style={vars({ "--loop-d": "0.3s" })} cx={pick.x} cy={pick.top} r="5.5" />
-      </g>
-      <circle className="mx-accent loop" cx={pick.x} cy={pick.top} r="11" fill="none" stroke={SAFFRON} strokeWidth="1.5" />
+      {/* Hovering a column reads its point off against both axes. */}
+      {SIGNAL.map(({ x, top }, i) =>
+        i === HIGHLIGHT ? null : (
+          <g key={x} className="pick seo-col">
+            <g className="pick-hl" fill="none" stroke={SAFFRON} strokeWidth="1.5">
+              <line x1="24" y1={top} x2={x} y2={top} strokeWidth="1" strokeDasharray="2 3" />
+              <line x1={x} y1={top} x2={x} y2={BASE_Y} />
+              <circle cx={x} cy={top} r="5.5" fill={SAFFRON} stroke="none" />
+              <circle cx={x} cy={top} r="11" />
+            </g>
+            <rect className="pick-hit" x={x - 9} y={top - 24} width="18" height={BASE_Y - top + 24} />
+          </g>
+        ),
+      )}
     </g>
   );
 }

@@ -1,0 +1,94 @@
+/*
+ * Explore layer for the Services plates (see PlateLoop.tsx). A .pick group
+ * shows its .pick-hl while its .pick-hit is hovered (or tapped: data-active), but only on a finished
+ * diagram: while data-explore="on" (the controller has settled the loop into
+ * END under the pointer) or when there is no loop at all (reduced motion,
+ * no JS). Mid-morph the details would float over the scattered START. The
+ * flows and pings run only while exploring; none of this touches the .loop
+ * nodes.
+ *
+ *   .pick / .pick-hl / .pick-hit   hover target and what it lights
+ *   .xp-flow                       saffron run along a path (pathLength 100),
+ *                                  --xp-t cycle, --xp-d stagger
+ *   .xp-ping                       ring that pings outwards from its node
+ */
+.svc-fig .pick-hit {
+  fill: transparent;
+  stroke: none;
+  pointer-events: all;
+}
+
+.svc-fig :is(.pick-hl, .xp-flow, .xp-ping) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* A pathLength dash needs the stroke in user units (services.css). */
+.svc-fig svg :is(.xp-flow, .auto-pulse) {
+  vector-effect: none;
+  stroke-width: 2;
+}
+
+.svc-fig:is([data-explore], :not([data-loop="on"])) :is(.pick:hover, .pick[data-active]) .pick-hl {
+  opacity: 1;
+}
+
+/* Automation: the run takes the top branch unless the bottom card is hovered. */
+.svc-fig :is(.auto-b, .auto-b-port) {
+  opacity: 0.55;
+}
+.svc-fig .auto-b-link {
+  opacity: 0.45;
+  stroke-dasharray: 3 3;
+}
+.svc-fig .auto-run-b {
+  opacity: 0;
+}
+.svc-fig:is([data-explore], :not([data-loop="on"])):has(.auto-b-hit:is(:hover, [data-active])) :is(.auto-b, .auto-b-link, .auto-b-port, .auto-run-b) {
+  opacity: 1;
+}
+.svc-fig:is([data-explore], :not([data-loop="on"])):has(.auto-b-hit:is(:hover, [data-active])) .auto-run-a {
+  opacity: 0;
+}
+.svc-fig:is([data-explore], :not([data-loop="on"])):has(.auto-b-hit:is(:hover, [data-active])) .auto-b-link {
+  stroke-dasharray: none;
+}
+.svc-fig:is([data-explore], :not([data-loop="on"])):has(.auto-b-hit:is(:hover, [data-active])) .auto-a-link {
+  opacity: 0.45;
+  stroke-dasharray: 3 3;
+}
+.svc-fig:is([data-explore], :not([data-loop="on"])):has(.auto-b-hit:is(:hover, [data-active])) .auto-a {
+  opacity: 0.55;
+}
+
+/* SEO: the highlighted result steps back while another point is read off. */
+.svc-fig:is([data-explore], :not([data-loop="on"])):has(.seo-col:is(:hover, [data-active])) .seo-pick {
+  opacity: 0.3;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .svc-fig :is(.pick-hl, .seo-pick, .auto-a, .auto-b, .auto-a-link, .auto-b-link, .auto-b-port, .auto-run-a, .auto-run-b) {
+    transition: opacity 220ms var(--ease-drawn);
+  }
+
+  .svc-fig[data-explore="on"] .xp-flow {
+    opacity: 1;
+    animation: xp-flow var(--xp-t, 2.4s) linear var(--xp-d, 0s) infinite backwards;
+  }
+
+  .svc-fig[data-explore="on"] .xp-ping {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: xp-ping 1.8s var(--ease-out-quart) infinite;
+  }
+}
+
+@keyframes xp-flow {
+  from { stroke-dashoffset: 12; }
+  to { stroke-dashoffset: -100; }
+}
+
+@keyframes xp-ping {
+  0% { opacity: 0.9; transform: scale(1); }
+  100% { opacity: 0; transform: scale(2.6); }
+}
