@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 };
 
 const ERROR_MESSAGES: Record<string, string> = {
-  auth_failed: "That sign-in link didn't work — it may have expired. Please try again.",
-  google_auth_failed: "We couldn't start Google sign-in just now. Please try again.",
+  auth_failed: "That sign-in link didn’t work — it may have expired. Please try again.",
+  google_auth_failed: "We couldn’t start Google sign-in just now. Please try again.",
 };
 
 interface LoginPageProps {

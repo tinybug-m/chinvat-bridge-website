@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 
 const MESSAGES: Record<string, string> = {
   not_configured:
-    "This plan isn't ready to accept payments yet — it hasn't been fully set up on our end.",
-  invalid_plan: "That plan couldn't be recognized. Please choose a plan again.",
-  stripe_error: "We couldn't reach our payment provider just now.",
+    "This plan isn’t ready to accept payments yet — it hasn’t been fully set up on our end.",
+  invalid_plan: "That plan couldn’t be recognised. Please choose a plan again.",
+  stripe_error: "We couldn’t reach our payment provider just now.",
 };
 
-const DEFAULT_MESSAGE = "We couldn't start checkout just now.";
+const DEFAULT_MESSAGE = "We couldn’t start checkout just now.";
 
 interface SubscribeErrorPageProps {
   searchParams: Promise<{ reason?: string }>;
@@ -31,7 +31,7 @@ export default async function SubscribeErrorPage({ searchParams }: SubscribeErro
       <StatusPage
         bare
         eyebrow="Checkout unavailable"
-        title="Something didn't go through."
+        title="Something didn’t go through."
         description={message}
         contactNote={
           <>

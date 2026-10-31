@@ -34,7 +34,7 @@ export default function Error({
           bare
           eyebrow="Something went wrong"
           title="Unexpected error"
-          description="Something didn't work as expected. You can try again, or reach out if the problem continues."
+          description="Something didn’t work as expected. You can try again, or reach out if the problem continues."
           contactNote={<EmailLink />}
           actions={
             <>

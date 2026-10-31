@@ -21,7 +21,7 @@ export default function SubscribeCancelledPage() {
         bare
         eyebrow="Checkout cancelled"
         title="No charge was made."
-        description="You cancelled before completing checkout. If you had trouble or have questions about a plan, reach out and we'll help."
+        description="You cancelled before completing checkout. If you had trouble or have questions about a plan, reach out and we’ll help."
         contactNote={<EmailLink />}
         actions={
           <>
