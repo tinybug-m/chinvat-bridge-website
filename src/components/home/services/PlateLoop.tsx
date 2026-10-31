@@ -4,8 +4,20 @@ import { useCallback } from "react";
 
 /** Where a loop holds its END pose: inside the END hold of every plate's keyframes. */
 const END = 0.8;
-/** How long settling into END takes, from wherever the loop is. */
-const SETTLE_MS = 650;
+/**
+ * Settling into END plays the loop at most this many times its normal speed,
+ * so a far jump takes longer instead of racing through the keyframes.
+ */
+const SETTLE_SPEED = 2.2;
+/** Settle duration bounds (ms). */
+const SETTLE_MIN_MS = 420;
+const SETTLE_MAX_MS = 1400;
+/** easeInOutCubic: starts from the loop's motion, lands softly on END. */
+/** Leaving hover, how long the loop takes to ramp from still to full speed. */
+const RESUME_MS = 450;
+const easeInOut = (k: number) => (k < 0.5 ? 4 * k ** 3 : 1 - (-2 * k + 2) ** 3 / 2);
+/** On re-entry, how long the rest pose shows before the loop starts moving. */
+const REPLAY_LEAD_MS = 300;
 
 /**
  * Renders a hidden marker and sets data-loop="on" | "off" on its .svc-fig
@@ -61,10 +73,12 @@ export function PlateLoop() {
         a.pause();
         return { a, from: Number(a.currentTime ?? 0), to: endOf(a) };
       });
+      const far = Math.max(0, ...moves.map(({ from, to }) => Math.abs(to - from)));
+      const ms = Math.min(SETTLE_MAX_MS, Math.max(SETTLE_MIN_MS, far / SETTLE_SPEED));
       const begin = performance.now();
       const step = (now: number) => {
-        const k = Math.min(1, (now - begin) / SETTLE_MS);
-        const eased = 1 - (1 - k) ** 3;
+        const k = Math.min(1, (now - begin) / ms);
+        const eased = easeInOut(k);
         for (const { a, from, to } of moves) a.currentTime = from + (to - from) * eased;
         if (k < 1) frame = requestAnimationFrame(step);
         else fig.setAttribute("data-explore", "on");
@@ -76,11 +90,36 @@ export function PlateLoop() {
       stop();
       fig.removeAttribute("data-explore");
       if (!owned) return;
-      for (const a of loops()) {
-        a.playbackRate = 1;
+      const all = loops();
+      for (const a of all) {
         if (on) a.play();
         else a.pause();
       }
+      if (!on) {
+        for (const a of all) a.playbackRate = 1;
+        return;
+      }
+      // Ease out of the held END pose instead of snapping to full speed.
+      const begin = performance.now();
+      const step = (now: number) => {
+        const k = Math.min(1, (now - begin) / RESUME_MS);
+        const rate = 0.05 + 0.95 * k * k;
+        for (const a of all) a.playbackRate = rate;
+        if (k < 1) frame = requestAnimationFrame(step);
+      };
+      frame = requestAnimationFrame(step);
+    };
+
+    /**
+     * Each time the figure comes back on screen, rewind every loop to just
+     * before its START so the story replays from the beginning (staggers kept).
+     */
+    const restart = () => {
+      const all = loops();
+      if (!all.length) return;
+      const base = Math.min(...all.map((a) => a.effect!.getTiming().delay ?? 0));
+      const at = Math.max(0, base - REPLAY_LEAD_MS);
+      for (const a of all) a.currentTime = at;
     };
 
     const sync = () => {
@@ -93,6 +132,7 @@ export function PlateLoop() {
       if (fig.getAttribute("data-loop") !== next) {
         fig.setAttribute("data-loop", next);
         if (!on) hovering = false;
+        else restart();
         resume();
       }
     };

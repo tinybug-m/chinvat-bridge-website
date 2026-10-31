@@ -18,7 +18,7 @@
  *   (duration, easing, delay, iteration, fill, paused are set here, shared)
  *
  * Shared variables (override per plate/node on the .svc-fig or the node):
- *   --loop-duration  cycle length, default 8s
+ *   --loop-duration  cycle length, default 6.4s
  *   --loop-start     start delay, default 2.8s: reveal total (accent at
  *                    1.7s + its fade, plus tail). Paused animations do not
  *                    advance, so it counts only once data-loop turns on.
@@ -44,13 +44,13 @@
  * Marker that must not show at rest: give it opacity 0 at 0% and 100%.
  */
 .svc-fig {
-  --loop-duration: 8s;
-  --loop-start: 2.8s;
+  --loop-duration: 6.4s;
+  --loop-start: 2.2s;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .js-reveal .svc-fig .loop {
-    animation-duration: var(--loop-duration, 8s);
+    animation-duration: var(--loop-duration, 6.4s);
     animation-timing-function: var(--loop-ease, var(--ease-drawn));
     animation-delay: calc(var(--loop-start, 2.8s) + var(--loop-d, 0s));
     animation-iteration-count: infinite;

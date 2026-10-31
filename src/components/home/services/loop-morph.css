@@ -18,7 +18,7 @@
  *   82 - 100  ease back to START
  */
 .svc-fig .mx {
-  --loop-duration: 10s;
+  --loop-duration: 7.6s;
   --loop-start: 0.6s;
 }
 
