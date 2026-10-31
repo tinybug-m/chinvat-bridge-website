@@ -9,7 +9,9 @@ import { BridgeSeam } from "./BridgeSeam";
  * right, both standing on the same line); the stage, the seam control and
  * the live caption naming the pair the seam is crossing share one small
  * client island because they all follow the seam. The stage runs edge to
- * edge; the raised ground sets the section apart without a rule.
+ * edge up to the container's 90rem, so on wide screens the seam stays beside
+ * the path; past that its sides fade into the raised ground, which sets the
+ * section apart without a rule.
  */
 export function Bridge() {
   return (

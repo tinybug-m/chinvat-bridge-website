@@ -338,12 +338,12 @@ export function BridgeSeam({ className }: { className?: string }) {
             <span className="text-right">Future direction</span>
           </Container>
         </div>
-        <div ref={frameRef} className="relative overflow-x-clip" data-seam-value={value} style={INITIAL_STYLE} suppressHydrationWarning>
+        <div ref={frameRef} className="relative mx-auto max-w-[90rem] overflow-x-clip" data-seam-value={value} style={INITIAL_STYLE} suppressHydrationWarning>
           <ThreeStage
             id="bridge"
             load={loadBridgeScene}
             handleRef={handle}
-            className="aspect-[4/3] max-h-[560px] w-full overflow-hidden sm:aspect-[16/9] lg:aspect-[21/9]"
+            className="aspect-[4/3] max-h-[560px] w-full overflow-hidden sm:aspect-[16/9] lg:aspect-[21/9] min-[90rem]:[mask-image:linear-gradient(to_right,transparent,#000_3%,#000_90%,transparent)]"
             mountMargin="25% 0px"
             releaseMargin="200% 0px"
             reducedMotion="fallback"
