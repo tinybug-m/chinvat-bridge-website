@@ -14,8 +14,7 @@ export const SECTION_LINKS: SiteLink[] = [
 
 /**
  * Prefetch setting for links in the new header, menu and footer: off. A hash link on the homepage
- * would prefetch the page onto itself, and every other route still lives in the (legacy) group,
- * whose old stylesheet and fonts a prefetch would pull onto this page.
+ * would prefetch the page onto itself, and the inner pages load on click rather than on sight.
  */
 export const prefetchFor = (href: string) => (href.startsWith("/#") || href !== "/" ? false : undefined);
 

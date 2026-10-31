@@ -123,8 +123,7 @@ test.describe("site shell", () => {
     await expect(bar).toHaveCSS("opacity", "0");
   });
 
-  // /pricing renders the legacy shell (its own header), so SiteHeader only ever sees the homepage:
-  // Pricing is never lit there.
+  // Pricing is a page link, not a homepage chapter, so scroll-spy never lights it on the homepage.
   test("Pricing is not lit on the homepage", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "desktop only");
     await page.goto("/");

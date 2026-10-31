@@ -1,85 +1,88 @@
-import { Button } from "@/components/atoms/Button";
+import { ButtonLink } from "@/components/system/Button";
 import type { PricingPlan } from "@/data/pricing";
+import { cn } from "@/lib/utils";
 
-export function PricingCard({ plan }: { plan: PricingPlan }) {
+interface PricingCardProps {
+  plan: PricingPlan;
+  /** Where the column sits, so the outer columns align with the page margin. */
+  position?: "first" | "middle" | "last";
+}
+
+/**
+ * One plan as a column: tier, name and price; the specs as a hairline table;
+ * the capabilities; the button. On lg it is a subgrid spanning the four rows
+ * Pricing defines, so every plan's blocks share a baseline. The recommended
+ * plan sits on raised paper under an ink rule and takes the primary (logo
+ * material) button; the others take the hairline button.
+ */
+export function PricingCard({ plan, position = "middle" }: PricingCardProps) {
+  const featured = Boolean(plan.highlighted);
+
   return (
-    <div
-      className={`flex flex-col justify-between rounded-sm card-border-glow ${
-        plan.highlighted
-          ? "border-2 border-gold-500/70 bg-obsidian-900 shadow-xl shadow-gold-500/5"
-          : "border border-stone-border bg-obsidian-850"
-      }`}
+    <li
+      className={cn(
+        "flex flex-col gap-8 border-t border-line py-10 lg:row-span-4 lg:grid lg:grid-rows-subgrid lg:gap-y-10 lg:border-t-0 lg:px-8 lg:py-12",
+        position === "first" && "border-t-0",
+        position !== "first" && "lg:border-l",
+        !featured && position === "first" && "lg:pl-0",
+        !featured && position === "last" && "lg:pr-0",
+        featured &&
+          "-mx-gutter border-t-transparent bg-paper-raised px-gutter shadow-[inset_0_2px_0_var(--color-ink)] lg:mx-0 lg:px-8",
+        featured && "[&+li]:border-t-transparent",
+      )}
     >
       <div>
-        {plan.highlighted ? (
-          <div className="bg-gold-500 text-obsidian-950 px-4 py-1.5 flex justify-between items-center text-[10px] font-mono font-bold tracking-technical uppercase">
-            <span>Recommended</span>
-            <span>{plan.tierLabel}</span>
-          </div>
-        ) : null}
-        <div className="p-6 border-b border-stone-border/80">
-          <div className="flex justify-between items-center mb-2">
-            <span className="font-cinzel text-[11px] tracking-technical text-gold-400 uppercase font-medium">
-              {plan.tierLabel}
+        <p className="flex items-center justify-between gap-4 text-small text-ink-muted">
+          <span>{plan.tierLabel}</span>
+          {featured ? (
+            <span className="inline-flex items-center gap-2 font-medium text-ink">
+              <span aria-hidden="true" className="size-[9px] rounded-full border-2 border-saffron-500" />
+              Recommended
             </span>
-          </div>
-          <h3 className="font-serif-monument text-2xl text-parchment-50 uppercase tracking-wide">{plan.name}</h3>
-          <div className="mt-4 flex items-baseline gap-1.5">
-            <span className="font-serif-monument text-4xl text-parchment-50">{plan.priceLabel}</span>
-            <span className="font-mono text-xs text-parchment-dim tracking-technical uppercase">
-              {plan.billingPeriod}
-            </span>
-          </div>
-          <p className="font-serif-monument text-sm text-parchment-muted mt-3 leading-relaxed">{plan.description}</p>
-        </div>
-        <div className="p-6 space-y-6">
-          <dl className="space-y-2.5 border-b border-stone-border/80 pb-5">
-            {plan.specs.map((spec) => (
-              <div key={spec.label} className="flex justify-between gap-3 text-sm">
-                <dt className="font-mono text-[11px] text-parchment-dim uppercase tracking-technical">
-                  {spec.label}
-                </dt>
-                <dd
-                  className={`font-mono text-xs font-semibold text-right ${
-                    spec.emphasized ? "text-gold-400" : "text-parchment-100"
-                  }`}
-                >
-                  {spec.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
-          <div className="space-y-3">
-            <span className="font-mono text-[10px] text-gold-500 uppercase tracking-technical block">
-              {plan.capabilitiesLabel}
-            </span>
-            <ul className="space-y-2.5">
-              {plan.capabilities.map((capability) => (
-                <li
-                  key={capability}
-                  className="flex items-start gap-2.5 font-serif-monument text-sm text-parchment-200"
-                >
-                  <span aria-hidden="true" className="text-gold-500 mt-0.5">
-                    &mdash;
-                  </span>
-                  <span>{capability}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+          ) : null}
+        </p>
+        <h2 className="mt-3 font-display text-heading font-medium text-ink">{plan.name}</h2>
+        <p className="mt-6 flex items-baseline gap-2">
+          <span className="font-display text-title font-medium tabular-nums text-ink">{plan.priceLabel}</span>
+          <span className="text-small text-ink-muted">{plan.billingPeriod}</span>
+        </p>
+        <p className="mt-5 max-w-[34ch] text-body text-pretty text-ink-soft">{plan.description}</p>
       </div>
-      <div className="p-6 pt-0">
-        <Button
+
+      <dl className="border-t border-line-strong">
+        {plan.specs.map((spec) => (
+          <div key={spec.label} className="flex items-baseline justify-between gap-4 border-b border-line py-3 text-small">
+            <dt className="text-ink-soft">{spec.label}</dt>
+            <dd className={cn("text-right text-ink", spec.emphasized ? "font-semibold" : "font-medium")}>
+              {spec.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+
+      <div>
+        <h3 className="text-small font-medium text-ink">{plan.capabilitiesLabel}</h3>
+        <ul className="mt-4 space-y-3">
+          {plan.capabilities.map((capability) => (
+            <li key={capability} className="flex items-start gap-3 text-small text-ink-soft">
+              <span aria-hidden="true" className="mt-[0.7em] h-px w-3 shrink-0 bg-ink-muted" />
+              <span>{capability}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="lg:self-end">
+        <ButtonLink
           href={`/subscribe/details?plan=${plan.id}`}
-          icon="arrowForward"
-          variant={plan.highlighted ? "solid" : "outline"}
-          size="md"
+          variant={featured ? "primary" : "secondary"}
+          size="lg"
+          arrow="right"
           className="w-full"
         >
           Choose {plan.name}
-        </Button>
+        </ButtonLink>
       </div>
-    </div>
+    </li>
   );
 }
