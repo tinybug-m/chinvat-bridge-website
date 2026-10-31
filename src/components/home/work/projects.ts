@@ -32,7 +32,7 @@ export const PROJECTS: Project[] = [
     label: "Concept",
     href: "https://benedict-funeral.vercel.app/",
     src: "/work/benedict.jpg",
-    alt: "Home page of the Benedict Funeral Directors concept on a plum background, with the headline Caring for your family, and the person you love, and a banner saying it is a design concept and not the live website.",
+    alt: "Home page of the Benedict Funeral Directors concept on a dark green background with a copper address bar, with the headline Caring for your family, and the person you love, and a banner saying it is a design concept and not the live website.",
   },
   {
     key: "naturaglow",
