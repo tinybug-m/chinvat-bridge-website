@@ -2,8 +2,10 @@
 
 import { useActionState } from "react";
 import { SubmitButton } from "@/components/atoms/SubmitButton";
+import { buttonVariants } from "@/components/system/Button";
 import { FormField } from "@/components/molecules/FormField";
 import { sendMagicLink, signInWithGoogle, type SendMagicLinkResult } from "@/actions/auth";
+import { cn } from "@/lib/utils";
 
 const initialState: SendMagicLinkResult | null = null;
 
@@ -38,34 +40,37 @@ export function LoginForm() {
       <form action={signInWithGoogle}>
         <button
           type="submit"
-          className="w-full inline-flex items-center justify-center gap-3 bg-parchment-50 hover:bg-parchment-100 text-obsidian-950 font-mono font-semibold text-xs tracking-monumental uppercase py-3.5 rounded-sm transition-colors"
+          className={cn(buttonVariants({ variant: "secondary", size: "lg" }), "w-full bg-paper")}
         >
           <GoogleIcon />
-          Continue with Google
+          <span>Continue with Google</span>
         </button>
       </form>
 
-      <div className="flex items-center gap-3">
-        <div className="h-px flex-1 bg-stone-border" />
-        <span className="font-mono text-[10px] text-parchment-dim uppercase tracking-technical">Or</span>
-        <div className="h-px flex-1 bg-stone-border" />
+      <div className="flex items-center gap-4">
+        <div aria-hidden="true" className="h-px flex-1 bg-line" />
+        <span className="text-small text-ink-muted">or</span>
+        <div aria-hidden="true" className="h-px flex-1 bg-line" />
       </div>
 
       <form action={formAction} className="space-y-5">
-        <FormField label="Email Address" name="email" type="email" required placeholder="you@company.com" />
+        <FormField label="Email address" name="email" type="email" required placeholder="you@company.com" />
 
-        {state ? (
-          <p
-            className={`font-serif-monument text-sm ${
-              state.status === "sent" ? "text-gold-300" : "text-red-400"
-            }`}
-          >
-            {state.message}
-          </p>
-        ) : null}
+        <div aria-live="polite">
+          {state ? (
+            <p
+              className={cn(
+                "border-l-2 pl-4 text-small",
+                state.status === "sent" ? "border-signal-success text-ink" : "border-signal-error text-ink",
+              )}
+            >
+              {state.message}
+            </p>
+          ) : null}
+        </div>
 
         <SubmitButton size="lg" className="w-full" pendingLabel="Sending…">
-          Send Sign-In Link
+          Send sign-in link
         </SubmitButton>
       </form>
     </div>

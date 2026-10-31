@@ -1,47 +1,44 @@
-import { CornerFrame } from "@/components/atoms/CornerFrame";
 import type { PricingPlan } from "@/data/pricing";
 
+/** The chosen plan as a ruled card beside the details form. */
 export function PlanSummary({ plan }: { plan: PricingPlan }) {
   return (
-    <CornerFrame className="border border-stone-border bg-obsidian-850 rounded-sm p-6">
-      <div className="border-b border-stone-border pb-4 mb-5">
-        <span className="font-mono text-[10px] text-gold-500 uppercase tracking-technical font-semibold block mb-1">
-          Engagement Specification
-        </span>
-        <h2 className="font-serif-monument text-xl text-parchment-50 uppercase">{plan.name} Plan</h2>
-        <p className="font-serif-monument text-sm text-parchment-muted mt-1 leading-relaxed">{plan.description}</p>
-      </div>
+    <section
+      aria-labelledby="plan-summary-title"
+      className="rounded-[2px] border border-line bg-paper-raised p-6 lg:p-8"
+    >
+      <p className="text-small text-ink-muted">Engagement specification</p>
+      <h2 id="plan-summary-title" className="mt-2 font-display text-subheading font-medium text-ink">
+        {plan.name} plan
+      </h2>
+      <p className="mt-2 text-small text-pretty text-ink-soft">{plan.description}</p>
 
-      <div className="py-4 border-b border-stone-border flex justify-between items-baseline">
-        <span className="font-mono text-[10px] text-parchment-dim uppercase tracking-technical">Monthly Rate</span>
+      <div className="mt-6 flex items-baseline justify-between gap-4 border-t border-line pt-5">
+        <span className="text-small text-ink-muted">Monthly rate</span>
         <div className="text-right">
-          <span className="font-serif-monument text-2xl text-gold-400 font-semibold">{plan.priceLabel}</span>
-          <span className="font-mono text-xs text-parchment-dim block">Billed monthly</span>
+          <span className="font-display text-heading font-medium text-ink tabular-nums">{plan.priceLabel}</span>
+          <span className="block text-small text-ink-muted">Billed monthly</span>
         </div>
       </div>
 
-      <div className="py-5 border-b border-stone-border space-y-3">
-        <span className="font-mono text-[10px] text-parchment-50 uppercase tracking-technical font-semibold block">
-          Scope of Deliverables
-        </span>
-        {plan.capabilities.map((capability) => (
-          <div key={capability} className="flex items-start gap-2.5">
-            <span aria-hidden="true" className="text-gold-500 mt-0.5">
-              &mdash;
-            </span>
-            <span className="font-serif-monument text-sm text-parchment-200">{capability}</span>
-          </div>
-        ))}
+      <div className="mt-5 border-t border-line pt-5">
+        <p className="text-small font-medium text-ink">Scope of deliverables</p>
+        <ul className="mt-3 space-y-2.5">
+          {plan.capabilities.map((capability) => (
+            <li key={capability} className="flex items-start gap-3 text-small text-ink-soft">
+              <span aria-hidden="true" className="mt-[0.7em] h-px w-3 shrink-0 bg-line-strong" />
+              <span>{capability}</span>
+            </li>
+          ))}
+        </ul>
       </div>
 
-      <div className="pt-4">
-        <span className="font-mono text-[10px] text-gold-500 uppercase tracking-technical font-semibold block mb-1">
-          Terms
-        </span>
-        <p className="font-serif-monument text-sm text-parchment-muted leading-relaxed">
+      <div className="mt-5 border-t border-line pt-5">
+        <p className="text-small font-medium text-ink">Terms</p>
+        <p className="mt-1 text-small text-pretty text-ink-soft">
           No lock-in contract. Cancel any time with 30 days&rsquo; notice.
         </p>
       </div>
-    </CornerFrame>
+    </section>
   );
 }

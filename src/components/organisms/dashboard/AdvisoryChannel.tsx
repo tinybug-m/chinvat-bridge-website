@@ -1,39 +1,42 @@
-import { Icon } from "@/components/atoms/icons";
-import { Bay } from "@/components/molecules/Bay";
+import { Panel } from "@/components/portal/Panel";
+import { Button, buttonVariants } from "@/components/system/Button";
+import { ArrowIcon } from "@/components/system/ArrowIcon";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 export function AdvisoryChannel() {
   return (
-    <Bay numeral="IV." title="Advisory Channel">
-      <div className="p-6 space-y-4">
-        <div className="border-l-2 border-gold-500 pl-3">
-          <span className="font-mono text-[10px] text-gold-500 uppercase tracking-technical font-semibold block">
-            Priority Advisory Access
-          </span>
-          <p className="font-serif-monument text-sm text-parchment-dim mt-1">
+    <Panel title="Advisory channel">
+      <div className="space-y-6 px-5 py-5 sm:px-6">
+        <div className="border-l-2 border-saffron-500 pl-4">
+          <p className="text-small font-medium text-ink">Priority advisory access</p>
+          <p className="mt-1 text-small text-pretty text-ink-soft">
             Direct access to your designated SEO consultant &mdash; included with the Growth and Scale plans.
           </p>
         </div>
 
-        <div className="space-y-2 pt-2">
-          <button
-            type="button"
-            disabled
-            className="w-full bg-obsidian-850 border border-stone-borderLight text-parchment-dim font-mono text-[10px] tracking-technical uppercase py-3 px-4 flex items-center justify-center gap-2 opacity-70 cursor-not-allowed"
-          >
-            <Icon name="helpOutline" className="text-sm" />
-            <span>Schedule Strategy Call (Coming Soon)</span>
-          </button>
+        <div className="flex flex-col gap-3">
+          <Button variant="secondary" disabled className="w-full border border-dashed border-line-strong text-ink-muted shadow-none disabled:opacity-100">
+            Schedule strategy call (coming soon)
+          </Button>
           <a
             href={`${CONTACT_MAILTO}?subject=Client%20Support`}
-            className="w-full bg-obsidian-850 border border-gold-500/50 text-gold-300 hover:text-gold-400 hover:border-gold-500 font-mono text-[10px] tracking-technical uppercase py-3 px-4 flex items-center justify-center gap-2 transition-colors"
+            className={cn(buttonVariants({ variant: "secondary", size: "md" }), "w-full")}
           >
-            <Icon name="mail" className="text-sm" />
-            <span>Email Support</span>
+            <span>Email support</span>
+            <ArrowIcon direction="up-right" />
           </a>
         </div>
-        <p className="text-center font-mono text-[10px] text-parchment-dim pt-1">Direct: {CONTACT_EMAIL}</p>
+        <p className="border-t border-line pt-4 text-small text-ink-muted">
+          Direct:{" "}
+          <a
+            href={CONTACT_MAILTO}
+            className="break-words text-cobalt-700 underline decoration-cobalt-700/35 underline-offset-[0.22em] hover:decoration-cobalt-700"
+          >
+            {CONTACT_EMAIL}
+          </a>
+        </p>
       </div>
-    </Bay>
+    </Panel>
   );
 }

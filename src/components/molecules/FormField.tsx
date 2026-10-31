@@ -16,8 +16,9 @@ interface FormFieldProps {
   rows?: number;
 }
 
+// Matches components/ui/input: control border on paper-raised, ink on hover.
 const FIELD_CLASS =
-  "w-full bg-obsidian-900 border border-stone-borderLight px-4 py-3 font-sans text-sm text-parchment-100 focus:border-gold-500 transition-colors rounded-sm placeholder:text-parchment-dim/60";
+  "w-full min-w-0 rounded-[2px] border border-control bg-paper-raised px-4 text-body text-ink transition-[border-color] duration-200 ease-out-quart placeholder:text-ink-muted hover:border-ink";
 
 export function FormField({
   label,
@@ -33,9 +34,9 @@ export function FormField({
     <div>
       <label
         htmlFor={name}
-        className="block font-mono text-[10px] text-parchment-200 tracking-technical uppercase mb-1.5"
+        className="mb-2 block text-small font-medium text-ink"
       >
-        {label} {required ? <span className="text-gold-500">*</span> : null}
+        {label} {required ? <span className="text-signal-error">*</span> : null}
       </label>
       {type === "select" ? (
         <select
@@ -43,7 +44,7 @@ export function FormField({
           name={name}
           required={required}
           defaultValue={defaultValue}
-          className={`${FIELD_CLASS} cursor-pointer`}
+          className={`${FIELD_CLASS} h-12 cursor-pointer`}
         >
           {options?.map((option) => (
             <option key={option.value} value={option.value}>
@@ -58,7 +59,7 @@ export function FormField({
           rows={rows}
           placeholder={placeholder}
           defaultValue={defaultValue}
-          className={`${FIELD_CLASS} resize-none`}
+          className={`${FIELD_CLASS} resize-none py-3`}
         />
       ) : (
         <input
@@ -68,7 +69,7 @@ export function FormField({
           required={required}
           placeholder={placeholder}
           defaultValue={defaultValue}
-          className={FIELD_CLASS}
+          className={`${FIELD_CLASS} h-12`}
         />
       )}
     </div>

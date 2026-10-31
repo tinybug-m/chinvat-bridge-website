@@ -1,6 +1,6 @@
-import { Bay } from "@/components/molecules/Bay";
 import { Chip } from "@/components/atoms/Chip";
-import { SteppedProgressBar } from "@/components/atoms/SteppedProgressBar";
+import { Panel } from "@/components/portal/Panel";
+import { ProgressRow } from "@/components/portal/ProgressRow";
 import { getPlanById } from "@/data/pricing";
 import { createClient } from "@/lib/supabase/server";
 
@@ -22,24 +22,20 @@ export async function RealProjectProgress({ customerId, planId }: RealProjectPro
 
   if (progressItems && progressItems.length > 0) {
     return (
-      <Bay numeral="I." title="Project Progress" footer={<span>Updated by your consultant as work progresses.</span>}>
-        <div className="p-6 space-y-6">
-          {progressItems.map((item, index) => (
-            <div key={item.id} className={index > 0 ? "pt-6 border-t border-stone-border space-y-2" : "space-y-2"}>
-              <div className="flex justify-between items-end gap-3">
-                <span className="font-mono text-[11px] text-parchment-100 uppercase tracking-technical">
-                  {item.label}: {item.status_label}
-                </span>
-                <span className="font-mono text-[11px] text-gold-400 font-semibold shrink-0">
-                  {item.percent_label}
-                </span>
-              </div>
-              <SteppedProgressBar totalSteps={item.total_steps} completedSteps={item.completed_steps} />
-              {item.note ? <p className="font-serif-monument text-xs text-parchment-dim">{item.note}</p> : null}
-            </div>
+      <Panel title="Project progress" footer={<span>Updated by your consultant as work progresses.</span>}>
+        <ul className="divide-y divide-line">
+          {progressItems.map((item) => (
+            <ProgressRow
+              key={item.id}
+              label={`${item.label}: ${item.status_label}`}
+              percentLabel={item.percent_label}
+              totalSteps={item.total_steps}
+              completedSteps={item.completed_steps}
+              note={item.note}
+            />
           ))}
-        </div>
-      </Bay>
+        </ul>
+      </Panel>
     );
   }
 
@@ -48,26 +44,19 @@ export async function RealProjectProgress({ customerId, planId }: RealProjectPro
   const scopeItems = plan?.capabilities ?? [];
 
   return (
-    <Bay
-      numeral="I."
-      title="Project Progress"
-      meta={
-        plan ? (
-          <span className="font-mono text-[10px] text-gold-500 uppercase tracking-technical font-semibold">
-            {plan.capabilitiesLabel}
-          </span>
-        ) : null
-      }
+    <Panel
+      title="Project progress"
+      meta={plan ? <span className="text-small text-ink-muted">{plan.capabilitiesLabel}</span> : null}
       footer={<span>Your consultant will update this as work begins on each item.</span>}
     >
-      <div className="divide-y divide-stone-border">
+      <ul className="divide-y divide-line">
         {scopeItems.map((item) => (
-          <div key={item} className="p-6 flex items-center justify-between gap-4">
-            <span className="font-serif-monument text-sm text-parchment-100">{item}</span>
-            <Chip>Not Started</Chip>
-          </div>
+          <li key={item} className="flex items-center justify-between gap-4 px-5 py-4 sm:px-6">
+            <span className="text-small text-ink">{item}</span>
+            <Chip>Not started</Chip>
+          </li>
         ))}
-      </div>
-    </Bay>
+      </ul>
+    </Panel>
   );
 }

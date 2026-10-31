@@ -1,32 +1,34 @@
 "use client";
 
 import { useFormStatus } from "react-dom";
-import { Icon, type IconName } from "@/components/atoms/icons";
-import { buttonClassName, type ButtonSize, type ButtonVariant } from "@/components/atoms/buttonStyles";
+import type { VariantProps } from "class-variance-authority";
+import { ArrowIcon } from "@/components/system/ArrowIcon";
+import { buttonVariants } from "@/components/system/Button";
+import { cn } from "@/lib/utils";
 
-interface SubmitButtonProps {
+interface SubmitButtonProps extends VariantProps<typeof buttonVariants> {
   children: string;
   pendingLabel?: string;
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  icon?: IconName;
+  /** Trailing arrow, hidden while the form is pending. */
+  arrow?: "right" | "down" | "up-right";
   className?: string;
 }
 
+/** The system button as a form submit: disabled and relabelled while the action is pending. */
 export function SubmitButton({
   children,
   pendingLabel = "Redirecting…",
-  variant = "solid",
+  variant = "primary",
   size = "md",
-  icon,
-  className = "",
+  arrow,
+  className,
 }: SubmitButtonProps) {
   const { pending } = useFormStatus();
 
   return (
-    <button type="submit" disabled={pending} className={buttonClassName(variant, size, className)}>
+    <button type="submit" disabled={pending} className={cn(buttonVariants({ variant, size }), className)}>
       <span>{pending ? pendingLabel : children}</span>
-      {!pending && icon ? <Icon name={icon} className="text-sm shrink-0" /> : null}
+      {!pending && arrow ? <ArrowIcon direction={arrow} /> : null}
     </button>
   );
 }

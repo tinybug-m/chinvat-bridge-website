@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 interface ChipProps {
   children: string;
   emphasized?: boolean;
@@ -6,9 +8,10 @@ interface ChipProps {
 export function Chip({ children, emphasized = false }: ChipProps) {
   return (
     <span
-      className={`px-2 py-0.5 bg-obsidian-950/80 border border-stone-border text-[9px] font-mono ${
-        emphasized ? "text-gold-400/90" : "text-parchment-dim"
-      }`}
+      className={cn(
+        "inline-flex items-center rounded-[2px] border px-2 py-0.5 text-[0.8125rem] leading-5",
+        emphasized ? "border-line-strong text-ink" : "border-line text-ink-muted",
+      )}
     >
       {children}
     </span>

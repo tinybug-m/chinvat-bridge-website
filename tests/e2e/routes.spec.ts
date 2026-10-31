@@ -32,7 +32,7 @@ test.describe("routes", () => {
       page.on("pageerror", (error) => errors.push(String(error)));
       const response = await page.goto(path);
       expect(response?.status()).toBe(200);
-      await expect(page.locator("main, [data-theme=legacy]").first()).toBeVisible();
+      await expect(page.locator("main").first()).toBeVisible();
       expect(errors).toEqual([]);
     });
   }

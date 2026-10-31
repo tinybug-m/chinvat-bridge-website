@@ -1,6 +1,6 @@
 import localFont from "next/font/local";
 
-// Preloaded on the routes whose layout applies them: the (site) group.
+// Preloaded on the routes whose layout applies them: the (site) and (pages) groups, plus the root 404 and error boundary.
 
 // Archivo carries the brand: one variable file covers every weight and width,
 // so display type can run expanded while body text stays at normal width.
