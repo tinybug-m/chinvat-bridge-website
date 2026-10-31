@@ -165,3 +165,12 @@ the article "Where the Name Chinvat Bridge Comes From", now linked from About.
 | Insights | "Practical thinking about AI, software, automation and digital growth." | (removed) | Each row already shows its category. |
 | Contact lede | "Have a business problem worth solving? Tell us what's slowing your business down, where you're trying to grow, or what you'd like to build. We'll help you identify the most practical next step." | "Tell us what's slowing your business down, where you're trying to grow, or what you'd like to build." | One sentence, verbatim. |
 | Contact form error | "Add a little more detail: at least 20 characters (N so far)." | "Add a little more detail: at least 20 characters." | The running count is already shown under the field. |
+
+## Final pass (31 October 2026)
+
+Typography and spelling only; no wording changed.
+
+| Where | Old | New | Why |
+|---|---|---|---|
+| Checkout error, sign-in errors, site error page, checkout cancelled | Straight apostrophes ("didn't", "couldn't", "isn't", "hasn't", "we'll") | Curly apostrophes ("didn’t", …) | Matches every other page. |
+| Checkout error, invalid plan | "That plan couldn't be recognized." | "That plan couldn’t be recognised." | British English. |
