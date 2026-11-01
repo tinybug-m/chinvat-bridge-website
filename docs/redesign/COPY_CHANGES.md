@@ -82,8 +82,8 @@ Both sections are new and use only material supplied by the owner's team.
 | Work concept lines | (none) | Benedict Funeral Directors: "Funeral directors, Henlow Camp, Bedfordshire." NATURAGLOW: "Skincare and wellness clinic, Beverly Hills." | Context from the supplied facts only. |
 | Work links | (none) | Visit the site (screen readers also hear "for <project> (opens in a new tab)") | External links open in a new tab. |
 | Work image alt text | (none) | One description of each screenshot's page | Describes what the screenshot shows. |
-| Team heading | (none) | The team. | New section. |
-| Team names and roles | (none) | Artin, Owner. Arshia, CTO. Erik, SEO expert. | First names and roles only; no bios, quotes or photos exist. |
+| Team heading | (none) | ~~The team.~~ | Section removed 1 November 2026, see below. |
+| Team names and roles | (none) | ~~Artin, Owner. Arshia, CTO. Erik, SEO expert.~~ | Section removed 1 November 2026, see below. |
 
 ## De-template pass (casing and removals)
 
@@ -174,3 +174,40 @@ Typography and spelling only; no wording changed.
 |---|---|---|---|
 | Checkout error, sign-in errors, site error page, checkout cancelled | Straight apostrophes ("didn't", "couldn't", "isn't", "hasn't", "we'll") | Curly apostrophes ("didn’t", …) | Matches every other page. |
 | Checkout error, invalid plan | "That plan couldn't be recognized." | "That plan couldn’t be recognised." | British English. |
+
+## Contact conversation and Team removal (1 November 2026)
+
+The Team section is gone, and no team names appear in the contact conversation either.
+The contact form became a short scripted conversation (three steps), so its field labels were replaced by these
+lines. It is not an AI; every line is written in `ContactChat.tsx`. The timeline question was dropped.
+
+| Where | Before | Now |
+|---|---|---|
+| Header | (form) | Chinvat Bridge, with "1 of 3" progress |
+| Greeting | (form) | Hi, thanks for stopping by. What can we help you with? (topic buttons, or "Or tell us in your own words") |
+| Follow-up, AI & Automation | Message | Good. What would you like to automate, or hand over to AI? |
+| Follow-up, Workflows | Message | Good. Which process feels slow or messy right now? |
+| Follow-up, Software & Web | Message | Good. What would you like built? |
+| Follow-up, SEO & Growth | Message | Good. What would you like to grow, and where are you now? |
+| Follow-up, Not sure yet | Message | That’s fine. What’s slowing your business down at the moment? |
+| Contact step | Name / Email / Company (optional) | Thanks, that’s clear. Where should we send our reply? (same three fields) |
+| Name missing | Enter your name. | Add your name so we know who we’re talking to. |
+| Email missing / wrong | Enter your email address. / Enter a valid email address… | Add your email so we can reply. / Check the address, like name@company.com. |
+| Send | Send brief | Send message (sends from the page; "Sending…" while it goes) |
+| After sending | Your email app should open. If it didn’t: | Got it, thanks {first name}. Your message is with us, and we’ll reply to {email}. / Send another message |
+| Send failed | (none) | {reason} Try again, or email it to us instead. |
+
+## Crossing hero (1 November 2026)
+
+The homepage hero is now the Crossing chart (CTO's choice). Its headline, lede
+and chart labels come from the company's LinkedIn overview; the eyebrow, CTAs
+and the four discipline labels are unchanged.
+
+| Where | Before | Redesign | Why |
+|---|---|---|---|
+| Hero H1 | Same business. / Better systems. | Cross the bridge. / Enter the future. | LinkedIn's closing line; the chart shows the crossing it names. |
+| Hero lede | Chinvat Bridge helps businesses use AI, automation and modern software to reduce manual work. | We bridge the gap between complex challenges and intelligent technology. | LinkedIn's opening line, without "At Chinvat Bridge,". |
+| Hero chart labels | (none) | Complex challenges · Intelligent technology | The two halves of the chart, from the same LinkedIn sentence. |
+| Hero discipline links | AI integration, Automation & workflows, Software & web, SEO & growth (text list) | The chart's four tiers: AI, Automation, Software, SEO (each link's accessible name is the full label) | The tiers are the links; the list beside them only repeated them. |
+| Hero callouts and logo toggle | "Transition" callout, Chrome / Classic toggle | (removed with the old hero) | The Crossing hero has no 3D mark. |
+

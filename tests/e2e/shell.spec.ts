@@ -97,15 +97,6 @@ test.describe("site shell", () => {
     await expect(nav.getByRole("link", { name: "Approach" })).toHaveAttribute("data-active", "true");
   });
 
-  test("reading Team keeps About lit", async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name !== "desktop", "desktop only");
-    await page.goto("/");
-    const nav = page.getByRole("navigation", { name: "Main" });
-    await page.evaluate(() => document.getElementById("team")!.scrollIntoView({ behavior: "instant", block: "center" }));
-    await expect(page.locator("#team")).toBeInViewport();
-    await expect(nav.getByRole("link", { name: "About" })).toHaveAttribute("data-active", "true");
-  });
-
   test("one decorative indicator follows the lit link and hides when none is lit", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "desktop only");
     await page.goto("/");

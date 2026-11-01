@@ -59,7 +59,12 @@ export function Hero() {
 
         <figure className="relative mt-10 flex justify-center pt-10 pb-16 lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:-mr-gutter lg:mt-0 lg:items-center lg:pl-12 lg:pt-[calc(4.5rem+3rem)] lg:pb-14">
           {/* The seam: the object's axis, from the top of the hero to the foot of the figure. */}
-          <span aria-hidden="true" className="absolute inset-y-0 left-1/2 w-px bg-line-strong lg:top-18 lg:left-[calc(50%+1.5rem)]" />
+          {/* Its foot is where the energy wire into Services starts (data-energy-origin, see EnergyFlow). */}
+          <span
+            aria-hidden="true"
+            data-energy-origin=""
+            className="absolute inset-y-0 left-1/2 w-px bg-line-strong lg:top-18 lg:left-[calc(50%+1.5rem)]"
+          />
           <HeroObject
             className="h-[38svh] max-h-[26rem] min-h-[17rem] lg:h-[min(34rem,calc(100svh-15rem))] xl:h-[min(40rem,calc(100svh-15rem))] lg:max-h-none lg:min-h-[28rem]"
             sizes="(min-width: 64rem) 40rem, 26rem"

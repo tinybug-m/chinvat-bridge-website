@@ -15,10 +15,10 @@ test.describe("logo material toggle", () => {
     await expect(classic(page)).toHaveAttribute("aria-checked", "false");
     expect(await material(page)).toBe("chrome");
 
-    // Both layers are server-rendered in the hero drawing and the About mark; CSS shows one.
-    const drawing = page.locator('[data-layer="drawing"]');
-    await expect(drawing.locator('[data-material="chrome"]')).toHaveCount(1);
-    await expect(drawing.locator('[data-material="classic"]')).toHaveCount(1);
+    // Both layers are server-rendered in the hero mark and the About mark; CSS shows one.
+    const mark = page.locator("[data-hero] .cx-chart > div").first();
+    await expect(mark.locator('[data-material="chrome"]')).toHaveCount(1);
+    await expect(mark.locator('[data-material="classic"]')).toHaveCount(1);
     await expect(page.locator('#about [data-material="classic"]')).toHaveCount(1);
 
     await classic(page).click();
@@ -104,17 +104,18 @@ test.describe("logo material toggle", () => {
     await expect(classic(page)).toHaveAttribute("aria-checked", "true");
   });
 
-  test("the hero 3D scene follows the choice (live canvas, no errors)", async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name === "mobile", "the 3D stage is exercised in hero.spec at all sizes");
+  test("the hero mark and the tier glow follow the choice", async ({ page }) => {
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(String(error)));
     await page.goto("/");
-    await expect(page.locator('[data-stage="seam"]')).toHaveAttribute("data-stage-state", "live", { timeout: 30_000 });
+    const mark = page.locator("[data-hero] .cx-chart > div").first();
+    const glow = page.locator('[data-hero] .cx-tier[data-i="0"] .cx-glow');
     await classic(page).click();
-    await page.waitForTimeout(600);
+    await expect(mark.locator('[data-material="classic"]')).toHaveCSS("opacity", "1");
+    await expect(glow.locator('[data-material="chrome"]')).toHaveCSS("visibility", "hidden");
     await chrome(page).click();
-    await page.waitForTimeout(600);
-    await expect(page.locator('[data-stage="seam"]')).toHaveAttribute("data-stage-state", "live");
+    await expect(mark.locator('[data-material="classic"]')).toHaveCSS("opacity", "0");
+    await expect(glow.locator('[data-material="chrome"]')).toHaveCSS("visibility", "visible");
     expect(errors).toEqual([]);
   });
 });

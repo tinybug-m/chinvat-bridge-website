@@ -1,26 +1,9 @@
-import { type Locator, type Page, expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 
-type StageProbe = { state: string; frames: number; running: boolean; visible: boolean; triangles?: number; calls?: number };
-
-// three.js keeps its warning strings through minification, so this finds the
-// library in dev and production chunks alike (chunk names are hashed in production).
-const THREE_MARKER = "THREE.WebGLRenderer";
-
-/** Records every script the page fetches and whether it contains three.js. */
-function collectScripts(page: Page) {
-  const scripts: Promise<{ url: string; at: number; three: boolean }>[] = [];
-  page.on("response", (response) => {
-    if (response.request().resourceType() !== "script") return;
-    const at = Date.now();
-    scripts.push(
-      response
-        .text()
-        .then((body) => ({ url: response.url(), at, three: body.includes(THREE_MARKER) }))
-        .catch(() => ({ url: response.url(), at, three: false })),
-    );
-  });
-  return () => Promise.all(scripts);
-}
+/*
+ * The homepage hero, THE CROSSING (CrossingHero.tsx): the engraved chart,
+ * the copy beside it and the four tiers as the discipline links.
+ */
 
 function collectErrors(page: Page) {
   const errors: string[] = [];
@@ -29,59 +12,33 @@ function collectErrors(page: Page) {
   return errors;
 }
 
-// The WebGL canvas. The line drawing also carries a 2D canvas for the chrome
-// texture (MarkChromeCanvas, data-material="chrome"); it is not the scene.
-const sceneCanvas = (stage: Locator) => stage.locator("canvas:not([data-material])");
-
-const probe = (page: Page) => page.evaluate(() => (window as unknown as { __three?: Record<string, StageProbe> }).__three?.seam);
-
 test.describe("hero", () => {
-  test("the line drawing is one path per ring: an outer ring, then the holes", async ({ page }) => {
-    await page.goto("/");
-    const rings = page.locator('[data-layer="drawing"] svg path');
-    expect(await rings.count()).toBeGreaterThan(1);
-    await expect(rings.first()).toHaveAttribute("data-ring", "outer");
-    await expect(page.locator('[data-layer="drawing"] path[data-ring="outer"]')).toHaveCount(1);
-  });
-
   test("content, links and one h1, with no console errors", async ({ page }) => {
     const errors = collectErrors(page);
     await page.goto("/");
     const hero = page.locator("section[data-hero]");
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Same business\.\s*Better systems\./);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Cross the bridge\.\s*Enter the future\./);
     await expect(hero.getByText("UK Based // Working Globally")).toBeVisible();
-    // The lede is cut to its first clause.
-    await expect(hero.getByText(/^Chinvat Bridge helps businesses/)).toHaveText(
-      "Chinvat Bridge helps businesses use AI, automation and modern software to reduce manual work.",
-    );
-    await expect(hero).not.toContainText("improve digital performance");
+    await expect(hero.getByText("We bridge the gap between complex challenges and intelligent technology.")).toBeVisible();
     await expect(hero.getByRole("link", { name: "Start a conversation" })).toHaveAttribute("href", "/#contact");
     await expect(hero.getByRole("link", { name: "Explore services" })).toHaveAttribute("href", "/#services");
 
-    // Below lg the discipline links are hidden: Services follows straight after and would only repeat them.
-    const nav = hero.locator('nav[aria-label="Disciplines"]');
-    const wide = (page.viewportSize()?.width ?? 0) >= 1024;
-    if (!wide) await expect(nav).toBeHidden();
-    const index = nav.getByRole("link");
+    // The chart's tiers are the discipline links, at every width: named in full, large enough to tap.
+    const index = hero.locator('nav[aria-label="Disciplines"]').getByRole("link");
     const expected = [
       ["AI integration", "/#services-ai"],
       ["Automation & workflows", "/#services-automation"],
       ["Software & web", "/#services-software"],
       ["SEO & growth", "/#services-seo"],
     ];
-    if (wide) {
-      await expect(index).toHaveCount(4);
-      for (const [i, [label, href]] of expected.entries()) {
-        await expect(index.nth(i)).toContainText(label);
-        await expect(index.nth(i)).toHaveAttribute("href", href);
-        const box = await index.nth(i).boundingBox();
-        expect(box!.height).toBeGreaterThanOrEqual(44);
-      }
+    await expect(index).toHaveCount(4);
+    for (const [i, [label, href]] of expected.entries()) {
+      await expect(index.nth(i)).toHaveAccessibleName(label);
+      await expect(index.nth(i)).toHaveAttribute("href", href);
+      const box = await index.nth(i).boundingBox();
+      expect(box!.height).toBeGreaterThanOrEqual(44);
     }
-    // One callout on the mark, where the seam leaves it; the figure's screen-reader caption names all three states.
-    await expect(hero.locator("figure").getByText("Transition", { exact: true })).toBeVisible();
-    await expect(hero.locator("figure figcaption")).toContainText(/Current state.*Transition.*Better systems/);
     // The eyebrow is plain text, not mono capitals.
     const eyebrow = await hero.getByText("UK Based // Working Globally").evaluate((el) => {
       const style = getComputedStyle(el);
@@ -94,9 +51,18 @@ test.describe("hero", () => {
     expect(errors).toEqual([]);
   });
 
-  // The H1 is the LCP on desktop. On narrow screens the three-line lede can
-  // cover more area than the two-line H1, so it may win there; either way the
-  // LCP is server-rendered hero text, never the poster or the canvas.
+  test("a tier lights while its link is hovered", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === "mobile", "no hover on touch");
+    await page.goto("/");
+    await page.waitForTimeout(3500);
+    const glow = page.locator('.cx-tier[data-i="1"] .cx-glow');
+    await expect.poll(() => glow.evaluate((el) => getComputedStyle(el).opacity)).toBe("0");
+    await page.locator('.cx-link[data-i="1"]').hover();
+    await expect.poll(() => glow.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+  });
+
+  // The H1 is the LCP on desktop; on narrow screens the lede may cover more
+  // area. Either way it is server-rendered hero text, never the chart.
   test("the largest contentful paint is the hero text", async ({ page }, testInfo) => {
     await page.goto("/");
     await page.waitForTimeout(1500);
@@ -105,8 +71,7 @@ test.describe("hero", () => {
         new Promise<string>((resolve) => {
           new PerformanceObserver((list) => {
             const entries = list.getEntries() as (PerformanceEntry & { element?: Element | null })[];
-            const last = entries[entries.length - 1];
-            const element = last?.element;
+            const element = entries[entries.length - 1]?.element;
             resolve(
               element?.closest("h1")
                 ? "h1"
@@ -121,88 +86,12 @@ test.describe("hero", () => {
     else expect(["h1", "lede"]).toContain(lcp);
   });
 
-  test("three loads only after the trigger; the stage goes live, hidden from AT, and sleeps offscreen", async ({ page }) => {
-    const errors = collectErrors(page);
-    const scripts = collectScripts(page);
-
-    await page.goto("/", { waitUntil: "load" });
-    const loadedAt = Date.now();
-    const stage = page.locator('[data-stage="seam"]');
-    // The trigger is load + idle (and near the viewport); nothing fetched before load may contain three.
-    await expect(stage).toHaveAttribute("data-stage-state", "live", { timeout: 30_000 });
-    const fetched = await scripts();
-    expect(fetched.filter((s) => s.at <= loadedAt && s.three).map((s) => s.url)).toEqual([]);
-    expect(fetched.some((s) => s.at > loadedAt && s.three)).toBe(true);
-
-    const canvas = sceneCanvas(stage);
-    await expect(canvas).toHaveAttribute("aria-hidden", "true");
-    // window.__three only exists in development builds (three/core/debug.ts), so the
-    // frame and triangle checks are skipped against `next start`.
-    const info = await probe(page);
-    if (info) {
-      expect(info.triangles).toBeLessThanOrEqual(20_000);
-      expect(info.calls).toBeLessThanOrEqual(4);
-    }
-
-    // Offscreen: the loop stops and no more frames are drawn.
-    await page.evaluate(() => window.scrollTo({ top: window.innerHeight * 1.6, behavior: "instant" }));
-    if (info) {
-      await expect.poll(async () => (await probe(page))?.running, { timeout: 15_000 }).toBe(false);
-      const frames = (await probe(page))!.frames;
-      await page.mouse.move(200, 200);
-      await page.waitForTimeout(800);
-      expect((await probe(page))!.frames).toBe(frames);
-    }
-
-    // Far offscreen: the context is released and the poster takes over.
-    await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
-    await expect(stage).toHaveAttribute("data-stage-state", "suspended", { timeout: 15_000 });
-    await expect(sceneCanvas(stage)).toHaveCount(0);
-
-    // Back on screen: it comes back.
-    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
-    await expect(stage).toHaveAttribute("data-stage-state", "live", { timeout: 30_000 });
-    expect(errors).toEqual([]);
-  });
-
-  test("reduced motion: static poster, no canvas, no intro animation", async ({ page }) => {
+  test("reduced motion: no intro animation and no sweep down the tiers", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     const errors = collectErrors(page);
     await page.goto("/", { waitUntil: "load" });
-    const stage = page.locator('[data-stage="seam"]');
-    await expect(stage).toHaveAttribute("data-stage-state", "fallback");
-    await expect(stage.locator('[data-layer="poster"] [data-material="chrome"] img')).toBeVisible();
-    await page.waitForTimeout(1500);
-    await expect(sceneCanvas(stage)).toHaveCount(0);
-    const animation = await page.locator("h1").evaluate((el) => getComputedStyle(el).animationName);
-    expect(animation).toBe("none");
+    expect(await page.locator("h1").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+    expect(await page.locator(".cx-glow").first().evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
     expect(errors).toEqual([]);
-  });
-});
-
-// Playwright forbids test.use({ launchOptions }) inside a describe (it forces a
-// new worker), so this group launches its own browser with WebGL switched off.
-test.describe("hero without WebGL", () => {
-  test("shows the poster and never loads three", async ({ playwright, baseURL }, testInfo) => {
-    const browser = await playwright.chromium.launch({ args: ["--disable-webgl", "--disable-3d-apis"] });
-    const { viewport, deviceScaleFactor, isMobile, hasTouch } = testInfo.project.use;
-    const context = await browser.newContext({ baseURL, viewport, deviceScaleFactor, isMobile, hasTouch });
-    const page = await context.newPage();
-    try {
-      const errors = collectErrors(page);
-      const scripts = collectScripts(page);
-      await page.goto("/", { waitUntil: "load" });
-      const stage = page.locator('[data-stage="seam"]');
-      await expect(stage).toHaveAttribute("data-stage-state", "fallback");
-      const poster = stage.locator('[data-layer="poster"] [data-material="chrome"] img');
-      await expect(poster).toBeVisible();
-      await expect.poll(() => poster.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
-      await page.waitForTimeout(1500);
-      await expect(sceneCanvas(stage)).toHaveCount(0);
-      expect((await scripts()).filter((s) => s.three).map((s) => s.url)).toEqual([]);
-      expect(errors).toEqual([]);
-    } finally {
-      await browser.close();
-    }
   });
 });

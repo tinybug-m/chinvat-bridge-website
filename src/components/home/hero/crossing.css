@@ -1,0 +1,149 @@
+/*
+ * The homepage hero, THE CROSSING (CrossingHero.tsx).
+ */
+
+/*
+ * One engraved chart in a fixed-aspect frame (viewBox 540 x 934, see
+ * CrossingHero); the tier links sit on it by the same coordinates: chart y
+ * is at (y + 34) / 934 of its height. Large screens: chart left, copy right,
+ * centred on the bridge. Small screens: copy, then the chart, centred.
+ */
+.cx {
+  --W: min(100cqw * 0.78, 22rem);
+  --H: calc(var(--W) / 0.5782);
+  position: relative;
+}
+
+@media (min-width: 64rem) {
+  .cx {
+    --H: clamp(36rem, calc(100svh - 9rem), 54rem);
+    --W: calc(var(--H) * 0.5782);
+    height: var(--H);
+  }
+
+  .cx-text {
+    position: absolute;
+    inset-block: 0;
+    left: calc(var(--W) + 3rem);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+.cx-chart {
+  position: relative;
+  width: var(--W);
+  height: var(--H);
+  margin-inline: auto;
+  /* Centre the drawing (bracket to tiers, x 44 to 540), not the frame. */
+  translate: calc(var(--W) * -22 / 540) 0;
+}
+
+@media (min-width: 64rem) {
+  .cx-chart {
+    margin-inline: 0;
+    translate: none;
+  }
+}
+
+/* A tier's hit area: its bounding box, from the chart's own coordinates. */
+.cx-link {
+  position: absolute;
+  left: calc(100% * var(--l) / 540);
+  width: calc(100% * var(--w) / 540);
+  top: calc(100% * (var(--y) + 34) / 934);
+  height: calc(100% * var(--h) / 934);
+  border-radius: 2px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cx-link:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+/* Chart lettering: Archivo condensed caps, as the old charts set it. */
+.cx-caps {
+  font-stretch: 75%;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Small screens draw the chart at about half size: the tier names grow to stay legible. */
+@media (max-width: 63.99rem) {
+  .cx-tier-name {
+    font-size: calc(var(--fs) * 1.25px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The drawn half, then the bridge, then the tiers from the waist down. */
+  .cx-in {
+    animation: cx-in 700ms var(--ease-out-expo) both;
+    animation-delay: var(--d, 0ms);
+  }
+}
+
+@keyframes cx-in {
+  from {
+    opacity: 0;
+    translate: 0 -0.4rem;
+  }
+}
+
+/* The logo material on a tier: off at rest. */
+.cx-glow {
+  opacity: 0;
+  transition: opacity 450ms var(--ease-out-quart);
+}
+
+/* The chevron under each tier's name: it says the tier is a link. */
+.cx-chevron {
+  opacity: 0.45;
+  transition:
+    opacity 250ms var(--ease-out-quart),
+    translate 250ms var(--ease-out-quart);
+}
+
+/* A tier lights while its link is hovered or focused. */
+.cx:has(.cx-link[data-i="0"]:is(:hover, :focus-visible)) .cx-tier[data-i="0"],
+.cx:has(.cx-link[data-i="1"]:is(:hover, :focus-visible)) .cx-tier[data-i="1"],
+.cx:has(.cx-link[data-i="2"]:is(:hover, :focus-visible)) .cx-tier[data-i="2"],
+.cx:has(.cx-link[data-i="3"]:is(:hover, :focus-visible)) .cx-tier[data-i="3"] {
+  & .cx-glow {
+    opacity: 1;
+  }
+
+  & .cx-chevron {
+    opacity: 1;
+    translate: 0 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-glow,
+  .cx-chevron {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The crossing: once the chart is in, the material runs down the tiers and lets go. */
+  .cx-glow {
+    animation: cx-sweep 1100ms var(--ease-in-out-quint) backwards;
+    animation-delay: calc(1900ms + var(--i) * 150ms);
+  }
+}
+
+@keyframes cx-sweep {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+}

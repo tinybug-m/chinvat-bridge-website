@@ -3,35 +3,31 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { ArrowIcon } from "@/components/system/ArrowIcon";
-import { Powder, loadImage } from "./powder";
+import { Screen, loadImage } from "./screen";
 import type { Project } from "./projects";
 
 /*
  * The project index. Each row is a label, a large name and one line of
- * context, and the whole row is the link. On a fine pointer the screenshot
- * is a preview that only exists while a name is hovered or focused: it
- * settles out of drifting powder beside the pointer, sharpens, trails it a
- * little, and blows away when the pointer leaves. Keyboard focus places it
- * beside the focused name.
+ * context, and the whole row is the link. On a fine pointer, hovering or
+ * focusing a name draws a straight hairline from the end of the name to a
+ * frame on the right of the row, and the screenshot switches on in that frame
+ * cell by cell, starting where the line arrives (see screen.ts). The frame has
+ * a fixed place in its row: it never follows the pointer.
  *
  * On touch screens and without JavaScript each row shows its screenshot
  * inline instead (CSS decides, so nothing waits on hydration). Under reduced
- * motion the preview fades in place: no powder, no trailing, no lean.
+ * motion the line appears without drawing and the screenshot fades in.
  */
 
-/** Preview size in CSS px (the screenshots are 16:10), and its gap from the pointer. */
-const PREVIEW_W = 440;
-const PREVIEW_H = PREVIEW_W * (10 / 16);
-const OFFSET = 32;
-/** Time constant (ms) of the trail behind the pointer. */
-const FOLLOW_MS = 95;
-/** Duration (ms) of a full assemble from powder; reduced motion uses a short fade. */
-const ASSEMBLE_MS = 1150;
+/** Duration (ms) of a full switch-on; reduced motion uses a short fade. */
+const ON_MS = 620;
 const FADE_MS = 200;
-/** The fixed header's height plus a gap; the preview never tucks under it. */
-const HEADER_CLEAR = 88;
+/** How long the line takes to reach the frame (matches .work-line in work.css). */
+const LINE_MS = 260;
+/** Gap (px) between the line and the arrow at its start, and the frame at its end. */
+const LINE_GAP = 20;
 
-/** The optimised screenshot at 1080px (the preview is 880 device px at 2x), not the 2000px original. */
+/** The optimised screenshot at 1080px (the frame is at most 880 device px at 2x), not the 2000px original. */
 const previewSrc = (src: string) => `/_next/image?url=${encodeURIComponent(src)}&w=1080&q=75`;
 
 /** A name split before its last word, so the arrow can be kept with that word. */
@@ -47,105 +43,55 @@ export function WorkIndex({ projects }: { projects: Project[] }) {
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
     const reducedQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-    // The preview lives on <body>: a fixed element inside a transformed ancestor (a Reveal mid-rise)
-    // would be positioned against that ancestor instead of the viewport.
-    const frame = document.createElement("div");
-    frame.className = "work-preview";
-    frame.setAttribute("aria-hidden", "true");
-    frame.dataset.state = "off";
-    const canvas = document.createElement("canvas");
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    canvas.width = Math.round(PREVIEW_W * dpr);
-    canvas.height = Math.round(PREVIEW_H * dpr);
-    frame.style.width = `${PREVIEW_W}px`;
-    frame.style.height = `${PREVIEW_H}px`;
-    frame.append(canvas);
-    document.body.append(frame);
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return () => frame.remove();
-
-    const powders = new Map<string, Powder>();
-    const powderFor = (key: string) => {
-      let powder = powders.get(key);
-      if (!powder) {
+    const screens = new Map<string, Screen>();
+    const rowFor = (key: string) => list.querySelector<HTMLElement>(`[data-project="${key}"]`);
+    const screenFor = (key: string) => {
+      let screen = screens.get(key);
+      if (!screen) {
         const project = projects.find((p) => p.key === key);
-        if (!project) return null;
-        powder = new Powder(project.key, previewSrc(project.src), PREVIEW_W, PREVIEW_H);
-        powders.set(key, powder);
+        const canvas = rowFor(key)?.querySelector("canvas");
+        if (!project || !canvas) return null;
+        screen = new Screen(key, canvas, previewSrc(project.src));
+        screens.set(key, screen);
       }
-      return powder;
-    };
-
-    let active: string | null = null;
-    const pointer = { x: 0, y: 0 };
-    const pos = { x: 0, y: 0, lean: 0 };
-    let placed = false;
-    let raf = 0;
-    let last = 0;
-
-    /** Right edge of the current name: the preview starts past it, so it never sits on the name. */
-    let nameRight = 0;
-    const measureName = (key: string | null) => {
-      const name = key ? list.querySelector(`[data-project="${key}"] [data-name]`) : null;
-      nameRight = name ? name.getBoundingClientRect().right : 0;
+      return screen;
     };
 
     /**
-     * Top-left of the frame for a pointer at (x, y): right of the pointer and of the name, held
-     * inside the viewport, and below the fixed header.
+     * Lines the frame up with the end of the name (centred on the line that holds the arrow) and
+     * stretches the line from just past the arrow to the frame's left edge. Layout only, so it reads
+     * the same whether or not the row is mid-transition.
      */
-    const anchor = (x: number, y: number) => {
-      if (focusRow) {
-        const below = focusRow.bottom + 12;
-        return {
-          x: Math.min(window.innerWidth - PREVIEW_W - 16, x),
-          y: below + PREVIEW_H < window.innerHeight - 16 ? below : Math.max(HEADER_CLEAR, focusRow.top - 12 - PREVIEW_H),
-        };
-      }
-      return {
-        x: Math.min(window.innerWidth - PREVIEW_W - 16, Math.max(x, nameRight) + OFFSET),
-        y: Math.min(window.innerHeight - PREVIEW_H - 16, Math.max(HEADER_CLEAR, y - PREVIEW_H / 2)),
-      };
+    const place = (row: HTMLElement) => {
+      const frame = row.querySelector<HTMLElement>("[data-frame]");
+      const line = row.querySelector<HTMLElement>("[data-line]");
+      const end = row.querySelector<HTMLElement>("[data-tail]");
+      if (!frame || !line || !end) return;
+      const box = row.getBoundingClientRect();
+      const tailBox = end.getBoundingClientRect();
+      const y = tailBox.top + tailBox.height / 2 - box.top;
+      frame.style.top = `${y - frame.offsetHeight / 2}px`;
+      const start = tailBox.right - box.left + LINE_GAP;
+      const stop = box.width - frame.offsetWidth - LINE_GAP;
+      line.style.top = `${y}px`;
+      line.style.left = `${start}px`;
+      line.style.width = `${Math.max(0, stop - start)}px`;
     };
+
+    let active: string | null = null;
+    let raf = 0;
+    let last = 0;
 
     const tick = (now: number) => {
       const dt = Math.min(64, now - last);
       last = now;
       const reduced = reducedQuery.matches;
-
-      const goal = anchor(pointer.x, pointer.y);
-      if (!placed || reduced) {
-        pos.x = goal.x;
-        pos.y = goal.y;
-        pos.lean = 0;
-        placed = true;
-      } else {
-        const k = 1 - Math.exp(-dt / FOLLOW_MS);
-        const dx = (goal.x - pos.x) * k;
-        pos.x += dx;
-        pos.y += (goal.y - pos.y) * k;
-        // A slight lean into the direction of travel, settling when the pointer stops.
-        pos.lean += (Math.max(-3, Math.min(3, dx * 0.3)) - pos.lean) * k;
-      }
-      frame.style.transform = `translate3d(${pos.x.toFixed(1)}px, ${pos.y.toFixed(1)}px, 0) rotate(${pos.lean.toFixed(2)}deg)`;
-
       let moving = false;
-      let visible = false;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, PREVIEW_W, PREVIEW_H);
-      for (const powder of powders.values()) {
-        if (powder.step(dt, reduced ? FADE_MS : ASSEMBLE_MS)) moving = true;
-        if (powder.draw(ctx, reduced)) visible = true;
+      for (const screen of screens.values()) {
+        if (screen.step(dt, reduced ? FADE_MS : ON_MS)) moving = true;
+        screen.draw(reduced);
       }
-      frame.dataset.state = visible ? "on" : "off";
-
-      const settled = Math.abs(goal.x - pos.x) < 0.5 && Math.abs(goal.y - pos.y) < 0.5 && Math.abs(pos.lean) < 0.02;
-      if (moving || (active && !settled)) {
-        raf = requestAnimationFrame(tick);
-      } else {
-        raf = 0;
-        if (!active) placed = false;
-      }
+      raf = moving ? requestAnimationFrame(tick) : 0;
     };
     const run = () => {
       if (raf) return;
@@ -155,10 +101,14 @@ export function WorkIndex({ projects }: { projects: Project[] }) {
 
     const show = (key: string | null) => {
       if (key === active) return;
-      for (const powder of powders.values()) if (powder.key !== key) powder.leave();
+      for (const screen of screens.values()) if (screen.key !== key) screen.leave();
       active = key;
-      if (key) powderFor(key)?.enter();
-      for (const row of list.children) (row as HTMLElement).toggleAttribute("data-current", row.getAttribute("data-project") === key);
+      const row = key ? rowFor(key) : null;
+      if (key && row) {
+        place(row);
+        screenFor(key)?.enter(reducedQuery.matches ? 0 : LINE_MS);
+      }
+      for (const item of list.children) (item as HTMLElement).toggleAttribute("data-current", item === row);
       run();
     };
 
@@ -167,56 +117,20 @@ export function WorkIndex({ projects }: { projects: Project[] }) {
 
     const onMove = (event: PointerEvent) => {
       if (event.pointerType !== "mouse" || !fine.matches) return;
-      pointer.x = event.clientX;
-      pointer.y = event.clientY;
-      focusRow = null;
-      const key = rowKey(event.target);
-      show(key);
-      measureName(key);
-      run();
+      show(rowKey(event.target));
     };
     const onLeave = () => show(null);
-    /** Puts the pointer stand-in at the focused name, so the preview sits beside it. */
-    // Keyboard: the preview goes below the focused row (above it near the bottom of the screen),
-    // lined up with the name, so it never covers the row or its focus ring.
-    let focusRow: DOMRect | null = null;
-    const aimAtFocus = (link: Element) => {
-      const row = link.closest("[data-project]");
-      const name = link.querySelector("[data-name]") ?? link;
-      if (!row) return;
-      focusRow = row.getBoundingClientRect();
-      pointer.x = name.getBoundingClientRect().left;
-      nameRight = 0;
-    };
     const onFocus = (event: FocusEvent) => {
       const link = event.target;
       if (!fine.matches || !(link instanceof HTMLAnchorElement) || !link.matches(":focus-visible")) return;
-      placed = false;
       show(rowKey(link));
-      // Measure after the browser has scrolled the focused row into view.
-      requestAnimationFrame(() => {
-        aimAtFocus(link);
-        run();
-      });
     };
     const onBlur = (event: FocusEvent) => {
-      if (!list.contains(event.relatedTarget as Node | null)) {
-        focusRow = null;
-        show(null);
-      }
+      if (!list.contains(event.relatedTarget as Node | null)) show(null);
     };
-    // The page scrolling under a still pointer moves the rows, not the pointer: re-read the row under it.
-    const onScroll = () => {
-      if (!active) return;
-      const focused = document.activeElement;
-      if (focused && list.contains(focused) && focused.matches(":focus-visible")) {
-        aimAtFocus(focused);
-        run();
-        return;
-      }
-      measureName(active);
-      const under = document.elementFromPoint(pointer.x, pointer.y);
-      show(under && list.contains(under) ? rowKey(under) : null);
+    const onResize = () => {
+      const row = active ? rowFor(active) : null;
+      if (row) place(row);
     };
     // Fetch and decode the screenshots the first time the pointer comes near, so the first hover is ready.
     const warm = () => projects.forEach((project) => void loadImage(previewSrc(project.src)).catch(() => {}));
@@ -226,16 +140,15 @@ export function WorkIndex({ projects }: { projects: Project[] }) {
     list.addEventListener("pointerleave", onLeave);
     list.addEventListener("focusin", onFocus);
     list.addEventListener("focusout", onBlur);
-    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
     return () => {
       cancelAnimationFrame(raf);
-      frame.remove();
       list.removeEventListener("pointerenter", warm);
       list.removeEventListener("pointermove", onMove);
       list.removeEventListener("pointerleave", onLeave);
       list.removeEventListener("focusin", onFocus);
       list.removeEventListener("focusout", onBlur);
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
     };
   }, [projects]);
 
@@ -260,7 +173,7 @@ export function WorkIndex({ projects }: { projects: Project[] }) {
                   className="work-name inline-block text-balance font-display text-[length:clamp(2rem,1.2rem+3.4vw,4.25rem)] leading-[1.02] font-medium tracking-[-0.02em] [font-stretch:100%] lg:[font-stretch:112%]"
                 >
                   {head(project.name)}
-                  <span className="whitespace-nowrap">
+                  <span data-tail className="whitespace-nowrap">
                     {tail(project.name)}
                     <ArrowIcon direction="up-right" className="work-arrow ml-[0.25em] inline-block size-[0.4em] align-[0.1em]" />
                   </span>
@@ -271,6 +184,11 @@ export function WorkIndex({ projects }: { projects: Project[] }) {
             <p className="work-context max-w-[30ch] text-balance text-body text-ink-soft md:col-span-4 md:col-start-9 md:pt-3">
               {project.context}
             </p>
+          </div>
+          {/* The hover preview: a line from the name to a fixed frame on the right (fine pointers only). */}
+          <span data-line aria-hidden="true" className="work-line" />
+          <div data-frame aria-hidden="true" className="work-frame">
+            <canvas />
           </div>
           <div className="work-inline pb-8 md:grid md:grid-cols-12 md:gap-x-6">
             <Image

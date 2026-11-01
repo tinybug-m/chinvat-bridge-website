@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 // Whole-page guarantees for the homepage; each section has its own spec too.
-const CHAPTERS = ["services", "work", "approach", "method", "capabilities", "about", "team", "insights", "contact"];
+const CHAPTERS = ["services", "work", "approach", "method", "capabilities", "about", "insights", "contact"];
 
 test.describe("homepage", () => {
   test("one h1 and a heading outline without skipped levels", async ({ page }) => {

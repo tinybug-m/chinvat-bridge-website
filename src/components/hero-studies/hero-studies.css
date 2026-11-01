@@ -1,0 +1,217 @@
+/*
+ * Hero studies (internal). Alternative heroes, kept apart from the shipped
+ * hero so nothing here can leak into it.
+ */
+
+/* ---------- Portal ------------------------------------------------------ */
+
+/*
+ * A dark stage inset under the header (the header's ink text needs paper
+ * behind it). A lit doorway, two pillars (drawn and built, like the mark's
+ * two halves) and the light it throws on the floor: the bridge.
+ */
+.portal {
+  --night: #06090d;
+  --horizon: 66%;
+  --door-w: clamp(9.5rem, 17vw, 17rem);
+  background:
+    radial-gradient(
+      ellipse 34% 48% at 50% 40%,
+      rgb(255 240 214 / 0.11),
+      transparent 72%
+    ),
+    linear-gradient(
+      to bottom,
+      #0a1017 0%,
+      var(--night) var(--horizon),
+      #030507 100%
+    );
+}
+
+/* Small screens: the scene keeps to the top, the text sits on the floor below it. */
+@media (max-width: 63.99rem) {
+  .portal {
+    --horizon: 19rem;
+    --door-w: 7.5rem;
+    --door-h: 13rem;
+    --pillar-h: 14.5rem;
+  }
+}
+
+.portal-door {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - var(--horizon));
+  width: var(--door-w);
+  height: var(--door-h, 56%);
+  translate: -50% 0;
+  border-radius: 999px 999px 0 0;
+  background: radial-gradient(
+    ellipse 90% 70% at 50% 100%,
+    #fffdf8 0%,
+    #f5ecdb 48%,
+    #c9bfac 100%
+  );
+  box-shadow:
+    0 0 60px 6px rgb(255 238 210 / 0.22),
+    0 0 220px 40px rgb(255 232 196 / 0.1);
+}
+
+/* The light on the floor: widens from the threshold to the viewer. */
+.portal-path {
+  position: absolute;
+  left: 50%;
+  top: var(--horizon);
+  bottom: 0;
+  width: calc(var(--door-w) * 3.4);
+  translate: -50% 0;
+  clip-path: polygon(35.3% 0, 64.7% 0, 100% 100%, 0 100%);
+  background: linear-gradient(
+    to bottom,
+    rgb(255 246 230 / 0.34),
+    rgb(255 246 230 / 0.07) 45%,
+    transparent 80%
+  );
+  transform-origin: top center;
+}
+
+.portal-floor {
+  position: absolute;
+  inset: var(--horizon) 0 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.05) 0 1px,
+    transparent 1px 2.4rem
+  );
+  mask-image: linear-gradient(to bottom, transparent, #000 60%);
+}
+
+.portal-pillar {
+  position: absolute;
+  bottom: calc(100% - var(--horizon));
+  width: calc(var(--door-w) * 0.24);
+  height: var(--pillar-h, 61%);
+}
+
+.portal-pillar[data-side="drawn"] {
+  right: calc(50% + var(--door-w) * 0.5 + var(--door-w) * 0.16);
+  box-shadow: inset 0 0 0 1px rgb(246 244 239 / 0.55);
+}
+
+.portal-pillar[data-side="built"] {
+  left: calc(50% + var(--door-w) * 0.5 + var(--door-w) * 0.16);
+}
+
+/* Capital and base: a slightly wider block at each end. */
+.portal-pillar::before,
+.portal-pillar::after {
+  content: "";
+  position: absolute;
+  left: -14%;
+  right: -14%;
+  height: 4%;
+  min-height: 0.5rem;
+  background: inherit;
+  box-shadow: inherit;
+}
+
+.portal-pillar::before {
+  top: 0;
+}
+
+.portal-pillar::after {
+  bottom: 0;
+}
+
+/* Paper-on-night secondary button. */
+.portal-secondary {
+  color: var(--color-paper);
+  box-shadow: inset 0 0 0 1px rgb(246 244 239 / 0.35);
+}
+
+.portal-secondary:hover {
+  box-shadow: inset 0 0 0 1px var(--color-paper);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Small screens: the scene keeps to the top, the text sits on the floor below it. */
+  @media (max-width: 63.99rem) {
+    .portal {
+      --horizon: 19rem;
+      --door-w: 7.5rem;
+      --door-h: 13rem;
+      --pillar-h: 14.5rem;
+    }
+  }
+
+  .portal-door {
+    animation: portal-light 1600ms var(--ease-out-quart) both;
+  }
+
+  .portal-path {
+    animation: portal-path 1400ms var(--ease-out-expo) 500ms both;
+  }
+
+  .portal-pillar {
+    animation: portal-rise 1100ms var(--ease-out-expo) 250ms both;
+  }
+}
+
+@keyframes portal-light {
+  from {
+    opacity: 0;
+    filter: brightness(0.4);
+  }
+}
+
+@keyframes portal-path {
+  from {
+    opacity: 0;
+    scale: 1 0;
+  }
+}
+
+@keyframes portal-rise {
+  from {
+    opacity: 0;
+    translate: 0 1.5rem;
+  }
+}
+
+/* ---------- Monument ---------------------------------------------------- */
+
+/* The rendered mark, very large, cropped by the hero's edges. */
+.monument-mark {
+  position: absolute;
+  aspect-ratio: 1266 / 1280;
+  height: 112%;
+  top: 7%;
+  right: -14%;
+}
+
+/* Small screens: after the text, cropped by the right edge. */
+@media (max-width: 63.99rem) {
+  .monument-mark {
+    position: relative;
+    order: 1;
+    align-self: flex-end;
+    height: auto;
+    width: 115%;
+    top: auto;
+    right: auto;
+    margin: -1rem -30% -3rem 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .monument-mark {
+    animation: monument-settle 1800ms var(--ease-out-expo) both;
+  }
+}
+
+@keyframes monument-settle {
+  from {
+    opacity: 0;
+    scale: 1.05;
+  }
+}

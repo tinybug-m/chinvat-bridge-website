@@ -25,11 +25,9 @@ export const CONTACT_LINK: SiteLink = { label: "Start a conversation", href: "/#
 /**
  * Sections without a header link light up the nearest chapter instead.
  * Capabilities has none on purpose: reading it must not hand the highlight back to Services.
- * Team has none either, but it belongs to About, so About stays lit while reading it.
  */
 export const SECTION_ALIASES: Record<string, string> = {
   method: "approach",
-  team: "about",
 };
 
 /** One anchor per discipline inside #services. */

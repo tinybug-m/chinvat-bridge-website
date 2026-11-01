@@ -6,18 +6,18 @@ const PROJECTS = [
   { key: "naturaglow", name: "NATURAGLOW", label: "Concept", href: "https://beauty-blue-sigma.vercel.app/", context: "Skincare and wellness clinic, Beverly Hills." },
 ];
 
-/** True when the preview canvas has any painted pixel. */
-const previewPainted = (page: Page) =>
-  page.evaluate(() => {
-    const canvas = document.querySelector<HTMLCanvasElement>(".work-preview canvas");
+/** True when the row's preview canvas has any painted pixel. */
+const previewPainted = (page: Page, key: string) =>
+  page.evaluate((key) => {
+    const canvas = document.querySelector<HTMLCanvasElement>(`[data-project="${key}"] [data-frame] canvas`);
     const ctx = canvas?.getContext("2d");
-    if (!canvas || !ctx) return false;
+    if (!canvas || !ctx || !canvas.width) return false;
     const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
     for (let i = 3; i < data.length; i += 4 * 37) if (data[i] > 0) return true;
     return false;
-  });
+  }, key);
 
-const previewState = (page: Page) => page.locator(".work-preview").getAttribute("data-state");
+const frameBox = (page: Page, key: string) => page.locator(`#work [data-project="${key}"] [data-frame]`).boundingBox();
 
 async function hoverName(page: Page, key: string) {
   const name = page.locator(`#work [data-project="${key}"] [data-name]`);
@@ -65,35 +65,40 @@ test.describe("work section", () => {
     }
   });
 
-  test("hovering a name gathers its screenshot beside the pointer, leaving blows it away", async ({ page }, testInfo) => {
+  test("hovering a name draws a line to a fixed frame and switches the screenshot on", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "hover needs a fine pointer");
     await page.goto("/");
     // Fine pointers keep the screenshots out of the rows.
     await expect(page.locator("#work .work-inline").first()).toBeHidden();
-    await expect(page.locator(".work-preview")).toHaveCount(1);
-    await expect(page.locator(".work-preview")).toHaveAttribute("aria-hidden", "true");
+    await expect(page.locator("#work [data-frame]").first()).toHaveAttribute("aria-hidden", "true");
 
     await hoverName(page, "scornik");
-    await expect(page.locator('#work [data-project="scornik"]')).toHaveAttribute("data-current", "");
-    await expect.poll(() => previewState(page), { timeout: 10_000 }).toBe("on");
-    await expect.poll(() => previewPainted(page)).toBe(true);
-    // The preview sits beside the pointer, inside the viewport.
-    const frame = (await page.locator(".work-preview").boundingBox())!;
-    const viewport = page.viewportSize()!;
-    expect(frame.x).toBeGreaterThanOrEqual(0);
-    expect(frame.x + frame.width).toBeLessThanOrEqual(viewport.width);
+    const row = page.locator('#work [data-project="scornik"]');
+    await expect(row).toHaveAttribute("data-current", "");
+    await expect.poll(() => previewPainted(page, "scornik"), { timeout: 10_000 }).toBe(true);
+    // The line runs from past the name to the frame's left edge, on one horizontal.
+    const line = (await row.locator("[data-line]").boundingBox())!;
+    const frame = (await frameBox(page, "scornik"))!;
+    expect(line.x + line.width).toBeLessThanOrEqual(frame.x);
+    expect(Math.abs(line.y - (frame.y + frame.height / 2))).toBeLessThan(2);
+    expect(frame.x + frame.width).toBeLessThanOrEqual(page.viewportSize()!.width);
 
-    // Moving to another name hands over; the others step back.
+    // The frame stays put while the pointer moves along the name.
+    const name = (await row.locator("[data-name]").boundingBox())!;
+    await page.mouse.move(name.x + name.width - 30, name.y + name.height / 2, { steps: 6 });
+    expect(await frameBox(page, "scornik")).toEqual(frame);
+
+    // Moving to another name hands over.
     await hoverName(page, "naturaglow");
     await expect(page.locator('#work [data-project="naturaglow"]')).toHaveAttribute("data-current", "");
-    await expect(page.locator('#work [data-project="scornik"]')).not.toHaveAttribute("data-current", "");
+    await expect(row).not.toHaveAttribute("data-current", "");
 
     await page.mouse.move(5, 5);
-    await expect.poll(() => previewState(page), { timeout: 10_000 }).toBe("off");
     await expect(page.locator("#work [data-current]")).toHaveCount(0);
+    await expect.poll(() => previewPainted(page, "naturaglow"), { timeout: 10_000 }).toBe(false);
   });
 
-  test("keyboard focus shows the preview beside the focused name", async ({ page }, testInfo) => {
+  test("keyboard focus shows the preview for the focused name", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "the preview is for fine pointers");
     await page.goto("/");
     await page.locator("#work").scrollIntoViewIfNeeded();
@@ -103,21 +108,20 @@ test.describe("work section", () => {
     await page.keyboard.press("Shift+Tab");
     await page.keyboard.press("Tab");
     await expect(links.first()).toBeFocused();
-    await expect.poll(() => previewState(page), { timeout: 10_000 }).toBe("on");
+    await expect.poll(() => previewPainted(page, "scornik"), { timeout: 10_000 }).toBe(true);
     const outline = await page
       .locator('#work [data-project="scornik"]')
       .evaluate((el) => getComputedStyle(el).outlineStyle);
     expect(outline).toBe("solid");
   });
 
-  test("under reduced motion the preview still appears, without the powder", async ({ browser }, testInfo) => {
+  test("under reduced motion the preview still appears", async ({ browser }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "hover needs a fine pointer");
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
     const page = await context.newPage();
     await page.goto("/");
     await hoverName(page, "benedict");
-    await expect.poll(() => previewState(page), { timeout: 10_000 }).toBe("on");
-    await expect.poll(() => previewPainted(page)).toBe(true);
+    await expect.poll(() => previewPainted(page, "benedict"), { timeout: 10_000 }).toBe(true);
     await context.close();
   });
 
@@ -133,7 +137,7 @@ test.describe("work section", () => {
       await expect(img).toHaveAttribute("alt", /.{40,}/);
       await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true);
     }
-    await expect(page.locator(".work-preview")).toBeHidden();
+    await expect(page.locator("#work [data-frame]").first()).toBeHidden();
   });
 
   test("names and labels are there without JavaScript, with no horizontal overflow", async ({ browser }, testInfo) => {
