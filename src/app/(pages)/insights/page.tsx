@@ -33,7 +33,7 @@ export default function InsightsIndexPage() {
             "@type": "CollectionPage",
             name: "Insights",
             url: `${SITE_URL}/insights`,
-          }),
+          }).replace(/</g, "\\u003c"),
         }}
       />
     </SiteShell>
