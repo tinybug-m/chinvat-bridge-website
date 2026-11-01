@@ -3,11 +3,12 @@ import { Container } from "@/components/system/Container";
 import { Section } from "@/components/system/Section";
 import { SectionHeading } from "@/components/system/SectionHeading";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/lib/constants";
-import { ContactBrief } from "./ContactBrief";
+import { ContactChat } from "./ContactChat";
 
 /*
- * The closing section: no card or frame, the brief sits straight on the ground.
- * One sentence of lede says what to send; the brief and the address do the rest.
+ * The closing section: no card or frame, the conversation sits straight on the
+ * ground. One sentence of lede says what to send; the conversation and the
+ * address do the rest.
  */
 export function Contact() {
   return (
@@ -35,10 +36,10 @@ export function Contact() {
         </div>
 
         <Reveal delay={120} className="lg:col-span-6 lg:col-start-7">
-          <ContactBrief />
+          <ContactChat />
           <noscript>
             <p className="mt-6 text-small text-ink-soft">
-              The brief needs JavaScript. Please write to{" "}
+              The conversation needs JavaScript. Please write to{" "}
               <a className="text-cobalt-700 underline" href={CONTACT_MAILTO}>
                 {CONTACT_EMAIL}
               </a>

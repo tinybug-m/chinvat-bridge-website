@@ -1,0 +1,47 @@
+/* Each new line in the conversation rises in a few pixels; nothing moves under reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .chat-line {
+    animation: chat-in 280ms var(--ease-out-quart) both;
+  }
+}
+
+@keyframes chat-in {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+/* The typing pause: three dots that brighten in turn. */
+.chat-typing {
+  display: inline-flex;
+  gap: 5px;
+  padding-block: 10px;
+}
+
+.chat-typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-ink-muted);
+  animation: chat-dot 1s ease-in-out infinite;
+}
+
+.chat-typing span:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.chat-typing span:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@keyframes chat-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+  }
+  30% {
+    opacity: 1;
+  }
+}

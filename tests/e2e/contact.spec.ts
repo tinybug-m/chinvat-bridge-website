@@ -1,170 +1,135 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const EMAIL = "chinvatbridge.tech@gmail.com";
+const EMAIL = "contact@chinvatbridge.com";
 
-/** Records programmatic anchor clicks (how the brief opens the mail client) instead of navigating. */
-async function stubMailClient(page: Page) {
-  await page.addInitScript(() => {
-    const w = window as unknown as { __mailto: string[] };
-    w.__mailto = [];
-    HTMLAnchorElement.prototype.click = function (this: HTMLAnchorElement) {
-      w.__mailto.push(this.href);
-    };
+/** Collects the bodies of Server Action POSTs (the request that sends the message). */
+function recordSends(page: Page) {
+  const bodies: string[] = [];
+  page.on("request", (request) => {
+    if (request.method() === "POST" && request.headers()["next-action"]) bodies.push(request.postData() ?? "");
   });
+  return bodies;
 }
 
-async function fill(page: Page) {
-  await page.getByLabel("Name", { exact: true }).fill("Ada Lovelace");
-  await page.getByLabel("Email", { exact: true }).fill("ada@example.com");
-  await page.getByRole("button", { name: "AI & Automation" }).click();
-  await page.getByRole("button", { name: "SEO & Growth" }).click();
-  await page.getByRole("radio", { name: "1–3 months" }).click();
-  await page.getByLabel("Message").fill("We need to automate our weekly reporting.");
+const contact = (page: Page) => page.locator("#contact");
+const log = (page: Page) => contact(page).getByRole("log");
+
+/** Types into the composer (labelled by the question it answers) and sends. */
+async function say(page: Page, question: RegExp, text: string) {
+  await contact(page).getByRole("textbox", { name: question }).fill(text);
+  await contact(page).getByRole("button", { name: "Send", exact: true }).click();
+}
+
+async function fillContact(page: Page, name: string, email: string, company = "") {
+  await contact(page).getByLabel("Name").fill(name);
+  await contact(page).getByLabel("Email").fill(email);
+  if (company) await contact(page).getByLabel(/Company/).fill(company);
+  await contact(page).getByRole("button", { name: "Send message" }).click();
 }
 
 test.describe("contact section", () => {
-  test("shows the closing heading, direct details and the brief", async ({ page }) => {
+  test.use({ reducedMotion: "reduce" });
+
+  test("shows the closing heading, direct details and the first question with topics", async ({ page }) => {
     await page.goto("/");
-    const section = page.locator("#contact");
+    const section = contact(page);
     await expect(section.getByRole("heading", { level: 2 })).toHaveText("Build a better way forward.");
     await expect(section.getByRole("link", { name: EMAIL })).toHaveAttribute("href", `mailto:${EMAIL}`);
-    await expect(section).not.toContainText("Working Globally");
-    // The lede is one sentence: the question before it and the promise after it were cut.
-    await expect(section.getByText(/^Tell us what’s slowing your business down/)).toHaveText(
-      "Tell us what’s slowing your business down, where you’re trying to grow, or what you’d like to build.",
-    );
-    await expect(section).not.toContainText("Have a business problem worth solving?");
-    await expect(section).not.toContainText("most practical next step");
-    await expect(section.getByText("Opens your email app with the brief filled in.")).toBeVisible();
-    await expect(section.getByRole("group", { name: "What do you need?" }).getByRole("button")).toHaveCount(5);
-    await expect(section.getByRole("radiogroup", { name: /Timeline/ }).getByRole("radio")).toHaveCount(4);
-    await expect(section.getByRole("button", { name: "Send brief" })).toBeVisible();
+    await expect(section.getByText("Chinvat Bridge", { exact: true })).toBeVisible();
+    await expect(section.getByText("1 of 3")).toBeVisible();
+    await expect(log(page).getByRole("listitem")).toHaveCount(1);
+    await expect(section.getByRole("group", { name: /What can we help you with/ }).getByRole("button")).toHaveCount(5);
+    await expect(section.getByRole("textbox", { name: /What can we help you with/ })).toBeVisible();
+    // Nothing takes focus on page load.
+    await expect(section.getByRole("textbox")).not.toBeFocused();
   });
 
-  test("validates on submit, then live per field", async ({ page }) => {
-    await stubMailClient(page);
+  test("topic, a sentence, then name and email: sends from the page and confirms", async ({ page }) => {
+    const sends = recordSends(page);
     await page.goto("/");
-    const name = page.getByLabel("Name", { exact: true });
-    const email = page.getByLabel("Email", { exact: true });
-    const message = page.getByLabel("Message");
-    await expect(name).not.toHaveAttribute("aria-invalid", "true");
-    await expect(page.locator("#brief-error-count")).toHaveCount(0);
-    const shadow = page.locator("#brief-needs [data-state=off]").first();
-    const calmShadow = await shadow.evaluate((el) => getComputedStyle(el).boxShadow);
+    await contact(page).getByRole("button", { name: "AI & Automation" }).click();
+    await expect(log(page)).toContainText("What would you like to automate");
+    await expect(contact(page).getByText("2 of 3")).toBeVisible();
+    await say(page, /automate/, "Our weekly reporting.");
+    await expect(contact(page).getByLabel("Name")).toBeFocused();
+    await fillContact(page, "Ada Lovelace", "ada@example.com", "Analytical Engines Ltd");
 
-    await page.getByRole("button", { name: "Send brief" }).click();
-    await expect(page.locator("#contact").getByRole("status").first()).toHaveText("4 fields need attention");
-    await expect(name).toBeFocused();
-    for (const [field, text] of [
-      [name, "Enter your name."],
-      [email, "Enter your email address."],
-      [message, "Tell us a little about the project."],
-    ] as const) {
-      await expect(field).toHaveAttribute("aria-invalid", "true");
-      const describedBy = await field.getAttribute("aria-describedby");
-      await expect(page.locator(`#${describedBy?.split(" ")[0]}`)).toHaveText(text);
+    await expect(log(page)).toContainText("Got it, thanks Ada. Your message is with us, and we’ll reply to ada@example.com.");
+    await expect(contact(page).getByText("Sent", { exact: true })).toBeVisible();
+    expect(sends).toHaveLength(1);
+    for (const part of ["Ada Lovelace", "ada@example.com", "Analytical Engines Ltd", "AI & Automation", "Our weekly reporting."]) {
+      expect(sends[0]).toContain(part);
     }
-    await expect(page.locator("#brief-needs-error")).toHaveText("Choose at least one option.");
-    // The count is also on screen, above the button, and the needs group shows the danger state.
-    const count = page.locator("#brief-error-count");
-    await expect(count).toHaveText("4 fields need attention");
-    await expect(page.locator("#brief-needs")).toHaveAttribute("aria-invalid", "true");
-    expect(await shadow.evaluate((el) => getComputedStyle(el).boxShadow)).not.toBe(calmShadow);
-    expect(await page.evaluate(() => (window as unknown as { __mailto: string[] }).__mailto)).toEqual([]);
+  });
 
+  test("typing straight away skips the topic", async ({ page }) => {
+    const sends = recordSends(page);
+    await page.goto("/");
+    await say(page, /What can we help you with/, "We need a booking system.");
+    await expect(log(page)).toContainText("Where should we send our reply?");
+    await fillContact(page, "Ada", "ada@example.com");
+    await expect(log(page)).toContainText("Got it, thanks Ada.");
+    expect(sends[0]).toContain("We need a booking system.");
+    expect(sends[0]).toContain('"need":""');
+  });
+
+  test("when sending fails, it says so and offers the email app instead", async ({ page }) => {
+    await page.route("**/*", (route) => (route.request().headers()["next-action"] ? route.abort() : route.fallback()));
+    await page.goto("/");
+    await say(page, /What can we help you with/, "We need a booking system.");
+    await fillContact(page, "Ada", "ada@example.com");
+    await expect(contact(page).getByText(/That didn’t go through\. Try again/)).toBeVisible();
+    await expect(contact(page).getByRole("link", { name: "email it to us instead" })).toHaveAttribute("href", /^mailto:.*booking%20system/);
+    await expect(contact(page).getByRole("button", { name: "Send message" })).toBeEnabled();
+  });
+
+  test("checks name and email in place, without sending", async ({ page }) => {
+    const sends = recordSends(page);
+    await page.goto("/");
+    await say(page, /What can we help you with/, "We need a booking system.");
+    await contact(page).getByRole("button", { name: "Send message" }).click();
+    const name = contact(page).getByLabel("Name");
+    await expect(name).toHaveAttribute("aria-invalid", "true");
+    await expect(name).toBeFocused();
+    await expect(contact(page)).toContainText("Add your email so we can reply.");
     await name.fill("Ada");
     await expect(name).not.toHaveAttribute("aria-invalid", "true");
-    await email.fill("not-an-email");
-    await expect(page.locator("#brief-email-error")).toContainText("valid email");
-    await message.fill("Too short");
-    // The error states the rule only; the running count lives in the hint beside it.
-    await expect(page.locator("#brief-message-error")).toHaveText("Add a little more detail: at least 20 characters.");
-    await expect(page.locator("#brief-message-hint")).toHaveText("9 / 20 minimum");
-    await expect(message).toHaveAttribute("aria-describedby", "brief-message-error brief-message-hint");
-    await page.getByRole("button", { name: "Software & Web" }).click();
-    await expect(page.locator("#brief-needs-error")).toBeHidden();
-    await expect(count).toHaveText("2 fields need attention");
-
-    await page.getByRole("button", { name: "Send brief" }).click();
-    await expect(page.locator("#contact").getByRole("status").first()).toHaveText("2 fields need attention");
-    await expect(email).toBeFocused();
-    await email.fill("ada@example.com");
-    await message.fill("Exactly twenty chars!");
-    await page.getByRole("button", { name: "Send brief" }).click();
-    await expect(page.getByText("Your email app should open. If it didn’t:")).toBeVisible();
-    // The sent tick is decorative and ends fully drawn.
-    const tick = page.locator('[aria-labelledby="brief-sent-title"] svg path');
-    await expect(tick).toHaveAttribute("pathLength", "1");
-    await expect(page.locator('[aria-labelledby="brief-sent-title"] svg')).toHaveAttribute("aria-hidden", "true");
-    await expect.poll(() => tick.evaluate((el) => getComputedStyle(el).strokeDashoffset)).toMatch(/^0(px)?$|^none$/);
+    await contact(page).getByLabel("Email").fill("not-an-email");
+    await contact(page).getByRole("button", { name: "Send message" }).click();
+    await expect(contact(page)).toContainText("Check the address");
+    expect(sends).toEqual([]);
   });
 
-  test("opens the exact mailto URL for a filled brief", async ({ page }) => {
-    await stubMailClient(page);
+  test("clicking an answer rewinds to it for editing", async ({ page }) => {
     await page.goto("/");
-    await fill(page);
-    await page.getByLabel(/Company/).fill("Analytical Engines Ltd");
-    await page.getByRole("button", { name: "Send brief" }).click();
-
-    const body = [
-      "Name: Ada Lovelace",
-      "Email: ada@example.com",
-      "Company: Analytical Engines Ltd",
-      "Interested in: AI & Automation, SEO & Growth",
-      "Timeline: 1–3 months",
-      "",
-      "We need to automate our weekly reporting.",
-    ].join("\n");
-    const expected = `mailto:${EMAIL}?subject=${encodeURIComponent("Project enquiry: AI & Automation, SEO & Growth")}&body=${encodeURIComponent(body)}`;
-    await expect.poll(() => page.evaluate(() => (window as unknown as { __mailto: string[] }).__mailto)).toEqual([expected]);
+    await contact(page).getByRole("button", { name: "Workflows" }).click();
+    await say(page, /process/, "Invoices take forever.");
+    await contact(page).getByRole("button", { name: /Invoices take forever\. Edit this answer/ }).click();
+    const box = contact(page).getByRole("textbox", { name: /process/ });
+    await expect(box).toHaveValue("Invoices take forever.");
+    await expect(box).toBeFocused();
+    await contact(page).getByRole("button", { name: /Workflows\. Edit this answer|Workflows Edit this answer/ }).click();
+    await expect(log(page).getByRole("listitem")).toHaveCount(1);
+    await expect(contact(page).getByRole("group", { name: /What can we help you with/ })).toBeVisible();
   });
 
-  test("uses an em dash for an empty company and timeline", async ({ page }) => {
-    await stubMailClient(page);
+  test("send another message starts over", async ({ page }) => {
     await page.goto("/");
-    await page.getByLabel("Name", { exact: true }).fill("Ada");
-    await page.getByLabel("Email", { exact: true }).fill("ada@example.com");
-    await page.getByRole("button", { name: "Not sure yet" }).click();
-    await page.getByLabel("Message").fill("Just a conversation about options.");
-    await page.getByRole("button", { name: "Send brief" }).click();
-    const [url] = await page.evaluate(() => (window as unknown as { __mailto: string[] }).__mailto);
-    const body = decodeURIComponent(url.split("&body=")[1]);
-    expect(body).toContain("Company: —\nInterested in: Not sure yet\nTimeline: —\n\nJust a conversation");
-    expect(decodeURIComponent(url.split("?subject=")[1].split("&")[0])).toBe("Project enquiry: Not sure yet");
+    await say(page, /What can we help you with/, "We need a booking system.");
+    await fillContact(page, "Ada", "ada@example.com");
+    await contact(page).getByRole("button", { name: "Send another message" }).click();
+    await expect(log(page).getByRole("listitem")).toHaveCount(1);
+    await expect(contact(page).getByText("1 of 3")).toBeVisible();
   });
 
-  test("copy fallback: copies, and falls back to selectable text when the clipboard is blocked", async ({ page, context }, testInfo) => {
-    await stubMailClient(page);
-    if (testInfo.project.name === "desktop") await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  test("the page does not grow as the conversation does, no overflow, 44px targets", async ({ page }) => {
     await page.goto("/");
-    await fill(page);
-    await page.getByRole("button", { name: "Send brief" }).click();
-    await expect(page.getByText("Your email app should open. If it didn’t:")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Copy message" })).toBeVisible();
-
-    if (testInfo.project.name === "desktop") {
-      await page.getByRole("button", { name: "Copy address" }).click();
-      await expect(page.getByText("Address copied to the clipboard.")).toBeVisible();
-      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(EMAIL);
-    }
-
-    await page.evaluate(() => {
-      Object.defineProperty(navigator, "clipboard", { value: { writeText: () => Promise.reject(new Error("blocked")) }, configurable: true });
-    });
-    await page.getByRole("button", { name: "Copy message" }).click();
-    await expect(page.getByText(/Copying was blocked/)).toBeVisible();
-    const manual = page.getByLabel("Message to copy");
-    await expect(manual).toBeFocused();
-    await expect(manual).toHaveValue(/^Subject: Project enquiry: AI & Automation, SEO & Growth\n\nName: Ada Lovelace/);
-  });
-
-  test("no horizontal overflow and tap targets are 44px", async ({ page }) => {
-    await page.goto("/");
-    await page.locator("#contact").scrollIntoViewIfNeeded();
-    for (const locator of [page.getByRole("button", { name: "Workflows" }), page.getByRole("radio", { name: "Just exploring" }), page.getByRole("button", { name: "Send brief" })]) {
-      await locator.scrollIntoViewIfNeeded();
-      expect((await locator.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
-    }
+    const height = await page.evaluate(() => document.documentElement.scrollHeight);
+    await contact(page).getByRole("button", { name: "Not sure yet" }).click();
+    await say(page, /slowing/, "Line one.\nLine two.\nLine three.");
+    expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(height);
+    await expect(contact(page).getByRole("button", { name: "Send message" })).toBeVisible();
+    expect((await contact(page).getByRole("button", { name: "Send message" }).boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(0);
   });
