@@ -30,6 +30,10 @@ const SETTLE_MS = 900;
 const SEAM_LEAD = 40;
 /** A hold lets go once the scroll position is this share of the viewport past it. */
 const HOLD_REACH = 0.5;
+/** A burst of layout changes is routed once it has been quiet this long (ms)... */
+const RELAYOUT_SETTLE_MS = 100;
+/** ...and the main thread is idle, or this much later at the most (ms). */
+const RELAYOUT_MAX_MS = 400;
 /** The travelling current: a short bright run with a fainter tail behind it. */
 const COMETS = [
   { length: 84, opacity: 0.22 },
@@ -198,9 +202,20 @@ export function EnergyFlow() {
     const section = layerRef.current?.closest("section");
     if (!section) return;
     let frame = 0;
+    let wait = 0;
+    let idle = 0;
+    // Routing the wire is the costliest thing it does, so a burst of changes (the observer's first
+    // report, fonts settling, a window being dragged wider) is routed once, when the main thread is
+    // free, and never later than RELAYOUT_MAX_MS. The wire only fades in after the hero's intro.
     const relayout = () => {
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => setLayout(measure(section)));
+      clearTimeout(wait);
+      if (idle) cancelIdleCallback(idle);
+      wait = window.setTimeout(() => {
+        const run = () => (frame = requestAnimationFrame(() => setLayout(measure(section))));
+        if ("requestIdleCallback" in window) idle = requestIdleCallback(run, { timeout: RELAYOUT_MAX_MS });
+        else run();
+      }, RELAYOUT_SETTLE_MS);
     };
     const ro = new ResizeObserver(relayout);
     ro.observe(section);
@@ -210,6 +225,8 @@ export function EnergyFlow() {
     document.fonts?.ready.then(relayout);
     return () => {
       cancelAnimationFrame(frame);
+      clearTimeout(wait);
+      if (idle) cancelIdleCallback(idle);
       ro.disconnect();
     };
   }, []);
