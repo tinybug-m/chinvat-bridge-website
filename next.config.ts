@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Keeps local screenshots clean; build and runtime errors still surface.
   devIndicators: false,
+  // No X-Powered-By: it only tells a scanner which framework (and so which advisories) to try.
+  poweredByHeader: false,
   async headers() {
     return [
       {
