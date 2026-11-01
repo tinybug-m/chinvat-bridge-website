@@ -77,7 +77,7 @@ export function ContactChat() {
   const timer = useRef<number>(0);
   /** Only move focus once the visitor has answered something: never on page load. */
   const engaged = useRef(false);
-  const threadRef = useRef<HTMLOListElement>(null);
+  const threadRef = useRef<HTMLDivElement>(null);
   const answerRef = useRef<HTMLDivElement>(null);
   const honeypotRef = useRef<HTMLInputElement>(null);
   /** When the conversation opened; the server treats a send within seconds of it as a bot. */
@@ -219,45 +219,48 @@ export function ContactChat() {
         <p className="text-small tabular-nums text-ink-muted">{PROGRESS[step]}</p>
       </div>
 
-      <ol
+      {/* The log scrolls; the list inside it keeps its own role, so each line is still a list item. */}
+      <div
         ref={threadRef}
         role="log"
         aria-label="Conversation with Chinvat Bridge"
-        className="flex min-h-0 flex-1 list-none flex-col gap-3 overflow-y-auto px-5 py-5 [&>li:first-child]:mt-auto"
+        className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 py-5"
       >
-        {lines.map((l) =>
-          l.from === "us" ? (
-            <li key={l.id} id={`${baseId}-line-${l.id}`} className="chat-line max-w-[30rem] self-start text-pretty text-body text-ink">
-              <span className="sr-only">Chinvat Bridge: </span>
-              {l.text}
-            </li>
-          ) : (
-            <li key={l.id} className="chat-line max-w-[30rem] self-end">
-              <button
-                type="button"
-                disabled={step === "sent"}
-                onClick={() => edit(l)}
-                className="group/answer block rounded-[2px] bg-ink px-4 py-2.5 text-left text-body whitespace-pre-line text-paper outline-offset-2 transition-opacity hover:opacity-90"
-              >
-                <span className="sr-only">You: </span>
+        <ol className="mt-auto flex list-none flex-col gap-3">
+          {lines.map((l) =>
+            l.from === "us" ? (
+              <li key={l.id} id={`${baseId}-line-${l.id}`} className="chat-line max-w-[30rem] self-start text-pretty text-body text-ink">
+                <span className="sr-only">Chinvat Bridge: </span>
                 {l.text}
-                {step === "sent" ? null : (
-                  <span className="mt-0.5 block text-right text-[0.75rem] text-paper/60 group-hover/answer:text-paper">
-                    Edit<span className="sr-only"> this answer</span>
-                  </span>
-                )}
-              </button>
+              </li>
+            ) : (
+              <li key={l.id} className="chat-line max-w-[30rem] self-end">
+                <button
+                  type="button"
+                  disabled={step === "sent"}
+                  onClick={() => edit(l)}
+                  className="group/answer block rounded-[2px] bg-ink px-4 py-2.5 text-left text-body whitespace-pre-line text-paper outline-offset-2 transition-opacity hover:opacity-90"
+                >
+                  <span className="sr-only">You: </span>
+                  {l.text}
+                  {step === "sent" ? null : (
+                    <span className="mt-0.5 block text-right text-[0.75rem] text-paper/60 group-hover/answer:text-paper">
+                      Edit<span className="sr-only"> this answer</span>
+                    </span>
+                  )}
+                </button>
+              </li>
+            ),
+          )}
+          {typing ? (
+            <li aria-hidden="true" className="chat-typing self-start">
+              <span />
+              <span />
+              <span />
             </li>
-          ),
-        )}
-        {typing ? (
-          <li aria-hidden="true" className="chat-typing self-start">
-            <span />
-            <span />
-            <span />
-          </li>
-        ) : null}
-      </ol>
+          ) : null}
+        </ol>
+      </div>
 
       <div ref={answerRef} className="border-t border-line px-5 py-4" hidden={typing}>
         {step === "start" ? (

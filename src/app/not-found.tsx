@@ -62,12 +62,12 @@ export default function NotFound() {
               </div>
 
               <nav aria-label="Other pages" className="intro-rise mt-10 border-t border-line pt-6 lg:mt-12" style={rise(280)}>
-                <ul className="flex flex-wrap gap-x-6 gap-y-3 text-small">
+                <ul className="flex flex-wrap gap-x-6 gap-y-1 text-small">
                   {ROUTES.map((route) => (
                     <li key={route.href}>
                       <a
                         href={route.href}
-                        className="text-ink underline decoration-line-strong underline-offset-[0.22em] transition-colors hover:text-cobalt-700 hover:decoration-cobalt-700"
+                        className="inline-block py-1 text-ink underline decoration-line-strong underline-offset-[0.22em] transition-colors hover:text-cobalt-700 hover:decoration-cobalt-700"
                       >
                         {route.label}
                       </a>
