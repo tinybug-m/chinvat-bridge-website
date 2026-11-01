@@ -1,0 +1,87 @@
+/*
+ * The current (current.ts): a short cobalt pulse runs through each of a
+ * plate's built lines as the morph completes, outward from the seam, just
+ * before the saffron accent lands. On a plate the energy wire reached, it
+ * runs outward from the wire's port instead (aimPlate). It is a loop node (loop.css), so it
+ * pauses, settles and replays with the plate, and it is gone at 0%, at the
+ * END hold (80%) and at 100%.
+ *
+ * On the 7.6s morph clock (+ up to 0.35s outward stagger):
+ *   60 - 61   the pulse appears at the start of its line
+ *   61 - 70   it runs the length of the line and out the far end
+ *
+ * The figure's non-scaling stroke makes dashes unreliable (services.css),
+ * so the pulse opts out of it: dash, offset and width are in board units.
+ */
+.svc-current {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js-reveal .svc-fig .svc-current {
+    --loop-duration: 7.6s;
+    --loop-start: 0.6s;
+    display: inline;
+    vector-effect: none;
+    fill: none;
+    stroke: var(--color-cobalt-700);
+    stroke-width: 2.25;
+    stroke-linecap: round;
+    stroke-dasharray: var(--seg) calc(var(--len) + var(--seg));
+    stroke-dashoffset: var(--seg);
+    opacity: 0;
+    pointer-events: none;
+    animation-name: svc-current;
+    animation-timing-function: linear;
+  }
+
+  /* A plate the energy wire powers: the current leads the build instead of closing it (aimPlate). */
+  .js-reveal .svc-fig[data-reveal-by="energy"] .svc-current {
+    animation-name: svc-current-lead;
+  }
+}
+
+/* --from / --to: aimPlate reverses them for a line whose far end is nearer the energy's port. */
+@keyframes svc-current {
+  0%,
+  60% {
+    opacity: 0;
+    stroke-dashoffset: var(--from, var(--seg));
+  }
+  61% {
+    opacity: 1;
+  }
+  69% {
+    opacity: 1;
+  }
+  70%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: var(--to, calc(-1 * var(--len)));
+  }
+}
+
+/*
+ * The leading current, on a powered plate: it runs while the nodes travel
+ * in, from 22%, so near the port the energy is seen running through the
+ * lines before the faces there turn solid (34 - 46%), and the build follows
+ * it outward.
+ */
+@keyframes svc-current-lead {
+  0%,
+  22% {
+    opacity: 0;
+    stroke-dashoffset: var(--from, var(--seg));
+  }
+  23% {
+    opacity: 1;
+  }
+  31% {
+    opacity: 1;
+  }
+  32%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: var(--to, calc(-1 * var(--len)));
+  }
+}

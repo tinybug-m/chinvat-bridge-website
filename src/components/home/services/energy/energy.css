@@ -1,0 +1,99 @@
+/*
+ * The energy wire (EnergyFlow.tsx), in the plates' own grammar: drawn ahead
+ * (a dashed hairline, like the diagrams' construction lines), built behind
+ * (a solid ink line), and the current itself in cobalt, as in current.css.
+ * Strokes are in screen pixels: the layer's viewBox is its pixel size.
+ */
+.energy-track,
+.energy-wire,
+.energy-comet {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.energy-track {
+  stroke: var(--color-line-strong);
+  stroke-width: 1;
+  stroke-dasharray: 2 5;
+}
+
+.energy-wire {
+  stroke: var(--color-ink);
+  stroke-width: 1.25;
+  stroke-opacity: 0.85;
+}
+
+.energy-comet {
+  stroke: var(--color-cobalt-600);
+  opacity: 0;
+}
+
+.energy-bead {
+  fill: var(--color-cobalt-700);
+}
+
+.energy-head {
+  transition: opacity 500ms var(--ease-out-quart);
+}
+
+.energy-head[data-away] {
+  opacity: 0;
+}
+
+/* A port: hollow until the energy reaches it, then solid ink. */
+.energy-dot {
+  fill: var(--color-paper);
+  stroke: var(--color-line-strong);
+  stroke-width: 1;
+  transition:
+    fill 300ms var(--ease-out-quart),
+    stroke 300ms var(--ease-out-quart);
+}
+
+.energy-port[data-lit] .energy-dot {
+  fill: var(--color-ink);
+  stroke: var(--color-ink);
+}
+
+.energy-ring {
+  fill: none;
+  stroke: var(--color-cobalt-600);
+  stroke-width: 1;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The first arrival at a port: one ring out from it, never repeated. */
+  .energy-port[data-fired] .energy-ring {
+    animation: energy-arrive 900ms var(--ease-out-quart);
+  }
+
+  /*
+   * The wire takes over from the hero: it appears as the material sweeping
+   * down the tiers (cx-sweep, crossing.css: 1900ms + 150ms a tier) peaks on
+   * the last one, so the energy reads as coming out of its foot. Scrolling
+   * earlier starts it at once (EnergyFlow).
+   */
+  .energy {
+    animation: energy-in 700ms var(--ease-out-quart) 2600ms backwards;
+  }
+}
+
+@keyframes energy-arrive {
+  from {
+    opacity: 0.8;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    scale: 4.5;
+  }
+}
+
+@keyframes energy-in {
+  from {
+    opacity: 0;
+  }
+}

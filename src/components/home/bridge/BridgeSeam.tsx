@@ -10,6 +10,7 @@ import { BRIDGE_POSTERS, BRIDGE_SEAM } from "@/components/three/scenes/bridge/co
 import { CURRENT_STATE_ITEMS, FUTURE_STATE_ITEMS } from "@/data/transition";
 import { cn } from "@/lib/utils";
 import { SeamSlider } from "./SeamSlider";
+import { SWEEP_FROM, SWEEP_MIN_PX, SWEEP_TO, sweepValue } from "./sweep";
 
 /*
  * The seam, its stage and the caption that follows it. The value is the
@@ -77,14 +78,6 @@ const posterLayer = cn(
  */
 const POSTER_SIZES = "100vw";
 
-/**
- * Scroll sweep: the value is 0 while the stage's centre is at or below SWEEP_FROM of the viewport
- * height and 100 once it has risen to SWEEP_TO, so the finished bridge is seen with the stage
- * whole and mid-screen. The sweep is never shorter than SWEEP_MIN_PX (landscape phones).
- */
-const SWEEP_FROM = 1;
-const SWEEP_TO = 0.45;
-const SWEEP_MIN_PX = 420;
 /** A value the visitor set fades back into the scroll position over this much scrolling (px). */
 const HOLD_FADE = 320;
 /** Time constant (ms) of the ease that carries the seam to its scroll position, so wheel notches glide. */
@@ -94,11 +87,18 @@ const DRAG_FOLLOW_MS = 45;
 
 const seamOffset = (value: number) => `${100 - value}%`;
 
-/** Share modernised (0..100) for a stage whose centre is `centre` px from the top of a `vh` px tall viewport. */
-function sweepValue(centre: number, vh: number) {
-  const span = Math.max((SWEEP_FROM - SWEEP_TO) * vh, SWEEP_MIN_PX);
-  return Math.min(1, Math.max(0, (SWEEP_FROM * vh - centre) / span)) * 100;
-}
+/*
+ * The energy wire (EnergyFlow) hands its energy to the seam: it comes down onto the seam's ring
+ * where the sweep starts (the stage's top right, value 0), the seam carries it across as it sweeps,
+ * and it leaves from the foot of the seam where the sweep ends (bottom left, value 100). Ports are
+ * shares of the frame; the keepout is the whole stage. data-energy-sweep times the hand-over to the
+ * sweep (sweep.ts), and the wire's arrival sets data-energized, which powers the seam (bridge.css).
+ */
+const SEAM_PORTS = JSON.stringify({
+  ins: [{ x: 1, y: 0, dir: "down" }],
+  outs: [{ x: 0, y: 1, dir: "down" }],
+  keepout: [0, 0, 1, 1],
+});
 
 /*
  * Runs while the HTML is parsed, right after the stage: puts the seam where the scroll already is
@@ -334,11 +334,11 @@ export function BridgeSeam({ className }: { className?: string }) {
       <figure className="m-0">
         <div aria-hidden="true" className="mb-4">
           <Container className="flex justify-between gap-4 text-small text-ink-muted">
-            <span>Current state</span>
-            <span className="text-right">Future direction</span>
+            <span data-energy-text="">Current state</span>
+            <span data-energy-text="" className="text-right">Future direction</span>
           </Container>
         </div>
-        <div ref={frameRef} className="relative mx-auto max-w-[90rem] overflow-x-clip" data-seam-value={value} style={INITIAL_STYLE} suppressHydrationWarning>
+        <div ref={frameRef} className="relative mx-auto max-w-[90rem] overflow-x-clip" data-seam-value={value} data-energy-ports={SEAM_PORTS} data-energy-sweep="" style={INITIAL_STYLE} suppressHydrationWarning>
           <ThreeStage
             id="bridge"
             load={loadBridgeScene}
@@ -351,8 +351,16 @@ export function BridgeSeam({ className }: { className?: string }) {
             <Posters />
           </ThreeStage>
 
-          <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-[clamp(0.5px,var(--seam),calc(100%_-_0.5px))]">
-            <Seam node={0} className="h-full -translate-x-1/2 bg-ink" />
+          {/*
+            * The seam, kept 4px inside the frame like the wire's ports, and its two rails: along the top
+            * from the wire's in port to the seam's ring, the way the energy came, and along the foot from
+            * the seam to the out port, the way it has still to go (bridge.css). So the wire always runs
+            * into the seam and out of it, wherever the sweep has carried it.
+            */}
+          <span aria-hidden="true" className="bridge-rail pointer-events-none absolute top-0 right-[4px] left-[clamp(4px,var(--seam),calc(100%_-_4px))] h-px -translate-y-1/2 bg-ink" />
+          <span aria-hidden="true" className="bridge-rail-ahead pointer-events-none absolute bottom-0 left-[4px] right-[calc(100%_-_clamp(4px,var(--seam),calc(100%_-_4px)))] h-px translate-y-1/2 bg-ink" />
+          <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-[clamp(4px,var(--seam),calc(100%_-_4px))]">
+            <Seam node={0} className="bridge-seam h-full -translate-x-1/2 bg-ink" />
           </div>
 
           <SeamSlider

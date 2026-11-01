@@ -2,7 +2,8 @@ import { expect, test } from "@playwright/test";
 
 /*
  * 03 Method: one crossing in four steps, each a plate of the same stone path.
- * Nothing is driven by scroll and no WebGL stage runs here.
+ * No WebGL stage runs here; each plate draws in when the energy wire from the
+ * hero reaches it, in order, and the wire ends on the last.
  */
 
 const STEPS = ["Discover", "Define", "Build", "Improve"];
@@ -61,6 +62,37 @@ test.describe("method", () => {
     const plate = page.locator("#method li").nth(3).locator(".svc-fig");
     await plate.scrollIntoViewIfNeeded();
     await expect(plate).toHaveAttribute("data-revealed", /.*/, { timeout: 10_000 });
+  });
+
+  test("the energy wire reveals the plates in order and ends on Improve", async ({ page }) => {
+    await page.goto("/");
+    const figs = page.locator("#method li .svc-fig");
+    await expect(figs.first()).toHaveAttribute("data-reveal-by", "energy");
+    // Every plate has a way in; only the last has no way out.
+    const outs = await page
+      .locator("#method li svg")
+      .evaluateAll((svgs) => svgs.map((svg) => JSON.parse(svg.getAttribute("data-energy-ports")!).outs.length));
+    expect(outs).toEqual([1, 1, 1, 0]);
+    // Record the order the plates are revealed in while the page is scrolled down through them.
+    await page.evaluate(() => {
+      const order: number[] = [];
+      (window as unknown as { order: number[] }).order = order;
+      document.querySelectorAll("#method li .svc-fig").forEach((fig, index) =>
+        new MutationObserver(() => {
+          if (fig.hasAttribute("data-revealed") && !order.includes(index)) order.push(index);
+        }).observe(fig, { attributes: true, attributeFilter: ["data-revealed"] }),
+      );
+    });
+    const bottom = await page.evaluate(() => {
+      const r = document.querySelector("#method ol")!.getBoundingClientRect();
+      return r.bottom + scrollY;
+    });
+    for (let y = 0; y < bottom; y += 200) {
+      await page.evaluate((y) => window.scrollTo(0, y), y);
+      await page.waitForTimeout(60);
+    }
+    await expect.poll(() => page.evaluate(() => (window as unknown as { order: number[] }).order), { timeout: 15_000 }).toEqual([0, 1, 2, 3]);
+    await expect(page.locator(".energy-port").last()).toHaveAttribute("data-lit", "");
   });
 
   test("Build and Improve settle slab by slab from the near bank, unclipped", async ({ page }) => {

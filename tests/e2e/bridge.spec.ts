@@ -153,6 +153,25 @@ test.describe("approach (bridge)", () => {
     expect(await section(page).evaluate((element) => getComputedStyle(element).position)).toBe("relative");
   });
 
+  test("the energy wire powers the seam as its sweep starts", async ({ page }) => {
+    await page.goto("/");
+    const frame = section(page).locator("[data-energy-sweep]");
+    const seamColour = () =>
+      frame.evaluate((element) => getComputedStyle(element.querySelector(".bridge-seam")!).backgroundColor);
+    // Before the energy reaches it the seam waits unpowered: a hairline, not the ink seam.
+    await placeStage(page, 1.6);
+    await page.waitForTimeout(400);
+    await expect(frame).not.toHaveAttribute("data-energized");
+    const unpowered = await seamColour();
+    // Down through the sweep: the energy arrives, powers the seam, and the bridge is built.
+    for (const share of [1.3, 1.1, 0.9, 0.7, 0.5, 0.3]) {
+      await placeStage(page, share);
+      await page.waitForTimeout(250);
+    }
+    await expect(frame).toHaveAttribute("data-energized", "", { timeout: 5000 });
+    await expect.poll(seamColour).not.toBe(unpowered);
+  });
+
   test("no sideways scroll with the seam at either end", async ({ page }) => {
     await page.goto("/");
     for (const [share, expected] of [

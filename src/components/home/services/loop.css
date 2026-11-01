@@ -66,4 +66,12 @@
   .js-reveal .svc-fig[data-loop="on"] .loop {
     animation-play-state: running;
   }
+
+  /*
+   * A plate the energy wire reveals (EnergyFlow, PlateLoop's once mode)
+   * waits in its START pose, unpowered, until the energy arrives and builds it.
+   */
+  .js-reveal .svc-fig[data-reveal-by="energy"] .loop {
+    animation-fill-mode: both;
+  }
 }

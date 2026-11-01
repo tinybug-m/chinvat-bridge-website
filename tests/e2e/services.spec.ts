@@ -165,6 +165,43 @@ test.describe("services section", () => {
     await ctx.close();
   });
 
+  test("the energy wire, not scrolling, reveals each plate, which then holds without replaying", async ({ page }) => {
+    await page.goto("/");
+    const fig = page.locator("#services-ai .svc-fig");
+    const port = page.locator(".energy-port").first();
+    // Scroll so the figure's top edge sits at a share of the viewport height.
+    const topAt = (share: number) =>
+      page.evaluate((share) => {
+        const top = document.querySelector("#services-ai .svc-fig")!.getBoundingClientRect().top + scrollY;
+        window.scrollTo(0, top - innerHeight * share);
+      }, share);
+    // The top edge just on screen: in view, but the energy has not reached it yet.
+    await topAt(0.9);
+    await page.waitForTimeout(600);
+    await expect(fig).not.toHaveAttribute("data-revealed");
+    await expect(port).not.toHaveAttribute("data-lit");
+    // Its port above the trigger line: the energy arrives, lights the port and reveals the plate.
+    await topAt(0.3);
+    await expect(port).toHaveAttribute("data-lit", "", { timeout: 3000 });
+    await expect(fig).toHaveAttribute("data-revealed", "");
+    // The story plays once and holds at END; scrolling away and back does not replay it.
+    const time = () =>
+      fig.evaluate((el) =>
+        el
+          .getAnimations({ subtree: true })
+          .filter((a) => (a.effect as KeyframeEffect).target?.classList.contains("loop"))
+          .map((a) => Math.round(Number(a.currentTime)))
+          .join(),
+      );
+    await expect.poll(async () => fig.evaluate((el) => el.getAnimations({ subtree: true }).some((a) => a.playState === "running")), { timeout: 10000 }).toBe(false);
+    const held = await time();
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(400);
+    await topAt(0.3);
+    await page.waitForTimeout(800);
+    expect(await time()).toBe(held);
+  });
+
   test("each diagram opens on its START pose and morphs to END", async ({ page }) => {
     await page.goto("/");
     for (const slug of ["ai", "automation", "software", "seo"]) {
@@ -177,7 +214,8 @@ test.describe("services section", () => {
         fig.evaluate((el, pct) => {
           for (const a of el.getAnimations({ subtree: true })) {
             a.pause();
-            a.currentTime = Number(a.effect?.getTiming().delay ?? 0) + (pct / 100) * 10000;
+            const { delay = 0, duration } = a.effect!.getTiming();
+            a.currentTime = delay + (pct / 100) * Number(duration);
           }
           const start = el.querySelector(".mx-guess, .mx-start, .ai-guess") as Element;
           const end = el.querySelector(".mx-in, .ai-spoke") as Element;

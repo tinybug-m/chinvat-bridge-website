@@ -22,6 +22,11 @@
   }
 }
 
+/* A plate the energy wire reveals reacts the moment it lands: no beat. */
+.method-plate[data-reveal-by="energy"] {
+  --plate-delay: 0ms;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   /* The shared groups, shifted by the plate's beat. */
   .js-reveal [data-reveal].method-plate .svc-drawn:not(.svc-noclip) {

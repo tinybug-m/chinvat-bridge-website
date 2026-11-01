@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import "./services.css";
 import "./loop.css";
 import { PlateLoop } from "./PlateLoop";
+import type { EnergyPorts } from "./energy/EnergyFlow";
 
 interface PlateDiagramProps {
   /** Crop of the 400 x 300 board, so each plate can frame its own artwork. */
@@ -19,6 +20,8 @@ interface PlateDiagramProps {
   draw?: boolean;
   /** Mount the looping-animation controller (see loop.css). Only the Services plates have .loop nodes. */
   loop?: boolean;
+  /** Where the energy wire meets this plate; the wire's arrival then reveals it (EnergyFlow), not scrolling. */
+  energy?: EnergyPorts;
   children: ReactNode;
 }
 
@@ -27,7 +30,7 @@ interface PlateDiagramProps {
  * built on the right; the meaning is carried by the plate's text, so it is
  * hidden from assistive tech.
  */
-export function PlateDiagram({ viewBox, className, style, draw, loop, children }: PlateDiagramProps) {
+export function PlateDiagram({ viewBox, className, style, draw, loop, energy, children }: PlateDiagramProps) {
   // The viewBox width in user units, so CSS can turn a screen-pixel stroke into user units.
   const vbw = Number(viewBox.split(/[\s,]+/)[2]) || 400;
   return (
@@ -35,9 +38,16 @@ export function PlateDiagram({ viewBox, className, style, draw, loop, children }
       delay={80}
       className={cn("svc-fig", draw && "draw-scope", className)}
       style={{ "--vbw": vbw, ...style } as CSSProperties}
+      revealBy={energy ? "energy" : undefined}
     >
       {loop ? <PlateLoop /> : null}
-      <svg aria-hidden="true" viewBox={viewBox} focusable="false" className="block h-auto w-full overflow-visible">
+      <svg
+        aria-hidden="true"
+        viewBox={viewBox}
+        focusable="false"
+        className="block h-auto w-full overflow-visible"
+        data-energy-ports={energy ? JSON.stringify(energy) : undefined}
+      >
         {children}
       </svg>
     </Reveal>

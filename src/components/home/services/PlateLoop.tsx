@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { ONCE_FROM, ONCE_RATE, wireCurrent } from "./current";
 
 /** Where a loop holds its END pose: inside the END hold of every plate's keyframes. */
 const END = 0.8;
@@ -36,6 +37,14 @@ const REPLAY_LEAD_MS = 300;
  *                         figure or it scrolls away
  * Once the controller has driven the animations itself, CSS play-state no
  * longer reaches them (Web Animations), so sync() plays and pauses them too.
+ *
+ * A plate revealed by the energy wire (data-reveal-by="energy", see
+ * EnergyFlow) plays its story once, from START to its END hold, and holds
+ * there: the wire is plugged into its END artwork, and scrolling back and
+ * forth never replays it. It starts moving as soon as the energy lands (no
+ * start delay, no START hold), a pointer never interrupts it, and once it
+ * holds, its details are live whenever the pointer is over it (or it was
+ * tapped), including a pointer that was already there before it finished.
  */
 export function PlateLoop() {
   const ref = useCallback((marker: HTMLSpanElement | null) => {
@@ -43,6 +52,12 @@ export function PlateLoop() {
     if (!marker || !fig) return;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const once = fig.getAttribute("data-reveal-by") === "energy";
+    const unwire = wireCurrent(fig);
+    let started = false;
+    let held = false;
+    let pointing = false;
+    let watch = 0;
     let inView = false;
     let on = false;
     let owned = false;
@@ -56,6 +71,39 @@ export function PlateLoop() {
       });
 
     const stop = () => cancelAnimationFrame(frame);
+
+    /** A once plate's details: live while it holds END, is on screen and has the pointer. */
+    const explore = () => {
+      if (held && on && pointing) fig.setAttribute("data-explore", "on");
+      else fig.removeAttribute("data-explore");
+    };
+
+    /** Pin every loop at its first END hold: the story has been told. */
+    const hold = () => {
+      cancelAnimationFrame(watch);
+      held = true;
+      for (const a of loops()) {
+        const { delay = 0, duration } = a.effect!.getTiming();
+        a.pause();
+        a.currentTime = delay + END * Number(duration);
+        a.playbackRate = 1;
+      }
+      explore();
+    };
+
+    /** While a once plate plays, hold it the moment every loop reaches its first END. */
+    const watchEnd = () => {
+      cancelAnimationFrame(watch);
+      const check = () => {
+        const done = loops().every((a) => {
+          const { delay = 0, duration } = a.effect!.getTiming();
+          return Number(a.currentTime ?? 0) >= delay + END * Number(duration);
+        });
+        if (done) hold();
+        else if (on) watch = requestAnimationFrame(check);
+      };
+      watch = requestAnimationFrame(check);
+    };
 
     /** Each animation's time at its nearest END hold, forwards or back. */
     const endOf = (a: Animation) => {
@@ -89,6 +137,21 @@ export function PlateLoop() {
     const resume = () => {
       stop();
       fig.removeAttribute("data-explore");
+      if (once) {
+        owned = true;
+        for (const a of loops()) {
+          if (held) {
+            a.pause();
+            continue;
+          }
+          a.playbackRate = ONCE_RATE;
+          if (on) a.play();
+          else a.pause();
+        }
+        if (on && !held) watchEnd();
+        explore();
+        return;
+      }
       if (!owned) return;
       const all = loops();
       for (const a of all) {
@@ -122,6 +185,14 @@ export function PlateLoop() {
       for (const a of all) a.currentTime = at;
     };
 
+    /** A once plate's first start: straight to the moment its nodes leave START (staggers kept). */
+    const jumpIn = () => {
+      const all = loops();
+      if (!all.length) return;
+      const base = Math.min(...all.map((a) => a.effect!.getTiming().delay ?? 0));
+      for (const a of all) a.currentTime = base + ONCE_FROM * Number(a.effect!.getTiming().duration);
+    };
+
     const sync = () => {
       on =
         !reduce.matches &&
@@ -132,18 +203,32 @@ export function PlateLoop() {
       if (fig.getAttribute("data-loop") !== next) {
         fig.setAttribute("data-loop", next);
         if (!on) hovering = false;
-        else restart();
+        else if (!once) restart();
+        else if (!started) {
+          started = true;
+          jumpIn();
+        }
         resume();
       }
     };
 
     const enter = (e: PointerEvent) => {
-      if (e.pointerType === "touch" || !on || hovering) return;
+      if (e.pointerType === "touch") return;
+      if (once) {
+        pointing = true;
+        return explore();
+      }
+      if (!on || hovering) return;
       hovering = true;
       settle();
     };
     const leave = (e: PointerEvent) => {
-      if (e.pointerType === "touch" || !hovering) return;
+      if (e.pointerType === "touch") return;
+      if (once) {
+        pointing = false;
+        return explore();
+      }
+      if (!hovering) return;
       hovering = false;
       resume();
     };
@@ -155,6 +240,10 @@ export function PlateLoop() {
       const inside = fig.contains(e.target as Node);
       fig.querySelector(".pick[data-active]")?.removeAttribute("data-active");
       if (inside) (e.target as Element).closest(".pick")?.setAttribute("data-active", "");
+      if (once) {
+        pointing = inside;
+        return explore();
+      }
       if (inside && on && !hovering) {
         hovering = true;
         settle();
@@ -181,6 +270,8 @@ export function PlateLoop() {
     // React 19 runs the returned function when the ref detaches.
     return () => {
       stop();
+      cancelAnimationFrame(watch);
+      unwire();
       io.disconnect();
       mo.disconnect();
       document.removeEventListener("visibilitychange", sync);

@@ -6,6 +6,7 @@ import type { Service } from "@/data/services";
 import { cn } from "@/lib/utils";
 import { ButtonLink } from "@/components/system/Button";
 import { PlateDiagram } from "./PlateDiagram";
+import type { EnergyPorts } from "./energy/EnergyFlow";
 
 /**
  * How a plate sets its text. The plates share one short vocabulary
@@ -35,6 +36,8 @@ export interface PlateProps {
   /** Plate uses .draw lines (needs a definite-width figure; see PlateDiagram). */
   draw?: boolean;
   tone: PlateTone;
+  /** Where the energy wire enters and leaves the diagram (board units). */
+  energy?: EnergyPorts;
   /** Per-plate layout: each plate sets its own spans, offsets and bleed. */
   layout: {
     /** Margin above the plate, which sets the vertical rhythm of the list. */
@@ -48,7 +51,7 @@ export interface PlateProps {
 const BAND =
   "relative isolate py-14 before:absolute before:inset-y-0 before:left-1/2 before:-z-10 before:w-screen before:-translate-x-1/2 before:bg-haze before:content-[''] lg:py-24";
 
-export function ServicePlate({ service, slug, Diagram, viewBox, draw, tone, layout }: PlateProps) {
+export function ServicePlate({ service, slug, Diagram, viewBox, draw, tone, energy, layout }: PlateProps) {
   const linkLabel = service.href?.startsWith("/insights/") ? "Read the article" : "See pricing";
   const headingId = `services-${slug}-title`;
 
@@ -93,7 +96,7 @@ export function ServicePlate({ service, slug, Diagram, viewBox, draw, tone, layo
               )
             ) : null}
           </Reveal>
-          <PlateDiagram viewBox={viewBox} draw={draw} loop className={cn("lg:row-start-1", layout.figure)}>
+          <PlateDiagram viewBox={viewBox} draw={draw} loop energy={energy} className={cn("lg:row-start-1", layout.figure)}>
             <Diagram />
           </PlateDiagram>
         </div>
