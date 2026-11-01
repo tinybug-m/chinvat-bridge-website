@@ -61,6 +61,7 @@ export function DetailsForm({ planId }: { planId: PlanId }) {
             <FormField
               label="Full name"
               name="fullName"
+              autoComplete="name"
               required
               placeholder="e.g. Alex Sterling"
               defaultValue={values?.fullName}
@@ -68,6 +69,7 @@ export function DetailsForm({ planId }: { planId: PlanId }) {
             <FormField
               label="Company name"
               name="companyName"
+              autoComplete="organization"
               required
               placeholder="e.g. Sterling Industrial Ltd"
               defaultValue={values?.companyName}
@@ -75,6 +77,7 @@ export function DetailsForm({ planId }: { planId: PlanId }) {
             <FormField
               label="Business email"
               name="email"
+              autoComplete="email"
               type="email"
               required
               placeholder="alex@sterling.co.uk"
@@ -83,6 +86,7 @@ export function DetailsForm({ planId }: { planId: PlanId }) {
             <FormField
               label="Phone number"
               name="phone"
+              autoComplete="tel"
               type="tel"
               required
               placeholder="+44 20 7946 0192"
@@ -91,6 +95,7 @@ export function DetailsForm({ planId }: { planId: PlanId }) {
             <FormField
               label="Website URL"
               name="website"
+              autoComplete="url"
               type="url"
               required
               placeholder="https://sterling.co.uk"

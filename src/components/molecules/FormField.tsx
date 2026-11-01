@@ -14,6 +14,8 @@ interface FormFieldProps {
   defaultValue?: string;
   options?: SelectOption[];
   rows?: number;
+  /** The field's purpose for autofill (WCAG 1.3.5), e.g. "email" or "organization". */
+  autoComplete?: string;
 }
 
 // Matches components/ui/input: control border on paper-raised, ink on hover.
@@ -29,6 +31,7 @@ export function FormField({
   defaultValue,
   options,
   rows = 3,
+  autoComplete,
 }: FormFieldProps) {
   return (
     <div>
@@ -69,6 +72,7 @@ export function FormField({
           required={required}
           placeholder={placeholder}
           defaultValue={defaultValue}
+          autoComplete={autoComplete}
           className={`${FIELD_CLASS} h-12`}
         />
       )}

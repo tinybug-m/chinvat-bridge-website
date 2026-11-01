@@ -54,7 +54,7 @@ export function LoginForm() {
       </div>
 
       <form action={formAction} className="space-y-5">
-        <FormField label="Email address" name="email" type="email" required placeholder="you@company.com" />
+        <FormField label="Email address" name="email" type="email" autoComplete="email" required placeholder="you@company.com" />
 
         <div aria-live="polite">
           {state ? (
