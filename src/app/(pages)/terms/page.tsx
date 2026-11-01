@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/system/PageHeader";
 import { Container } from "@/components/system/Container";
 import { Prose } from "@/components/system/Prose";
 import { EmailLink } from "@/components/atoms/EmailLink";
+import { SHARED_OPEN_GRAPH } from "@/lib/metadata";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -11,6 +12,8 @@ export const metadata: Metadata = {
     "The terms that govern your subscription to Chinvat Bridge's SEO and content services — billing, cancellation, scope of work and responsibilities.",
   alternates: { canonical: "/terms" },
   openGraph: {
+    ...SHARED_OPEN_GRAPH,
+    url: "/terms",
     title: "Terms of Service — Chinvat Bridge",
     description:
       "The terms that govern your subscription to Chinvat Bridge's SEO and content services — billing, cancellation, scope of work and responsibilities.",

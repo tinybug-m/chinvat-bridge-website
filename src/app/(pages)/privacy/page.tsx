@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/system/PageHeader";
 import { Container } from "@/components/system/Container";
 import { Prose } from "@/components/system/Prose";
 import { EmailLink } from "@/components/atoms/EmailLink";
+import { SHARED_OPEN_GRAPH } from "@/lib/metadata";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -11,6 +12,8 @@ export const metadata: Metadata = {
     "How Chinvat Bridge collects, uses and protects your information when you visit our site or subscribe to a plan, and your rights under UK data protection law.",
   alternates: { canonical: "/privacy" },
   openGraph: {
+    ...SHARED_OPEN_GRAPH,
+    url: "/privacy",
     title: "Privacy Policy — Chinvat Bridge",
     description:
       "How Chinvat Bridge collects, uses and protects your information when you visit our site or subscribe to a plan, and your rights under UK data protection law.",

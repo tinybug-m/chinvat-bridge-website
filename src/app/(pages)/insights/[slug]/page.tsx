@@ -9,6 +9,7 @@ import { TextLink } from "@/components/system/TextLink";
 import { SiteShell } from "@/components/templates/SiteShell";
 import { getAllPosts, getPostBySlug, getRelatedPosts, formatPostDate } from "@/lib/blog";
 import { SITE_URL, SITE_NAME } from "@/lib/constants";
+import { SHARED_OPEN_GRAPH } from "@/lib/metadata";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -30,6 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: post.meta.description,
     alternates: { canonical: `/insights/${post.meta.slug}` },
     openGraph: {
+      ...SHARED_OPEN_GRAPH,
       title: post.meta.title,
       description: post.meta.description,
       url,
