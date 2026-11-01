@@ -34,6 +34,14 @@ async function placeStage(page: Page, share: number) {
   }, share);
 }
 
+/**
+ * The homepage with the 3D scene forced off (the QA switch). Tests of the seam's scroll timing use
+ * it: creating and drawing the WebGL scene on headless Chromium's software renderer can hold the
+ * main thread for seconds under parallel load, which freezes the seam's ease mid-assertion. The
+ * seam, the slider and the caption work the same with or without the scene.
+ */
+const SEAM_ONLY = "/?quality=none";
+
 test.describe("approach (bridge)", () => {
   test("content: heading, lede, a live pair under the stage, no console errors", async ({ page }) => {
     const errors = collectErrors(page);
@@ -108,7 +116,7 @@ test.describe("approach (bridge)", () => {
   });
 
   test("scrolling down builds the path and scrolling up undoes it", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(SEAM_ONLY);
     const value = () => slider(page).getAttribute("aria-valuenow").then(Number);
     /** The value once the ease has finished: the same reading twice, 250 ms apart. */
     const settled = async () => {
@@ -127,7 +135,6 @@ test.describe("approach (bridge)", () => {
       );
 
     // The seam eases to the scroll position, so poll rather than sleep.
-    await placeStage(page, 1.3);
     await expect.poll(value).toBe(0);
     await expect(pairLine(page)).toHaveAttribute("data-pair", "0");
     await expect(pairLine(page)).toHaveAttribute("data-state", "drawn");
@@ -154,7 +161,7 @@ test.describe("approach (bridge)", () => {
   });
 
   test("the energy wire powers the seam as its sweep starts", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(SEAM_ONLY);
     const frame = section(page).locator("[data-energy-sweep]");
     const seamColour = () =>
       frame.evaluate((element) => getComputedStyle(element.querySelector(".bridge-seam")!).backgroundColor);
@@ -173,7 +180,7 @@ test.describe("approach (bridge)", () => {
   });
 
   test("no sideways scroll with the seam at either end", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(SEAM_ONLY);
     for (const [share, expected] of [
       [1.3, 0],
       [0.3, 100],

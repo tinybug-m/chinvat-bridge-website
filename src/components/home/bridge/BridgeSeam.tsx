@@ -257,7 +257,9 @@ export function BridgeSeam({ className }: { className?: string }) {
     // Eases the fractional value toward the scroll position, so the line, the posters and the
     // scene all move smoothly together instead of in whole-percent jumps.
     const ease = (now: number) => {
-      const dt = Math.min(64, now - last);
+      // The first frame's timestamp can predate begin()'s performance.now() on a busy main thread; a negative
+      // step would fling the value far past either end.
+      const dt = Math.max(0, Math.min(64, now - last));
       last = now;
       const gap = target.current - fraction.current;
       const next = Math.abs(gap) < 0.05 ? target.current : fraction.current + gap * (1 - Math.exp(-dt / tau));

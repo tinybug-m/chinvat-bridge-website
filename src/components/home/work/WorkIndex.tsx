@@ -83,7 +83,7 @@ export function WorkIndex({ projects }: { projects: Project[] }) {
     let last = 0;
 
     const tick = (now: number) => {
-      const dt = Math.min(64, now - last);
+      const dt = Math.max(0, Math.min(64, now - last));
       last = now;
       const reduced = reducedQuery.matches;
       let moving = false;

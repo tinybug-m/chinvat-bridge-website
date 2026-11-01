@@ -26,7 +26,7 @@ function useEased(target: number) {
     let raf = 0;
     let last = performance.now();
     const step = (now: number) => {
-      const dt = Math.min(64, now - last);
+      const dt = Math.max(0, Math.min(64, now - last));
       last = now;
       current.current += (target - current.current) * (1 - Math.exp((-4.5 * dt) / 1000));
       if (jump || Math.abs(target - current.current) < 0.003) current.current = target;
