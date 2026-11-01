@@ -91,15 +91,18 @@ export function PlateLoop() {
       explore();
     };
 
-    /** While a once plate plays, hold it the moment every loop reaches its first END. */
+    /**
+     * A once plate's loops each stop on their own first END (the browser ends them there and keeps
+     * that frame), so a node the activation wave reached early holds while later ones are still
+     * building, instead of running on into its return to START. The plate holds when every loop has.
+     */
+    const stopAtEnd = () => {
+      for (const a of loops()) a.effect!.updateTiming({ iterations: END, fill: "forwards" });
+    };
     const watchEnd = () => {
       cancelAnimationFrame(watch);
       const check = () => {
-        const done = loops().every((a) => {
-          const { delay = 0, duration } = a.effect!.getTiming();
-          return Number(a.currentTime ?? 0) >= delay + END * Number(duration);
-        });
-        if (done) hold();
+        if (loops().every((a) => a.playState === "finished")) hold();
         else if (on) watch = requestAnimationFrame(check);
       };
       watch = requestAnimationFrame(check);
@@ -145,6 +148,8 @@ export function PlateLoop() {
             continue;
           }
           a.playbackRate = ONCE_RATE;
+          // A loop already stopped on its END stays there: play() would rewind it.
+          if (a.playState === "finished") continue;
           if (on) a.play();
           else a.pause();
         }
@@ -191,6 +196,7 @@ export function PlateLoop() {
       if (!all.length) return;
       const base = Math.min(...all.map((a) => a.effect!.getTiming().delay ?? 0));
       for (const a of all) a.currentTime = base + ONCE_FROM * Number(a.effect!.getTiming().duration);
+      stopAtEnd();
     };
 
     const sync = () => {

@@ -202,6 +202,40 @@ test.describe("services section", () => {
     expect(await time()).toBe(held);
   });
 
+  test("a plate's nodes each stop on their END pose, never running on into the loop's return", async ({ page }) => {
+    await page.goto("/");
+    // Every frame, the furthest pose any loop of each plate shows: its first END hold is at 80%, and
+    // some keyframes start back toward START right after it.
+    await page.evaluate(() => {
+      const furthest: number[] = [];
+      (window as unknown as { furthest: number[] }).furthest = furthest;
+      const tick = () => {
+        document.querySelectorAll("#services .svc-fig").forEach((fig, i) => {
+          for (const a of fig.getAnimations({ subtree: true })) {
+            if (!(a.effect as KeyframeEffect).target?.classList.contains("loop")) continue;
+            const { currentIteration, progress } = a.effect!.getComputedTiming();
+            if (progress != null) furthest[i] = Math.max(furthest[i] ?? 0, (currentIteration ?? 0) + progress);
+          }
+        });
+        requestAnimationFrame(tick);
+      };
+      tick();
+    });
+    // Read down through all four plates, then give the last one time to finish.
+    const bottom = await page.evaluate(() => document.querySelector("#services-seo")!.getBoundingClientRect().bottom + scrollY);
+    for (let y = 0; y < bottom; y += 150) {
+      await page.evaluate((y) => window.scrollTo(0, y), y);
+      await page.waitForTimeout(150);
+    }
+    await expect
+      .poll(() => page.evaluate(() => document.querySelectorAll("#services .svc-fig[data-revealed]").length))
+      .toBe(4);
+    await page.waitForTimeout(4000);
+    const furthest = await page.evaluate(() => (window as unknown as { furthest: number[] }).furthest);
+    expect(furthest.length).toBeGreaterThan(0);
+    for (const pose of furthest) expect(pose).toBeLessThanOrEqual(0.801);
+  });
+
   test("each diagram opens on its START pose and morphs to END", async ({ page }) => {
     await page.goto("/");
     for (const slug of ["ai", "automation", "software", "seo"]) {
