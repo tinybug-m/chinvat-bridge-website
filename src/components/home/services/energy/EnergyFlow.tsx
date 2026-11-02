@@ -11,7 +11,7 @@ import "./energy.css";
  * Where the wire meets a stop: the ports it may enter and leave by, and the
  * artwork it must not cross. Set as data-energy-ports on a plate's SVG, in
  * its board units (the viewBox), or on any other element, in shares of its
- * box (the Approach stage, whose seam carries the energy across).
+ * box (the Approach stage, whose deck carries the energy across).
  */
 export interface EnergyPorts {
   ins: Port[];
@@ -129,7 +129,7 @@ function measure(section: HTMLElement): Layout | null {
       at = (x, y) => toLayer(r.left + ((x - vb.x) * r.width) / vb.width, r.top + ((y - vb.y) * r.height) / vb.height);
     } else {
       // Shares of the box; a port on its edge is kept 4px inside the box and the page, where the wire
-      // can run (the seam's rails end on the same 4px, bridge.css).
+      // can run.
       const lo = Math.max(4, toLayer(r.left + 4, 0).x);
       const hi = Math.min(sr.width - 4, toLayer(r.right - 4, 0).x);
       at = (x, y) => {
@@ -174,8 +174,9 @@ function measure(section: HTMLElement): Layout | null {
 /**
  * The energy wire: one thread from the foot of the hero's pyramid down the
  * homepage, through every stop in page order (see route.ts for the routing):
- * the four Services plates, the Approach seam, which carries it across the
- * bridge as it sweeps, and the four Method plates, ending on the last. Ahead
+ * the four Services plates, the Approach bridge, whose deck carries it from
+ * the far plinth to the near one as the seam sweeps (BridgeSeam), and the
+ * four Method plates, ending on the last. Ahead
  * of the energy the wire is a drawn, dashed hairline; behind it, a built ink
  * line. The head follows scroll (one line of the viewport, smoothed), and a
  * stop is powered only when the energy reaches its in port: this sets its

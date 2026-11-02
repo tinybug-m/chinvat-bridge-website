@@ -7,10 +7,12 @@ import { Seam } from "@/components/system/Seam";
 import { ThreeStage } from "@/components/three/core/ThreeStage";
 import type { StageHandle } from "@/components/three/core/types";
 import { BRIDGE_POSTERS, BRIDGE_SEAM } from "@/components/three/scenes/bridge/config";
+import { bridgeLayout, type DeckTrace, deckTrace } from "@/components/three/scenes/bridge/path";
 import { CURRENT_STATE_ITEMS, FUTURE_STATE_ITEMS } from "@/data/transition";
 import { cn } from "@/lib/utils";
 import { SeamSlider } from "./SeamSlider";
 import { SWEEP_FROM, SWEEP_MIN_PX, SWEEP_TO, sweepValue } from "./sweep";
+import "../services/energy/energy.css";
 
 /*
  * The seam, its stage and the caption that follows it. The value is the
@@ -88,17 +90,34 @@ const DRAG_FOLLOW_MS = 45;
 const seamOffset = (value: number) => `${100 - value}%`;
 
 /*
- * The energy wire (EnergyFlow) hands its energy to the seam: it comes down onto the seam's ring
- * where the sweep starts (the stage's top right, value 0), the seam carries it across as it sweeps,
- * and it leaves from the foot of the seam where the sweep ends (bottom left, value 100). Ports are
- * shares of the frame; the keepout is the whole stage. data-energy-sweep times the hand-over to the
- * sweep (sweep.ts), and the wire's arrival sets data-energized, which powers the seam (bridge.css).
+ * The energy wire (EnergyFlow) hands its energy to the bridge itself: it comes down onto the far
+ * end of the saffron inlay, on the far plinth, as the sweep starts (value 0); the deck carries it
+ * down its middle, the energy keeping to where the seam crosses it, so the built deck is the powered
+ * part; and it leaves from the near plinth's outer edge as the sweep ends (value 100). The line is
+ * the built path projected by the scene's own camera (deckTrace), so it lies on the deck at every
+ * stage aspect; the ports and the keepout (the plinths and the deck, so the wire never cuts across
+ * the stone on its way in or out) are shares of the frame. data-energy-sweep times the hand-over to
+ * the sweep (sweep.ts), and the wire's arrival sets data-energized, which powers the seam and the
+ * deck's line (bridge.css).
  */
-const SEAM_PORTS = JSON.stringify({
-  ins: [{ x: 1, y: 0, dir: "down" }],
-  outs: [{ x: 0, y: 1, dir: "down" }],
-  keepout: [0, 0, 1, 1],
-});
+const PATH = bridgeLayout();
+
+function deckPorts({ line, boxes }: DeckTrace) {
+  const [fx, fy] = line[0];
+  const [nx, ny] = line[line.length - 1];
+  return JSON.stringify({
+    ins: [
+      { x: fx, y: fy, dir: "down" },
+      { x: fx, y: fy, dir: "left" },
+    ],
+    // Out sideways off the near plinth, or down where a narrow stage has cut the path at its side.
+    outs: [{ x: nx, y: ny, dir: nx > 0 ? "left" : "down" }],
+    keepout: boxes,
+  });
+}
+
+/** Until the stage is measured: the stage's 16:9 shape. */
+const FIRST_PORTS = deckPorts(deckTrace(PATH, 16 / 9));
 
 /*
  * Runs while the HTML is parsed, right after the stage: puts the seam where the scroll already is
@@ -183,11 +202,19 @@ const PairLine = memo(function PairLine({ index, built }: { index: number; built
   );
 });
 
+/** The deck's line in the stage's pixels. */
+const deckPath = ({ width, height, trace }: { width: number; height: number; trace: DeckTrace }) =>
+  trace.line.map(([x, y], i) => `${i ? "L" : "M"}${Math.round(x * width * 10) / 10} ${Math.round(y * height * 10) / 10}`).join("");
+
 /** Server render; constant, so React never rewrites what drive() sets. */
 const INITIAL_STYLE = { "--seam": seamOffset(BRIDGE_SEAM.initial) } as CSSProperties;
 
 export function BridgeSeam({ className }: { className?: string }) {
   const [value, setValue] = useState<number>(BRIDGE_SEAM.initial);
+  /** The deck's line at the stage's measured size, in its pixels. */
+  const [deck, setDeck] = useState<{ width: number; height: number; trace: DeckTrace } | null>(null);
+  const trace = useRef<DeckTrace | null>(null);
+  const headRef = useRef<SVGSVGElement>(null);
   const handle = useRef<StageHandle>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -202,11 +229,28 @@ export function BridgeSeam({ className }: { className?: string }) {
   /** True while the slider's own value, not the eased one, is what the slider and the caption show. */
   const owned = useRef(false);
 
+  /** Where the seam crosses the deck's line (clamped to its ends): the head of the energy on the bridge. */
+  const placeHead = useCallback((next: number) => {
+    const line = trace.current?.line;
+    const frame = frameRef.current;
+    if (!line || !frame) return;
+    const x = Math.min(line[0][0], Math.max(line[line.length - 1][0], 1 - next / 100));
+    let i = 1;
+    while (i < line.length - 1 && line[i][0] > x) i++;
+    const [[x0, y0], [x1, y1]] = [line[i - 1], line[i]];
+    const y = x0 === x1 ? y1 : y0 + ((y1 - y0) * (x - x0)) / (x1 - x0);
+    frame.style.setProperty("--deck-x", `${x * 100}%`);
+    frame.style.setProperty("--deck-y", `${y * 100}%`);
+    // The wire's own head shows the energy before the sweep and after it.
+    headRef.current?.toggleAttribute("data-away", next <= 0 || next >= 100);
+  }, []);
+
   const drive = useCallback(
     (next: number) => {
       if (next === fraction.current) return;
       fraction.current = next;
       frameRef.current?.style.setProperty("--seam", seamOffset(next));
+      placeHead(next);
       handle.current?.set("built", next / 100);
       // The slider's value was set when it moved; the eased fraction only catches up with it.
       if (owned.current) return;
@@ -216,8 +260,24 @@ export function BridgeSeam({ className }: { className?: string }) {
       shown.current = rounded;
       setValue(rounded);
     },
-    [],
+    [placeHead],
   );
+
+  // The deck's line follows the stage's size: its aspect changes the crop (stageTan).
+  useEffect(() => {
+    const frame = frameRef.current;
+    if (!frame) return;
+    const ro = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      if (!width || !height) return;
+      const next = deckTrace(PATH, width / height);
+      trace.current = next;
+      setDeck({ width, height, trace: next });
+      placeHead(fraction.current);
+    });
+    ro.observe(frame);
+    return () => ro.disconnect();
+  }, [placeHead]);
 
   const slide = useCallback(
     (next: number) => {
@@ -340,7 +400,7 @@ export function BridgeSeam({ className }: { className?: string }) {
             <span data-energy-text="" className="text-right">Future direction</span>
           </Container>
         </div>
-        <div ref={frameRef} className="relative mx-auto max-w-[90rem] overflow-x-clip" data-seam-value={value} data-energy-ports={SEAM_PORTS} data-energy-sweep="" style={INITIAL_STYLE} suppressHydrationWarning>
+        <div ref={frameRef} className="relative mx-auto max-w-[90rem] overflow-x-clip" data-seam-value={value} data-energy-ports={deck ? deckPorts(deck.trace) : FIRST_PORTS} data-energy-sweep="" style={INITIAL_STYLE} suppressHydrationWarning>
           <ThreeStage
             id="bridge"
             load={loadBridgeScene}
@@ -354,13 +414,30 @@ export function BridgeSeam({ className }: { className?: string }) {
           </ThreeStage>
 
           {/*
-            * The seam, kept 4px inside the frame like the wire's ports, and its two rails: along the top
-            * from the wire's in port to the seam's ring, the way the energy came, and along the foot from
-            * the seam to the out port, the way it has still to go (bridge.css). So the wire always runs
-            * into the seam and out of it, wherever the sweep has carried it.
+            * The energy on the bridge, down the middle of the deck: ahead of it the drawn, dashed way
+            * across (over the loose slabs it is only inferred), behind it the built ink line, cut at the
+            * energy's head, which the seam carries down the deck (placeHead; bridge.css, energy.css).
             */}
-          <span aria-hidden="true" className="bridge-rail pointer-events-none absolute top-0 right-[4px] left-[clamp(4px,var(--seam),calc(100%_-_4px))] h-px -translate-y-1/2 bg-ink" />
-          <span aria-hidden="true" className="bridge-rail-ahead pointer-events-none absolute bottom-0 left-[4px] right-[calc(100%_-_clamp(4px,var(--seam),calc(100%_-_4px)))] h-px translate-y-1/2 bg-ink" />
+          {deck ? (
+            <>
+              <svg aria-hidden="true" viewBox={`0 0 ${deck.width} ${deck.height}`} className="pointer-events-none absolute inset-0 size-full overflow-visible">
+                <path className="energy-track" d={deckPath(deck)} />
+              </svg>
+              <svg aria-hidden="true" viewBox={`0 0 ${deck.width} ${deck.height}`} className="deck-wire pointer-events-none absolute inset-0 size-full overflow-visible [clip-path:inset(-8px_-8px_-8px_var(--deck-x))]">
+                <path className="energy-wire" d={deckPath(deck)} />
+              </svg>
+              <svg ref={headRef} aria-hidden="true" viewBox="-12 -12 24 24" className="deck-head energy-head pointer-events-none absolute top-[var(--deck-y)] left-[var(--deck-x)] size-6 -translate-1/2 overflow-visible" data-away="">
+                <defs>
+                  <radialGradient id="deck-halo">
+                    <stop offset="0" stopColor="var(--color-cobalt-600)" stopOpacity="0.32" />
+                    <stop offset="1" stopColor="var(--color-cobalt-600)" stopOpacity="0" />
+                  </radialGradient>
+                </defs>
+                <circle r="12" fill="url(#deck-halo)" />
+                <circle className="energy-bead" r="2.25" />
+              </svg>
+            </>
+          ) : null}
           <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-[clamp(4px,var(--seam),calc(100%_-_4px))]">
             <Seam node={0} className="bridge-seam h-full -translate-x-1/2 bg-ink" />
           </div>

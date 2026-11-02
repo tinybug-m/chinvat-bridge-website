@@ -188,3 +188,94 @@ const unit = (a: Vec): Vec => {
   const length = Math.hypot(...a);
   return [a[0] / length, a[1] / length, a[2] / length];
 };
+
+/**
+ * Tangent of the camera's vertical half-angle on a stage of this aspect. The path is framed once at the
+ * reference aspect; a wider stage keeps that width and crops top and bottom (object-cover, like the
+ * posters), up to maxAspect, past which the crop stops.
+ */
+export function stageTan(aspect: number) {
+  const P = BRIDGE_PATH;
+  const tan = Math.tan((P.fov * Math.PI) / 360);
+  const crop = Math.min(aspect, P.maxAspect);
+  return crop >= P.referenceAspect ? (tan * P.referenceAspect) / crop : tan;
+}
+
+type Share = [number, number];
+
+export interface DeckTrace {
+  /**
+   * Down the middle of the built path's top, from the far end of the saffron inlay on the far plinth,
+   * along the deck and over the near plinth to its outer edge: in shares of the stage (y down),
+   * cut where it leaves the stage.
+   */
+  line: Share[];
+  /** The artwork the line runs over, as boxes [x0, y0, x1, y1] in shares: each plinth, and the deck in short runs. */
+  boxes: [number, number, number, number][];
+}
+
+/** The built path as a stage of this aspect shows it, from the same camera as the scene (bridgeFraming, stageTan). */
+export function deckTrace(layout: PathLayout, aspect: number): DeckTrace {
+  const P = BRIDGE_PATH;
+  const { deckEnd, endGap, rightTop, lift } = layout;
+  const { target, distance } = bridgeFraming(layout);
+  const eye: Vec = [
+    target[0] - distance * Math.sin(P.azimuth) * Math.cos(P.elevation),
+    target[1] + distance * Math.sin(P.elevation),
+    target[2] + distance * Math.cos(P.azimuth) * Math.cos(P.elevation),
+  ];
+  const back = unit(sub(eye, target));
+  const right = unit(cross([0, 1, 0], back));
+  const up = cross(back, right);
+  const tan = stageTan(aspect);
+  // Path coordinates (the scene's group sits at x = -deckEnd / 2) to shares of the stage.
+  const share = (x: number, y: number, z: number): Share => {
+    const ray = sub([x - deckEnd / 2, y, z], eye);
+    const depth = -dot(ray, back);
+    return [0.5 + dot(ray, right) / depth / (tan * aspect) / 2, 0.5 - dot(ray, up) / depth / tan / 2];
+  };
+  const bounds = (pts: Share[]): [number, number, number, number] => [
+    Math.min(...pts.map((p) => p[0])),
+    Math.min(...pts.map((p) => p[1])),
+    Math.max(...pts.map((p) => p[0])),
+    Math.max(...pts.map((p) => p[1])),
+  ];
+  /** A box from x0 to x1 along the path, its top following `top` and `height` deep below it. */
+  const block = (x0: number, x1: number, top: (x: number) => number, height: number, depth: number) =>
+    bounds(
+      [x0, (x0 + x1) / 2, x1].flatMap((x) =>
+        [top(x), top(x) - height].flatMap((y) => [share(x, y, -depth / 2), share(x, y, depth / 2)]),
+      ),
+    );
+
+  const nearEdge = -endGap - P.plinthLength - 0.3;
+  const farEdge = deckEnd + endGap + P.plinthLength;
+  // The inlay on the far plinth ends 0.3 short of its far edge (index.ts).
+  const farInlay = farEdge - 0.3;
+  const xs = [farInlay, deckEnd + endGap];
+  for (let x = deckEnd; x > 0; x -= layout.pitch / 3) xs.push(x);
+  xs.push(0, nearEdge);
+  const raw = xs.map((x) => share(x, x > deckEnd ? rightTop : lift(x), 0));
+
+  // Cut at the stage's sides (a narrow stage crops them).
+  const line: Share[] = [];
+  raw.forEach((p, i) => {
+    const q = raw[i - 1];
+    const inside = p[0] >= 0 && p[0] <= 1;
+    if (q && (q[0] >= 0 && q[0] <= 1) !== inside) {
+      const edge = p[0] < 0 || q[0] < 0 ? 0 : 1;
+      const k = (edge - q[0]) / (p[0] - q[0]);
+      line.push([edge, q[1] + (p[1] - q[1]) * k]);
+    }
+    if (inside) line.push(p);
+  });
+
+  const boxes = [
+    block(nearEdge, nearEdge + P.plinthLength, () => 0, P.plinthHeight, P.plinthDepth),
+    block(deckEnd + endGap, farEdge, () => rightTop, P.plinthHeight, P.plinthDepth),
+  ];
+  const runs = 5;
+  for (let i = 0; i < runs; i++)
+    boxes.push(block((deckEnd * i) / runs, (deckEnd * (i + 1)) / runs, lift, P.thickness, P.depth));
+  return { line, boxes };
+}

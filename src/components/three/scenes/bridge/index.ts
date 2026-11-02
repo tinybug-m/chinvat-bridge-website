@@ -23,7 +23,7 @@ import type { SceneContext, SceneInstance, SceneModule, StageSize } from "../../
 import { PALETTE_3D } from "../../materials/palette";
 import { BRIDGE_PATH } from "./config";
 import { mix, smooth } from "./math";
-import { bridgeFraming, bridgeLayout, type SlabPoses } from "./path";
+import { bridgeFraming, bridgeLayout, stageTan, type SlabPoses } from "./path";
 import { chamferedSlab, fadedBlock, glowTexture, stoneTexture } from "./stone";
 
 /*
@@ -241,10 +241,8 @@ export function createScene(context: SceneContext): SceneInstance {
     camera.aspect = aspect;
     // Wider than the reference: keep its width and crop top and bottom, like object-cover on the posters.
     // Past maxAspect the crop stops, so on ultra-wide stages the path keeps its height and gains empty
-    // paper at the sides instead of losing its slabs.
-    const cropAspect = Math.min(aspect, P.maxAspect);
-    camera.fov =
-      cropAspect >= P.referenceAspect ? DEG * 2 * Math.atan((Math.tan((P.fov * Math.PI) / 360) * P.referenceAspect) / cropAspect) : P.fov;
+    // paper at the sides instead of losing its slabs. The page's energy line (deckTrace) uses the same.
+    camera.fov = DEG * 2 * Math.atan(stageTan(aspect));
     camera.updateProjectionMatrix();
     camera.updateMatrixWorld();
     for (const slab of slabs) {

@@ -17,27 +17,31 @@
 }
 
 /*
- * The seam waits unpowered, a hairline with a hollow node, until the energy wire reaches its ring
- * (EnergyFlow sets data-energized on the frame, as the sweep starts); then it is the ink seam with
- * its saffron ring, and one cobalt ring goes out from the node, as at every port the wire reaches
- * (energy.css). Only with motion allowed and JS running: otherwise the seam is simply powered.
+ * The seam waits unpowered, a hairline with a hollow node, until the energy wire reaches the far end
+ * of the bridge (EnergyFlow sets data-energized on the frame, as the sweep starts); then it is the ink
+ * seam with its saffron ring, and one cobalt ring goes out from the node, as at every port the wire
+ * reaches (energy.css). The deck's line is the dashed way across until then; once powered, the built
+ * deck behind the energy's head is the ink wire. Only with motion allowed and JS running: otherwise
+ * the seam and the built deck are simply powered.
  */
 @media (prefers-reduced-motion: no-preference) {
   .js-reveal .bridge-seam,
-  .js-reveal .bridge-rail,
   .js-reveal .bridge-seam > span {
     transition:
       background-color 400ms var(--ease-out-quart),
       border-color 400ms var(--ease-out-quart);
   }
 
-  .js-reveal [data-energy-sweep]:not([data-energized]) :is(.bridge-seam, .bridge-rail) {
+  .js-reveal .deck-wire {
+    transition: opacity 400ms var(--ease-out-quart);
+  }
+
+  .js-reveal [data-energy-sweep]:not([data-energized]) .bridge-seam {
     background-color: var(--color-line-strong);
   }
 
-  /* The rail ahead of the seam is the wire not yet reached: the energy track's dashed hairline (energy.css). */
-  .js-reveal .bridge-rail-ahead {
-    background: repeating-linear-gradient(to right, var(--color-line-strong) 0 2px, transparent 2px 7px);
+  .js-reveal [data-energy-sweep]:not([data-energized]) :is(.deck-wire, .deck-head) {
+    opacity: 0;
   }
 
   .js-reveal [data-energy-sweep]:not([data-energized]) .bridge-seam > span {
@@ -52,6 +56,13 @@
     border-radius: 9999px;
     opacity: 0;
     animation: seam-energize 900ms var(--ease-out-quart);
+  }
+}
+
+/* Under reduced motion nothing travels: the built deck is drawn, without a head. */
+@media (prefers-reduced-motion: reduce) {
+  .deck-head {
+    display: none;
   }
 }
 
