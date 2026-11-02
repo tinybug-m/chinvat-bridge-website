@@ -8,11 +8,11 @@ const MAX_S = 0.35;
 /**
  * The activation wave of a plate the energy wire reached (aimPlate): seconds
  * of the plate's clock per board unit from the port, so it crosses a 400
- * unit board in 1.6s (1s at the once rate, PlateLoop).
+ * unit board in 1.6s (about 0.5s at the once rate, PlateLoop).
  */
 const WAVE_S = 0.004;
 /** A plate the energy wire reveals plays its one story this much faster (PlateLoop), so it builds while the energy is there. */
-export const ONCE_RATE = 2;
+export const ONCE_RATE = 3;
 /** Where that story starts: just before the nodes leave START (every plate's START holds 0 - 14%). */
 export const ONCE_FROM = 0.12;
 /** Where the plate reads as built behind the activation front: its faces have turned solid (34 - 46%). */

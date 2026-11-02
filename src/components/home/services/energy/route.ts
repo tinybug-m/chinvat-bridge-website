@@ -88,6 +88,11 @@ const STEP = 6;
 const SPANS = [36, 56, 80, 112, 150, 200, 270, 360];
 /** Smallest horizontal run into a side port (px). */
 const MIN_RUN = 14;
+/**
+ * A plate is powered once this share of its artwork (from the top) has reached the trigger line, so
+ * it builds as it comes on screen, not once the reader is past it.
+ */
+const EARLY = 0.15;
 
 /** One cubic leaving `a` along `da` and arriving at `b` along `db`. */
 function connector(a: Pt, da: Dir, b: Pt, db: Dir): Cubic | null {
@@ -224,16 +229,17 @@ const KAPPA = 0.5523;
  * A hop may run through the artwork right round its own ports (the box
  * each port is in): that is the wire reaching it. Every other box counts.
  */
-function hop(outs: Port[], ins: Port[], obstacles: Box[], from: Box[] | null, to: Box[] | null, width: number) {
+function hop(outs: Port[], ins: Port[], obstacles: Box[], from: Box[] | null, to: Box[] | null, width: number, lane: number) {
   type Best = { pieces: Piece[]; score: number; port: Port };
   let best = null as Best | null;
   const consider = (pieces: Piece[], score: number, port: Port) => {
     if (!best || score < best.score) best = { pieces, score, port };
   };
 
-  // Every 12px on a phone (24px wider up), plus the middle of each page margin, where a phone has its only free lanes.
-  const grid = new Set<number>([10, width - 10]);
-  for (let x = 8; x <= width - 8; x += width < 640 ? 12 : 24) grid.add(x);
+  // The middle of each page margin, where a phone has its only free lanes, then every 12px between
+  // them on a phone (24px wider up). Nothing nearer the screen's edge: the wire runs inside the page.
+  const grid = new Set<number>([lane, width - lane]);
+  for (let x = lane + 12; x <= width - lane; x += width < 640 ? 12 : 24) grid.add(x);
 
   for (const p of outs) {
     const f = from?.filter((b) => inside(p, b, CLEARANCE)) ?? null;
@@ -261,7 +267,7 @@ function hop(outs: Port[], ins: Port[], obstacles: Box[], from: Box[] | null, to
       const intoAt = new Map<number, Curve>();
       const exitAt = new Map<number, Curve>();
       for (const x of lanes) {
-        if (x < 4 || x > width - 4) continue;
+        if (x < lane || x > width - lane) continue;
         const intos = SPANS.map((h) => curve(connector(p, p.dir, { x, y: p.y + h }, "down"), "down", f, null));
         const cheapest = (cs: (Curve | null)[]) =>
           cs.reduce<Curve | null>((m, c) => (c && (!m || c.length + c.cost < m.length + m.cost) ? c : m), null);
@@ -351,9 +357,12 @@ function hop(outs: Port[], ins: Port[], obstacles: Box[], from: Box[] | null, to
 /**
  * Route the wire from `origin` through every stop. A stop with no outs ends
  * the wire. `obstacles` are text boxes; each stop's keepout is added for the
- * hops that do not start or end in it.
+ * hops that do not start or end in it. `lane` is the middle of the page
+ * margin, the outermost the wire may run; `reach` is how far below the
+ * trigger line a port may be when the energy reaches it (px), so the head is
+ * still on screen there.
  */
-export function routeWire(origin: Pt, stops: Stop[], text: Box[], width: number): Wire {
+export function routeWire(origin: Pt, stops: Stop[], text: Box[], width: number, lane: number, reach: number): Wire {
   CLEARANCE = width < 640 ? 7 : 14;
   const segments: Segment[] = [];
   const arrivals: Arrival[] = [];
@@ -369,15 +378,16 @@ export function routeWire(origin: Pt, stops: Stop[], text: Box[], width: number)
     const top = Math.min(...outs.map((p) => p.y)) - SPANS[SPANS.length - 1] - CLEARANCE;
     const bottom = Math.max(...stop.ins.map((q) => q.y)) + CLEARANCE;
     const obstacles = [...text, ...stops.flatMap((s) => s.keepout)].filter((b) => b.y1 > top && b.y0 < bottom);
-    const best = hop(outs, stop.ins, obstacles, from, stop.keepout, width);
+    const best = hop(outs, stop.ins, obstacles, from, stop.keepout, width, lane);
     const points = sample(best.pieces);
     const length = points[points.length - 1].at;
     segments.push({ d: toPath(best.pieces), length, start: at, points });
-    // The energy arrives when the port or the middle of the artwork reaches the line, whichever is first,
-    // so a plate whose port is low (the SEO baseline) is never on screen and still unbuilt.
+    // The energy arrives when the port or the top of the artwork (EARLY) reaches the line, whichever is
+    // first, so a plate builds as it comes on screen; but never while its port is more than `reach`
+    // below the line, so a low port (the SEO baseline) is on screen when the energy lands on it.
     const y0 = Math.min(...stop.keepout.map((b) => b.y0));
     const y1 = Math.max(...stop.keepout.map((b) => b.y1));
-    const arrive = stop.arriveY ?? Math.min(best.port.y, (y0 + y1) / 2);
+    const arrive = stop.arriveY ?? Math.min(best.port.y, Math.max(y0 + EARLY * (y1 - y0), best.port.y - reach));
     keys.push({ y: leaveY ?? points[0].y, at }, { y: arrive, at: at + length });
     at += length;
     arrivals.push({ stop: i, port: stop.ins.indexOf(best.port), x: best.port.x, y: best.port.y, at });

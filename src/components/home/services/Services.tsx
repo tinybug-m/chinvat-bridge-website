@@ -13,8 +13,12 @@ import { EnergyFlow } from "./energy/EnergyFlow";
  * title on the right, SEO bleeding off the right edge; the section clips the
  * overhang) but every diagram draws at one scale: six columns on desktop
  * and a crop about 368 units wide (SEO's 400 includes its bleed), at most
- * 40rem below lg. `tone` varies the text: title scale, description size and
- * how the link looks.
+ * 40rem on a phone. On a tablet (md) the stacked figures are held to about
+ * half the page and set off to alternate sides of it (right, left, centre,
+ * right), so they read as illustrations of the text above them, not as
+ * full-width slabs. At lg the text takes five columns, four from xl, so it
+ * never sets in a narrow strip. `tone` varies the text: title scale,
+ * description size and how the link looks.
  *
  * `energy` is where the wire from the hero (EnergyFlow) meets each diagram,
  * on its END artwork: the AI graph's top or leftmost node, the automation
@@ -39,8 +43,8 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
     layout: {
       article: "mt-10 lg:mt-12",
       grid: "lg:items-end",
-      text: "lg:col-span-4 lg:col-start-9 lg:pb-8",
-      figure: "max-w-[40rem] lg:col-span-6 lg:col-start-2 lg:max-w-none",
+      text: "lg:col-span-5 lg:col-start-8 lg:pb-8 xl:col-span-4 xl:col-start-9",
+      figure: "max-w-[40rem] md:max-w-[30rem] md:justify-self-end lg:col-span-6 lg:col-start-2 lg:max-w-none lg:justify-self-auto",
     },
   },
   {
@@ -57,7 +61,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
       article: "mt-24 lg:mt-36",
       grid: "lg:items-start",
       text: "lg:col-span-5 lg:col-start-1",
-      figure: "max-w-[40rem] lg:col-span-6 lg:col-start-7 lg:mt-32 lg:max-w-none",
+      figure: "max-w-[40rem] md:max-w-[34rem] lg:col-span-6 lg:col-start-7 lg:mt-32 lg:max-w-none",
     },
   },
   {
@@ -76,8 +80,8 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
     layout: {
       article: "mt-20 lg:mt-40",
       grid: "lg:items-center",
-      text: "lg:col-span-4 lg:col-start-8",
-      figure: "max-w-[40rem] lg:col-span-6 lg:col-start-1 lg:max-w-none",
+      text: "lg:col-span-5 lg:col-start-8 xl:col-span-4",
+      figure: "max-w-[40rem] md:max-w-[28rem] md:justify-self-center lg:col-span-6 lg:col-start-1 lg:max-w-none lg:justify-self-auto",
     },
   },
   {
@@ -93,8 +97,8 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
     layout: {
       article: "mt-24 lg:mt-36",
       grid: "lg:items-start",
-      text: "lg:col-span-4 lg:col-start-1 lg:pt-12",
-      figure: "svc-bleed-r lg:col-span-6 lg:col-start-7",
+      text: "lg:col-span-5 lg:col-start-1 lg:pt-12 xl:col-span-4",
+      figure: "svc-bleed-r md:max-w-[36rem] md:justify-self-end lg:col-span-6 lg:col-start-7 lg:max-w-none lg:justify-self-auto",
     },
   },
 ];

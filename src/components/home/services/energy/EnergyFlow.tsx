@@ -20,8 +20,13 @@ export interface EnergyPorts {
   keepout: [number, number, number, number] | [number, number, number, number][];
 }
 
-/** The head sits on this line of the viewport (share of its height from the top). */
-const LINE = 0.62;
+/**
+ * The head sits on this line of the viewport (share of its height from the top): low, so the energy
+ * reaches a plate as it comes on screen and the plate is built by the time it is read.
+ */
+const LINE = 0.76;
+/** A port is never more than this far down the viewport when the energy lands on it, so the landing is seen. */
+const PORT_MAX = 0.94;
 /** Smoothing of the head towards its scroll position (ms). */
 const TAU = 110;
 /** How long a plate without a timed story (a Method plate's one-shot draw-in) holds the energy before passing it on (ms). */
@@ -29,7 +34,7 @@ const SETTLE_MS = 900;
 /** The energy reaches the seam this far (px of scrolling) before its sweep starts. */
 const SEAM_LEAD = 40;
 /** A hold lets go once the scroll position is this share of the viewport past it. */
-const HOLD_REACH = 0.5;
+const HOLD_REACH = 0.25;
 /** A burst of layout changes is routed once it has been quiet this long (ms)... */
 const RELAYOUT_SETTLE_MS = 100;
 /** ...and the main thread is idle, or this much later at the most (ms). */
@@ -107,6 +112,12 @@ function measure(section: HTMLElement): Layout | null {
   });
   const origin = mr ? toLayer(mr.left + mr.width / 2, mr.bottom) : toLayer(sr.left + 16, sr.top);
   const vh = window.innerHeight;
+  // The middle of the page margin: the wire's outermost lane, and how far in an edge port is kept.
+  const gutter = document.querySelector("#services .px-gutter");
+  const margin = gutter
+    ? gutter.getBoundingClientRect().left - sr.left + Number.parseFloat(getComputedStyle(gutter).paddingLeft)
+    : 20;
+  const lane = Math.round(margin / 2);
 
   const box = (r: { left: number; right: number; top: number; bottom: number }): Box => {
     const a = toLayer(r.left, r.top);
@@ -126,12 +137,16 @@ function measure(section: HTMLElement): Layout | null {
     let at: (x: number, y: number) => { x: number; y: number };
     if (node instanceof SVGSVGElement) {
       const vb = node.viewBox.baseVal;
-      at = (x, y) => toLayer(r.left + ((x - vb.x) * r.width) / vb.width, r.top + ((y - vb.y) * r.height) / vb.height);
+      // A port on artwork bled off the page (the SEO baseline) is pulled in to the margin's lane.
+      at = (x, y) => {
+        const p = toLayer(r.left + ((x - vb.x) * r.width) / vb.width, r.top + ((y - vb.y) * r.height) / vb.height);
+        return { x: Math.min(sr.width - lane, Math.max(lane, p.x)), y: p.y };
+      };
     } else {
-      // Shares of the box; a port on its edge is kept 4px inside the box and the page, where the wire
-      // can run.
-      const lo = Math.max(4, toLayer(r.left + 4, 0).x);
-      const hi = Math.min(sr.width - 4, toLayer(r.right - 4, 0).x);
+      // Shares of the box; a port on its edge is kept 4px inside the box and in the page margin's
+      // lane, where the wire can run.
+      const lo = Math.max(lane, toLayer(r.left + 4, 0).x);
+      const hi = Math.min(sr.width - lane, toLayer(r.right - 4, 0).x);
       at = (x, y) => {
         const p = toLayer(r.left + x * r.width, r.top + y * r.height);
         return { x: Math.min(hi, Math.max(lo, p.x)), y: p.y };
@@ -159,7 +174,7 @@ function measure(section: HTMLElement): Layout | null {
     return stop;
   });
 
-  const wire = routeWire(origin, stops, text, sr.width);
+  const wire = routeWire(origin, stops, text, sr.width, lane, (PORT_MAX - LINE) * vh);
   const height = Math.max(...wire.segments.flatMap((s) => s.points.map((p) => p.y))) + 32;
   return {
     top,

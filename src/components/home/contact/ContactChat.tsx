@@ -212,8 +212,10 @@ export function ContactChat() {
   const lastOurs = [...lines].reverse().find((l) => l.from === "us");
   const questionId = lastOurs ? `${baseId}-line-${lastOurs.id}` : undefined;
 
+  // One height throughout, so the page never grows as the conversation does; lower on a phone, where
+  // the full height opened on a tall empty well above the first line.
   return (
-    <div className="flex h-[min(38rem,80svh)] flex-col rounded-[2px] border border-line bg-paper-raised">
+    <div className="flex h-[min(30rem,70svh)] flex-col rounded-[2px] border border-line bg-paper-raised md:h-[min(38rem,80svh)]">
       <div className="flex items-baseline justify-between gap-4 border-b border-line px-5 py-3.5">
         <p className="text-body font-medium text-ink">Chinvat Bridge</p>
         <p className="text-small tabular-nums text-ink-muted">{PROGRESS[step]}</p>
