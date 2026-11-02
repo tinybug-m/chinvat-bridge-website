@@ -34,13 +34,6 @@
   }
 }
 
-/* The chrome of the built half arrives as the last holes land (~1s). */
-@media (prefers-reduced-motion: no-preference) {
-  [data-layer="drawing"] .mark-chrome {
-    animation: mark-chrome-in 600ms var(--ease-drawn) 700ms both;
-  }
-}
-
 /*
  * The chrome canvas (MarkChromeCanvas) is blank until its texture is painted,
  * which the script holds until ~0.7s; data-drawn then fades it in.

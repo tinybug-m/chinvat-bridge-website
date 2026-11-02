@@ -112,8 +112,7 @@
   --rise-distance: 0.75rem;
 
   /*
-   * The primary fill is the logo's material, so it follows the Chrome /
-   * Classic toggle under the hero mark. Chrome is the mark's liquid chrome:
+   * The primary fill is the logo's material, the mark's liquid chrome:
    * gunmetal with oil-slick blue, cyan, amber and a trace of violet, layered
    * as soft pools. Drawn at 180% width: rest shows the left part, hover
    * slides the pools across. The pools stay deep enough for paper text.
@@ -143,26 +142,6 @@
   --material-edge:
     inset 0 1px 0 rgb(255 255 255 / 0.28),
     inset 0 -1px 0 rgb(0 0 0 / 0.5);
-}
-
-/* Classic: deep cerulean with an azure sheen and a saffron glint, paper text. */
-:root[data-logo-material="classic"] {
-  --material-fill: linear-gradient(
-    110deg,
-    #0b263c 0%,
-    #0f557d 14%,
-    #0b263c 27%,
-    #1d75a3 41%,
-    #0f557d 50%,
-    #0b263c 62%,
-    #5e4019 76%,
-    #8e5a1e 90%,
-    #ebc26b 100%
-  );
-  --material-ink: var(--color-paper);
-  --material-edge:
-    inset 0 1px 0 rgb(255 255 255 / 0.16),
-    inset 0 -1px 0 rgb(0 0 0 / 0.35);
 }
 
 @utility bg-material {

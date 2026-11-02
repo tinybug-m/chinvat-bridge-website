@@ -61,7 +61,7 @@ test.describe("about section", () => {
     await page.goto("/");
     const figure = page.locator("#about figure");
     await expect(figure.locator('path[data-part="left"]')).toHaveCount(1);
-    // The right half is a group (chrome and classic materials inside), not a bare path.
+    // The right half is a group (the clipped chrome inside), not a bare path.
     await expect(figure.locator('[data-part="right"]')).toHaveCount(1);
   });
 

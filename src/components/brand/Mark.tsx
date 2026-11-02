@@ -1,8 +1,6 @@
 import { useId } from "react";
 import { preload } from "react-dom";
 import { cn } from "@/lib/utils";
-import "./logo-material.css";
-import { MarkClassicGradient } from "./mark-classic";
 import { MARK_LEFT_PATH, MARK_RIGHT_PATH } from "./mark-geometry";
 import { MARK_TEXTURE } from "./mark-texture";
 
@@ -35,15 +33,11 @@ interface MarkProps {
   sheen?: boolean;
 }
 
-/**
- * Glass variants render both materials, chrome and the classic gradient; the
- * visitor's choice (<html data-logo-material>) shows one.
- */
+/** Glass variants fill the right half with the liquid chrome texture. */
 export function Mark({ variant = "glass", className, title, size = "lg", priority = false, sheen = false }: MarkProps) {
   const uid = useId();
   const clipId = `${uid}-clip`;
   const bandId = `${uid}-band`;
-  const classicId = `${uid}-classic`;
   const isGlass = variant === "glass" || variant === "glass-paper";
   const [left, right] = isGlass
     ? [variant === "glass-paper" ? "var(--color-paper)" : "var(--color-ink)", "none"]
@@ -68,8 +62,7 @@ export function Mark({ variant = "glass", className, title, size = "lg", priorit
           </clipPath>
           {/* Outer group carries the CSS wipe (a clip-path there would replace a clipPath attribute on the same element), inner group the shape clip. */}
           <g data-part="right">
-            {/* Both materials are server-rendered; <html data-logo-material> picks one (logo-material.css). */}
-            <g data-material="chrome" clipPath={`url(#${clipId})`}>
+            <g clipPath={`url(#${clipId})`}>
               {/* The real liquid-chrome pixels from the brand photo. */}
               <image
                 href={src}
@@ -79,10 +72,6 @@ export function Mark({ variant = "glass", className, title, size = "lg", priorit
                 height={MARK_TEXTURE.height}
                 preserveAspectRatio="none"
               />
-            </g>
-            <g data-material="classic">
-              <MarkClassicGradient id={classicId} />
-              <path d={MARK_RIGHT_PATH} fill={`url(#${classicId})`} fillRule="evenodd" />
             </g>
           </g>
           {sheen ? (

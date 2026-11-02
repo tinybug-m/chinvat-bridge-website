@@ -1,11 +1,7 @@
 import type { CSSProperties } from "react";
-import { MarkClassicGradient } from "@/components/brand/mark-classic";
-import { MARK_RIGHT_PATH } from "@/components/brand/mark-geometry";
-import { MARK_TEXTURE } from "@/components/brand/mark-texture";
 import { MARK_RING_PATHS } from "@/components/three/geometry/mark-outline";
 import { SEAM_FRAME } from "@/components/three/scenes/seam/config";
 import { cn } from "@/lib/utils";
-import "@/components/brand/logo-material.css";
 import { MarkChromeCanvas } from "./MarkChromeCanvas";
 import "./hero.css";
 
@@ -36,17 +32,6 @@ export function MarkDrawing({ className }: { className?: string }) {
         className={cn("absolute inset-0 size-full", className)}
         style={{ "--vbw": width, "--vbh": height } as CSSProperties}
       >
-        {/* The built half's classic material; fades in per <html data-logo-material> (logo-material.css). The chrome is the canvas under this SVG. */}
-        <g data-material="classic" clipPath="url(#mark-drawing-chrome)">
-          <rect
-            className="mark-chrome"
-            x={MARK_TEXTURE.x}
-            y={MARK_TEXTURE.y}
-            width={MARK_TEXTURE.width}
-            height={MARK_TEXTURE.height}
-            fill="url(#mark-drawing-classic)"
-          />
-        </g>
         {MARK_RING_PATHS.map((d, index) => (
           <path
             key={index}
@@ -64,11 +49,6 @@ export function MarkDrawing({ className }: { className?: string }) {
             vectorEffect="non-scaling-stroke"
           />
         ))}
-        {/* Defs last, so the first <path> in the drawing is the outer ring. */}
-        <MarkClassicGradient id="mark-drawing-classic" />
-        <clipPath id="mark-drawing-chrome">
-          <path d={MARK_RIGHT_PATH} clipRule="evenodd" />
-        </clipPath>
       </svg>
     </>
   );

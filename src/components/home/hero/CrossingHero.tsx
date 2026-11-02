@@ -1,13 +1,10 @@
 import type { CSSProperties } from "react";
 import { Mark } from "@/components/brand/Mark";
-import { MARK_CLASSIC_GRADIENT } from "@/components/brand/mark-classic";
 import { ButtonLink } from "@/components/system/Button";
 import { Container } from "@/components/system/Container";
 import { HERO_COPY } from "./content";
 import Link from "next/link";
 import { CROSSING_COPY, TIERS } from "./crossing-content";
-import { LogoMaterialToggle } from "./LogoMaterialToggle";
-import "@/components/brand/logo-material.css";
 import "./crossing.css";
 
 /*
@@ -187,11 +184,6 @@ export function CrossingHero() {
               </ul>
             </nav>
           </div>
-
-          {/* The logo material toggle, quiet at the foot of the hero (after the chart on small screens). */}
-          <div className="mt-8 flex justify-end lg:absolute lg:right-0 lg:bottom-0 lg:mt-0">
-            <LogoMaterialToggle className="intro-rise" />
-          </div>
         </div>
       </Container>
     </section>
@@ -225,18 +217,6 @@ function Chart() {
           y2="900"
         >
           {CHROME.map(([offset, color]) => (
-            <stop key={offset} offset={offset} stopColor={color} />
-          ))}
-        </linearGradient>
-        <linearGradient
-          id="cx-classic"
-          gradientUnits="userSpaceOnUse"
-          x1="100"
-          y1="480"
-          x2="540"
-          y2="900"
-        >
-          {MARK_CLASSIC_GRADIENT.stops.map(([offset, color]) => (
             <stop key={offset} offset={offset} stopColor={color} />
           ))}
         </linearGradient>
@@ -347,24 +327,13 @@ function Chart() {
                 ))}
                 {/* The logo material: run once after the intro, held while hovered. */}
                 <g className="cx-glow" style={{ "--i": i } as CSSProperties}>
-                  <g data-material="chrome">
-                    <rect
-                      x={CX - 220}
-                      y={y0}
-                      width="440"
-                      height={y1 - y0}
-                      fill="url(#cx-chrome)"
-                    />
-                  </g>
-                  <g data-material="classic">
-                    <rect
-                      x={CX - 220}
-                      y={y0}
-                      width="440"
-                      height={y1 - y0}
-                      fill="url(#cx-classic)"
-                    />
-                  </g>
+                  <rect
+                    x={CX - 220}
+                    y={y0}
+                    width="440"
+                    height={y1 - y0}
+                    fill="url(#cx-chrome)"
+                  />
                 </g>
               </g>
               <line

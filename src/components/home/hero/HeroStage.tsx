@@ -1,14 +1,12 @@
 "use client";
 
 import { type CSSProperties, type ReactNode, useEffect, useRef } from "react";
-import { readLogoMaterial, subscribeLogoMaterial } from "@/components/brand/logo-material";
 import { ThreeStage } from "@/components/three/core/ThreeStage";
 import type { StageHandle } from "@/components/three/core/types";
 
 /*
  * Client island for the hero object. It feeds the seam scene its inputs:
- * scroll progress through the hero, pointer tilt (fine pointers only) and
- * "chrome" (1 = chrome material, 0 = classic, from <html data-logo-material>).
+ * scroll progress through the hero and pointer tilt (fine pointers only).
  * Everything visible before WebGL arrives is server-rendered and passed in
  * as children.
  */
@@ -59,13 +57,6 @@ export function HeroStage({ className, style, children }: HeroStageProps) {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, []);
-
-  // The logo material: the scene swaps its material parameters (no rebuild).
-  useEffect(() => {
-    const sync = () => handle.current?.set("chrome", readLogoMaterial() === "chrome" ? 1 : 0);
-    sync();
-    return subscribeLogoMaterial(sync);
   }, []);
 
   // Pointer tilt: fine pointers only, never under reduced motion; follows

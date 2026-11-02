@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { LOGO_MATERIAL_RUNTIME } from "@/components/brand/logo-material";
 import { REVEAL_RUNTIME } from "@/components/motion/reveal-runtime";
 import { CONTACT_EMAIL, SITE_DESCRIPTION, SITE_NAME, SITE_ORIGIN, SITE_URL, SITE_TITLE } from "@/lib/constants";
 
@@ -66,13 +65,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en-GB"
       data-scroll-behavior="smooth"
       className="h-full scroll-smooth antialiased"
-      // The logo material choice (chrome by default).
-      data-logo-material="chrome"
-      // The reveal runtime adds a class and the logo material script an attribute before React hydrates.
+      // The reveal runtime adds a class before React hydrates.
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: LOGO_MATERIAL_RUNTIME }} />
         <script dangerouslySetInnerHTML={{ __html: REVEAL_RUNTIME }} />
       </head>
       <body className="flex min-h-full flex-col bg-paper font-body text-ink selection:bg-cobalt-700 selection:text-paper">

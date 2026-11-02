@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { readLogoMaterial, subscribeLogoMaterial } from "@/components/brand/logo-material";
 import { MARK_RIGHT_PATH } from "@/components/brand/mark-geometry";
 import { MARK_TEXTURE } from "@/components/brand/mark-texture";
 import { SEAM_FRAME } from "@/components/three/scenes/seam/config";
@@ -17,9 +16,8 @@ import { SEAM_FRAME } from "@/components/three/scenes/seam/config";
  * the ink lines, and the poster or the 3D scene replaces it anyway.
  *
  * Why script: the texture is only fetched when it is actually wanted. Nothing
- * is preloaded, a saved "classic" choice never requests it (it is fetched if
- * the visitor switches to chrome later), and reduced motion (which shows the
- * poster instead of this drawing) skips it too.
+ * is preloaded, and reduced motion (which shows the poster instead of this
+ * drawing) skips it.
  *
  * The paint waits until ~0.7s after navigation start, when the rings have
  * drawn on (hero.css), then fades in. Before that, and without JS, the drawing
@@ -36,8 +34,7 @@ export function MarkChromeCanvas({ className }: { className?: string }) {
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let started = false;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let cancelled = false;
     let timer = 0;
 
@@ -54,25 +51,18 @@ export function MarkChromeCanvas({ className }: { className?: string }) {
       canvas.dataset.drawn = "true";
     };
 
-    const start = () => {
-      if (started || reduce.matches || readLogoMaterial() !== "chrome") return;
-      started = true;
-      const image = new Image();
-      image.decoding = "async";
-      image.onload = () => {
-        const wait = Math.max(0, PAINT_AFTER_MS - performance.now());
-        timer = window.setTimeout(() => paint(image), wait);
-      };
-      // On failure the drawing simply stays the ink lines.
-      image.src = MARK_TEXTURE.src;
+    const image = new Image();
+    image.decoding = "async";
+    image.onload = () => {
+      const wait = Math.max(0, PAINT_AFTER_MS - performance.now());
+      timer = window.setTimeout(() => paint(image), wait);
     };
+    // On failure the drawing simply stays the ink lines.
+    image.src = MARK_TEXTURE.src;
 
-    start();
-    const unsubscribe = subscribeLogoMaterial(start);
     return () => {
       cancelled = true;
       window.clearTimeout(timer);
-      unsubscribe();
     };
   }, []);
 
@@ -80,7 +70,6 @@ export function MarkChromeCanvas({ className }: { className?: string }) {
     <canvas
       ref={ref}
       aria-hidden="true"
-      data-material="chrome"
       className={className}
       width={Math.round(width)}
       height={Math.round(height)}

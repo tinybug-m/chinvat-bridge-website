@@ -3,11 +3,7 @@ import type { CSSProperties } from "react";
 import { ButtonLink } from "@/components/system/Button";
 import { Container } from "@/components/system/Container";
 import { HERO_COPY } from "@/components/home/hero/content";
-import {
-  POSTER_CLASSIC_SRC,
-  POSTER_SRC,
-} from "@/components/home/hero/HeroObject";
-import "@/components/brand/logo-material.css";
+import { POSTER_SRC } from "@/components/home/hero/HeroObject";
 import "./hero-studies.css";
 
 /*
@@ -15,9 +11,6 @@ import "./hero-studies.css";
  * viewport, cropped by the hero's edges, the paper half meeting the page
  * and the chrome half carrying the colour. Big type, lots of room, nothing
  * else on the page competes with it.
- *
- * Both material renders are server-rendered; <html data-logo-material>
- * picks one, and the classic one is only fetched once chosen.
  */
 
 const rise = (delay: number) =>
@@ -35,25 +28,14 @@ export function MonumentHero() {
         data-layer="poster"
         className="monument-mark pointer-events-none"
       >
-        <div data-material="chrome" className="absolute inset-0">
-          <Image
-            src={POSTER_SRC}
-            alt=""
-            fill
-            priority
-            sizes="(min-width: 64rem) 75vw, 135vw"
-            className="object-contain"
-          />
-        </div>
-        <div data-material="classic" className="absolute inset-0">
-          <Image
-            src={POSTER_CLASSIC_SRC}
-            alt=""
-            fill
-            sizes="(min-width: 64rem) 75vw, 135vw"
-            className="object-contain"
-          />
-        </div>
+        <Image
+          src={POSTER_SRC}
+          alt=""
+          fill
+          priority
+          sizes="(min-width: 64rem) 75vw, 135vw"
+          className="object-contain"
+        />
       </div>
 
       <Container className="relative flex flex-col pt-[calc(4rem+2.25rem)] pb-12 lg:min-h-[clamp(46rem,100svh,62rem)] lg:pt-[calc(4.5rem+2rem)] lg:pb-16">
