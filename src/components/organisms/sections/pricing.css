@@ -1,0 +1,49 @@
+/*
+ * Pricing cards. Each card sets its plate colours inline (--plate-ground,
+ * --plate-ink, --plate-fill; see PlanPlate) and --pad (its inline padding)
+ * by breakpoint, so the plate can bleed to the card's edges.
+ */
+
+/* The plate's engraved ground: fine hairlines in its own ink, like the scan lines on the hero's slabs. */
+.pp-engraving {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--plate-ink) 12%, transparent) 0 1px,
+    transparent 1px 4px
+  );
+  mask-image: linear-gradient(to bottom, transparent, #000 70%);
+}
+
+/* The plan in the light: a frame of the logo's chrome round raised paper, lifted off the page. */
+.pc-shine {
+  background:
+    linear-gradient(var(--color-paper-raised), var(--color-paper-raised)) padding-box,
+    var(--material-fill) border-box;
+  box-shadow: 0 32px 64px -36px color-mix(in oklab, var(--color-cobalt-900) 60%, transparent);
+}
+
+/* A sheen of light across its plate, now and then. */
+.pc-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgb(255 236 200 / 0.3) 50%, transparent 65%);
+  translate: -100% 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pc-sheen::after {
+    animation: pc-sheen 6s var(--ease-in-out-quint) 1.2s infinite;
+  }
+}
+
+@keyframes pc-sheen {
+  0% {
+    translate: -100% 0;
+  }
+  30%,
+  100% {
+    translate: 100% 0;
+  }
+}

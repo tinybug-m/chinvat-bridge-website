@@ -3,13 +3,17 @@ import { Container } from "@/components/system/Container";
 import { TextLink } from "@/components/system/TextLink";
 import { ArrowIcon } from "@/components/system/ArrowIcon";
 import { PricingCard } from "@/components/organisms/sections/PricingCard";
+import { CustomPlanCard } from "@/components/organisms/sections/CustomPlanCard";
 import { getPlans } from "@/data/pricing";
+import "./pricing.css";
 
 /**
- * /pricing: the page header, then the plans as columns on paper split by
- * hairlines. On lg each column is a subgrid spanning the four rows set here,
- * so the price block, spec rows, capability list and button line up across
- * plans whatever the copy length.
+ * /pricing: the page header, then the plans as cards, each with its own tier
+ * identity, and the custom package last. One column up to xl, every card a
+ * wide row from md, so no plan stands alone or larger; from xl the three plans
+ * in a row with the custom card as a band beneath. From xl every plan card is
+ * a subgrid spanning five of the row tracks repeated here, so the plate, price
+ * block, spec rows, capability list and button line up across the plans.
  */
 export async function Pricing() {
   const plans = await getPlans();
@@ -17,21 +21,19 @@ export async function Pricing() {
   return (
     <>
       <PageHeader
+        ruled={false}
         kicker="SEO & content retainers"
         title="SEO & content plans"
         lede="Ongoing content, technical SEO and link building — delivered on a predictable monthly retainer. For AI, automation or custom software work, get in touch for a scoped quote."
       />
 
-      <section id="pricing" aria-label="Plans" className="border-b border-line">
+      <section id="pricing" aria-label="Plans" className="border-b border-line pb-12 lg:pb-16">
         <Container>
-          <ul className="grid grid-cols-1 lg:grid-cols-3 lg:grid-rows-[auto_auto_1fr_auto]">
+          <ul className="grid grid-cols-1 gap-4 lg:gap-5 xl:auto-rows-[auto_auto_auto_1fr_auto] xl:grid-cols-3">
             {plans.map((plan, index) => (
-              <PricingCard
-                key={plan.id}
-                plan={plan}
-                position={index === 0 ? "first" : index === plans.length - 1 ? "last" : "middle"}
-              />
+              <PricingCard key={plan.id} plan={plan} index={index} />
             ))}
+            <CustomPlanCard />
           </ul>
         </Container>
       </section>
