@@ -360,9 +360,18 @@ function hop(outs: Port[], ins: Port[], obstacles: Box[], from: Box[] | null, to
  * hops that do not start or end in it. `lane` is the middle of the page
  * margin, the outermost the wire may run; `reach` is how far below the
  * trigger line a port may be when the energy reaches it (px), so the head is
- * still on screen there.
+ * still on screen there; `below` is the trigger line's distance from the
+ * foot of the viewport (px).
  */
-export function routeWire(origin: Pt, stops: Stop[], text: Box[], width: number, lane: number, reach: number): Wire {
+export function routeWire(
+  origin: Pt,
+  stops: Stop[],
+  text: Box[],
+  width: number,
+  lane: number,
+  reach: number,
+  below: number,
+): Wire {
   CLEARANCE = width < 640 ? 7 : 14;
   const segments: Segment[] = [];
   const arrivals: Arrival[] = [];
@@ -384,10 +393,13 @@ export function routeWire(origin: Pt, stops: Stop[], text: Box[], width: number,
     segments.push({ d: toPath(best.pieces), length, start: at, points });
     // The energy arrives when the port or the top of the artwork (EARLY) reaches the line, whichever is
     // first, so a plate builds as it comes on screen; but never while its port is more than `reach`
-    // below the line, so a low port (the SEO baseline) is on screen when the energy lands on it.
+    // below the line, so a low port (the SEO baseline) is on screen when the energy lands on it. A plate
+    // whose whole artwork is on screen is powered whatever: a small one (a tablet's) is never left
+    // unbuilt at the foot of the screen.
     const y0 = Math.min(...stop.keepout.map((b) => b.y0));
     const y1 = Math.max(...stop.keepout.map((b) => b.y1));
-    const arrive = stop.arriveY ?? Math.min(best.port.y, Math.max(y0 + EARLY * (y1 - y0), best.port.y - reach));
+    const arrive =
+      stop.arriveY ?? Math.min(best.port.y, Math.max(y0 + EARLY * (y1 - y0), best.port.y - reach), y1 - below);
     keys.push({ y: leaveY ?? points[0].y, at }, { y: arrive, at: at + length });
     at += length;
     arrivals.push({ stop: i, port: stop.ins.indexOf(best.port), x: best.port.x, y: best.port.y, at });

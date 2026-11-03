@@ -174,7 +174,7 @@ function measure(section: HTMLElement): Layout | null {
     return stop;
   });
 
-  const wire = routeWire(origin, stops, text, sr.width, lane, (PORT_MAX - LINE) * vh);
+  const wire = routeWire(origin, stops, text, sr.width, lane, (PORT_MAX - LINE) * vh, (1 - LINE) * vh);
   const height = Math.max(...wire.segments.flatMap((s) => s.points.map((p) => p.y))) + 32;
   return {
     top,
