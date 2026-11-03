@@ -53,8 +53,8 @@
  *   .pop      scale 0.6 -> 1 with a fade, about the node's own centre
  *   .draw     solid stroke drawing on; the element needs pathLength="1" and
  *             delay via --draw-delay (default as above), duration via
- *             --draw-duration (default --motion-draw). Use drawProps() from
- *             components/motion/draw.ts. Never put it on dashed strokes. Use
+ *             --draw-duration (default --motion-draw). Set the draw props inline (see
+ *             the plate's draw prop). Never put it on dashed strokes. Use
  *             butt caps: a round cap would dot the hidden start.
  *             Inside .svc-fig see services.css (needs the plate's draw prop).
  *

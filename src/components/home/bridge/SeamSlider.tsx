@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 import "./bridge.css";
 
 /*
- * The seam control: components/ui/slider restyled as a handle riding the
- * seam line, halfway up the stage. Local because the shared Slider does not
- * pass props to its thumb (aria-valuetext, aria-labelledby).
+ * The seam control: a Radix slider restyled as a handle riding the
+ * seam line, halfway up the stage. Local so the thumb can take
+ * props (aria-valuetext, aria-labelledby).
  *
  * Radix gets the rounded value (aria-valuenow stays an integer) and would
  * place the thumb on whole steps; the thumb wrapper is pinned to --seam

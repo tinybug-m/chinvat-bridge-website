@@ -1,20 +1,10 @@
 import type { SVGProps } from "react";
 
 export type IconName =
-  | "arrowForward"
-  | "arrowOutward"
-  | "arrowDownward"
-  | "unfoldMore"
   | "neurology"
   | "infinity"
   | "codeBlocks"
   | "trendingUp"
-  | "helpOutline"
-  | "verified"
-  | "article"
-  | "mail"
-  | "menu"
-  | "close"
   | "lock";
 
 type IconProps = SVGProps<SVGSVGElement>;
@@ -28,38 +18,6 @@ const base = {
   strokeLinejoin: "round" as const,
   "aria-hidden": true,
 };
-
-function ArrowForward(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M4 12h16M14 6l6 6-6 6" />
-    </svg>
-  );
-}
-
-function ArrowOutward(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M7 17 17 7M9 7h8v8" />
-    </svg>
-  );
-}
-
-function ArrowDownward(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M12 4v16M6 14l6 6 6-6" />
-    </svg>
-  );
-}
-
-function UnfoldMore(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M8 9l4-4 4 4M8 15l4 4 4-4" />
-    </svg>
-  );
-}
 
 function Neurology(props: IconProps) {
   return (
@@ -94,59 +52,6 @@ function TrendingUp(props: IconProps) {
   );
 }
 
-function HelpOutline(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <circle cx="12" cy="12" r="8.5" />
-      <path d="M9.7 9.3a2.3 2.3 0 1 1 3.4 2c-.8.5-1.1 1-1.1 2" />
-      <path d="M12 16.3v.1" />
-    </svg>
-  );
-}
-
-function Verified(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M12 3.5l2.1 1.3 2.4-.4 1 2.2 2.2 1-.4 2.4L20.6 12l-1.3 2.1.4 2.4-2.2 1-1 2.2-2.4-.4L12 20.5l-2.1-1.3-2.4.4-1-2.2-2.2-1 .4-2.4L3.4 12l1.3-2.1-.4-2.4 2.2-1 1-2.2 2.4.4z" />
-      <path d="M9 12.3l2 2 4-4.3" />
-    </svg>
-  );
-}
-
-function Article(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <rect x="5" y="4" width="14" height="16" rx="1" />
-      <path d="M8 8.5h8M8 12h8M8 15.5h5" />
-    </svg>
-  );
-}
-
-function Mail(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <rect x="3.5" y="5.5" width="17" height="13" rx="1.5" />
-      <path d="M4 6.5l8 6.5 8-6.5" />
-    </svg>
-  );
-}
-
-function Menu(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M4 7h16M4 12h16M4 17h16" />
-    </svg>
-  );
-}
-
-function Close(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M6 6l12 12M18 6 6 18" />
-    </svg>
-  );
-}
-
 function Lock(props: IconProps) {
   return (
     <svg {...base} {...props}>
@@ -157,20 +62,10 @@ function Lock(props: IconProps) {
 }
 
 const ICONS: Record<IconName, (props: IconProps) => React.JSX.Element> = {
-  arrowForward: ArrowForward,
-  arrowOutward: ArrowOutward,
-  arrowDownward: ArrowDownward,
-  unfoldMore: UnfoldMore,
   neurology: Neurology,
   infinity: Infinity,
   codeBlocks: CodeBlocks,
   trendingUp: TrendingUp,
-  helpOutline: HelpOutline,
-  verified: Verified,
-  article: Article,
-  mail: Mail,
-  menu: Menu,
-  close: Close,
   lock: Lock,
 };
 
