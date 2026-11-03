@@ -12,8 +12,9 @@ import "./crossing.css";
  * engraved inverted triangle (complex challenges: a tangle in a sunburst)
  * narrows to the waist, where the mark stands in its halo as the bridge,
  * and widens into four engraved tiers, one per discipline. Dotted
- * brackets on the left name the two halves; the copy on the right sits
- * level with the bridge.
+ * brackets on the left name the two halves. On the right the copy takes the
+ * same halves: the headline stands on the bridge, a lead runs from the halo
+ * under it to the lede and the actions.
  *
  * Each tier is a link to its service (an HTML hit area over the chart, see
  * .cx-link). The logo material is held back for the crossing itself: it
@@ -82,14 +83,12 @@ export function CrossingHero() {
       <Container className="@container pt-[calc(4rem+2.25rem)] pb-12 lg:pt-[calc(4.5rem+2.5rem)] lg:pb-14">
         <div className="cx">
           <div className="cx-text">
-            <div className="cx-copy lg:border-t lg:border-ink lg:pt-6">
+            {/* Above the waist: the running head and the headline, standing on the bridge. */}
+            <div className="cx-above">
               <p className="intro-rise text-small text-ink-muted">
                 {HERO_COPY.eyebrow}
               </p>
-              <h1
-                id="hero-title"
-                className="intro-rise mt-5 font-display text-[clamp(2.5rem,1.6rem+3.2vw,4rem)] leading-[0.98] font-medium tracking-[-0.025em] [font-stretch:100%] xl:[font-stretch:112%]"
-              >
+              <h1 id="hero-title" className="cx-title intro-rise font-display">
                 <span className="block font-normal">
                   {CROSSING_COPY.title[0]}
                 </span>{" "}
@@ -97,39 +96,44 @@ export function CrossingHero() {
                   {CROSSING_COPY.title[1]}
                 </span>
               </h1>
+            </div>
+
+            {/* Below it: the lede and the actions. */}
+            <div className="cx-below">
               <p
-                className="intro-rise mt-5 max-w-[30rem] text-lede text-pretty text-ink-soft"
+                className="cx-lede intro-rise max-w-[30rem] text-lede text-pretty text-ink-soft lg:text-balance"
                 style={rise(120)}
               >
                 {CROSSING_COPY.lede}
               </p>
-            </div>
 
-            <div
-              className="intro-rise mt-8 mb-12 flex flex-col gap-3 sm:flex-row sm:flex-wrap lg:mt-10 lg:mb-0"
-              style={rise(200)}
-            >
-              <ButtonLink
-                href={HERO_COPY.primary.href}
-                size="lg"
-                arrow="right"
-                className="w-full sm:w-auto"
+              <div
+                className="intro-rise mt-8 mb-12 flex flex-col gap-3 sm:flex-row sm:flex-wrap lg:mt-9 lg:mb-0"
+                style={rise(200)}
               >
-                {HERO_COPY.primary.label}
-              </ButtonLink>
-              <ButtonLink
-                href={HERO_COPY.secondary.href}
-                size="lg"
-                variant="secondary"
-                arrow="down"
-                className="w-full sm:w-auto"
-              >
-                {HERO_COPY.secondary.label}
-              </ButtonLink>
+                <ButtonLink
+                  href={HERO_COPY.primary.href}
+                  size="lg"
+                  arrow="right"
+                  className="w-full sm:w-auto"
+                >
+                  {HERO_COPY.primary.label}
+                </ButtonLink>
+                <ButtonLink
+                  href={HERO_COPY.secondary.href}
+                  size="lg"
+                  variant="secondary"
+                  arrow="down"
+                  className="w-full sm:w-auto"
+                >
+                  {HERO_COPY.secondary.label}
+                </ButtonLink>
+              </div>
             </div>
           </div>
 
           <div className="cx-chart">
+            <Orbits />
             <Chart />
             {/* The bridge: the real mark, centred on the waist. */}
             <div
@@ -373,6 +377,112 @@ function Chart() {
       })}
 
       <Bracket />
+    </svg>
+  );
+}
+
+/** The orbits' radii, rippling out from the halo behind the copy. */
+const ORBITS = [290, 400, 520, 650, 790, 940, 1100, 1270];
+
+/** Points on the orbits: which ring, its period (s), where in the period it starts, and the colour it takes once across. */
+const POINTS = [
+  { ring: 0, period: 26, at: 0, color: "var(--color-azure-400)" },
+  { ring: 1, period: 34, at: 0.35, color: "var(--color-saffron-500)" },
+  { ring: 2, period: 40, at: 0.12, color: "var(--color-ink)" },
+  { ring: 2, period: 40, at: 0.62, color: "var(--color-azure-400)" },
+  { ring: 3, period: 48, at: 0.6, color: "var(--color-saffron-500)" },
+  { ring: 4, period: 56, at: 0.15, color: "var(--color-ink)" },
+  { ring: 5, period: 64, at: 0.62, color: "var(--color-azure-400)" },
+  { ring: 6, period: 72, at: 0.28, color: "var(--color-saffron-500)" },
+  { ring: 7, period: 80, at: 0.66, color: "var(--color-ink)" },
+  { ring: 1, period: 34, at: 0.85, color: "var(--color-azure-400)" },
+  { ring: 3, period: 48, at: 0.1, color: "var(--color-ink)" },
+  { ring: 5, period: 64, at: 0.2, color: "var(--color-saffron-500)" },
+  { ring: 6, period: 72, at: 0.78, color: "var(--color-azure-400)" },
+] as const;
+
+/**
+ * Large screens only: dotted orbits rippling out from the halo behind the
+ * copy, so chart and text read as one drawing. Points ride them down across
+ * the waist (the rule under the headline): they arrive as open rings, the
+ * challenges, and leave the crossing solid in the logo's colours. Drawn in
+ * the chart's own coordinates, so it scales with it; faded out over the
+ * chart and at the hero's top and foot. Still under reduced motion.
+ */
+function Orbits() {
+  return (
+    <svg
+      viewBox="0 -34 540 934"
+      aria-hidden="true"
+      className="cx-orbits absolute inset-0 size-full overflow-visible"
+    >
+      <defs>
+        <linearGradient id="cx-fade-y" gradientUnits="userSpaceOnUse" x1="0" x2="0" y1="-34" y2="900">
+          <stop offset="0" stopColor="#fff" stopOpacity="0" />
+          <stop offset="0.16" stopColor="#fff" />
+          <stop offset="0.84" stopColor="#fff" />
+          <stop offset="1" stopColor="#fff" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id="cx-fade-x" gradientUnits="userSpaceOnUse" x1="560" x2="700" y1="0" y2="0">
+          <stop offset="0" stopColor="#fff" stopOpacity="0" />
+          <stop offset="1" stopColor="#fff" />
+        </linearGradient>
+        <mask id="cx-orbits-y" maskUnits="userSpaceOnUse" x="-2000" y="-34" width="6000" height="934">
+          <rect x="-2000" y="-34" width="6000" height="934" fill="url(#cx-fade-y)" />
+        </mask>
+        <mask id="cx-orbits-x" maskUnits="userSpaceOnUse" x="-2000" y="-34" width="6000" height="934">
+          <rect x="-2000" y="-34" width="6000" height="934" fill="url(#cx-fade-x)" />
+        </mask>
+      </defs>
+      <g className="cx-in" style={delay(1200)} mask="url(#cx-orbits-y)">
+        <g mask="url(#cx-orbits-x)">
+          {ORBITS.map((r, i) => (
+            <circle
+              key={r}
+              cx={CX}
+              cy={WAIST.y}
+              r={r}
+              fill="none"
+              stroke="var(--color-ink)"
+              strokeOpacity={0.3 - i * 0.022}
+              strokeWidth={1.1}
+              strokeDasharray="2 6"
+            />
+          ))}
+          {POINTS.map((point, i) => {
+            const r = ORBITS[point.ring];
+            return (
+              <g
+                key={i}
+                className="cx-point"
+                data-crossed={point.at >= 0.5 ? "" : undefined}
+                style={
+                  {
+                    "--period": `${point.period}s`,
+                    "--at": `${-point.at * point.period}s`,
+                    "--rest": `${(point.at - 0.5) * 150}deg`,
+                  } as CSSProperties
+                }
+              >
+                <circle
+                  className="cx-point-open"
+                  cx={CX + r}
+                  cy={WAIST.y}
+                  r={6}
+                  fill="none"
+                  stroke="var(--color-ink)"
+                  strokeOpacity={0.6}
+                  strokeWidth={1.4}
+                />
+                <g className="cx-point-solid" fill={point.color}>
+                  <circle cx={CX + r} cy={WAIST.y} r={14} fillOpacity={0.14} />
+                  <circle cx={CX + r} cy={WAIST.y} r={5.5} />
+                </g>
+              </g>
+            );
+          })}
+        </g>
+      </g>
     </svg>
   );
 }

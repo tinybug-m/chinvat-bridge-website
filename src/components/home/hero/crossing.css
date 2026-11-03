@@ -6,7 +6,8 @@
  * One engraved chart in a fixed-aspect frame (viewBox 540 x 934, see
  * CrossingHero); the tier links sit on it by the same coordinates: chart y
  * is at (y + 34) / 934 of its height. Large screens: chart left, copy right,
- * centred on the bridge. Small screens: copy, then the chart, centred.
+ * split at the waist like the chart. Small screens: copy, then the chart,
+ * centred.
  */
 .cx {
   --W: min(100cqw * 0.78, 22rem);
@@ -14,21 +15,92 @@
   position: relative;
 }
 
+/* The headline: one size per line, set to the measure it has. */
+.cx-title {
+  margin-top: 1.25rem;
+  font-size: clamp(2.5rem, 1.2rem + 6.4vw, 4.5rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+}
+
+.cx-below {
+  padding-top: 1.5rem;
+}
+
 @media (min-width: 64rem) {
   .cx {
     --H: clamp(36rem, calc(100svh - 9rem), 54rem);
     --W: calc(var(--H) * 0.5782);
+    --gap: clamp(3rem, 1rem + 4vw, 5.5rem);
     height: var(--H);
   }
 
+  /* The copy column: beside the chart, no wider than the headline needs. */
   .cx-text {
     position: absolute;
+    z-index: 1;
     inset-block: 0;
-    left: calc(var(--W) + 3rem);
-    right: 0;
+    left: calc(var(--W) + var(--gap));
+    width: min(100% - var(--W) - var(--gap), 50rem);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    container-type: inline-size;
+  }
+
+  /*
+   * Chart top to the waist (y 405): the running head and the headline stand
+   * on the bridge together, so the copy reads as one block either side of it.
+   */
+  .cx-above {
+    height: calc(var(--H) * 439 / 934);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 1.75rem;
+  }
+
+  .cx-title {
+    /* Sized by the chart's height, capped by the column so each line holds. */
+    margin-top: 1.5rem;
+    font-size: min(var(--H) * 0.112, 13.4cqi);
+    letter-spacing: -0.03em;
+  }
+
+  /* The lede grows with the chart a little, so it holds its own under the headline. */
+  .cx-lede {
+    max-width: 34rem;
+    font-size: max(var(--text-lede), min(var(--H) * 0.031, 1.625rem));
+  }
+
+  /* The waist down: a hairline across the copy, then the lede and the actions. */
+  .cx-below {
+    position: relative;
+    border-top: 1px solid var(--color-ink);
+    padding-top: 1.75rem;
+  }
+
+  /* The lead from the halo to the copy, dotted like the bracket's (x 400 onwards). */
+  .cx-below::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    right: 100%;
+    width: calc(var(--gap) + var(--W) * 140 / 540);
+    height: 1px;
+    opacity: 0.7;
+    background: repeating-linear-gradient(
+      to right,
+      var(--color-ink) 0 1.5px,
+      transparent 1.5px 4.5px
+    );
+  }
+}
+
+@media (min-width: 80rem) {
+  .cx-title {
+    font-size: min(var(--H) * 0.112, 12.2cqi);
+    font-stretch: 112%;
   }
 }
 
@@ -45,6 +117,82 @@
   .cx-chart {
     margin-inline: 0;
     translate: none;
+  }
+}
+
+/* The orbits behind the copy: large screens only, never in the way of a pointer. */
+.cx-orbits {
+  display: none;
+  pointer-events: none;
+}
+
+@media (min-width: 64rem) {
+  .cx-orbits {
+    display: block;
+  }
+}
+
+/* A point on its orbit, turning about the halo (chart x 320, y 405). At rest it holds its place, open above the waist and solid below. */
+.cx-point {
+  transform-origin: 320px 405px;
+  rotate: var(--rest);
+}
+
+.cx-point:not([data-crossed]) .cx-point-solid,
+.cx-point[data-crossed] .cx-point-open {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Down the orbit and across the waist: an open ring above it, solid once across. */
+  .cx-point {
+    rotate: none;
+    animation: cx-orbit var(--period) linear var(--at) infinite;
+  }
+
+  .cx-point .cx-point-open {
+    animation: cx-open var(--period) linear var(--at) infinite;
+  }
+
+  .cx-point .cx-point-solid {
+    animation: cx-solid var(--period) linear var(--at) infinite;
+  }
+}
+
+@keyframes cx-orbit {
+  from {
+    rotate: -75deg;
+    opacity: 0;
+  }
+  12%,
+  88% {
+    opacity: 1;
+  }
+  to {
+    rotate: 75deg;
+    opacity: 0;
+  }
+}
+
+@keyframes cx-open {
+  0%,
+  48% {
+    opacity: 1;
+  }
+  52%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes cx-solid {
+  0%,
+  48% {
+    opacity: 0;
+  }
+  52%,
+  100% {
+    opacity: 1;
   }
 }
 
