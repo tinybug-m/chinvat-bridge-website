@@ -444,9 +444,9 @@ function Orbits() {
               r={r}
               fill="none"
               stroke="var(--color-ink)"
-              strokeOpacity={0.3 - i * 0.022}
-              strokeWidth={1.1}
-              strokeDasharray="2 6"
+              strokeOpacity={0.55 - i * 0.03}
+              strokeWidth={1.5}
+              strokeDasharray="3 5"
             />
           ))}
           {POINTS.map((point, i) => {
