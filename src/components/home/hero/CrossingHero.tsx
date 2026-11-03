@@ -382,28 +382,29 @@ function Chart() {
 }
 
 /** The orbits' radii, rippling out from the halo behind the copy. */
-const ORBITS = [290, 400, 520, 650, 790, 940, 1100, 1270];
+const ORBITS = [430, 560, 700, 850, 1010, 1180, 1360, 1550];
 
 /** Points on the orbits: which ring, its period (s), where in the period it starts, and the colour it takes once across. */
 const POINTS = [
-  { ring: 0, period: 26, at: 0, color: "var(--color-azure-400)" },
-  { ring: 1, period: 34, at: 0.35, color: "var(--color-saffron-500)" },
-  { ring: 2, period: 40, at: 0.12, color: "var(--color-ink)" },
-  { ring: 2, period: 40, at: 0.62, color: "var(--color-azure-400)" },
-  { ring: 3, period: 48, at: 0.6, color: "var(--color-saffron-500)" },
-  { ring: 4, period: 56, at: 0.15, color: "var(--color-ink)" },
-  { ring: 5, period: 64, at: 0.62, color: "var(--color-azure-400)" },
-  { ring: 6, period: 72, at: 0.28, color: "var(--color-saffron-500)" },
-  { ring: 7, period: 80, at: 0.66, color: "var(--color-ink)" },
-  { ring: 1, period: 34, at: 0.85, color: "var(--color-azure-400)" },
-  { ring: 3, period: 48, at: 0.1, color: "var(--color-ink)" },
-  { ring: 5, period: 64, at: 0.2, color: "var(--color-saffron-500)" },
-  { ring: 6, period: 72, at: 0.78, color: "var(--color-azure-400)" },
+  { ring: 0, period: 34, at: 0.35, color: "var(--color-saffron-500)" },
+  { ring: 1, period: 40, at: 0.62, color: "var(--color-azure-400)" },
+  { ring: 2, period: 48, at: 0.1, color: "var(--color-ink)" },
+  { ring: 3, period: 56, at: 0.6, color: "var(--color-saffron-500)" },
+  { ring: 3, period: 56, at: 0.15, color: "var(--color-ink)" },
+  { ring: 4, period: 64, at: 0.62, color: "var(--color-azure-400)" },
+  { ring: 4, period: 64, at: 0.2, color: "var(--color-saffron-500)" },
+  { ring: 5, period: 72, at: 0.28, color: "var(--color-saffron-500)" },
+  { ring: 5, period: 72, at: 0.78, color: "var(--color-azure-400)" },
+  { ring: 6, period: 80, at: 0.66, color: "var(--color-ink)" },
+  { ring: 6, period: 80, at: 0.12, color: "var(--color-azure-400)" },
+  { ring: 7, period: 88, at: 0.45, color: "var(--color-saffron-500)" },
+  { ring: 7, period: 88, at: 0.9, color: "var(--color-azure-400)" },
 ] as const;
 
 /**
  * Large screens only: dotted orbits rippling out from the halo behind the
- * copy, so chart and text read as one drawing. Points ride them down across
+ * copy, quiet by the copy and strongest towards the page's outer edge, so
+ * chart and text read as one drawing. Points ride them down across
  * the waist (the rule under the headline): they arrive as open rings, the
  * challenges, and leave the crossing solid in the logo's colours. Drawn in
  * the chart's own coordinates, so it scales with it; faded out over the
@@ -423,8 +424,9 @@ function Orbits() {
           <stop offset="0.84" stopColor="#fff" />
           <stop offset="1" stopColor="#fff" stopOpacity="0" />
         </linearGradient>
-        <linearGradient id="cx-fade-x" gradientUnits="userSpaceOnUse" x1="560" x2="700" y1="0" y2="0">
+        <linearGradient id="cx-fade-x" gradientUnits="userSpaceOnUse" x1="560" x2="1250" y1="0" y2="0">
           <stop offset="0" stopColor="#fff" stopOpacity="0" />
+          <stop offset="0.35" stopColor="#fff" stopOpacity="0.45" />
           <stop offset="1" stopColor="#fff" />
         </linearGradient>
         <mask id="cx-orbits-y" maskUnits="userSpaceOnUse" x="-2000" y="-34" width="6000" height="934">
@@ -444,7 +446,7 @@ function Orbits() {
               r={r}
               fill="none"
               stroke="var(--color-ink)"
-              strokeOpacity={0.55 - i * 0.03}
+              strokeOpacity={0.4 + i * 0.03}
               strokeWidth={1.5}
               strokeDasharray="3 5"
             />
