@@ -207,6 +207,7 @@ and the four discipline labels are unchanged.
 |---|---|---|---|
 | Hero H1 | Same business. / Better systems. | Cross the bridge. / Enter the future. | LinkedIn's closing line; the chart shows the crossing it names. |
 | Hero lede | Chinvat Bridge helps businesses use AI, automation and modern software to reduce manual work. | We bridge the gap between complex challenges and intelligent technology. | LinkedIn's opening line, without "At Chinvat Bridge,". |
+| Hero lede (4 November 2026) | We bridge the gap between complex challenges and intelligent technology. | We bridge the gap between complex challenges and intelligent technology: AI and automation, custom software, SEO, and data analytics. | SEO phase 1: the first screen names the four services in plain words. Short forms keep it to three lines, so the H1 stays the desktop LCP. |
 | Hero chart labels | (none) | Complex challenges · Intelligent technology | The two halves of the chart, from the same LinkedIn sentence. |
 | Hero discipline links | AI integration, Automation & workflows, Software & web, SEO & growth (text list) | The chart's four tiers: AI, Automation, Software, SEO (each link's accessible name is the full label) | The tiers are the links; the list beside them only repeated them. |
 | Hero callouts and logo toggle | "Transition" callout, Chrome / Classic toggle | (removed with the old hero) | The Crossing hero has no 3D mark. |

@@ -49,6 +49,44 @@ test.describe("routes", () => {
     expect(response?.status()).toBe(404);
   });
 
+  // Each inner page describes itself in social cards, not the homepage it would otherwise inherit.
+  for (const [path, title] of [
+    ["/insights", "Insights"],
+    ["/pricing", "SEO & Content Pricing"],
+    ["/privacy", "Privacy Policy"],
+    ["/terms", "Terms of Service"],
+  ]) {
+    test(`${path} has its own canonical, Open Graph and Twitter metadata`, async ({ page }) => {
+      await page.goto(path);
+      const content = (selector: string) => page.locator(selector).first().getAttribute("content");
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", new RegExp(`${path}$`));
+      expect(await content('meta[property="og:url"]')).toMatch(new RegExp(`${path}$`));
+      expect(await content('meta[property="og:title"]')).toBe(`${title} — Chinvat Bridge`);
+      expect(await content('meta[name="twitter:title"]')).toBe(`${title} — Chinvat Bridge`);
+      const description = await content('meta[name="description"]');
+      expect(await content('meta[property="og:description"]')).toBe(description);
+      expect(await content('meta[name="twitter:description"]')).toBe(description);
+      expect(await content('meta[name="twitter:image"]')).toMatch(/opengraph-image\.png$/);
+    });
+  }
+
+  test("sitemap lastmod comes from content dates, never the build time", async ({ request }) => {
+    const xml = await (await request.get("/sitemap.xml")).text();
+    const entries = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map(([, body]) => ({
+      loc: body.match(/<loc>(.*?)<\/loc>/)?.[1] ?? "",
+      lastmod: body.match(/<lastmod>(.*?)<\/lastmod>/)?.[1],
+    }));
+    const lastmodOf = (suffix: string) => entries.find((entry) => entry.loc.endsWith(suffix))?.lastmod;
+    expect(entries.map((entry) => new URL(entry.loc).pathname)).toEqual(
+      expect.arrayContaining(["/", "/pricing", "/insights", "/privacy", "/terms", "/insights/what-should-you-automate-first"]),
+    );
+    expect(lastmodOf("/pricing")).toBeUndefined();
+    expect(lastmodOf("/privacy")).toBe("2026-09-14");
+    expect(lastmodOf("/insights/what-should-you-automate-first")).toBe("2026-09-15");
+    // The index changes when its newest article does.
+    expect(lastmodOf("/insights")).toBe("2026-10-29");
+  });
+
   test("sitemap and robots respond", async ({ request }) => {
     const sitemap = await request.get("/sitemap.xml");
     expect(sitemap.status()).toBe(200);

@@ -1,3 +1,4 @@
+import { unstable_rethrow } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export type PlanId = string;
@@ -55,15 +56,23 @@ function mapRow(row: PlanRow): PricingPlan {
 
 /** All subscription plans shown on /pricing, ordered for display. */
 export async function getPlans(): Promise<PricingPlan[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.from("plans").select("*").order("sort_order");
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("plans").select("*").order("sort_order");
 
-  if (error || !data) {
+    if (error || !data) {
+      console.error("Failed to load plans:", error);
+      return [];
+    }
+
+    return data.map(mapRow);
+  } catch (error) {
+    // Next's own control-flow errors (e.g. from cookies()) must keep propagating; anything else
+    // (network failure, missing configuration) leaves the page to show its no-plans state.
+    unstable_rethrow(error);
     console.error("Failed to load plans:", error);
     return [];
   }
-
-  return data.map(mapRow);
 }
 
 export async function getPlanById(planId: string): Promise<PricingPlan | undefined> {

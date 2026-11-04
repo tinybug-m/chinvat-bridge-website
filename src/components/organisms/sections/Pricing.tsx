@@ -4,6 +4,7 @@ import { TextLink } from "@/components/system/TextLink";
 import { ArrowIcon } from "@/components/system/ArrowIcon";
 import { PricingCard } from "@/components/organisms/sections/PricingCard";
 import { CustomPlanCard } from "@/components/organisms/sections/CustomPlanCard";
+import { EmailLink } from "@/components/atoms/EmailLink";
 import { getPlans } from "@/data/pricing";
 import "./pricing.css";
 
@@ -29,6 +30,14 @@ export async function Pricing() {
 
       <section id="pricing" aria-label="Plans" className="border-b border-line pb-12 lg:pb-16">
         <Container>
+          {plans.length === 0 ? (
+            // No plans came back (none published, or the database could not be reached): say so
+            // plainly rather than show prices from anywhere else. The custom package still stands.
+            <p role="status" className="mb-4 max-w-[40rem] text-body text-pretty text-ink-soft lg:mb-5">
+              Our plan details can&rsquo;t be shown right now. Please try again shortly, or email <EmailLink /> and
+              we&rsquo;ll send you current pricing.
+            </p>
+          ) : null}
           <ul className="grid grid-cols-1 gap-4 lg:gap-5 xl:auto-rows-[auto_auto_auto_1fr_auto] xl:grid-cols-3">
             {plans.map((plan, index) => (
               <PricingCard key={plan.id} plan={plan} index={index} />

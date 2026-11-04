@@ -4,21 +4,16 @@ import { PageHeader } from "@/components/system/PageHeader";
 import { Container } from "@/components/system/Container";
 import { Prose } from "@/components/system/Prose";
 import { EmailLink } from "@/components/atoms/EmailLink";
-import { SHARED_OPEN_GRAPH } from "@/lib/metadata";
+import { formatPostDate } from "@/lib/blog";
+import { TERMS_UPDATED } from "@/lib/legal";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Terms of Service",
   description:
     "The terms that govern your subscription to Chinvat Bridge's SEO and content services — billing, cancellation, scope of work and responsibilities.",
-  alternates: { canonical: "/terms" },
-  openGraph: {
-    ...SHARED_OPEN_GRAPH,
-    url: "/terms",
-    title: "Terms of Service — Chinvat Bridge",
-    description:
-      "The terms that govern your subscription to Chinvat Bridge's SEO and content services — billing, cancellation, scope of work and responsibilities.",
-  },
-};
+  path: "/terms",
+});
 
 export default function TermsOfServicePage() {
   return (
@@ -26,7 +21,9 @@ export default function TermsOfServicePage() {
       <PageHeader kicker="Legal" title="Terms of service" />
       <Container className="grid grid-cols-1 gap-y-10 pt-10 pb-section lg:grid-cols-12 lg:gap-x-6 lg:pt-16">
         <aside aria-label="About this document" className="lg:col-span-3">
-          <p className="text-small text-ink-muted lg:sticky lg:top-28">Last updated: 14 September 2026</p>
+          <p className="text-small text-ink-muted lg:sticky lg:top-28">
+            Last updated: <time dateTime={TERMS_UPDATED}>{formatPostDate(TERMS_UPDATED)}</time>
+          </p>
         </aside>
         <Prose className="lg:col-span-7 lg:col-start-4">
           <p className="text-lede text-ink">
