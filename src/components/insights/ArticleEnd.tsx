@@ -1,12 +1,30 @@
-import Link from "next/link";
-import { ArrowIcon } from "@/components/system/ArrowIcon";
+import type { ReactNode } from "react";
 import { ButtonLink } from "@/components/system/Button";
 import { Container } from "@/components/system/Container";
+import { RowLink } from "@/components/system/RowLink";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/lib/constants";
 import type { Post } from "@/lib/blog";
 
+interface ArticleEndProps {
+  related: Post[];
+  /** The closing block's heading, lede and button label; articles keep the defaults, service pages say their own. */
+  title?: string;
+  lede?: ReactNode;
+  cta?: string;
+}
+
 /** Related reading as hairline rows, then a quiet way to get in touch. */
-export function ArticleEnd({ related }: { related: Post[] }) {
+export function ArticleEnd({
+  related,
+  title = "Build a better way forward.",
+  lede = (
+    <>
+      Tell us what&rsquo;s slowing your business down, where you&rsquo;re trying to grow, or what you&rsquo;d like to
+      build.
+    </>
+  ),
+  cta = "Start a conversation",
+}: ArticleEndProps) {
   return (
     <>
       {related.length > 0 ? (
@@ -18,21 +36,7 @@ export function ArticleEnd({ related }: { related: Post[] }) {
             <ul className="border-b border-line lg:col-span-8 lg:col-start-4">
               {related.map((post) => (
                 <li key={post.meta.slug} className="border-t border-line">
-                  <Link
-                    href={`/insights/${post.meta.slug}`}
-                    prefetch={false}
-                    className="group/row relative grid min-h-16 grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 py-5"
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="pointer-events-none absolute inset-x-0 -top-px h-px origin-left scale-x-0 bg-ink transition-transform duration-500 ease-out-quart group-hover/row:scale-x-100 group-focus-visible/row:scale-x-100 motion-reduce:transition-none"
-                    />
-                    <span className="text-balance font-display text-body font-medium text-ink transition-colors duration-200 group-hover/row:text-cobalt-700 md:text-lede">
-                      {post.meta.title}
-                    </span>
-                    <span className="col-start-1 row-start-2 text-small text-ink-muted">{post.meta.category}</span>
-                    <ArrowIcon className="col-start-2 row-span-2 row-start-1 text-ink group-hover/row:translate-x-0.5 group-hover/row:text-cobalt-700" />
-                  </Link>
+                  <RowLink href={`/insights/${post.meta.slug}`} title={post.meta.title} meta={post.meta.category} />
                 </li>
               ))}
             </ul>
@@ -44,16 +48,13 @@ export function ArticleEnd({ related }: { related: Post[] }) {
         <Container className="grid grid-cols-1 gap-y-8 lg:grid-cols-12 lg:items-end lg:gap-x-6">
           <div className="lg:col-span-7">
             <h2 id="article-contact-title" className="max-w-[18ch] text-balance font-display text-heading font-medium text-ink">
-              Build a better way forward.
+              {title}
             </h2>
-            <p className="mt-4 max-w-measure text-body text-pretty text-ink-soft">
-              Tell us what&rsquo;s slowing your business down, where you&rsquo;re trying to grow, or what you&rsquo;d
-              like to build.
-            </p>
+            <p className="mt-4 max-w-measure text-body text-pretty text-ink-soft">{lede}</p>
           </div>
           <div className="flex flex-col items-start gap-4 lg:col-span-5 lg:items-end">
             <ButtonLink href="/#contact" prefetch={false} variant="secondary" size="lg" arrow="right" className="w-full sm:w-auto">
-              Start a conversation
+              {cta}
             </ButtonLink>
             <a
               href={CONTACT_MAILTO}
