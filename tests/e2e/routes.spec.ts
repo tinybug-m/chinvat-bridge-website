@@ -80,9 +80,10 @@ test.describe("routes", () => {
     }));
     const lastmodOf = (suffix: string) => entries.find((entry) => entry.loc.endsWith(suffix))?.lastmod;
     expect(entries.map((entry) => new URL(entry.loc).pathname)).toEqual(
-      expect.arrayContaining(["/", "/pricing", "/insights", "/privacy", "/terms", "/insights/what-should-you-automate-first"]),
+      expect.arrayContaining(["/", "/pricing", "/services/seo", "/insights", "/privacy", "/terms", "/insights/what-should-you-automate-first"]),
     );
     expect(lastmodOf("/pricing")).toBeUndefined();
+    expect(lastmodOf("/services/seo")).toBe("2026-11-04");
     expect(lastmodOf("/privacy")).toBe("2026-09-14");
     expect(lastmodOf("/insights/what-should-you-automate-first")).toBe("2026-09-15");
     // The index changes when its newest article does.
