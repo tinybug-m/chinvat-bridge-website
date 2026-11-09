@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 // Routes still in the old design must keep working while the homepage changes.
 const PAGES = [
   "/pricing",
+  "/services/seo",
   "/insights",
   "/insights/what-should-you-automate-first",
   "/insights/when-should-a-business-build-custom-software",
@@ -53,6 +54,7 @@ test.describe("routes", () => {
   for (const [path, title] of [
     ["/insights", "Insights"],
     ["/pricing", "SEO & Content Pricing"],
+    ["/services/seo", "SEO Services & Digital Growth"],
     ["/privacy", "Privacy Policy"],
     ["/terms", "Terms of Service"],
   ]) {
