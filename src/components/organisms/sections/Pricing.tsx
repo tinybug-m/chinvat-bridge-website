@@ -26,7 +26,12 @@ export async function Pricing() {
         kicker="SEO & content retainers"
         title="SEO & content plans"
         lede="Ongoing content, technical SEO and link building — delivered on a predictable monthly retainer. For AI, automation or custom software work, get in touch for a scoped quote."
-      />
+      >
+        <TextLink href="/services/seo" className="inline-flex min-h-11 items-center gap-2 text-body">
+          <span>How our SEO service works</span>
+          <ArrowIcon />
+        </TextLink>
+      </PageHeader>
 
       <section id="pricing" aria-label="Plans" className="border-b border-line pb-12 lg:pb-16">
         <Container>

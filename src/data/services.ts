@@ -54,7 +54,7 @@ export const SERVICES: Service[] = [
       "We improve the technical foundations, structure and digital experience of your website so that search engines and customers can understand your business more clearly.",
     tags: ["Technical SEO", "Site architecture", "Structured data", "Performance audits"],
     outcome: "Improve visibility",
-    href: "/pricing",
+    href: "/services/seo",
   },
 ];
 

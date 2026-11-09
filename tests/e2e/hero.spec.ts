@@ -34,7 +34,7 @@ test.describe("hero", () => {
       ["AI integration", "/#services-ai"],
       ["Automation & workflows", "/#services-automation"],
       ["Software & web", "/#services-software"],
-      ["SEO & growth", "/#services-seo"],
+      ["SEO & growth", "/services/seo"],
     ];
     await expect(index).toHaveCount(4);
     for (const [i, [label, href]] of expected.entries()) {

@@ -4,7 +4,7 @@ const PLATES = [
   { id: "services-ai", title: "AI & Automation Integration", href: "/insights/where-ai-can-save-your-business-time" },
   { id: "services-automation", title: "Automation & Workflows", href: "/insights/what-should-you-automate-first" },
   { id: "services-software", title: "Software & Web", href: "/insights/when-should-a-business-build-custom-software" },
-  { id: "services-seo", title: "SEO & Digital Growth", href: "/pricing" },
+  { id: "services-seo", title: "SEO & Digital Growth", href: "/services/seo" },
 ];
 
 test.describe("services section", () => {

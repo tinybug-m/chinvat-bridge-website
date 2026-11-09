@@ -52,7 +52,11 @@ const BAND =
   "relative isolate py-14 before:absolute before:inset-y-0 before:left-1/2 before:-z-10 before:w-screen before:-translate-x-1/2 before:bg-haze before:content-[''] lg:py-24";
 
 export function ServicePlate({ service, slug, Diagram, viewBox, draw, tone, energy, layout }: PlateProps) {
-  const linkLabel = service.href?.startsWith("/insights/") ? "Read the article" : "See pricing";
+  const linkLabel = service.href?.startsWith("/insights/")
+    ? "Read the article"
+    : service.href?.startsWith("/services/")
+      ? "Explore the service"
+      : "See pricing";
   const headingId = `services-${slug}-title`;
 
   return (
