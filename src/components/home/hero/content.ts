@@ -20,7 +20,7 @@ export const HERO_DISCIPLINES = [
   { label: "AI integration", href: "/#services-ai" },
   { label: "Automation & workflows", href: "/#services-automation" },
   { label: "Software & web", href: "/#services-software" },
-  { label: "SEO & growth", href: "/#services-seo" },
+  { label: "SEO & growth", href: "/services/seo" },
 ] as const;
 
 /** Drawing callouts tied to the object. */

@@ -32,10 +32,12 @@ test.describe("site shell", () => {
     await expect(trigger).toBeFocused();
 
     await trigger.click();
-    await dialog.getByRole("link", { name: /Insights/ }).click();
+    // Insights is the index page, not the homepage teaser.
+    await expect(dialog.getByRole("link", { name: "Insights" })).toHaveAttribute("href", "/insights");
+    await dialog.getByRole("link", { name: /About/ }).click();
     await expect(dialog).toBeHidden();
-    await expect(page).toHaveURL(/#insights$/);
-    await expect(page.locator("#insights")).toBeInViewport();
+    await expect(page).toHaveURL(/#about$/);
+    await expect(page.locator("#about")).toBeInViewport();
   });
 
   test("the menu sheet is loaded on demand, not with the page", async ({ page }, testInfo) => {
@@ -76,11 +78,12 @@ test.describe("site shell", () => {
     test.skip(testInfo.project.name !== "desktop", "desktop only");
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: "Main" });
-    for (const name of ["Services", "Work", "Approach", "About", "Insights"]) {
+    for (const name of ["Services", "Work", "Approach", "About"]) {
       await nav.getByRole("link", { name }).click();
       // Generous: the long smooth scroll passes the 3D stages, which can hold the main thread for a few seconds.
       await expect(page.locator(`#${name === "Approach" ? "approach" : name.toLowerCase()}`)).toBeInViewport({ timeout: 20_000 });
     }
+    await expect(nav.getByRole("link", { name: "Insights" })).toHaveAttribute("href", "/insights");
     await expect(nav.getByRole("link", { name: "Pricing" })).toHaveAttribute("href", "/pricing");
     // Links run in page order.
     await expect(nav.getByRole("link")).toHaveText(["Services", "Work", "Approach", "About", "Insights", "Pricing"]);
@@ -135,5 +138,19 @@ test.describe("site shell", () => {
     await page.goto("/");
     const explore = page.getByRole("navigation", { name: "Footer: Explore" });
     await expect(explore.getByRole("link", { name: "Work" })).toHaveAttribute("href", "/#work");
+    await expect(explore.getByRole("link", { name: "Insights" })).toHaveAttribute("href", "/insights");
+  });
+
+  test("Insights lights while its homepage teaser is read, and on the insights pages", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "desktop only");
+    await page.goto("/");
+    const nav = page.getByRole("navigation", { name: "Main" });
+    await page.evaluate(() => document.getElementById("insights")!.scrollIntoView({ behavior: "instant", block: "center" }));
+    await expect(nav.getByRole("link", { name: "Insights" })).toHaveAttribute("aria-current", "location");
+    await page.goto("/insights");
+    await expect(nav.getByRole("link", { name: "Insights" })).toHaveAttribute("aria-current", "page");
+    await page.goto("/insights/what-should-you-automate-first");
+    await expect(nav.getByRole("link", { name: "Insights" })).toHaveAttribute("aria-current", "true");
+    await expect(nav.getByRole("link", { name: "Pricing" })).not.toHaveAttribute("aria-current", /.+/);
   });
 });

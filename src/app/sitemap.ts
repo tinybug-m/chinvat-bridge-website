@@ -1,45 +1,58 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/constants";
 import { getAllPosts } from "@/lib/blog";
+import { PRIVACY_UPDATED, TERMS_UPDATED } from "@/lib/legal";
+import { SEO_SERVICE } from "@/data/seo-service";
 
+/*
+ * lastModified is given only where the content carries a real date: each
+ * article's own dates, the newest of them for the index, the service pages'
+ * own "updated" and the legal pages' "last updated". The homepage and /pricing have no such date (pricing comes
+ * from the database), so they leave lastmod out rather than claim the build time.
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date();
   const posts = getAllPosts();
+  const postModified = posts.map((post) => post.meta.updated ?? post.meta.date);
+  const latestPost = postModified.toSorted().at(-1);
 
   return [
     {
       url: SITE_URL,
-      lastModified,
       changeFrequency: "monthly",
       priority: 1,
     },
     {
       url: `${SITE_URL}/pricing`,
-      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}${SEO_SERVICE.path}`,
+      lastModified: SEO_SERVICE.updated,
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
       url: `${SITE_URL}/insights`,
-      lastModified,
+      ...(latestPost && { lastModified: latestPost }),
       changeFrequency: "weekly",
       priority: 0.7,
     },
-    ...posts.map((post) => ({
+    ...posts.map((post, i) => ({
       url: `${SITE_URL}/insights/${post.meta.slug}`,
-      lastModified: new Date(post.meta.updated ?? post.meta.date),
+      lastModified: postModified[i],
       changeFrequency: "monthly" as const,
       priority: 0.6,
     })),
     {
       url: `${SITE_URL}/privacy`,
-      lastModified,
+      lastModified: PRIVACY_UPDATED,
       changeFrequency: "yearly",
       priority: 0.3,
     },
     {
       url: `${SITE_URL}/terms`,
-      lastModified,
+      lastModified: TERMS_UPDATED,
       changeFrequency: "yearly",
       priority: 0.3,
     },

@@ -20,7 +20,11 @@ test.describe("hero", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Cross the bridge\.\s*Enter the future\./);
     await expect(hero.getByText("UK Based // Working Globally")).toBeVisible();
-    await expect(hero.getByText("We bridge the gap between complex challenges and intelligent technology.")).toBeVisible();
+    await expect(
+      hero.getByText(
+        "We bridge the gap between complex challenges and intelligent technology: AI and automation, custom software, SEO, and data analytics.",
+      ),
+    ).toBeVisible();
     await expect(hero.getByRole("link", { name: "Start a conversation" })).toHaveAttribute("href", "/#contact");
     await expect(hero.getByRole("link", { name: "Explore services" })).toHaveAttribute("href", "/#services");
 
@@ -30,7 +34,7 @@ test.describe("hero", () => {
       ["AI integration", "/#services-ai"],
       ["Automation & workflows", "/#services-automation"],
       ["Software & web", "/#services-software"],
-      ["SEO & growth", "/#services-seo"],
+      ["SEO & growth", "/services/seo"],
     ];
     await expect(index).toHaveCount(4);
     for (const [i, [label, href]] of expected.entries()) {

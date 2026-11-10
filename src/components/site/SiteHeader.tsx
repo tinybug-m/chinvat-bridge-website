@@ -8,20 +8,27 @@ import { ButtonLink } from "@/components/system/Button";
 import { Container } from "@/components/system/Container";
 import { cn } from "@/lib/utils";
 import { MobileMenu } from "./MobileMenu";
-import { CONTACT_LINK, LOGIN_LINK, PRICING_LINK, SECTION_LINKS, prefetchFor } from "./nav";
+import { CONTACT_LINK, LOGIN_LINK, PRICING_LINK, SECTION_LINKS, prefetchFor, sectionOf } from "./nav";
 import { useActiveSection } from "./useActiveSection";
 
-const SECTION_IDS = SECTION_LINKS.map((link) => link.href.split("#")[1]);
+const SECTION_IDS = SECTION_LINKS.map(sectionOf);
 const NAV_LINKS = [...SECTION_LINKS, PRICING_LINK];
+/** Links that are pages, not anchors: Insights and Pricing. */
+const PAGE_LINKS = NAV_LINKS.filter((link) => !link.href.includes("#"));
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const active = useActiveSection(SECTION_IDS);
   const pathname = usePathname();
 
-  // The lit link: the homepage chapter under the viewport midline, or Pricing while on /pricing.
-  const onPricing = pathname === PRICING_LINK.href;
-  const current = active !== null ? `/#${active}` : onPricing ? PRICING_LINK.href : null;
+  // The lit link: the homepage chapter under the viewport midline, or the page link for the page
+  // being read (Insights also lights on its articles).
+  const bySection = active !== null ? (SECTION_LINKS.find((link) => sectionOf(link) === active)?.href ?? null) : null;
+  const byPage =
+    PAGE_LINKS.find((link) => pathname === link.href || pathname.startsWith(`${link.href}/`))?.href ?? null;
+  const current = bySection ?? byPage;
+  // aria-current: a chapter is a location in the homepage; a page link is the page itself, or its section on an article.
+  const currentKind = bySection ? "location" : pathname === current ? "page" : "true";
 
   const list = useRef<HTMLElement>(null);
   const indicator = useRef<HTMLSpanElement>(null);
@@ -91,7 +98,7 @@ export function SiteHeader() {
                     href={link.href}
                     prefetch={prefetchFor(link.href)}
                     data-active={isActive || undefined}
-                    aria-current={isActive ? (link.href === PRICING_LINK.href ? "page" : "location") : undefined}
+                    aria-current={isActive ? currentKind : undefined}
                     className="relative inline-flex min-h-11 items-center px-2 text-small text-ink-soft transition-colors duration-200 ease-out-quart after:absolute after:inset-x-2 after:bottom-[7px] after:h-px after:origin-left after:scale-x-0 after:bg-ink after:transition-transform after:duration-150 after:ease-out-quart hover:text-ink hover:after:scale-x-100 data-active:text-ink data-active:after:hidden motion-reduce:transition-none motion-reduce:after:transition-none xl:px-3 xl:after:inset-x-3"
                   >
                     {link.label}

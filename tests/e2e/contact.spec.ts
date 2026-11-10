@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const EMAIL = "contact@chinvatbridge.com";
+const EMAIL = "artin@chinvatbridge.com";
 
 /** Collects the bodies of Server Action POSTs (the request that sends the message). */
 function recordSends(page: Page) {

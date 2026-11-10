@@ -4,21 +4,16 @@ import { PageHeader } from "@/components/system/PageHeader";
 import { Container } from "@/components/system/Container";
 import { Prose } from "@/components/system/Prose";
 import { EmailLink } from "@/components/atoms/EmailLink";
-import { SHARED_OPEN_GRAPH } from "@/lib/metadata";
+import { formatPostDate } from "@/lib/blog";
+import { PRIVACY_UPDATED } from "@/lib/legal";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Privacy Policy",
   description:
     "How Chinvat Bridge collects, uses and protects your information when you visit our site or subscribe to a plan, and your rights under UK data protection law.",
-  alternates: { canonical: "/privacy" },
-  openGraph: {
-    ...SHARED_OPEN_GRAPH,
-    url: "/privacy",
-    title: "Privacy Policy — Chinvat Bridge",
-    description:
-      "How Chinvat Bridge collects, uses and protects your information when you visit our site or subscribe to a plan, and your rights under UK data protection law.",
-  },
-};
+  path: "/privacy",
+});
 
 export default function PrivacyPolicyPage() {
   return (
@@ -26,7 +21,9 @@ export default function PrivacyPolicyPage() {
       <PageHeader kicker="Legal" title="Privacy policy" />
       <Container className="grid grid-cols-1 gap-y-10 pt-10 pb-section lg:grid-cols-12 lg:gap-x-6 lg:pt-16">
         <aside aria-label="About this document" className="lg:col-span-3">
-          <p className="text-small text-ink-muted lg:sticky lg:top-28">Last updated: 14 September 2026</p>
+          <p className="text-small text-ink-muted lg:sticky lg:top-28">
+            Last updated: <time dateTime={PRIVACY_UPDATED}>{formatPostDate(PRIVACY_UPDATED)}</time>
+          </p>
         </aside>
         <Prose className="lg:col-span-7 lg:col-start-4">
           <p className="text-lede text-ink">

@@ -4,13 +4,14 @@ import { PageHeader } from "@/components/system/PageHeader";
 import { SiteShell } from "@/components/templates/SiteShell";
 import { getAllPosts } from "@/lib/blog";
 import { SITE_URL } from "@/lib/constants";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Insights",
   description:
     "Practical thinking on AI, automation, software and SEO for UK small businesses — written to help you make better, faster operational decisions.",
-  alternates: { canonical: "/insights" },
-};
+  path: "/insights",
+});
 
 export default function InsightsIndexPage() {
   const posts = getAllPosts();
