@@ -15,7 +15,7 @@ const oneLine = (value: unknown, max: number) => (typeof value === "string" ? va
 /** A site path, optionally with a query string of plain characters. */
 export const sitePath = (value: unknown) => {
   const path = oneLine(value, 300);
-  return /^\/[\w\-./]*(\?[\w\-.=&%+]*)?$/.test(path) ? path : "";
+  return /^\/[\w\-./%~@]*(\?[\w\-.=&%+]*)?$/.test(path) ? path : "";
 };
 
 /** A bare host name, such as www.google.com. */
@@ -29,9 +29,8 @@ export function journeyLines(journey: JourneyInput | undefined): string[] {
   const entry = sitePath(journey?.entry);
   const referrer = hostName(journey?.referrer);
   const previous = sitePath(journey?.previous);
-  if (!entry) return [];
   return [
-    `First page: ${entry}${referrer ? ` (from ${referrer})` : " (direct or unknown)"}`,
+    ...(entry ? [`First page: ${entry}${referrer ? ` (from ${referrer})` : " (direct or unknown)"}`] : []),
     ...(previous && previous !== entry ? [`Page before contact: ${previous}`] : []),
   ];
 }

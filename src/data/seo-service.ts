@@ -14,7 +14,7 @@ export const SEO_SERVICE = {
   /** The service's name, as on the homepage plate. */
   name: "SEO & Digital Growth",
   /** When this page's content last changed (sitemap lastmod). */
-  updated: "2026-11-04",
+  updated: "2026-11-18",
   title: "SEO Services & Digital Growth",
   description:
     "Technical SEO, content strategy, link building and digital PR that improve how your business is found in search. Monthly SEO retainers or a custom scope.",

@@ -66,7 +66,7 @@ export const AI_SERVICE: ServicePageContent = {
   primaryCta: "Discuss an AI project",
   problems: {
     title: "Why AI often changes so little.",
-    intro: "Most businesses have tried an AI tool by now. The gap is rarely the technology; it is everything around it.",
+    intro: "You may well have tried an AI tool already. When it changes little, the gap is rarely the technology; it is everything around it.",
     items: [
       {
         title: "Subscriptions, but no change in the work",
@@ -74,7 +74,7 @@ export const AI_SERVICE: ServicePageContent = {
       },
       {
         title: "It doesn’t know your business",
-        body: "A general assistant doesn’t know your services, prices, policies or customers. Every answer needs checking and rewriting, and the time it was meant to save goes into editing.",
+        body: "Out of the box, a general assistant doesn’t know your services, prices, policies or customers. Every answer needs checking and rewriting, and the time it was meant to save goes into editing.",
       },
       {
         title: "Nobody trusts the output",
@@ -82,7 +82,7 @@ export const AI_SERVICE: ServicePageContent = {
       },
       {
         title: "Data goes where it shouldn’t",
-        body: "Pasting customer or financial information into a consumer tool raises data-protection questions under UK GDPR that most small businesses haven’t had time to answer.",
+        body: "Pasting customer or financial information into a consumer tool raises data-protection questions under UK GDPR that many small businesses haven’t had time to answer.",
       },
     ],
   },

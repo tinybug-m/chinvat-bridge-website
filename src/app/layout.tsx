@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { REVEAL_RUNTIME } from "@/components/motion/reveal-runtime";
+import { JourneyRecorder } from "@/components/site/JourneyRecorder";
 import { CONTACT_EMAIL, SITE_DESCRIPTION, SITE_NAME, SITE_ORIGIN, SITE_URL, SITE_TITLE } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -73,6 +74,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="flex min-h-full flex-col bg-paper font-body text-ink selection:bg-cobalt-700 selection:text-paper">
         {children}
+        {/* Every route, whatever its shell, so "page before contact" is always the real one. */}
+        <JourneyRecorder />
         <script
           type="application/ld+json"
           // Escaped so no string in the data can close the script element.

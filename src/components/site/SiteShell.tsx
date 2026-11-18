@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { JourneyRecorder } from "./JourneyRecorder";
 import { SiteFooter } from "./SiteFooter";
 import { SiteHeader } from "./SiteHeader";
 
@@ -17,7 +16,6 @@ export function SiteShell({ children }: { children: ReactNode }) {
         {children}
       </main>
       <SiteFooter />
-      <JourneyRecorder />
     </>
   );
 }

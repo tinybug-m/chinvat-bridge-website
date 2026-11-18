@@ -1,69 +1,40 @@
 import type { ComponentType } from "react";
 import type { Metadata } from "next";
+import { PLATE_VIEWBOX } from "@/components/home/services/crops";
 import { AiDiagram, AutomationDiagram, SoftwareDiagram } from "@/components/home/services/diagrams";
 import { PlateDiagram } from "@/components/home/services/PlateDiagram";
 import { ArticleEnd } from "@/components/insights/ArticleEnd";
 import { Reveal } from "@/components/motion/Reveal";
 import { FaqList, LinkList, OfferingList, ServiceSection, TextGrid } from "@/components/services/ServiceBlocks";
+import { JsonLdScripts, relatedInsightLinks, serviceJsonLd } from "@/components/services/structured-data";
 import { ButtonLink } from "@/components/system/Button";
 import { PageHeader } from "@/components/system/PageHeader";
 import { SiteShell } from "@/components/templates/SiteShell";
 import { PROCESS_STEPS } from "@/data/process";
 import type { ServiceDiagram, ServicePageContent } from "@/data/service-pages";
-import { getPostBySlug } from "@/lib/blog";
-import { SITE_URL } from "@/lib/constants";
 import { pageMetadata } from "@/lib/metadata";
 
 /*
  * The AI, automation and software service pages: the same order of blocks as /services/seo
  * (problem, what we do, examples, approach, process, engagement, questions, related reading),
  * filled from data/service-pages.ts. The header figure is the service's own homepage diagram,
- * cropped as on its plate. These services are quoted per project, so the calls to action open
+ * cropped as on its plate. These services are quoted per project, so every call to action opens
  * the homepage conversation; only SEO has plans on /pricing.
  */
 
-const DIAGRAMS: Record<ServiceDiagram, { Diagram: ComponentType; viewBox: string }> = {
-  ai: { Diagram: AiDiagram, viewBox: "16 24 368 270" },
-  automation: { Diagram: AutomationDiagram, viewBox: "16 66 368 168" },
-  software: { Diagram: SoftwareDiagram, viewBox: "16 40 368 232" },
+const DIAGRAMS: Record<ServiceDiagram, ComponentType> = {
+  ai: AiDiagram,
+  automation: AutomationDiagram,
+  software: SoftwareDiagram,
 };
 
 export function serviceMetadata(content: ServicePageContent): Metadata {
   return pageMetadata({ title: content.title, description: content.description, path: content.path });
 }
 
-/** Service and BreadcrumbList; the provider is the Organization the root layout declares. No offers: none are priced. */
-function structuredData(content: ServicePageContent) {
-  const url = `${SITE_URL}${content.path}`;
-  return [
-    {
-      "@context": "https://schema.org",
-      "@type": "Service",
-      "@id": `${url}#service`,
-      name: content.name,
-      serviceType: content.serviceType,
-      description: content.description,
-      url,
-      provider: { "@id": `${SITE_URL}/#organization` },
-      areaServed: "Worldwide",
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-        { "@type": "ListItem", position: 2, name: content.name, item: url },
-      ],
-    },
-  ];
-}
-
 export function ServicePage({ content }: { content: ServicePageContent }) {
-  const { Diagram, viewBox } = DIAGRAMS[content.diagram];
-  const relatedInsights = content.relatedInsights.flatMap(({ slug, reason }) => {
-    const post = getPostBySlug(slug);
-    return post ? [{ href: `/insights/${slug}`, title: post.meta.title, reason }] : [];
-  });
+  const Diagram = DIAGRAMS[content.diagram];
+  const relatedInsights = relatedInsightLinks(content.relatedInsights);
 
   return (
     <SiteShell>
@@ -72,7 +43,7 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
         title={content.h1}
         lede={content.lede}
         aside={
-          <PlateDiagram viewBox={viewBox} loop className="w-full max-w-[28rem] lg:max-w-none">
+          <PlateDiagram viewBox={PLATE_VIEWBOX[content.diagram]} loop className="w-full max-w-[28rem] lg:max-w-none">
             <Diagram />
           </PlateDiagram>
         }
@@ -139,12 +110,9 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
               {paragraph}
             </p>
           ))}
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <div className="mt-8">
             <ButtonLink href="/#contact" size="lg" arrow="right" className="w-full sm:w-auto">
               {content.primaryCta}
-            </ButtonLink>
-            <ButtonLink href="/pricing" size="lg" variant="secondary" arrow="right" className="w-full sm:w-auto">
-              See custom packages
             </ButtonLink>
           </div>
         </Reveal>
@@ -167,14 +135,7 @@ export function ServicePage({ content }: { content: ServicePageContent }) {
 
       <ArticleEnd related={[]} title={content.close.title} lede={content.close.lede} cta={content.close.cta} />
 
-      {structuredData(content).map((data) => (
-        <script
-          key={data["@type"]}
-          type="application/ld+json"
-          // Escaped so no string in the data can close the script element.
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }}
-        />
-      ))}
+      <JsonLdScripts data={serviceJsonLd(content)} />
     </SiteShell>
   );
 }

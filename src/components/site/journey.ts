@@ -15,6 +15,9 @@ export interface Journey {
 }
 
 const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign"] as const;
+/** The site's own domains: a visit arriving from one of them is internal, not a referral. */
+const OWN_DOMAINS = ["chinvatbridge.com", "chinvatbridge.uk"];
+const bareHost = (host: string) => host.replace(/^www\./, "");
 
 let journey: Journey = { entry: "", referrer: "", previous: "" };
 let current = "";
@@ -31,7 +34,8 @@ export function recordPage(pathname: string) {
     let referrer = "";
     try {
       const host = document.referrer ? new URL(document.referrer).hostname : "";
-      referrer = host === window.location.hostname ? "" : host;
+      const own = bareHost(host) === bareHost(window.location.hostname) || OWN_DOMAINS.includes(bareHost(host));
+      referrer = own ? "" : host;
     } catch {
       referrer = "";
     }

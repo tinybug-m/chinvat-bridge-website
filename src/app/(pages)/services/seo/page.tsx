@@ -11,6 +11,7 @@ import {
   ServiceSection,
   TextGrid,
 } from "@/components/services/ServiceBlocks";
+import { JsonLdScripts, relatedInsightLinks, serviceJsonLd } from "@/components/services/structured-data";
 import { ButtonLink } from "@/components/system/Button";
 import { PageHeader } from "@/components/system/PageHeader";
 import { SiteShell } from "@/components/templates/SiteShell";
@@ -27,8 +28,6 @@ import {
   SEO_RELATED_SERVICES,
   SEO_SERVICE,
 } from "@/data/seo-service";
-import { getPostBySlug } from "@/lib/blog";
-import { SITE_URL } from "@/lib/constants";
 import { pageMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = pageMetadata({
@@ -37,40 +36,13 @@ export const metadata: Metadata = pageMetadata({
   path: SEO_SERVICE.path,
 });
 
-const PAGE_URL = `${SITE_URL}${SEO_SERVICE.path}`;
-
 /*
- * Service and BreadcrumbList only. The Service carries no offers: prices live
- * on /pricing, which this page links to rather than repeats, and markup should
- * describe what the page shows. The provider is the Organization the root
- * layout already declares.
+ * Service and BreadcrumbList only (shared with the other service pages). The Service carries no
+ * offers: prices live on /pricing, which this page links to rather than repeats.
  */
-const jsonLd = [
-  {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    "@id": `${PAGE_URL}#service`,
-    name: SEO_SERVICE.name,
-    serviceType: "Search engine optimisation",
-    description: SEO_SERVICE.description,
-    url: PAGE_URL,
-    provider: { "@id": `${SITE_URL}/#organization` },
-    areaServed: "Worldwide",
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-      { "@type": "ListItem", position: 2, name: SEO_SERVICE.name, item: PAGE_URL },
-    ],
-  },
-];
+const jsonLd = serviceJsonLd({ ...SEO_SERVICE, serviceType: "Search engine optimisation" });
 
-const relatedInsights = SEO_RELATED_INSIGHTS.flatMap(({ slug, reason }) => {
-  const post = getPostBySlug(slug);
-  return post ? [{ href: `/insights/${slug}`, title: post.meta.title, reason }] : [];
-});
+const relatedInsights = relatedInsightLinks(SEO_RELATED_INSIGHTS);
 
 export default function SeoServicePage() {
   return (
@@ -182,14 +154,7 @@ export default function SeoServicePage() {
         cta="Discuss your SEO goals"
       />
 
-      {jsonLd.map((data) => (
-        <script
-          key={data["@type"]}
-          type="application/ld+json"
-          // Escaped so no string in the data can close the script element.
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }}
-        />
-      ))}
+      <JsonLdScripts data={jsonLd} />
     </SiteShell>
   );
 }

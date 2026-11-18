@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import nodemailer from "nodemailer";
 import { NEEDS, isEmail } from "@/components/home/contact/brief";
-import { CONTACT_EMAIL } from "@/lib/constants";
+import { CONTACT_EMAIL, SITE_URL } from "@/lib/constants";
 import { journeyLines, type JourneyInput } from "@/lib/enquiry-journey";
 
 /*
@@ -78,7 +78,7 @@ export async function sendEnquiry(input: EnquiryInput): Promise<EnquiryResult> {
     "",
     "—",
     ...journeyLines(input.journey),
-    "Sent from the contact conversation on chinvatbridge.com. Reply to this email to answer them directly.",
+    `Sent from the contact conversation on ${new URL(SITE_URL).hostname.replace(/^www\./, "")}. Reply to this email to answer them directly.`,
   ].join("\n");
 
   const user = process.env.GMAIL_USER;

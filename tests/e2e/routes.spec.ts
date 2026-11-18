@@ -89,7 +89,7 @@ test.describe("routes", () => {
       expect.arrayContaining(["/", "/pricing", "/services/seo", "/services/ai-integration", "/services/workflow-automation", "/services/custom-software", "/insights", "/privacy", "/terms", "/insights/what-should-you-automate-first"]),
     );
     expect(lastmodOf("/pricing")).toBeUndefined();
-    expect(lastmodOf("/services/seo")).toBe("2026-11-04");
+    expect(lastmodOf("/services/seo")).toBe("2026-11-18");
     expect(lastmodOf("/services/custom-software")).toBe("2026-11-18");
     expect(lastmodOf("/privacy")).toBe("2026-11-18");
     expect(lastmodOf("/insights/what-should-you-automate-first")).toBe("2026-09-15");

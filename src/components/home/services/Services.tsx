@@ -4,6 +4,7 @@ import { SectionHeading } from "@/components/system/SectionHeading";
 import { Reveal } from "@/components/motion/Reveal";
 import { SERVICES } from "@/data/services";
 import { AiDiagram, AutomationDiagram, SeoDiagram, SoftwareDiagram } from "./diagrams";
+import { PLATE_VIEWBOX } from "./crops";
 import { ServicePlate, type PlateProps } from "./ServicePlate";
 import { EnergyFlow } from "./energy/EnergyFlow";
 
@@ -30,7 +31,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
   {
     slug: "ai",
     Diagram: AiDiagram,
-    viewBox: "16 24 368 270",
+    viewBox: PLATE_VIEWBOX.ai,
     tone: { title: "heading", link: "text" },
     energy: {
       ins: [
@@ -50,7 +51,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
   {
     slug: "automation",
     Diagram: AutomationDiagram,
-    viewBox: "16 66 368 168",
+    viewBox: PLATE_VIEWBOX.automation,
     tone: { title: "title", link: "text" },
     energy: {
       ins: [{ x: 28, y: 150, dir: "right" }],
@@ -67,7 +68,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
   {
     slug: "software",
     Diagram: SoftwareDiagram,
-    viewBox: "16 40 368 232",
+    viewBox: PLATE_VIEWBOX.software,
     tone: { title: "heading", lede: true, link: "button", band: true },
     energy: {
       ins: [
@@ -87,7 +88,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
   {
     slug: "seo",
     Diagram: SeoDiagram,
-    viewBox: "0 40 400 240",
+    viewBox: PLATE_VIEWBOX.seo,
     tone: { title: "heading", link: "text" },
     energy: {
       ins: [{ x: 24, y: 256, dir: "right" }],
