@@ -37,6 +37,9 @@ export default function PrivacyPolicyPage() {
           <ul>
             <li>Your name, company name, business email address and phone number</li>
             <li>Your website URL and, optionally, your target market and project notes</li>
+            <li>With a message you send us, the page you were reading, the first page of your visit,
+              and the address of the website that referred you, if any, so we know what prompted it
+              (the page keeps this in memory while you browse; nothing is saved to your device)</li>
             <li>Billing information processed directly by our payment provider, Stripe (we do not
               store your card details ourselves)</li>
           </ul>

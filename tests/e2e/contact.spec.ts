@@ -62,6 +62,18 @@ test.describe("contact section", () => {
     }
   });
 
+  test("a message sent after reading a service page says which page prompted it", async ({ page }) => {
+    const sends = recordSends(page);
+    await page.goto("/services/workflow-automation");
+    await page.getByRole("link", { name: "Describe a process" }).first().click();
+    await expect(page).toHaveURL(/\/#contact$/);
+    await say(page, /What can we help you with/, "Invoices are retyped by hand.");
+    await fillContact(page, "Ada", "ada@example.com");
+    await expect(log(page)).toContainText("Got it, thanks Ada.");
+    expect(sends[0]).toContain('"entry":"/services/workflow-automation"');
+    expect(sends[0]).toContain('"previous":"/services/workflow-automation"');
+  });
+
   test("typing straight away skips the topic", async ({ page }) => {
     const sends = recordSends(page);
     await page.goto("/");

@@ -91,7 +91,7 @@ test.describe("routes", () => {
     expect(lastmodOf("/pricing")).toBeUndefined();
     expect(lastmodOf("/services/seo")).toBe("2026-11-04");
     expect(lastmodOf("/services/custom-software")).toBe("2026-11-18");
-    expect(lastmodOf("/privacy")).toBe("2026-09-14");
+    expect(lastmodOf("/privacy")).toBe("2026-11-18");
     expect(lastmodOf("/insights/what-should-you-automate-first")).toBe("2026-09-15");
     // The index changes when its newest article does.
     expect(lastmodOf("/insights")).toBe("2026-10-29");

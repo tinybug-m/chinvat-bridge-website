@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState, useTransition, type FormEvent, type KeyboardEvent } from "react";
 import { sendEnquiry } from "@/actions/enquiry";
+import { readJourney } from "@/components/site/journey";
 import { useReducedMotion } from "@/components/motion/useReducedMotion";
 import { Button, buttonVariants } from "@/components/system/Button";
 import { Input } from "@/components/ui/input";
@@ -164,6 +165,7 @@ export function ContactChat() {
           message: values.message,
           website: honeypotRef.current?.value ?? "",
           elapsed: Date.now() - openedAt.current,
+          journey: readJourney(),
         });
       } catch {
         // Offline, or a new deploy retired this action: the visitor can still reach us.

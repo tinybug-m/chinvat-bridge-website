@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import nodemailer from "nodemailer";
 import { NEEDS, isEmail } from "@/components/home/contact/brief";
 import { CONTACT_EMAIL } from "@/lib/constants";
+import { journeyLines, type JourneyInput } from "@/lib/enquiry-journey";
 
 /*
  * Sends the contact conversation straight to the team's inbox through Gmail
@@ -25,6 +26,8 @@ export interface EnquiryInput {
   website: string;
   /** Milliseconds between the conversation opening and sending. */
   elapsed: number;
+  /** Which pages led here (components/site/journey.ts); optional, so older clients still send. */
+  journey?: JourneyInput;
 }
 
 export type EnquiryResult = { status: "sent" } | { status: "invalid" | "limited" | "unavailable" | "error"; message: string };
@@ -74,6 +77,7 @@ export async function sendEnquiry(input: EnquiryInput): Promise<EnquiryResult> {
     message,
     "",
     "—",
+    ...journeyLines(input.journey),
     "Sent from the contact conversation on chinvatbridge.com. Reply to this email to answer them directly.",
   ].join("\n");
 
