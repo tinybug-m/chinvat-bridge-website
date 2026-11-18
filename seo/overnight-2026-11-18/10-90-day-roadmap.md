@@ -52,7 +52,7 @@ Day 1 is the day the owner starts acting on this plan. Each task names its owner
 |---|---|---|---|
 | Days 61–70 | Publish "What a technical SEO audit should include" | Editor | R13 |
 | Days 61–75 | Rewrite titles and descriptions for pages with impressions and CTR below 1% (from GSC) | Editor | — |
-| Days 61–80 | First data piece: UK SME AI adoption, combining ONS and DSIT figures with a short survey or analysis; pitch it to two UK SME publications | Owner/Editor | R16 |
+| Days 61–80 | Publish the data explainer (drafted; re-check the figures on the day), optionally add a short survey, and pitch it to two UK SME publications | Owner/Editor | R16 |
 | Days 65–80 | Publish "AI subscriptions or AI integration?" | Editor | R13 |
 | Days 70–80 | Submit one contributor article to SME Today or Small Business UK | Owner | R16 |
 | Days 70–85 | Decide on homepage H1 option B; decide AI-crawler policy | Owner | R15, R18 |
@@ -70,6 +70,6 @@ Day 1 is the day the owner starts acting on this plan. Each task names its owner
 - Enquiry attribution (first page, referrer, page before contact) in every enquiry email, with a privacy-policy line
 - Article structured data and breadcrumbs
 - The Scornik Gerstein link
-- Eight article drafts and one case study ready for review in [editorial/articles](editorial/articles/)
+- Nine article drafts and one case study ready for review in [editorial/articles](editorial/articles/)
 
 Nothing has been deployed, pushed or published.

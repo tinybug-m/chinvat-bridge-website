@@ -14,6 +14,7 @@ import * as aiSubscriptions from "./ai-subscriptions-vs-ai-integration";
 import * as howWeBuilt from "./how-we-built-this-site";
 import * as clientPortal from "./does-your-business-need-a-client-portal";
 import * as techPartner from "./how-to-choose-a-technology-partner";
+import * as aiAdoptionFigures from "./uk-small-business-ai-adoption-2026";
 
 /**
  * Explicit registry rather than a filesystem scan: this keeps article discovery a plain,
@@ -37,4 +38,5 @@ export const ALL_POSTS: Post[] = [
   { meta: howWeBuilt.meta, Content: howWeBuilt.Content },
   { meta: clientPortal.meta, Content: clientPortal.Content },
   { meta: techPartner.meta, Content: techPartner.Content },
+  { meta: aiAdoptionFigures.meta, Content: aiAdoptionFigures.Content },
 ];

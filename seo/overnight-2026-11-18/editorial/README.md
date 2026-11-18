@@ -1,6 +1,6 @@
 # Editorial
 
-Eight full article drafts and one case study, ready for owner review. **None is published.**
+Nine full article drafts and one case study, ready for owner review. **None is published.**
 
 Each exists twice:
 - **Here, as Markdown:** the brief. Its front matter holds the keyword, audience, purpose, internal links and the review notes to check before publishing.
@@ -18,6 +18,7 @@ Edit the `.tsx` file when changing wording; it is the version that will be publi
 | [How to choose an AI consultant for a small business](articles/how-to-choose-an-ai-consultant.md) | AI → /services/ai-integration | Decision | ~1,400 | Fourth |
 | [What a technical SEO audit should include](articles/what-a-technical-seo-audit-should-include.md) | SEO → /services/seo | Investigation | ~1,550 | Fifth, after the domain fix is live (it mentions it) |
 | [AI subscriptions or AI integration?](articles/ai-subscriptions-vs-ai-integration.md) | AI → /services/ai-integration | Investigation | ~1,000 | Sixth |
+| [What the UK's AI adoption figures actually say about small businesses](articles/uk-small-business-ai-adoption-2026.md) (data explainer) | AI (link-earning) → /services/ai-integration | Awareness | ~1,450 | Days 61–80; re-check figures on the day and after each ONS release |
 | [How to choose a technology partner](articles/how-to-choose-a-technology-partner.md) | All services | Decision | ~1,200 | After the AI-consultant and SEO-cost guides (links to both); owner decides our own ownership and handover answers first |
 | [Does your business need a client portal?](articles/does-your-business-need-a-client-portal.md) | Software → /services/custom-software | Investigation | ~1,250 | After the case study (links to it) |
 | [How we built our own site, client portal and checkout](articles/how-we-built-this-site.md) (case study) | Proof → /services/custom-software, /services/seo | Decision | ~1,150 | Any time: every fact is from this repository |

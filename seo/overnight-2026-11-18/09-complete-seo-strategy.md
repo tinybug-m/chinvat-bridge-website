@@ -159,7 +159,7 @@ See [measurement framework](15-measurement-framework.md). The north-star metric 
 | R13 | Publish the remaining four drafted articles, two a month | P2 | Medium | S each (drafted) | Medium | Owner review | [calendar](editorial/editorial-calendar.csv) | Non-brand impressions per cluster |
 | R14 | Clutch free profile, then ask the first two or three clients for reviews | P2 | Medium | S | Medium | Clients | [backlinks](13-backlink-opportunities.md) | Reviews count |
 | R15 | Homepage H1, option B | P3 | Low-medium | S | Medium | Owner design decision | [on-page audit](04-on-page-audit.md#h1-options-for-the-owner) | Engagement on hero |
-| R16 | First data explainer (UK SME AI adoption figures, read properly) | P3 | Medium (links) | L | Medium | R13 cadence | [backlinks](13-backlink-opportunities.md) | Referring domains |
+| R16 | Publish the data explainer (UK SME AI adoption figures, read properly; drafted) | P3 | Medium (links) | S (drafted) | Medium | R13 cadence; re-check figures | [backlinks](13-backlink-opportunities.md) | Referring domains |
 | R17 | Measure mobile INP; optimise the homepage main thread only if above 200 ms | P3 | Low-medium | M | Medium | R2/R4 field data | [T10](03-technical-seo-audit.md#t10-homepage-main-thread-cost-on-mobile--medium) | INP p75 |
 | R18 | Decide AI-crawler policy for `.com` | P3 | Low-medium | S | Medium | Owner preference | [T11](03-technical-seo-audit.md#t11-robots-policy-differs-between-the-domains--medium) | robots.txt matches decision |
 | R19 | Remove design-study routes from production | P3 | Low | S | High | None | [T14](03-technical-seo-audit.md#t14-design-study-routes-are-public--low) | 404 on those paths |

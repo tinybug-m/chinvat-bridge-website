@@ -24,7 +24,7 @@
 | Small Business UK contributor | Expert contribution | Free | M | Medium | As above | Contributor FAQ: don't pitch stories they've covered; editors rewrite headlines |
 | Featured.com free tier | Journalist requests | Free tier | S per answer | Low-medium | Real expertise on the question | US-skewed; answer only where the expertise is genuine |
 | #journorequest on LinkedIn and X | Journalist requests | Free | S per answer | Low-medium | — | Free alternative to paid UK services (ResponseSource is paid; pricing unverified) |
-| Data explainer: UK SME AI adoption figures, read properly | Digital PR | Time | L | Medium-high (citable) | Two months of articles first | See below |
+| Data explainer: UK SME AI adoption figures, read properly (**drafted**: `editorial/articles/uk-small-business-ai-adoption-2026.md`) | Digital PR | Time | S now | Medium-high (citable) | Two months of articles first | See below |
 | Zapier Solution Partner directory | Ecosystem | Free to apply | M | Medium: the directory ranks for "Zapier expert" queries | Genuine Zapier delivery; requirements not verified | Apply only if Zapier is part of real client work |
 | n8n Expert Partner programme | Ecosystem | Free | M | Medium | **At least three active n8n customers** (stated on n8n.io/experts) | Not yet eligible |
 | Local chamber of commerce / FSB | Membership | Paid (prices unverified) | M | Low as links; useful for networking | Membership | Worth it only if the owner will network there |

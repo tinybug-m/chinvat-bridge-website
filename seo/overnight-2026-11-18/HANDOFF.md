@@ -1,7 +1,7 @@
 # Handoff
 
 **Session:** 18 November 2026. **Branch:** `seo/overnight-2026-11-18` (from `main` at `64a4fc0`; `main` is untouched).
-**Status:** the research, strategy, technical audit, three service pages, technical fixes, enquiry attribution, eight article drafts and a case study are complete and verified locally. Owner actions, listed below, are needed before any of it reaches the live site.
+**Status:** the research, strategy, technical audit, three service pages, technical fixes, enquiry attribution, nine article drafts and a case study are complete and verified locally. Owner actions, listed below, are needed before any of it reaches the live site.
 
 ## Confirmation
 
@@ -48,7 +48,7 @@ Softomate (price-led, sprawling), Whitehat (pillar and cluster, high prices), Cl
 - Scornik Gerstein link → `https://www.scornik.com/`.
 - Sitemap includes the new service pages with their own dates.
 - **Next.js 16.4.5** (security): clears two moderate advisories; the build no longer stops on them. A separate commit (`08b0c9a`), so it can go to `main` on its own.
-- **Drafts in the site, unpublished:** the nine drafts are post modules with `draft: true`. Production never serves them; `pnpm dev` shows them in place. Publishing one is deleting a line and setting its date.
+- **Drafts in the site, unpublished:** the ten drafts are post modules with `draft: true`. Production never serves them; `pnpm dev` shows them in place. Publishing one is deleting a line and setting its date.
 - **Enquiry attribution:** every enquiry email now says which page started the visit, the referring site, and the page read just before contacting. It is held in memory only (no cookies or storage), sanitised on the server, and disclosed in the privacy policy.
 
 ## Existing pages optimised
@@ -72,6 +72,7 @@ In [editorial/articles](editorial/articles/), with front matter and review notes
 7. How we built our own site, client portal and checkout (case study; every fact checked against the repository)
 8. Does your business need a client portal?
 9. How to choose a technology partner
+10. What the UK's AI adoption figures actually say about small businesses (the link-earning data explainer; every figure checked against ONS and DSIT)
 
 ## Backlink and authority opportunities
 
@@ -90,7 +91,7 @@ See [technical verification](technical-verification.md).
 
 ## Files created
 
-`seo/overnight-2026-11-18/`: `00-executive-summary.md`, `01-business-positioning.md`, `02-current-seo-baseline.md`, `03-technical-seo-audit.md`, `04-on-page-audit.md`, `05-keyword-research.csv`, `06-keyword-to-url-map.csv`, `07-competitor-analysis.md`, `08-content-gap-analysis.md`, `09-complete-seo-strategy.md`, `10-90-day-roadmap.md`, `11-service-page-strategy.md`, `12-internal-linking-plan.md`, `13-backlink-opportunities.md`, `14-conversion-optimisation.md`, `15-measurement-framework.md`, `source-register.md`, `implementation-log.md`, `technical-verification.md`, `HANDOFF.md`, `pricing-copy-proposal.md`, `editorial/README.md`, `editorial/editorial-calendar.csv`, `editorial/scornik-gerstein-case-study-brief.md`, and nine files in `editorial/articles/`.
+`seo/overnight-2026-11-18/`: `00-executive-summary.md`, `01-business-positioning.md`, `02-current-seo-baseline.md`, `03-technical-seo-audit.md`, `04-on-page-audit.md`, `05-keyword-research.csv`, `06-keyword-to-url-map.csv`, `07-competitor-analysis.md`, `08-content-gap-analysis.md`, `09-complete-seo-strategy.md`, `10-90-day-roadmap.md`, `11-service-page-strategy.md`, `12-internal-linking-plan.md`, `13-backlink-opportunities.md`, `14-conversion-optimisation.md`, `15-measurement-framework.md`, `source-register.md`, `implementation-log.md`, `technical-verification.md`, `HANDOFF.md`, `pricing-copy-proposal.md`, `editorial/README.md`, `editorial/editorial-calendar.csv`, `editorial/scornik-gerstein-case-study-brief.md`, and ten files in `editorial/articles/`.
 
 Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, three `page.tsx` routes under `src/app/(pages)/services/`, `tests/e2e/service-pages.spec.ts`, `src/components/site/journey.ts`, `src/components/site/JourneyRecorder.tsx`, `src/lib/enquiry-journey.ts`.
 
