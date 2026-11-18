@@ -74,7 +74,7 @@ export async function sendEnquiry(input: EnquiryInput): Promise<EnquiryResult> {
     message,
     "",
     "—",
-    "Sent from the contact conversation on chinvatbridge.uk. Reply to this email to answer them directly.",
+    "Sent from the contact conversation on chinvatbridge.com. Reply to this email to answer them directly.",
   ].join("\n");
 
   const user = process.env.GMAIL_USER;

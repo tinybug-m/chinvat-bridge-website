@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const PROJECTS = [
-  { key: "scornik", name: "Scornik Gerstein LLP", label: "Client project", href: "https://scornik.vercel.app/", context: "London law firm. We designed and built their website." },
+  { key: "scornik", name: "Scornik Gerstein LLP", label: "Client project", href: "https://www.scornik.com/", context: "London law firm. We designed and built their website." },
   { key: "benedict", name: "Benedict Funeral Directors", label: "Concept", href: "https://benedict-funeral.vercel.app/", context: "Funeral directors, Henlow Camp, Bedfordshire." },
   { key: "naturaglow", name: "NATURAGLOW", label: "Concept", href: "https://beauty-blue-sigma.vercel.app/", context: "Skincare and wellness clinic, Beverly Hills." },
 ];

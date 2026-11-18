@@ -58,24 +58,34 @@ export default async function InsightArticlePage({ params }: PageProps) {
   const { Content } = post;
   const related = getRelatedPosts(post);
 
+  const url = `${SITE_URL}/insights/${post.meta.slug}`;
+  // The same node the root layout declares, so search engines tie each article to the business.
+  const organization = { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: SITE_NAME, url: SITE_URL };
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
+    "@id": `${url}#article`,
     headline: post.meta.title,
     description: post.meta.description,
+    url,
+    inLanguage: "en-GB",
+    image: `${SITE_URL}${SHARED_OPEN_GRAPH.images[0].url}`,
     datePublished: post.meta.date,
     dateModified: post.meta.updated ?? post.meta.date,
-    author: { "@type": "Organization", name: post.meta.author },
-    publisher: { "@type": "Organization", name: SITE_NAME },
-    mainEntityOfPage: `${SITE_URL}/insights/${post.meta.slug}`,
+    // Every article is signed by the company; a named author waits for a real person's byline.
+    author: post.meta.author === SITE_NAME ? organization : { "@type": "Person", name: post.meta.author },
+    publisher: organization,
+    mainEntityOfPage: url,
   };
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Insights", item: `${SITE_URL}/insights` },
-      { "@type": "ListItem", position: 2, name: post.meta.title, item: `${SITE_URL}/insights/${post.meta.slug}` },
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Insights", item: `${SITE_URL}/insights` },
+      { "@type": "ListItem", position: 3, name: post.meta.title, item: url },
     ],
   };
 

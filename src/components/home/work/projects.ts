@@ -21,7 +21,9 @@ export const PROJECTS: Project[] = [
     name: "Scornik Gerstein LLP",
     context: "London law firm. We designed and built their website.",
     label: "Client project",
-    href: "https://scornik.vercel.app/",
+    // The firm's production site. The earlier preview link (scornik.vercel.app) returned
+    // DEPLOYMENT_NOT_FOUND on 18 Nov 2026.
+    href: "https://www.scornik.com/",
     src: "/work/scornik.jpg",
     alt: "Home page of the Scornik Gerstein LLP website: an aerial view of the Thames, Tower Bridge and the Shard under the headline Your London Solicitors for Individuals, with Request a consultation and Call buttons.",
   },
