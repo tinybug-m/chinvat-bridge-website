@@ -47,4 +47,4 @@ Only with enough enquiries to read a result (roughly 30+ per variant); until the
 
 1. Service-page CTA with a pre-selected need, versus without.
 2. A "from £X" first-engagement line on one service page.
-3. Homepage H1 option B, versus the brand line.
+3. A short descriptive second H1 line (about 18 characters, so the hero keeps two lines), versus the brand line.

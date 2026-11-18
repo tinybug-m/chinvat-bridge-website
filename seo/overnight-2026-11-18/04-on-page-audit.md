@@ -22,8 +22,8 @@ Page by page: does each page serve a distinct search intent, say something usefu
 
 The H1 is built into the hero design and is the desktop LCP element, so any change should keep its length and rhythm.
 
-- **Option A (keep):** "Cross the bridge. Enter the future." Rely on the new title and the lede for relevance. Cost: the most prominent text on the site carries no meaning for a first-time visitor.
-- **Option B (recommended):** keep the two-line rhythm and make the second line descriptive: "Cross the bridge. / Practical AI and software for your business." The brand line stays first; the second line says what the business is. It is longer, so check that the hero still fits on desktop.
+- **Option A (keep, now recommended):** "Cross the bridge. Enter the future." Rely on the new title and the lede for relevance. Cost: the most prominent text on the site carries no meaning for a first-time visitor.
+- **Option B (tested, not recommended as written):** "Cross the bridge. / Practical AI and software for your business." Rendered on 18 Nov 2026 in a local build: at the hero's display size the H1 grows from 2 lines to 4 on both desktop (166 px to 332 px tall) and mobile (87 px to 173 px), and pushes the eyebrow up under the header. See the screenshots: [A desktop](assets/h1-option-a-desktop.png), [B desktop](assets/h1-option-b-desktop.png), [A mobile](assets/h1-option-a-mobile.png), [B mobile](assets/h1-option-b-mobile.png). A descriptive second line would need to stay within about 18 characters, the length of "Enter the future.", to keep two lines; for example "Automate the rest." or "Better systems.", neither of which says much more than the current line.
 - **Option C:** move the brand line to the eyebrow and make the H1 "Practical AI, automation and software for UK SMEs." This is the clearest for search and the biggest change to the design.
 
 ### Lede, optional

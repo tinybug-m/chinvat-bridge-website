@@ -55,7 +55,7 @@ Day 1 is the day the owner starts acting on this plan. Each task names its owner
 | Days 61–80 | Publish the data explainer (drafted; re-check the figures on the day), optionally add a short survey, and pitch it to two UK SME publications | Owner/Editor | R16 |
 | Days 65–80 | Publish "AI subscriptions or AI integration?" | Editor | R13 |
 | Days 70–80 | Submit one contributor article to SME Today or Small Business UK | Owner | R16 |
-| Days 70–85 | Decide on homepage H1 option B; decide AI-crawler policy | Owner | R15, R18 |
+| Days 70–85 | Decide whether to try a short descriptive second H1 line (see the rendered options); decide AI-crawler policy | Owner | R15, R18 |
 | Days 75–90 | Check mobile INP in field data; act only if above 200 ms | Dev | R17 |
 | Days 80–90 | Remove the design-study routes from production | Dev | R19 |
 | Day 90 | Quarter review against the [measurement framework](15-measurement-framework.md); set the next quarter's clusters (client portals, law-firm page if the case study is live) | Owner | — |

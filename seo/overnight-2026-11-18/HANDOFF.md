@@ -111,7 +111,7 @@ Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, th
 | Pricing page copy | Fix the Starter "Basic" vs "Full" audit contradiction; define "asset"; state VAT; drop jargon. Ready-to-apply wording and SQL (prices unchanged) in the proposal. | [pricing copy proposal](pricing-copy-proposal.md) |
 | A productised first engagement | Operations review and/or technical SEO audit, with a published price. Copy, placement, market anchors and suggested price ranges are drafted; set the prices and delivery terms. | [first-engagement proposal](first-engagement-proposal.md) |
 | Naming the founder | Yes, with a short bio; also as article author | R12 |
-| Homepage H1 | Option B ("Cross the bridge." / "Practical AI and software for your business.") | [on-page audit](04-on-page-audit.md#h1-options-for-the-owner) |
+| Homepage H1 | Keep the current line (option A). A descriptive option B was rendered and grows the H1 to four lines; screenshots are in `assets/`. The new title and the lede carry the meaning. | [on-page audit](04-on-page-audit.md#h1-options-for-the-owner) |
 | AI-crawler policy on `.com` | Keep search and retrieval agents allowed; decide on training crawlers | [T11](03-technical-seo-audit.md#t11-robots-policy-differs-between-the-domains--medium) |
 | Platforms to name | Only those genuinely delivered (n8n? Xero API? HubSpot?) | [positioning](01-business-positioning.md#open-questions-for-the-owner) |
 | Case study and footer credit | Ask Scornik Gerstein (draft provided, not sent) | [backlinks](13-backlink-opportunities.md#drafts-for-owner-approval-not-sent) |
