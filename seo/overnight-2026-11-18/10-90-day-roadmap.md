@@ -70,6 +70,6 @@ Day 1 is the day the owner starts acting on this plan. Each task names its owner
 - Enquiry attribution (first page, referrer, page before contact) in every enquiry email, with a privacy-policy line
 - Article structured data and breadcrumbs
 - The Scornik Gerstein link
-- Seven article drafts and one case study ready for review in [editorial/articles](editorial/articles/)
+- Eight article drafts and one case study ready for review in [editorial/articles](editorial/articles/)
 
 Nothing has been deployed, pushed or published.

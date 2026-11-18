@@ -1,6 +1,6 @@
 # Editorial
 
-Seven full article drafts and one case study, ready for owner review. **None is published.** They live here as Markdown with their SEO metadata in front matter, not in `src/content/blog/posts/`, because adding them there would publish them on the next deploy.
+Eight full article drafts and one case study, ready for owner review. **None is published.** They live here as Markdown with their SEO metadata in front matter, not in `src/content/blog/posts/`, because adding them there would publish them on the next deploy.
 
 ## The drafts
 
@@ -12,6 +12,7 @@ Seven full article drafts and one case study, ready for owner review. **None is 
 | [How to choose an AI consultant for a small business](articles/how-to-choose-an-ai-consultant.md) | AI → /services/ai-integration | Decision | ~1,400 | Fourth |
 | [What a technical SEO audit should include](articles/what-a-technical-seo-audit-should-include.md) | SEO → /services/seo | Investigation | ~1,550 | Fifth, after the domain fix is live (it mentions it) |
 | [AI subscriptions or AI integration?](articles/ai-subscriptions-vs-ai-integration.md) | AI → /services/ai-integration | Investigation | ~1,000 | Sixth |
+| [How to choose a technology partner](articles/how-to-choose-a-technology-partner.md) | All services | Decision | ~1,200 | After the AI-consultant and SEO-cost guides (links to both); owner decides our own ownership and handover answers first |
 | [Does your business need a client portal?](articles/does-your-business-need-a-client-portal.md) | Software → /services/custom-software | Investigation | ~1,250 | After the case study (links to it) |
 | [How we built our own site, client portal and checkout](articles/how-we-built-this-site.md) (case study) | Proof → /services/custom-software, /services/seo | Decision | ~1,150 | Any time: every fact is from this repository |
 
