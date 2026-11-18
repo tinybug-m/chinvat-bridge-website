@@ -138,7 +138,7 @@ export function Content() {
         </Link>{" "}
         &mdash; we&rsquo;ll tell you honestly if it&rsquo;s a connection problem, an
         off-the-shelf fit, or a genuine custom{" "}
-        <Link href="/#services">
+        <Link href="/services/custom-software">
           software project
         </Link>
         .

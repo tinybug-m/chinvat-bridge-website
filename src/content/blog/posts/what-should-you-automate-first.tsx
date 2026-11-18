@@ -96,7 +96,7 @@ export function Content() {
         built-in automation or a connector to tools like Zapier or Make. Wiring existing tools
         together is almost always faster and cheaper than custom development, and it&rsquo;s
         where{" "}
-        <Link href="/#services">
+        <Link href="/services/workflow-automation">
           workflow automation
         </Link>{" "}
         work usually starts.

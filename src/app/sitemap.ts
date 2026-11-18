@@ -3,6 +3,7 @@ import { SITE_URL } from "@/lib/constants";
 import { getAllPosts } from "@/lib/blog";
 import { PRIVACY_UPDATED, TERMS_UPDATED } from "@/lib/legal";
 import { SEO_SERVICE } from "@/data/seo-service";
+import { SERVICE_PAGES } from "@/data/service-pages";
 
 /*
  * lastModified is given only where the content carries a real date: each
@@ -26,12 +27,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
-    {
-      url: `${SITE_URL}${SEO_SERVICE.path}`,
-      lastModified: SEO_SERVICE.updated,
-      changeFrequency: "monthly",
+    ...[...SERVICE_PAGES, SEO_SERVICE].map((service) => ({
+      url: `${SITE_URL}${service.path}`,
+      lastModified: service.updated,
+      changeFrequency: "monthly" as const,
       priority: 0.8,
-    },
+    })),
     {
       url: `${SITE_URL}/insights`,
       ...(latestPost && { lastModified: latestPost }),

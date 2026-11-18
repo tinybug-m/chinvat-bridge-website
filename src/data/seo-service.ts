@@ -192,7 +192,12 @@ export const SEO_RELATED_INSIGHTS: { slug: string; reason: string }[] = [
 export const SEO_RELATED_SERVICES: { title: string; href: string; reason: string }[] = [
   {
     title: "Custom software development",
-    href: "/#services-software",
+    href: "/services/custom-software",
     reason: "When the site itself is the problem, a rebuild or a new web application is software work, scoped separately from SEO.",
+  },
+  {
+    title: "Workflow automation and integration",
+    href: "/services/workflow-automation",
+    reason: "When enquiries arrive but follow-up is slow: connecting forms, inbox and CRM so no lead waits on someone retyping it.",
   },
 ];

@@ -101,7 +101,7 @@ export function Content() {
         If you can name that task in under a minute, you&rsquo;ve found your first sensible AI
         project. If you can&rsquo;t name one, that&rsquo;s a genuinely useful answer too &mdash;
         it means your time is probably better spent on{" "}
-        <Link href="/#services">
+        <Link href="/services/workflow-automation">
           process automation
         </Link>{" "}
         or a different kind of improvement altogether, not AI for its own sake.
@@ -115,7 +115,7 @@ export function Content() {
         &mdash; general-purpose assistants, help-desk AI features already built into platforms
         like Zendesk or Intercom, or simple automation rules connecting your existing software
         &mdash; cover a large share of the tasks above. The point at which custom{" "}
-        <Link href="/#services">
+        <Link href="/services/ai-integration">
           AI integration
         </Link>{" "}
         starts to make sense is when the off-the-shelf option doesn&rsquo;t understand your

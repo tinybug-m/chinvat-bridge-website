@@ -31,9 +31,9 @@ test.describe("hero", () => {
     // The chart's tiers are the discipline links, at every width: named in full, large enough to tap.
     const index = hero.locator('nav[aria-label="Disciplines"]').getByRole("link");
     const expected = [
-      ["AI integration", "/#services-ai"],
-      ["Automation & workflows", "/#services-automation"],
-      ["Software & web", "/#services-software"],
+      ["AI integration", "/services/ai-integration"],
+      ["Automation & workflows", "/services/workflow-automation"],
+      ["Software & web", "/services/custom-software"],
       ["SEO & growth", "/services/seo"],
     ];
     await expect(index).toHaveCount(4);

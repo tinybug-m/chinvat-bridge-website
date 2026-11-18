@@ -38,10 +38,10 @@ export const SECTION_ALIASES: Record<string, string> = {
   method: "approach",
 };
 
-/** One link per discipline: its service page once it has one (SEO), else its plate inside #services. */
+/** One link per discipline, to its service page. */
 export const DISCIPLINE_LINKS: SiteLink[] = [
-  { label: "AI & Automation", href: "/#services-ai" },
-  { label: "Workflows", href: "/#services-automation" },
-  { label: "Software & Web", href: "/#services-software" },
+  { label: "AI & Automation", href: "/services/ai-integration" },
+  { label: "Workflows", href: "/services/workflow-automation" },
+  { label: "Software & Web", href: "/services/custom-software" },
   { label: "SEO & Growth", href: "/services/seo" },
 ];

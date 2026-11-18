@@ -17,9 +17,9 @@ export const HERO_COPY = {
 
 /** The only place the disciplines appear in the hero; short forms of the service titles. */
 export const HERO_DISCIPLINES = [
-  { label: "AI integration", href: "/#services-ai" },
-  { label: "Automation & workflows", href: "/#services-automation" },
-  { label: "Software & web", href: "/#services-software" },
+  { label: "AI integration", href: "/services/ai-integration" },
+  { label: "Automation & workflows", href: "/services/workflow-automation" },
+  { label: "Software & web", href: "/services/custom-software" },
   { label: "SEO & growth", href: "/services/seo" },
 ] as const;
 

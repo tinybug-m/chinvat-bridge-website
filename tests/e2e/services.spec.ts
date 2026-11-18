@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 const PLATES = [
-  { id: "services-ai", title: "AI & Automation Integration", href: "/insights/where-ai-can-save-your-business-time" },
-  { id: "services-automation", title: "Automation & Workflows", href: "/insights/what-should-you-automate-first" },
-  { id: "services-software", title: "Software & Web", href: "/insights/when-should-a-business-build-custom-software" },
+  { id: "services-ai", title: "AI & Automation Integration", href: "/services/ai-integration" },
+  { id: "services-automation", title: "Automation & Workflows", href: "/services/workflow-automation" },
+  { id: "services-software", title: "Software & Web", href: "/services/custom-software" },
   { id: "services-seo", title: "SEO & Digital Growth", href: "/services/seo" },
 ];
 
@@ -37,8 +37,8 @@ test.describe("services section", () => {
     // Plates differ in type scale and in how the link is set.
     const sizes = await page.locator("#services article h3").evaluateAll((els) => els.map((el) => getComputedStyle(el).fontSize));
     expect(new Set(sizes).size).toBeGreaterThan(1);
-    await expect(page.locator("#services-software a[href^='/insights/']")).toHaveClass(/shadow/);
-    await expect(page.locator("#services-ai a[href^='/insights/']")).not.toHaveClass(/shadow/);
+    await expect(page.locator("#services-software a[href^='/services/']")).toHaveClass(/shadow/);
+    await expect(page.locator("#services-ai a[href^='/services/']")).not.toHaveClass(/shadow/);
   });
 
   test("the software plate sits on a full-bleed haze band", async ({ page }) => {
@@ -72,7 +72,7 @@ test.describe("services section", () => {
     }
     // Frameless: no registration marks, Drawn/Built captions or seam inside the plates.
     await expect(page.locator("#services").getByText(/^(Drawn|Built)$/)).toHaveCount(0);
-    const link = page.locator("#services-ai").getByRole("link", { name: /Read the article/ });
+    const link = page.locator("#services-ai").getByRole("link", { name: /Explore the service/ });
     await link.scrollIntoViewIfNeeded();
     // Layout height (offsetHeight), not the bounding box: the plate may still be rising into
     // place, and a transform makes the box a hair under 44 (43.99997) from float rounding alone.

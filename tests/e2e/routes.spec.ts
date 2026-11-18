@@ -4,6 +4,9 @@ import { expect, test } from "@playwright/test";
 const PAGES = [
   "/pricing",
   "/services/seo",
+  "/services/ai-integration",
+  "/services/workflow-automation",
+  "/services/custom-software",
   "/insights",
   "/insights/what-should-you-automate-first",
   "/insights/when-should-a-business-build-custom-software",
@@ -55,6 +58,9 @@ test.describe("routes", () => {
     ["/insights", "Insights"],
     ["/pricing", "SEO & Content Pricing"],
     ["/services/seo", "SEO Services & Digital Growth"],
+    ["/services/ai-integration", "AI Consultancy & Integration for UK SMEs"],
+    ["/services/workflow-automation", "Business Process Automation & Integration"],
+    ["/services/custom-software", "Custom Software Development for UK SMEs"],
     ["/privacy", "Privacy Policy"],
     ["/terms", "Terms of Service"],
   ]) {
@@ -80,10 +86,11 @@ test.describe("routes", () => {
     }));
     const lastmodOf = (suffix: string) => entries.find((entry) => entry.loc.endsWith(suffix))?.lastmod;
     expect(entries.map((entry) => new URL(entry.loc).pathname)).toEqual(
-      expect.arrayContaining(["/", "/pricing", "/services/seo", "/insights", "/privacy", "/terms", "/insights/what-should-you-automate-first"]),
+      expect.arrayContaining(["/", "/pricing", "/services/seo", "/services/ai-integration", "/services/workflow-automation", "/services/custom-software", "/insights", "/privacy", "/terms", "/insights/what-should-you-automate-first"]),
     );
     expect(lastmodOf("/pricing")).toBeUndefined();
     expect(lastmodOf("/services/seo")).toBe("2026-11-04");
+    expect(lastmodOf("/services/custom-software")).toBe("2026-11-18");
     expect(lastmodOf("/privacy")).toBe("2026-09-14");
     expect(lastmodOf("/insights/what-should-you-automate-first")).toBe("2026-09-15");
     // The index changes when its newest article does.

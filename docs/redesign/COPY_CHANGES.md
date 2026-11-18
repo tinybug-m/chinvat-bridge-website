@@ -212,3 +212,18 @@ and the four discipline labels are unchanged.
 | Hero discipline links | AI integration, Automation & workflows, Software & web, SEO & growth (text list) | The chart's four tiers: AI, Automation, Software, SEO (each link's accessible name is the full label) | The tiers are the links; the list beside them only repeated them. |
 | Hero callouts and logo toggle | "Transition" callout, Chrome / Classic toggle | (removed with the old hero) | The Crossing hero has no 3D mark. |
 
+
+## SEO programme (18 November 2026)
+
+Research and reasons: `seo/overnight-2026-11-18/`. Local only, not deployed.
+
+| Where | Before | Now | Why |
+|---|---|---|---|
+| Homepage `<title>` | Chinvat Bridge — AI, Automation, Software & SEO | AI, Automation & Custom Software for UK SMEs — Chinvat Bridge | A search for the name alone returns the Zoroastrian bridge; the title now leads with the offer and the buyer. |
+| Homepage meta description | UK-based technology consultancy helping businesses solve practical operational and digital problems using AI, automation, custom software, and technical SEO. | UK technology consultancy for small businesses: AI integration, workflow automation, custom software and technical SEO, built around how you already work. | Names the buyer and the four services in under 160 characters. |
+| Service plates (AI, Automation, Software) | Read the article → the matching Insights article | Explore the service → the new service page | Commercial interest goes to a page that can rank for the service. |
+| Hero discipline links, footer Disciplines | AI, Automation and Software linked to their homepage plates | Each links to its service page | Same labels, indexable targets. |
+| New pages | (none) | /services/ai-integration, /services/workflow-automation, /services/custom-software | All copy is in `src/data/service-pages.ts`; the claims to confirm are listed in `seo/overnight-2026-11-18/HANDOFF.md`. |
+| Recent work, Scornik Gerstein LLP | https://scornik.vercel.app/ | https://www.scornik.com/ | The preview link returned DEPLOYMENT_NOT_FOUND; this is the firm's production site. |
+| Article links | "process automation", "AI integration", "workflow automation", "software project" → /#services | → the matching service page | Descriptive anchors to pages that can rank. |
+| Enquiry email footer | Sent from the contact conversation on chinvatbridge.uk. | …on chinvatbridge.com. | The .com is the primary domain. |
