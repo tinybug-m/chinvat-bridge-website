@@ -25,14 +25,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!post) return {};
 
   const url = `${SITE_URL}/insights/${post.meta.slug}`;
+  const title = post.meta.seoTitle ?? post.meta.title;
 
   return {
-    title: post.meta.title,
+    title,
     description: post.meta.description,
     alternates: { canonical: `/insights/${post.meta.slug}` },
+    // Drafts only render under `next dev`; keep them out of any index regardless.
+    ...(post.meta.draft && { robots: { index: false, follow: false } }),
     openGraph: {
       ...SHARED_OPEN_GRAPH,
-      title: post.meta.title,
+      title,
       description: post.meta.description,
       url,
       type: "article",
@@ -41,7 +44,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: "summary_large_image",
-      title: post.meta.title,
+      title,
       description: post.meta.description,
     },
   };
@@ -92,7 +95,12 @@ export default async function InsightArticlePage({ params }: PageProps) {
   return (
     <SiteShell>
       <article aria-labelledby="article-title">
-        <PageHeader kicker={post.meta.category} title={post.meta.title} titleId="article-title" lede={post.meta.description} />
+        <PageHeader
+          kicker={post.meta.draft ? `Draft, not published · ${post.meta.category}` : post.meta.category}
+          title={post.meta.title}
+          titleId="article-title"
+          lede={post.meta.description}
+        />
 
         <Container className="grid grid-cols-1 gap-y-10 pt-10 pb-section lg:grid-cols-12 lg:gap-x-6 lg:pt-16">
           <aside aria-label="About this article" className="lg:col-span-3">

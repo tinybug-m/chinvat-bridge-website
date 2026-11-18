@@ -97,6 +97,19 @@ test.describe("routes", () => {
     expect(lastmodOf("/insights")).toBe("2026-10-29");
   });
 
+  // Drafts live in the post registry with `draft: true`; a production build must never expose them.
+  test("draft articles are not served, listed or in the sitemap", async ({ page, request }) => {
+    const drafts = ["how-much-does-seo-cost-uk", "replace-spreadsheets-with-custom-software", "how-we-built-this-site"];
+    const sitemap = await (await request.get("/sitemap.xml")).text();
+    await page.goto("/insights");
+    const listed = await page.locator("main a[href^='/insights/']").evaluateAll((els) => els.map((el) => el.getAttribute("href")));
+    for (const slug of drafts) {
+      expect((await request.get(`/insights/${slug}`)).status(), slug).toBe(404);
+      expect(sitemap).not.toContain(slug);
+      expect(listed).not.toContain(`/insights/${slug}`);
+    }
+  });
+
   test("sitemap and robots respond", async ({ request }) => {
     const sitemap = await request.get("/sitemap.xml");
     expect(sitemap.status()).toBe(200);
