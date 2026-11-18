@@ -67,6 +67,7 @@ In [editorial/articles](editorial/articles/), with front matter and review notes
 4. How to choose an AI consultant for a small business
 5. What a technical SEO audit should include
 6. AI subscriptions or AI integration?
+7. How we built our own site, client portal and checkout (case study; every fact checked against the repository)
 
 ## Backlink and authority opportunities
 
@@ -78,7 +79,7 @@ Lint pass; typecheck pass; production build pass (Next.js prints a security advi
 
 ## Files created
 
-`seo/overnight-2026-11-18/`: `00-executive-summary.md`, `01-business-positioning.md`, `02-current-seo-baseline.md`, `03-technical-seo-audit.md`, `04-on-page-audit.md`, `05-keyword-research.csv`, `06-keyword-to-url-map.csv`, `07-competitor-analysis.md`, `08-content-gap-analysis.md`, `09-complete-seo-strategy.md`, `10-90-day-roadmap.md`, `11-service-page-strategy.md`, `12-internal-linking-plan.md`, `13-backlink-opportunities.md`, `14-conversion-optimisation.md`, `15-measurement-framework.md`, `source-register.md`, `implementation-log.md`, `technical-verification.md`, `HANDOFF.md`, `editorial/README.md`, `editorial/editorial-calendar.csv`, and six files in `editorial/articles/`.
+`seo/overnight-2026-11-18/`: `00-executive-summary.md`, `01-business-positioning.md`, `02-current-seo-baseline.md`, `03-technical-seo-audit.md`, `04-on-page-audit.md`, `05-keyword-research.csv`, `06-keyword-to-url-map.csv`, `07-competitor-analysis.md`, `08-content-gap-analysis.md`, `09-complete-seo-strategy.md`, `10-90-day-roadmap.md`, `11-service-page-strategy.md`, `12-internal-linking-plan.md`, `13-backlink-opportunities.md`, `14-conversion-optimisation.md`, `15-measurement-framework.md`, `source-register.md`, `implementation-log.md`, `technical-verification.md`, `HANDOFF.md`, `pricing-copy-proposal.md`, `editorial/README.md`, `editorial/editorial-calendar.csv`, `editorial/scornik-gerstein-case-study-brief.md`, and seven files in `editorial/articles/`.
 
 Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, three `page.tsx` routes under `src/app/(pages)/services/`, `tests/e2e/service-pages.spec.ts`, `src/components/site/journey.ts`, `src/components/site/JourneyRecorder.tsx`, `src/lib/enquiry-journey.ts`.
 
@@ -95,7 +96,7 @@ Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, th
 | Service-page claims to confirm before deploying | (a) "scope and cost are agreed before any work starts" for AI, automation and software; (b) automation: "we build in alerts and logs, and write down how each workflow works"; (c) software: support "agreed before the build begins, whether we support it or your own team"; (d) software: "We also designed and built the website of Scornik Gerstein LLP"; (e) "we use Zapier or Make where they fit"; (f) "We’re based in the UK and work remotely with businesses elsewhere" (AI FAQ) | `src/data/service-pages.ts` |
 | Analytics vendor | Cookieless (Vercel Web Analytics or Plausible) | [measurement](15-measurement-framework.md#tooling) |
 | Privacy-policy line for enquiry attribution (added locally, dated 18 Nov 2026) | Approve or edit: "With a message you send us, the page you were reading, the first page of your visit, and the address of the website that referred you, if any, so we know what prompted it (the page keeps this in memory while you browse; nothing is saved to your device)." | `src/app/(pages)/privacy/page.tsx` |
-| Pricing page copy | Fix the Starter "Basic" vs "Full" audit contradiction; define "asset"; state VAT; drop jargon | [on-page audit](04-on-page-audit.md#pricing) |
+| Pricing page copy | Fix the Starter "Basic" vs "Full" audit contradiction; define "asset"; state VAT; drop jargon. Ready-to-apply wording and SQL (prices unchanged) in the proposal. | [pricing copy proposal](pricing-copy-proposal.md) |
 | A productised first engagement | Operations review and/or technical SEO audit, with a published price | [strategy R11](09-complete-seo-strategy.md#recommendations) |
 | Naming the founder | Yes, with a short bio; also as article author | R12 |
 | Homepage H1 | Option B ("Cross the bridge." / "Practical AI and software for your business.") | [on-page audit](04-on-page-audit.md#h1-options-for-the-owner) |
@@ -126,4 +127,4 @@ Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, th
 
 ## Continuation point
 
-If work resumes in a new session: start from the [90-day roadmap](10-90-day-roadmap.md). Enquiry attribution is done. The next task that needs no owner decision is the **"how we built this site" case study**, whose facts are all in this repository's history. Everything else waits on the owner decisions above.
+If work resumes in a new session: start from the [90-day roadmap](10-90-day-roadmap.md). Enquiry attribution and the "how we built this site" case study are done. Remaining work waits on the owner decisions above; the next writing task after approvals is the Scornik Gerstein case study, using the [brief](editorial/scornik-gerstein-case-study-brief.md).
