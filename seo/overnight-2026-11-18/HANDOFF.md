@@ -47,6 +47,8 @@ Softomate (price-led, sprawling), Whitehat (pillar and cluster, high prices), Cl
 - Article structured data linked to the Organization, with image; breadcrumbs from Home.
 - Scornik Gerstein link → `https://www.scornik.com/`.
 - Sitemap includes the new service pages with their own dates.
+- **Next.js 16.4.5** (security): clears two moderate advisories; the build no longer stops on them. A separate commit (`08b0c9a`), so it can go to `main` on its own.
+- **Drafts in the site, unpublished:** the nine drafts are post modules with `draft: true`. Production never serves them; `pnpm dev` shows them in place. Publishing one is deleting a line and setting its date.
 - **Enquiry attribution:** every enquiry email now says which page started the visit, the referring site, and the page read just before contacting. It is held in memory only (no cookies or storage), sanitised on the server, and disclosed in the privacy policy.
 
 ## Existing pages optimised
@@ -112,7 +114,7 @@ Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, th
 | AI-crawler policy on `.com` | Keep search and retrieval agents allowed; decide on training crawlers | [T11](03-technical-seo-audit.md#t11-robots-policy-differs-between-the-domains--medium) |
 | Platforms to name | Only those genuinely delivered (n8n? Xero API? HubSpot?) | [positioning](01-business-positioning.md#open-questions-for-the-owner) |
 | Case study and footer credit | Ask Scornik Gerstein (draft provided, not sent) | [backlinks](13-backlink-opportunities.md#drafts-for-owner-approval-not-sent) |
-| Next.js security upgrade | Run it as a separate, tested change | Build output |
+| Next.js security upgrade | **Done** on this branch (16.4.5, full suite green); merge with the branch or cherry-pick `08b0c9a` onto `main` first | `package.json` |
 | Publishing each article | Review the notes in each file's front matter | [editorial README](editorial/README.md) |
 
 ## Outstanding issues
@@ -131,7 +133,7 @@ Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, th
 6. **Confirm the company details** and add them to the footer.
 7. **Choose analytics** (enquiry attribution is already built; approve its privacy-policy line).
 8. **Fix the /pricing wording.**
-9. **Publish** the spreadsheet article, then the SEO cost guide (process in the [editorial README](editorial/README.md#publishing-an-article-when-approved)).
+9. **Publish** the spreadsheet article, then the SEO cost guide: read them under `pnpm dev`, then delete `draft: true` (process in the [editorial README](editorial/README.md#publishing-an-article-when-approved)).
 10. **Ask Scornik Gerstein** about the case study and credit.
 
 ## Continuation point

@@ -36,6 +36,18 @@ All checks run on 18 November 2026 against the branch `seo/overnight-2026-11-18`
 | `routes`, `service-pages`, `services`, `hero`, `contact` specs on the final build | **126 passed, 0 failed, 63 skipped by design** |
 | Sanitiser re-run | Percent-encoded entry kept; `javascript:` entry dropped while a valid "page before contact" is kept; CR/LF values dropped |
 
+## Next.js 16.4.5 and the draft posts
+
+| Check | Result |
+|---|---|
+| `pnpm audit --prod` after the upgrade | No known vulnerabilities |
+| Build on 16.4.5 | Passes first time; the advisory gate no longer triggers |
+| Full e2e suite on 16.4.5 | **283 passed, 0 failed, 95 skipped by design** (17.1 min) |
+| Production build with nine drafts registered | Still 37 static pages; draft URLs return 404; sitemap still 14 URLs |
+| `routes`, `insights`, `service-pages` specs, including the new draft guard | **62 passed, 0 failed** |
+| `next dev` | Drafts render at `/insights/<slug>` with "Draft, not published", `noindex` and the short `<title>`; tables render without overflow at 390 px. No tracked files changed by the dev server. |
+| Homepage CPU profile (4× slowdown) | Four long tasks, 716 ms of blocking time; details and a proposed fix in [T10](03-technical-seo-audit.md#t10-homepage-main-thread-cost-on-mobile--medium) |
+
 ## Independent review
 
 Two reviews ran at the end of the session. A code review of `main...seo/overnight-2026-11-18` raised 8 findings; all are fixed (see the [implementation log](implementation-log.md)). An adversarial content review raised 4 must-fix, 11 should-fix and 17 could-improve items. All must-fix and should-fix items are corrected, as are most could-improve items. These were deliberately left:

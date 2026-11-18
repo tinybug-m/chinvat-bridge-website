@@ -1,6 +1,12 @@
 # Editorial
 
-Eight full article drafts and one case study, ready for owner review. **None is published.** They live here as Markdown with their SEO metadata in front matter, not in `src/content/blog/posts/`, because adding them there would publish them on the next deploy.
+Eight full article drafts and one case study, ready for owner review. **None is published.**
+
+Each exists twice:
+- **Here, as Markdown:** the brief. Its front matter holds the keyword, audience, purpose, internal links and the review notes to check before publishing.
+- **In the site, as a draft post:** `src/content/blog/posts/<slug>.tsx`, registered in `index.ts` with `draft: true`. Drafts are never built or served in production (an e2e test checks that they 404 and stay out of the sitemap and the Insights index). Under `pnpm dev` they appear in place, at `/insights/<slug>`, labelled "Draft, not published", so you can read them exactly as they will look.
+
+Edit the `.tsx` file when changing wording; it is the version that will be published. The Markdown was converted once with a script, so later edits are not synced back.
 
 ## The drafts
 
@@ -34,11 +40,11 @@ Each answers a question a buyer asks *between* reading a general article and mak
 
 ## Publishing an article (when approved)
 
-1. Create `src/content/blog/posts/<slug>.tsx` following the existing posts: export `meta` (slug, title, description, date, author, category, tags, readingMinutes) and `Content` (JSX using `<Link>` for internal links, `<a>` for external).
-2. Use the front matter's `seo_title` for `meta.title` (the template adds "— Chinvat Bridge") and `meta_description` for `meta.description`.
-3. Register it in `src/content/blog/posts/index.ts`. Use curly apostrophes and quotes (`&rsquo;`, `&ldquo;`) throughout, as the existing posts do; the drafts mix straight and curly ones.
-4. Add it to the target service page's `relatedInsights` in `src/data/service-pages.ts` (or `SEO_RELATED_INSIGHTS` in `src/data/seo-service.ts`) with a one-line reason.
+1. Read it under `pnpm dev` at `/insights/<slug>`, and work through the review notes in its Markdown front matter.
+2. In `src/content/blog/posts/<slug>.tsx`: delete `draft: true`, and set `date` to the publishing day.
+3. Add it to the target service page's `relatedInsights` in `src/data/service-pages.ts` (or `SEO_RELATED_INSIGHTS` in `src/data/seo-service.ts`) with a one-line reason.
+4. Remove its slug from the draft list in the "draft articles are not served" test in `tests/e2e/routes.spec.ts` if it is one of the three listed there.
 5. Run `pnpm lint`, `pnpm typecheck`, `pnpm build`, and the insights and routes e2e specs.
 6. After deploy, request indexing in Search Console.
 
-The H1 on article pages is `meta.title`, so a post's on-page heading will be its SEO title. If the shorter `h1` from the front matter is preferred on the page, that would need a small change to `PostMeta` and the article template; not done here.
+The page heading is `meta.title` (the full, title-cased H1); the `<title>` and social title use the shorter `meta.seoTitle` when it is set.

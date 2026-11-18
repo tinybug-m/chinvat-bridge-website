@@ -89,3 +89,22 @@ Corrections from the content review, across the documents and drafts:
 - **Keyword collisions:** each overlapping term now belongs to one URL (drafts' secondaries trimmed; map, research CSV and cannibalisation table updated).
 - **Drafts:** shorter SEO titles (about 60 characters with the brand); an up-link to the service page in each draft's first third; Starter and Growth inclusions and VAT corrected in the SEO cost guide; AI-subscriptions claims framed as defaults; the case study says "the stack we propose for clients"; the connect-systems example stores the CRM ID; HowTo retirement dated September 2023; 75th percentile cited to web.dev.
 - **Handoff:** every service-page commitment the owner must confirm is now listed.
+
+## Commit `08b0c9a` — fix(security): Next.js and eslint-config-next 16.4.3 → 16.4.5
+
+Two moderate advisories (GHSA-mfr8-8qww-v76h, GHSA-vc7v-qv4w-wrv8) affect 16.2.0–16.4.4 and are patched in 16.4.5. The app uses neither `use cache` nor `unstable_cache`, so it was not exposed. But the build stopped on the advisory every time, and a flagged version shouldn't stay in production. 16.4.5 was chosen over 16.4.6 because it carries the fix and had been released for 15 days. `package.json` and `pnpm-lock.yaml` only, so it can be cherry-picked onto `main` on its own.
+
+## Commit `58921dd` — feat(insights): nine unpublished drafts in the post registry
+
+| File | Change |
+|---|---|
+| `src/content/blog/posts/*.tsx` (nine new), `index.ts` | The editorial drafts as post modules with `draft: true`, converted from the Markdown by script |
+| `src/lib/blog.ts` | Drafts included only when `NODE_ENV === "development"`; `PostMeta.seoTitle` added |
+| `src/app/(pages)/insights/[slug]/page.tsx` | `<title>`/social title from `seoTitle` when set; drafts get `noindex` and a "Draft, not published" kicker (they only render under `next dev`) |
+| `tests/e2e/routes.spec.ts` | Draft URLs 404, and stay out of the sitemap and the Insights index, in production |
+
+## Documents (this round)
+
+- T10 now records a CPU profile of the homepage, with the energy wire's relayout identified as the longest task and a specific fix to apply when field data justifies it.
+- Enquiry and monthly tracker templates (`measurement-tracker-*.csv`).
+- The editorial README describes the draft-in-code workflow.

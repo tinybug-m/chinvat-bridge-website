@@ -36,6 +36,13 @@ No numeric traffic targets are set, because there is no baseline yet. Set them o
 
 Installing any of these involves an owner choice (vendor, privacy policy wording, account ownership), so nothing was installed in this session.
 
+## Trackers
+
+Two empty CSV templates, ready to copy into a spreadsheet:
+
+- [measurement-tracker-enquiries.csv](measurement-tracker-enquiries.csv): one row per enquiry. The first page, referrer and page before contact come straight from the lines the enquiry email now carries; qualified, proposal and won are filled in by hand.
+- [measurement-tracker-monthly.csv](measurement-tracker-monthly.csv): one row per month, from Search Console and the enquiry tracker. Brand vs non-brand uses the filter below.
+
 ## Reporting rhythm
 
 - **Monthly, 30 minutes:** export GSC performance by page; fill the tracker; note the top five queries per service page; list pages with impressions but CTR under 1% (title or description rewrite), and queries in positions 8–20 (content to strengthen).

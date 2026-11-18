@@ -132,6 +132,20 @@ The homepage HTML is 559 KB uncompressed (59 KB with Brotli). About 171 KB is in
 
 LCP and CLS are comfortably inside Google's "good" thresholds, so this isn't holding rankings back today. The risk is INP on mid-range phones, since the hero, the energy wire and the WebGL mark all run on the main thread during load. Inner pages are light.
 
+**Profile (18 Nov 2026, local production build on Next.js 16.4.5, 4× CPU slowdown, no network throttling, 8 s from navigation):** four long tasks, at 0.2 s (66 ms), 0.4 s (148 ms), 1.0 s (262 ms) and 2.1 s (440 ms), totalling 716 ms of blocking time over the 50 ms budget. Script self-time by chunk:
+
+| Self time | Chunk | Contents (fingerprinted) |
+|---|---|---|
+| 411 ms | `1br88ih52n1vn.js` (41 KB) | Homepage client components, chiefly the energy wire (`EnergyFlow` measure + `routeWire`) |
+| 217 ms | `34ko-eoof27za.js` (229 KB) | React DOM (hydration) |
+| 177 ms | `3-c1m73_9z6i6.js` (34 KB) | Plate loops and reveal (`PlateLoop`) |
+| 122 ms | `0rn_e497gahy_.js` (164 KB) | Next.js runtime |
+| 1,359 ms | (program) | Browser-internal work: HTML/RSC parsing, style, layout, paint |
+
+The last and longest task (about 440 ms at 2.1 s) matches the energy wire's deferred relayout: `EnergyFlow` waits for an idle period, then in one animation frame calls `measure(section)`, which reads text boxes from the DOM and runs the pure-geometry `routeWire()`. Running it while idle protects loading, but a tap that lands during that one task would wait for it, which is an INP risk on mid-range phones.
+
+**Specific fix, when field data justifies it:** split the work into two tasks. Read the boxes in the frame as now, then run `routeWire()` in its own task (`scheduler.yield()` where available, otherwise `setTimeout(0)`), or in a Web Worker, since it takes plain data and returns plain data. Then call `setLayout`. Verify with the existing "energy wire reveals each plate" e2e test and a fresh profile.
+
 **Correction:** measure first. Once field data exists (Search Console's Core Web Vitals report, or the analytics tool's web-vitals), act only if mobile INP is above 200 ms. Candidate fixes, in order of safety: defer the energy-flow routing until after first input, lazy-mount the WebGL scenes when they near the viewport, and render the large decorative SVGs from static files rather than inline JSX so they leave the RSC payload. Nothing was changed: it is design-critical code and there is no field evidence of harm.
 
 ## T11. Robots policy differs between the domains — Medium
