@@ -2,14 +2,15 @@
 status: draft — for owner review, not published
 slug: what-a-technical-seo-audit-should-include
 url: /insights/what-a-technical-seo-audit-should-include
-seo_title: "What a Technical SEO Audit Should Include (and What to Ignore)"
+seo_title: "What a Technical SEO Audit Should Include"
 meta_description: "The checks that matter in a technical SEO audit — crawling, indexing, rendering, structure, structured data and Core Web Vitals — and the tool scores you can ignore."
 h1: "What a technical SEO audit should include"
 primary_keyword: what should a technical seo audit include
 secondary_keywords:
   - technical seo audit
   - seo audit checklist
-  - seo audit services uk
+  - technical seo audit checklist
+# 'seo audit services uk' (service intent) belongs to /services/seo.
   - seo audit cost uk
   - technical seo audit for small business
 search_intent: commercial investigation
@@ -40,12 +41,12 @@ schema: Article, BreadcrumbList
 review_notes:
   - "The aside about our own site (two live domains, canonicals on the old one) is true as of 18 Nov 2026 and makes the point well. Keep it only if the owner is comfortable, and only after the fix is live, so the article describes a solved problem."
   - "Core Web Vitals thresholds (LCP 2.5 s, INP 200 ms, CLS 0.1 at the 75th percentile) and the 2023 FAQ rich-result change are from Google's documentation. Re-check the linked pages on the day of publishing."
-  - "Audit pricing is described in words. Published UK figures seen on 18 Nov 2026 run from £495 + VAT for small sites (Ink Digital) to £1,000–£5,000 (SEO Sherpa), all vendor-stated."
+  - "Audit pricing is described in words. Published UK figures seen on 18 Nov 2026 run from £495 + VAT for small sites (Ink Digital) to £1,000–£5,000 (SEO Sherpa, an international agency, on its UK pages), all vendor-stated."
 ---
 
 # What a technical SEO audit should include
 
-A useful technical SEO audit answers three questions. Can search engines crawl and index the pages that matter? Do they understand what each page is about? Is anything on the site holding those pages back? It should end with a short, prioritised list of fixes, each tied to a URL and the evidence for it, rather than a 200-page export from a crawling tool. Here is what belongs in one, and what you can safely ignore.
+A useful technical SEO audit answers three questions. Can search engines crawl and index the pages that matter? Do they understand what each page is about? Is anything on the site holding those pages back? It should end with a short, prioritised list of fixes, each tied to a URL and the evidence for it, rather than a 200-page export from a crawling tool. Here is what belongs in one, and what you can safely ignore. It is also the checklist behind the [technical SEO audits and fixes](/services/seo) in our plans.
 
 ## Crawling and indexing: can search engines reach the right pages?
 
@@ -83,11 +84,11 @@ Many modern sites build their content with JavaScript. Google can render JavaScr
 
 Structured data (JSON-LD) tells search engines what a page represents: the organisation behind the site, a service, an article, a breadcrumb trail. An audit should check that it parses, that it matches what is visible on the page, and that the entities connect (articles and services pointing to the same organisation).
 
-It should also be realistic about rich results. Some once-popular markup no longer produces them for most sites: since August 2023 Google shows FAQ rich results only for well-known, authoritative government and health websites, and it has retired HowTo rich results ([Google, August 2023](https://developers.google.com/search/blog/2023/08/howto-faq-changes)). Adding FAQ markup to a small business's service page won't create a rich result, whatever a plugin suggests.
+It should also be realistic about rich results. Some once-popular markup no longer produces them for most sites: since August 2023 Google shows FAQ rich results only for well-known, authoritative government and health websites, and it retired HowTo rich results the following month ([Google, August 2023, updated September 2023](https://developers.google.com/search/blog/2023/08/howto-faq-changes)). Adding FAQ markup to a small business's service page won't create a rich result, whatever a plugin suggests.
 
 ## Performance and Core Web Vitals: does the page load and respond well?
 
-Google's [Core Web Vitals](https://developers.google.com/search/docs/appearance/core-web-vitals) measure loading (Largest Contentful Paint, good at 2.5 seconds or less), responsiveness (Interaction to Next Paint, good at 200 milliseconds or less) and visual stability (Cumulative Layout Shift, good at 0.1 or less), assessed at the 75th percentile of real visits.
+Google's [Core Web Vitals](https://developers.google.com/search/docs/appearance/core-web-vitals) measure loading (Largest Contentful Paint, good at 2.5 seconds or less), responsiveness (Interaction to Next Paint, good at 200 milliseconds or less) and visual stability (Cumulative Layout Shift, good at 0.1 or less), assessed at the 75th percentile of real visits ([web.dev](https://web.dev/articles/vitals)).
 
 Two points an audit should make clear:
 
@@ -127,4 +128,4 @@ It depends mostly on the size and complexity of the site and on whether fixes ar
 
 A technical SEO audit worth paying for checks crawling and indexing, rendering, structure and internal links, on-page signals, structured data and real-world performance, and ignores vanity scores. It delivers a prioritised list of specific fixes with evidence, and a way to confirm each one worked. If your site already gets visitors who don't enquire, start with [why your website isn’t bringing you enough customers](/insights/why-your-website-isnt-bringing-you-customers) instead.
 
-Every one of our SEO plans begins with [technical SEO audits and fixes](/services/seo). If you'd like a second opinion on your site, [tell us where search is holding you back](/#contact).
+Every one of [our SEO plans](/services/seo) begins with a technical audit and fixes. If you'd like a second opinion on your site, [tell us where search is holding you back](/#contact).

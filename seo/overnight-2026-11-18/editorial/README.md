@@ -1,6 +1,6 @@
 # Editorial
 
-Six full article drafts and one case study, ready for owner review. **None is published.** They live here as Markdown with their SEO metadata in front matter, not in `src/content/blog/posts/`, because adding them there would publish them on the next deploy.
+Seven full article drafts and one case study, ready for owner review. **None is published.** They live here as Markdown with their SEO metadata in front matter, not in `src/content/blog/posts/`, because adding them there would publish them on the next deploy.
 
 ## The drafts
 
@@ -12,6 +12,7 @@ Six full article drafts and one case study, ready for owner review. **None is pu
 | [How to choose an AI consultant for a small business](articles/how-to-choose-an-ai-consultant.md) | AI → /services/ai-integration | Decision | ~1,400 | Fourth |
 | [What a technical SEO audit should include](articles/what-a-technical-seo-audit-should-include.md) | SEO → /services/seo | Investigation | ~1,550 | Fifth, after the domain fix is live (it mentions it) |
 | [AI subscriptions or AI integration?](articles/ai-subscriptions-vs-ai-integration.md) | AI → /services/ai-integration | Investigation | ~1,000 | Sixth |
+| [Does your business need a client portal?](articles/does-your-business-need-a-client-portal.md) | Software → /services/custom-software | Investigation | ~1,250 | After the case study (links to it) |
 | [How we built our own site, client portal and checkout](articles/how-we-built-this-site.md) (case study) | Proof → /services/custom-software, /services/seo | Decision | ~1,150 | Any time: every fact is from this repository |
 
 Word counts exclude front matter. The full calendar, including planned pieces not yet drafted, is in [editorial-calendar.csv](editorial-calendar.csv).
@@ -34,7 +35,7 @@ Each answers a question a buyer asks *between* reading a general article and mak
 
 1. Create `src/content/blog/posts/<slug>.tsx` following the existing posts: export `meta` (slug, title, description, date, author, category, tags, readingMinutes) and `Content` (JSX using `<Link>` for internal links, `<a>` for external).
 2. Use the front matter's `seo_title` for `meta.title` (the template adds "— Chinvat Bridge") and `meta_description` for `meta.description`.
-3. Register it in `src/content/blog/posts/index.ts`.
+3. Register it in `src/content/blog/posts/index.ts`. Use curly apostrophes and quotes (`&rsquo;`, `&ldquo;`) throughout, as the existing posts do; the drafts mix straight and curly ones.
 4. Add it to the target service page's `relatedInsights` in `src/data/service-pages.ts` (or `SEO_RELATED_INSIGHTS` in `src/data/seo-service.ts`) with a one-line reason.
 5. Run `pnpm lint`, `pnpm typecheck`, `pnpm build`, and the insights and routes e2e specs.
 6. After deploy, request indexing in Search Console.

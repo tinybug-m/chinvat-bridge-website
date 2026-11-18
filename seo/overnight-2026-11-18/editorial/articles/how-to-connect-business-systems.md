@@ -2,7 +2,7 @@
 status: draft — for owner review, not published
 slug: how-to-connect-business-systems
 url: /insights/how-to-connect-business-systems
-seo_title: "How to Connect Business Systems That Don’t Talk to Each Other"
+seo_title: "Connecting Business Systems That Don’t Talk"
 meta_description: "A practical guide for UK SMEs: map what moves between your tools, decide where each record lives, and choose between built-in integrations, connectors and APIs."
 h1: "How to connect business systems that don’t talk to each other"
 primary_keyword: how to connect business systems
@@ -42,7 +42,7 @@ review_notes:
 
 # How to connect business systems that don’t talk to each other
 
-Most business software can share information with other software, through a built-in integration, a connector platform or its API. The hard part is rarely the technology. It is deciding which system is the source of truth for each piece of information, and then choosing the lightest connection that will run reliably. Get those two decisions right and most "our systems don't talk to each other" problems become a series of small, manageable jobs.
+Most business software can share information with other software, through a built-in integration, a connector platform or its API. The hard part is rarely the technology. It is deciding which system is the source of truth for each piece of information, and then choosing the lightest connection that will run reliably. Get those two decisions right and most "our systems don't talk to each other" problems become a series of small, manageable jobs. This is the core of our [workflow automation and integration](/services/workflow-automation) work, and the approach is the same whoever does it.
 
 ## Start with a map, not a tool
 
@@ -119,7 +119,7 @@ Picture a small professional-services firm. Today an enquiry arrives through the
 
 Connected, the same journey looks like this:
 
-1. The form submission creates or updates the contact in the CRM (the source of truth for clients), matched on email address with a duplicate check, and sends the acknowledgement.
+1. The form submission creates or updates the contact in the CRM (the source of truth for clients), matched on email address the first time and linked by the CRM's own ID from then on, and sends the acknowledgement.
 2. When the deal is marked won in the CRM, the client is created in the accounting software using the CRM's ID, so the two records stay linked.
 3. The first invoice is drafted in the accounts package for a person to check and send.
 4. If any step fails, an alert goes to the office manager with the details, and nothing is lost.
@@ -134,4 +134,4 @@ Sometimes the map shows that the real problem is a missing tool, not a missing c
 
 Map what moves between your systems and who moves it. Decide where each piece of information lives. Then choose the lightest reliable connection for each handoff: built-in integrations first, connector platforms for simple flows between popular tools, direct API work when the rules, volumes or stakes demand it. Build every connection to fail loudly and write down how it works.
 
-If you have a handoff in mind, [describe the process to us](/#contact). We'll tell you whether it's a quick connection, a bigger project, or something your software can already do. Or read more about our [workflow automation and integration](/services/workflow-automation) work, and when we'd recommend [a small tool of its own](/services/custom-software) instead.
+If you have a handoff in mind, [describe the process to us](/#contact). We'll tell you whether it's a quick connection, a bigger project, or something your software can already do. Or read more about [how we approach automation projects](/services/workflow-automation), and when we'd recommend [a small tool of its own](/services/custom-software) instead.

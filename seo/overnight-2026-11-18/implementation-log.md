@@ -59,3 +59,33 @@ Everything under `seo/overnight-2026-11-18/`. See the [handoff](HANDOFF.md#files
 | robots.txt AI-crawler rules | Policy choice (T11) |
 | Next.js upgrade | The build prints a security advisory for 16.4.3. A framework upgrade is outside this SEO change and should be its own reviewed change. |
 | New articles in `src/content/blog/posts/` | Adding them would publish them on the next deploy |
+
+## Commit `6a5e7e3` — fix: review findings on the service pages and enquiry attribution
+
+Two independent reviews ran at the end of the session: a code review of the branch diff, and an adversarial content review of every document, draft and page. The code findings fixed here:
+
+| File | Change | Finding |
+|---|---|---|
+| `src/components/services/structured-data.tsx` (new), `src/app/(pages)/services/seo/page.tsx`, `src/components/services/ServicePage.tsx` | Service/Breadcrumb JSON-LD, related-insight links and script rendering shared by all four service pages | The SEO page and the template duplicated them |
+| `src/components/home/services/crops.ts` (new), `Services.tsx`, `ServicePage.tsx` | One `PLATE_VIEWBOX` map | Crops were copied by hand |
+| `ServicePage.tsx` | "See custom packages" → /pricing removed | /pricing sells SEO plans; contradicted the pages' own intent |
+| `src/app/layout.tsx`, `src/components/site/SiteShell.tsx` | `JourneyRecorder` moved to the root layout | Pages outside the site shell (login, checkout) weren't recorded |
+| `src/components/site/journey.ts` | Own domains (with or without `www`, `.com` or `.uk`) are not referrers | Internal traffic could be reported as a referral |
+| `src/lib/enquiry-journey.ts` | A valid "page before contact" survives an invalid entry; `% ~ @` allowed in paths | Attribution was lost entirely on unusual entry paths |
+| `src/actions/enquiry.ts` | Email footer domain from `SITE_URL` | Hard-coded domain could disagree with the canonical |
+| `src/app/(pages)/privacy/page.tsx` | Mentions campaign tags; "name of the website" | Disclosure didn't match what is collected |
+| `src/data/service-pages.ts` | "You may well have tried an AI tool already…"; "Out of the box…"; "many small businesses" | Unsupported "most businesses" claims that contradicted the cited ONS and DSIT figures |
+| `src/data/seo-service.ts`, `tests/e2e/routes.spec.ts` | `/services/seo` updated 2026-11-18 | Its related services changed on this branch |
+
+## Commit (documents) — docs(seo): content-review corrections
+
+Corrections from the content review, across the documents and drafts:
+
+- **T5:** citation corrected to the Company, LLP and Business (Names and Trading Disclosures) Regulations 2015 (SI 2015/17); the legal-entity question is now a blocker for listings and outreach.
+- **ONS 38%:** the bulletin has two different 38% figures (adoption among firms with 10+ staff; and the share of AI users naming admin roles as most affected). The pitch and data-explainer idea now say so precisely.
+- **Google Business Profile:** recommended only if the business meets clients in person; Google excludes online-only businesses.
+- **SERP claims:** "no UK-specific result" → "few UK SME-focused answers"; "ranks" → "appears in results".
+- **International clients:** "the site says it works globally", not "serves international clients".
+- **Keyword collisions:** each overlapping term now belongs to one URL (drafts' secondaries trimmed; map, research CSV and cannibalisation table updated).
+- **Drafts:** shorter SEO titles (about 60 characters with the brand); an up-link to the service page in each draft's first third; Starter and Growth inclusions and VAT corrected in the SEO cost guide; AI-subscriptions claims framed as defaults; the case study says "the stack we propose for clients"; the connect-systems example stores the CRM ID; HowTo retirement dated September 2023; 75th percentile cited to web.dev.
+- **Handoff:** every service-page commitment the owner must confirm is now listed.

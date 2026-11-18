@@ -1,7 +1,7 @@
 # Handoff
 
 **Session:** 18 November 2026. **Branch:** `seo/overnight-2026-11-18` (from `main` at `64a4fc0`; `main` is untouched).
-**Status:** the research, strategy, technical audit, three service pages, technical fixes and six article drafts are complete and verified locally. Owner actions, listed below, are needed before any of it reaches the live site.
+**Status:** the research, strategy, technical audit, three service pages, technical fixes, enquiry attribution, seven article drafts and a case study are complete and verified locally. Owner actions, listed below, are needed before any of it reaches the live site.
 
 ## Confirmation
 
@@ -10,8 +10,8 @@ No production publication, deployment, GitHub push, email, message or external o
 ## What I learned about the market
 
 - UK search for AI, automation and custom software is **fragmented**. Head terms are held by directories (Clutch, DesignRush, G-Cloud listings) and by agencies with hundreds of URLs. Below them sit small firms with generic pages, unsourced metrics and self-ranking "best agencies" lists.
-- **Small specialists can rank.** A solo consultant's page ranks for the core business-process-automation query, and a 500-word page with a sharp spreadsheet hook ranks for internal tools.
-- **The clearest gap:** UK results for replacing spreadsheets with custom software are US low-code vendors, with no UK SME answer.
+- **Small specialists can compete.** A solo consultant's page appears in results for the core business-process-automation query, and a 500-word page with a sharp spreadsheet hook appears for internal tools (the search tool shows presence, not position).
+- **The clearest gap:** UK results for replacing spreadsheets with custom software are mostly US low-code vendors, with few UK SME-focused answers.
 - **The common trust substitutes** competitors use in place of client logos: a cheap fixed-price first step, ownership/no-lock-in promises, a named niche, or first-hand evidence.
 - **Verticals:** automotive dealerships and van hire are owned by DMS and SaaS vendors, so no pages are recommended. Law firms are viable only once the Scornik Gerstein case study exists.
 - **Search demand is real but unmeasured.** No volumes could be obtained without a logged-in tool, so all demand evidence is Google autocomplete plus SERP composition. Nothing in this folder claims a search volume.
@@ -56,7 +56,7 @@ Homepage (title, description, plate links, hero links), `/services/seo` (related
 ## New landing pages
 
 **Built locally:** `/services/ai-integration`, `/services/workflow-automation`, `/services/custom-software`.
-**Planned:** Scornik Gerstein case study; "how we built this site"; a productised first engagement (owner prices it); client portals (later); law-firm page (after the case study); a `/services` hub (low priority).
+**Drafted:** "how we built this site" (case study). **Planned:** Scornik Gerstein case study; a productised first engagement (owner prices it); client portals (later); law-firm page (after the case study); a `/services` hub (low priority).
 
 ## Articles fully drafted (not published)
 
@@ -68,18 +68,26 @@ In [editorial/articles](editorial/articles/), with front matter and review notes
 5. What a technical SEO audit should include
 6. AI subscriptions or AI integration?
 7. How we built our own site, client portal and checkout (case study; every fact checked against the repository)
+8. Does your business need a client portal?
 
 ## Backlink and authority opportunities
 
-Client credit from Scornik Gerstein; Google Business Profile; LinkedIn page; Clutch free profile; SME Today and Small Business UK contributor routes; Featured.com free tier; an original-data explainer on ONS and DSIT AI-adoption figures. Two outreach drafts are in [backlink opportunities](13-backlink-opportunities.md#drafts-for-owner-approval-not-sent); neither has been sent.
+Client credit from Scornik Gerstein; LinkedIn page; Clutch free profile; Google Business Profile only if the business meets clients in person (Google excludes online-only businesses); SME Today and Small Business UK contributor routes; Featured.com free tier; a data explainer on ONS and DSIT AI-adoption figures. Two outreach drafts are in [backlink opportunities](13-backlink-opportunities.md#drafts-for-owner-approval-not-sent); neither has been sent.
 
 ## Tests and verification
 
-Lint pass; typecheck pass; production build pass (Next.js prints a security advisory for 16.4.3); **e2e 280 passed / 0 failed / 95 skipped by design** on desktop, tablet and mobile for the service-page work, then **76 passed / 0 failed** for the contact, routes and service-page specs after the attribution commit; rendered metadata, sitemap, robots and visual layout checked; all article references and quoted figures verified against their sources. See [technical verification](technical-verification.md).
+- Lint, typecheck and production build pass. Next.js prints a security advisory for 16.4.3 and stops the first build attempt; the re-run completes.
+- **Full e2e suite: 283 passed, 0 failed** (378 tests, 95 skipped by the suite's own per-viewport conditions) on desktop, tablet and mobile, after the code-review fixes.
+- **Affected specs on the final build: 126 passed, 0 failed.**
+- Rendered metadata, canonicals, sitemap, robots and the visual layout were checked on a local production server.
+- Every figure and external reference in the drafts was verified against its source.
+- **Independent review:** a code review (8 findings, all fixed) and an adversarial content review (4 must-fix and 11 should-fix, all fixed; most could-improve items fixed; the rest are listed with reasons).
+
+See [technical verification](technical-verification.md).
 
 ## Files created
 
-`seo/overnight-2026-11-18/`: `00-executive-summary.md`, `01-business-positioning.md`, `02-current-seo-baseline.md`, `03-technical-seo-audit.md`, `04-on-page-audit.md`, `05-keyword-research.csv`, `06-keyword-to-url-map.csv`, `07-competitor-analysis.md`, `08-content-gap-analysis.md`, `09-complete-seo-strategy.md`, `10-90-day-roadmap.md`, `11-service-page-strategy.md`, `12-internal-linking-plan.md`, `13-backlink-opportunities.md`, `14-conversion-optimisation.md`, `15-measurement-framework.md`, `source-register.md`, `implementation-log.md`, `technical-verification.md`, `HANDOFF.md`, `pricing-copy-proposal.md`, `editorial/README.md`, `editorial/editorial-calendar.csv`, `editorial/scornik-gerstein-case-study-brief.md`, and seven files in `editorial/articles/`.
+`seo/overnight-2026-11-18/`: `00-executive-summary.md`, `01-business-positioning.md`, `02-current-seo-baseline.md`, `03-technical-seo-audit.md`, `04-on-page-audit.md`, `05-keyword-research.csv`, `06-keyword-to-url-map.csv`, `07-competitor-analysis.md`, `08-content-gap-analysis.md`, `09-complete-seo-strategy.md`, `10-90-day-roadmap.md`, `11-service-page-strategy.md`, `12-internal-linking-plan.md`, `13-backlink-opportunities.md`, `14-conversion-optimisation.md`, `15-measurement-framework.md`, `source-register.md`, `implementation-log.md`, `technical-verification.md`, `HANDOFF.md`, `pricing-copy-proposal.md`, `editorial/README.md`, `editorial/editorial-calendar.csv`, `editorial/scornik-gerstein-case-study-brief.md`, and eight files in `editorial/articles/`.
 
 Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, three `page.tsx` routes under `src/app/(pages)/services/`, `tests/e2e/service-pages.spec.ts`, `src/components/site/journey.ts`, `src/components/site/JourneyRecorder.tsx`, `src/lib/enquiry-journey.ts`.
 
@@ -92,10 +100,10 @@ Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, th
 | Decision | Recommendation | Where |
 |---|---|---|
 | Canonical domain | `www.chinvatbridge.com`; redirect `.uk` | [T1](03-technical-seo-audit.md#t1-two-live-domains-canonicals-on-the-wrong-one--critical) |
-| Legal entity on the site | Confirm the registered name and number; show the number and registered office; drop "Ltd" if not incorporated | [T5](03-technical-seo-audit.md#t5-company-identity-is-not-verifiable--high-trust-and-compliance) |
-| Service-page claims to confirm before deploying | (a) "scope and cost are agreed before any work starts" for AI, automation and software; (b) automation: "we build in alerts and logs, and write down how each workflow works"; (c) software: support "agreed before the build begins, whether we support it or your own team"; (d) software: "We also designed and built the website of Scornik Gerstein LLP"; (e) "we use Zapier or Make where they fit"; (f) "We’re based in the UK and work remotely with businesses elsewhere" (AI FAQ) | `src/data/service-pages.ts` |
+| Legal entity on the site (**blocker** for directory listings, Clutch and any outreach; not introduced by this branch, but it should be fixed before or with the deploy) | Confirm the registered name and number. If incorporated: show the number and registered office (Company, LLP and Business (Names and Trading Disclosures) Regulations 2015). If not: remove "Ltd" from the footer, terms, checkout shell and schema. | [T5](03-technical-seo-audit.md#t5-company-identity-is-not-verifiable--high-trust-and-compliance) |
+| Service-page commitments to confirm before deploying | **Engagement:** scope and cost agreed before any work starts (all three). **AI:** answers "show where each answer came from"; "after launch we check it against" the agreed measure; data handling (where data is processed, retention, training use, keeping personal data out of AI steps). **Automation:** alerts, logs and written documentation for each workflow; using Zapier or Make where they fit; the data-handling FAQ. **Software:** testing "with them before it replaces anything"; development "in short cycles, shown to you as it takes shape"; support "agreed before the build begins"; "We also designed and built the website of Scornik Gerstein LLP". **All:** "We’re based in the UK and work remotely with businesses elsewhere". | `src/data/service-pages.ts` |
 | Analytics vendor | Cookieless (Vercel Web Analytics or Plausible) | [measurement](15-measurement-framework.md#tooling) |
-| Privacy-policy line for enquiry attribution (added locally, dated 18 Nov 2026) | Approve or edit: "With a message you send us, the page you were reading, the first page of your visit, and the address of the website that referred you, if any, so we know what prompted it (the page keeps this in memory while you browse; nothing is saved to your device)." | `src/app/(pages)/privacy/page.tsx` |
+| Privacy-policy line for enquiry attribution (added locally, dated 18 Nov 2026) | Approve or edit: "With a message you send us, the page you were reading, the first page of your visit (including any campaign tags in the link you followed), and the name of the website that referred you, if any, so we know what prompted it. The page keeps this in memory while you browse; nothing is saved to your device." | `src/app/(pages)/privacy/page.tsx` |
 | Pricing page copy | Fix the Starter "Basic" vs "Full" audit contradiction; define "asset"; state VAT; drop jargon. Ready-to-apply wording and SQL (prices unchanged) in the proposal. | [pricing copy proposal](pricing-copy-proposal.md) |
 | A productised first engagement | Operations review and/or technical SEO audit, with a published price | [strategy R11](09-complete-seo-strategy.md#recommendations) |
 | Naming the founder | Yes, with a short bio; also as article author | R12 |
@@ -114,7 +122,7 @@ Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, th
 
 ## Exact next actions
 
-1. **Read and approve** the service-page copy in `src/data/service-pages.ts` (about 15 minutes), checking the six claims listed above.
+1. **Read and approve** the service-page copy in `src/data/service-pages.ts` (about 20 minutes), checking the commitments listed above.
 2. **Supabase:** Site URL → `https://www.chinvatbridge.com`; add `https://www.chinvatbridge.com/**` to the redirect URLs.
 3. **Vercel:** set `NEXT_PUBLIC_SITE_URL=https://www.chinvatbridge.com` for Production; merge `seo/overnight-2026-11-18` into `main`; deploy.
 4. **Redirect** `chinvatbridge.uk` and `www.chinvatbridge.uk` to `https://www.chinvatbridge.com` (path-preserving 301/308) in Vercel or Cloudflare.

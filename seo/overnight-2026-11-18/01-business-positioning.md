@@ -49,7 +49,7 @@ Short form for titles and social: *Practical AI, automation and software for UK 
 The [competitor analysis](07-competitor-analysis.md) tested three candidate positions. This combines the strongest parts of two and leaves out the third:
 
 - **"Connect what you already have"** is the clearest single promise across AI, automation and software. It matches the plainest pain in the SERPs ("tools that don't talk to each other") and the voice of the existing articles, which tell readers to try what they already pay for first.
-- **"Replace the workaround"** (spreadsheet to proper software) is the clearest *search gap*: UK results for replacing spreadsheets with custom software are US low-code vendors, with no credible UK SME answer. It becomes the hook for the software page and a flagship article, not the whole brand.
+- **"Replace the workaround"** (spreadsheet to proper software) is the clearest *search gap*: UK results for replacing spreadsheets with custom software are mostly US low-code vendors, with few UK SME-focused answers. It becomes the hook for the software page and a flagship article, not the whole brand.
 - **"Fixed-price operations review"** is the best *conversion* answer to having little proof, but a near-identical UK offer already exists (Campbell Consultancy, from £450), and pricing a new product is an owner decision. It is recommended as an offer to consider, not as the position.
 
 ### What makes it defensible for a small firm
@@ -64,7 +64,7 @@ The [competitor analysis](07-competitor-analysis.md) tested three candidate posi
 - No percentages, hours saved, ROI, revenue or "trusted by" statements until a client has agreed to a measured case study.
 - No partner badges or platform expertise (Zapier, Make, n8n, HubSpot, Xero, Power BI) beyond "we use connector platforms such as Zapier or Make where they fit". Expert-directory listings require customers and certifications that aren't evidenced yet.
 - No "AI agency" framing. The research shows that searches for "AI automation agency" are dominated by people wanting to *start* one.
-- No London or city pages. There is no office there.
+- No London or city pages. The site shows no local presence there (confirm with the owner); either way, city pages would be doorway pages.
 - No "Ltd" or legal-entity claims until the registered company details are confirmed (see [technical audit T5](03-technical-seo-audit.md#t5-company-identity-is-not-verifiable--high-trust-and-compliance)).
 
 ## Messaging pillars for pages and articles

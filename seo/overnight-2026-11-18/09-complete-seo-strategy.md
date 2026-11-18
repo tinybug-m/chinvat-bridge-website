@@ -47,8 +47,8 @@ See [keyword research](05-keyword-research.csv): 79 keywords across AI, automati
 | Cluster | Lead query | Why it's winnable |
 |---|---|---|
 | AI consultancy for SMEs | AI consultancy for small businesses UK | Results are blog-style pages from SEO firms, not specialists |
-| Business process automation | business process automation consultant UK | A solo consultant's page ranks, so specificity beats size |
-| Spreadsheet replacement | replace spreadsheets with software | No UK-specific result at all |
+| Business process automation | business process automation services / consultant UK | A solo consultant's page appears in results, so specificity can beat size |
+| Spreadsheet replacement | replace spreadsheets with software | Mostly US low-code vendors; few UK SME-focused answers |
 | SEO cost | how much does SEO cost UK | We publish real prices; competitor guides are self-interested |
 | Custom software for small business | bespoke software for small business | Head term is directory-held; the SME long tail isn't |
 | Client portals | client portal development | Agencies but no directories; a natural fit for the stack |
@@ -66,7 +66,7 @@ See [keyword-to-URL map](06-keyword-to-url-map.csv). One primary intent per URL;
 | Commercial investigation: choosing | how to choose an AI consultant | Hiring guide with honest criteria | Service page (too salesy) |
 | Problem-aware | outgrown spreadsheets | Problem article, then service page | Service page (the reader hasn't named the solution yet) |
 | Job seekers / course buyers | AI consultant salary, AI automation agency course | Nowhere | Avoid these phrasings in titles |
-| Local | SEO consultant London | Nowhere (no office) | City page (doorway risk) |
+| Local | SEO consultant London | Nowhere (no presence shown there) | City page (doorway risk) |
 
 The autocomplete data shows two traps to avoid in titles and H1s: "AI consultant UK" (jobs and salary) and "AI automation agency" (people starting agencies). Prefer "AI consultancy for small businesses", "AI integration" and "business process automation".
 
@@ -110,21 +110,21 @@ See [internal linking plan](12-internal-linking-plan.md). Hub-and-spoke: the hom
 
 ## Local and UK SEO strategy
 
-- **Google Business Profile** as a *service-area business* (no public address needed), category "Business management consultant" or "Software company", whichever the owner judges more accurate. This is the main source of brand-panel and map visibility for "Chinvat Bridge". Requires verification, so it's an owner action.
+- **Google Business Profile**, only if the business meets clients in person (Google requires in-person contact with customers during stated hours and excludes online-only businesses; [guidelines](https://support.google.com/business/answer/13762416)). If the owner does meet clients at their premises or at a staffed location, set it up as a service-area business; otherwise skip it and rely on LinkedIn, Clutch and consistent company details as entity signals. Creating a profile for an ineligible business risks suspension and misrepresents it.
 - **UK signals:** `en-GB` is already set; British spelling throughout; prices in pounds; "UK" in titles where buyers use it. Add the registered office to the footer and schema once confirmed.
 - **No city pages.** Remote-first is stated plainly instead.
-- **Bing Places and Apple Business Connect:** free, minutes each, after Google Business Profile.
+- **Bing Places and Apple Business Connect:** free, minutes each, on the same eligibility basis.
 
 ## International expansion opportunities
 
-The site already serves international clients from the same pages, with prices in pounds. Autocomplete shows English-speaking demand for the same phrasings (AI consultant for small business, workflow automation consultant), but SERPs abroad are local agencies and offshore vendors. Recommendation: **no country pages or hreflang in the next 90 days.** Keep "we work remotely with businesses elsewhere" in FAQs. Revisit if Search Console shows more than about 20% of non-brand impressions from one country, *and* there is a client there; the Scale SEO plan already offers hreflang work to clients.
+The site says it works globally and would serve any international enquiries from the same pages, with prices in pounds. Autocomplete shows English-speaking demand for the same phrasings (AI consultant for small business, workflow automation consultant), but SERPs abroad are local agencies and offshore vendors. Recommendation: **no country pages or hreflang in the next 90 days.** Keep "we work remotely with businesses elsewhere" in FAQs. Revisit if Search Console shows more than about 20% of non-brand impressions from one country, *and* there is a client there; the Scale SEO plan already offers hreflang work to clients.
 
 ## Link acquisition strategy
 
 See [backlink opportunities](13-backlink-opportunities.md). The order of effort:
 
-1. Links the business can earn without asking strangers: a client credit from Scornik Gerstein; Google Business Profile; Companies House-backed profiles (once confirmed); Clutch free profile.
-2. One piece of original, citable data each quarter, built on ONS and DSIT AI-adoption figures plus Chinvat's own analysis.
+1. Links the business can earn without asking strangers: a client credit from Scornik Gerstein; a LinkedIn company page; Companies House-backed profiles (once confirmed); Clutch free profile; Google Business Profile only if eligible.
+2. One citable data explainer each quarter, built on ONS and DSIT AI-adoption figures plus Chinvat's own analysis (original data only if a survey is run, with its method and sample size stated).
 3. Expert contributions to UK SME publications with published contributor routes (SME Today, Small Business UK).
 4. Journalist-request platforms (Featured.com free tier), answered only where there is real expertise.
 
@@ -150,16 +150,16 @@ See [measurement framework](15-measurement-framework.md). The north-star metric 
 | R4 | Add cookieless analytics. Enquiry attribution (first page, referrer, page before contact) is **built locally**. | P1 | High | S (attribution done) | High | Owner picks tool; approves privacy line | [T4](03-technical-seo-audit.md#t4-no-measurement--high) | Enquiries attributable by page |
 | R5 | Resolve the legal-entity question; add company number and registered office to the footer and schema | P1 | Medium (trust; directories) | S | High | Owner | [T5](03-technical-seo-audit.md#t5-company-identity-is-not-verifiable--high-trust-and-compliance) | Footer shows verifiable details |
 | R6 | Fix the Starter-plan contradiction and jargon on /pricing; state VAT | P1 | Medium | S | High | Owner; DB edit | [on-page audit](04-on-page-audit.md#pricing) | Fewer "what's included" questions |
-| R7 | Create Google Business Profile (service-area) | P1 | Medium (brand, trust) | S | Medium | R5 | [local SEO](#local-and-uk-seo-strategy) | Brand panel shows |
+| R7 | Entity profiles: LinkedIn company page now; Google Business Profile only if the business meets clients in person (Google's eligibility rule) | P1 | Medium (brand, trust) | S | Medium | R5; GBP eligibility | [local SEO](#local-and-uk-seo-strategy) | Profiles live; brand search shows the business |
 | R8 | Publish the flagship spreadsheet article and the SEO cost guide | P1 | Medium-high | S (drafted) | Medium | Owner review | [content gaps](08-content-gap-analysis.md) | Impressions; enquiries citing them |
 | R9 | Write the Scornik Gerstein case study and ask for a "website by" credit | P2 | High (proof, link) | M | Medium | Client permission | [T3](03-technical-seo-audit.md#t3-dead-link-on-the-only-real-client-project--high) | Case study live; referring domain |
-| R10 | Publish a "how we built this site" case study | P2 | Medium | M | High | None | [positioning](01-business-positioning.md) | Visits from software page |
+| R10 | Publish the "how we built this site" case study (drafted) | P2 | Medium | S (drafted) | High | Owner review | [positioning](01-business-positioning.md) | Visits from software page |
 | R11 | Decide on a productised first engagement and its price; add it to the service pages | P2 | High | M | Medium | Owner pricing decision | [competitors](07-competitor-analysis.md#independents-worth-studying-for-positioning) | Enquiry rate on service pages |
 | R12 | Name the founder (and team) with short bios; add a named author to articles | P2 | Medium | S | Medium | Owner consent | [competitors table stakes](07-competitor-analysis.md#table-stakes-chinvat-must-match) | Engagement; E-E-A-T |
 | R13 | Publish the remaining four drafted articles, two a month | P2 | Medium | S each (drafted) | Medium | Owner review | [calendar](editorial/editorial-calendar.csv) | Non-brand impressions per cluster |
 | R14 | Clutch free profile, then ask the first two or three clients for reviews | P2 | Medium | S | Medium | Clients | [backlinks](13-backlink-opportunities.md) | Reviews count |
 | R15 | Homepage H1, option B | P3 | Low-medium | S | Medium | Owner design decision | [on-page audit](04-on-page-audit.md#h1-options-for-the-owner) | Engagement on hero |
-| R16 | First original-data piece (UK SME AI adoption analysis) | P3 | Medium (links) | L | Medium | R13 cadence | [backlinks](13-backlink-opportunities.md) | Referring domains |
+| R16 | First data explainer (UK SME AI adoption figures, read properly) | P3 | Medium (links) | L | Medium | R13 cadence | [backlinks](13-backlink-opportunities.md) | Referring domains |
 | R17 | Measure mobile INP; optimise the homepage main thread only if above 200 ms | P3 | Low-medium | M | Medium | R2/R4 field data | [T10](03-technical-seo-audit.md#t10-homepage-main-thread-cost-on-mobile--medium) | INP p75 |
 | R18 | Decide AI-crawler policy for `.com` | P3 | Low-medium | S | Medium | Owner preference | [T11](03-technical-seo-audit.md#t11-robots-policy-differs-between-the-domains--medium) | robots.txt matches decision |
 | R19 | Remove design-study routes from production | P3 | Low | S | High | None | [T14](03-technical-seo-audit.md#t14-design-study-routes-are-public--low) | 404 on those paths |
@@ -177,6 +177,18 @@ Proof and conversion: R9, R10, R11, R12, R14, plus two more articles (R13).
 
 ### 90-day plan
 Authority and refinement: R13 continues, R16, R15, R17, R18, R19. Review Search Console for the first queries each service page earns, and rewrite titles where impressions arrive without clicks.
+
+## Risks and assumptions
+
+| Assumption or risk | Why it matters | Mitigation |
+|---|---|---|
+| `.com` is the intended primary domain | The whole consolidation depends on it | Supported by the mission brief, the contact address and Google Workspace MX on `.com`. If `.uk` has more inbound links, Change of Address still carries them. |
+| The service-page claims are true | A page that over-promises costs more trust than it earns | Six claims are listed for the owner to confirm before deploy |
+| Demand exists for the targeted long tail | Volumes could not be measured | Autocomplete shows people type these queries; Search Console will show within 60 days which pages earn impressions, and the plan re-ranks content then |
+| A new domain with no links ranks slowly | Months, not weeks, for competitive commercial terms | Lead with long-tail and problem-led content; earn a few relevant links early (client credit, profiles, one data piece) |
+| Four service lines read as "does everything" | Dilutes the position | One promise across all four (connect, automate, build the missing piece), and cross-links that show them as one offer |
+| Content is written but not published | Drafts help no one | Two articles in the first 30 days are on the critical path, not optional |
+| The owner's time is the bottleneck | Most P1 items are owner actions | The roadmap front-loads short, high-impact owner tasks (about a day of work in total in week 1) |
 
 ## What would change this plan
 

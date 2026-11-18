@@ -23,12 +23,12 @@ The buyer is the owner or operations lead of a UK business with roughly 5–50 s
 - **Technical fixes:** `.com` as the canonical origin in code and Supabase config; an offer-led homepage title; article structured data tied to the business; the dead client link replaced with the firm's live site.
 - **Enquiry attribution:** each enquiry email now says which page started the visit, where the visitor came from, and the page they read before getting in touch. It is held in memory only, with no cookies.
 - **Verified:** lint, types and production build pass; **280 end-to-end tests pass, none fail**, on desktop, tablet and mobile.
-- **Six full articles and a case study drafted** for review, chosen to fill the gap between reading and enquiring: replacing spreadsheets (the clearest UK search gap), SEO costs (using our real prices), connecting systems, choosing an AI consultant, technical SEO audits, and AI subscriptions vs integration.
+- **Seven full articles and a case study drafted** for review, chosen to fill the gap between reading and enquiring: replacing spreadsheets (the clearest UK search gap), SEO costs (using our real prices), connecting systems, choosing an AI consultant, technical SEO audits, and AI subscriptions vs integration.
 - **A complete strategy:** technical and on-page audits, 79-keyword research (volumes honestly marked as not measured), competitor analysis, a keyword-to-URL map, 20 prioritised recommendations and a 90-day roadmap.
 
 ## The five things to do first
 
-1. **Approve the service-page copy** (six claims to confirm are listed in the [handoff](HANDOFF.md#decisions-requiring-human-approval)).
+1. **Approve the service-page copy** (the commitments to confirm are listed in the [handoff](HANDOFF.md#decisions-requiring-human-approval)).
 2. **Switch to `.com`:** Supabase site URL, the Vercel `NEXT_PUBLIC_SITE_URL`, deploy the branch, redirect `.uk`, then Search Console.
 3. **Confirm the company's registered name and number**, and show them in the footer.
 4. **Turn on measurement:** Search Console and cookieless analytics. Every enquiry email already records the page that prompted it (built locally).

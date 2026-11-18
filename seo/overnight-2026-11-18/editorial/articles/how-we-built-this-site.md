@@ -2,13 +2,13 @@
 status: draft — for owner review, not published
 slug: how-we-built-this-site
 url: /insights/how-we-built-this-site   # or /work/chinvat-bridge-website if a Work section is added
-seo_title: "How We Built Our Own Site, Client Portal and Subscription Checkout"
+seo_title: "How We Built Our Site, Portal and Checkout"
 meta_description: "A look inside our own website: a custom Next.js build with a client portal, Stripe subscriptions, sign-in, and the technical SEO we sell, all on one stack."
 h1: "How we built our own site, client portal and checkout"
 primary_keyword: custom web application with client portal and subscriptions
 secondary_keywords:
   - next.js supabase stripe
-  - client portal development
+# 'client portal development' belongs to /services/custom-software.
   - subscription website development uk
   - technical seo next.js
 search_intent: commercial investigation (proof)
@@ -36,7 +36,7 @@ external_references: []
 cta: "Describe what you need → /#contact"
 schema: Article, BreadcrumbList
 review_notes:
-  - "All facts are from the repository on 18 Nov 2026: package.json (Next.js 16, React 19, Supabase, Stripe, three.js), src/actions/auth.ts (magic link and Google sign-in), src/app/api/webhooks/stripe/route.ts (checkout completed, payment failed, subscription deleted), supabase/migrations (customers, plans, updates, progress and sprint items), tests/e2e (12 specs, about 100 tests, three viewports)."
+  - "All facts are from the repository on 18 Nov 2026: package.json (Next.js 16, React 19, Supabase, Stripe, three.js), src/actions/auth.ts (magic link and Google sign-in), src/app/api/webhooks/stripe/route.ts (checkout completed, payment failed, subscription deleted), supabase/migrations (customers, plans, updates, progress and sprint items), tests/e2e (13 specs; 375 test runs across three viewports on 18 Nov 2026)."
   - "Lab performance figures are from this session's runs (Chromium, 4x CPU slowdown, 1.6 Mbps, 150 ms latency, 18 Nov 2026), labelled as lab results. Re-run before publishing, and prefer field data from Search Console once it exists."
   - "The paragraph on what we would do differently is honest by design (the homepage's main-thread cost, the domain split). Keep it; it is what makes the piece credible. Remove the domain sentence if the owner prefers, but only once the fix is live."
   - "Check with the owner that describing the admin area and webhook flow at this level is fine from a security point of view. Nothing here reveals configuration or secrets."
@@ -65,7 +65,7 @@ We chose mainstream, well-documented tools, so the site is easy to host, secure 
 - **Stripe** for payments. Card details never touch our servers.
 - **Vercel** for hosting.
 
-It is the same stack we use for [custom software](/services/custom-software) for clients.
+It is the stack we propose for [custom software](/services/custom-software) for clients, too.
 
 ## How a subscription becomes a portal
 
@@ -90,7 +90,7 @@ In our own lab tests on a throttled mobile profile, the inner pages reach their 
 
 ## How we keep it working
 
-The site has an end-to-end test suite of around a hundred tests, run on desktop, tablet and phone sizes. It covers navigation, the contact conversation (including what happens when sending fails), every route's metadata, the sitemap's dates, and the service pages' structured data. Alongside the production build, the type checks and the linter, it is how we check a change before it goes live.
+The site has an end-to-end test suite of more than a hundred tests, each run at desktop, tablet and phone sizes. It covers navigation, the contact conversation (including what happens when sending fails), every route's metadata, the sitemap's dates, and the service pages' structured data. Alongside the production build, the type checks and the linter, it is how we check a change before it goes live.
 
 ## What we'd do differently
 
@@ -99,6 +99,6 @@ The site has an end-to-end test suite of around a hundred tests, run on desktop,
 
 ## What this means if you're a client
 
-The same approach applies to your project: mainstream tools, a database that enforces who can see what, payments handled by a specialist provider, tests that run before every release, and technical SEO designed in from the start. It's also why we'll often suggest something smaller than you expect. [When should a business build custom software?](/insights/when-should-a-business-build-custom-software) explains when we think building is worth it.
+The same approach applies to your project: mainstream tools, a database that enforces who can see what, payments handled by a specialist provider, tests we run before we release, and technical SEO designed in from the start. It's also why we'll often suggest something smaller than you expect. [When should a business build custom software?](/insights/when-should-a-business-build-custom-software) explains when we think building is worth it.
 
 If you have a portal, a booking flow or an internal tool in mind, [describe what you need](/#contact). Or read about our [custom software](/services/custom-software) and [SEO service](/services/seo).

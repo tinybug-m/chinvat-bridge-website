@@ -46,7 +46,7 @@ Every external source used in this programme, with the date it was accessed and 
 |---|---|
 | `https://suggestqueries.google.com/complete/search?client=firefox&hl=en-GB&gl=gb&q=…` (about 60 seed queries with suffix sweeps) | Every "autocomplete-observed" tag in [keyword research](05-keyword-research.csv) |
 | https://ahrefs.com/keyword-generator | Tried for volumes; no figures exposed without login. Hence "not measured" throughout. |
-| WebSearch, about 30 commercial queries across the four services and verticals | Every "SERP observation" tag; ranking URLs seen |
+| WebSearch, about 30 commercial queries across the four services and verticals (keyword research), plus 11 for the competitor analysis | Every "SERP observation" tag; URLs seen in results (presence, not position) |
 
 ## Competitors and benchmarks
 
@@ -72,6 +72,13 @@ Every external source used in this programme, with the date it was accessed and 
 | https://ink-digital.co.uk/services/seo/website-audit/ | SEO audit price anchor (£495 + VAT, vendor-stated) |
 
 ## Authority opportunities
+
+| Source | Supports |
+|---|---|
+| https://support.google.com/business/answer/13762416 (Google Business Profile guidelines, checked 18 Nov 2026) | "To qualify for a Business Profile on Google, a business must make in-person contact with customers during its stated hours"; online-only businesses are ineligible |
+| https://web.dev/articles/vitals | Core Web Vitals assessed at the 75th percentile of page loads |
+
+### Directories and programmes
 
 | Source | Supports |
 |---|---|

@@ -15,7 +15,7 @@
 
 ## Page anatomy (shared by all four)
 
-Built from `components/services/ServiceBlocks.tsx` and the new `components/services/ServicePage.tsx`, so every page reads as one system and matches the existing design:
+Built from `components/services/ServiceBlocks.tsx`, the new `components/services/ServicePage.tsx` and the shared `components/services/structured-data.tsx` (which `/services/seo` now uses too), so every page reads as one system and matches the existing design:
 
 1. **Header**: kicker (service name), H1 (benefit plus service phrase), lede, the service's own homepage diagram, CTA into the conversation, secondary "See what we do".
 2. **Problem**: four recognisable symptoms in the buyer's words.
@@ -24,7 +24,7 @@ Built from `components/services/ServiceBlocks.tsx` and the new `components/servi
 5. **Detail** (software only): how we build, with the stack and the site itself as evidence.
 6. **Approach**: three principles and a candid note (what we won't promise).
 7. **How we work**: the shared Discover / Define / Build / Improve, with a line per service.
-8. **How projects start**: scoped per project, with scope and cost agreed before work; links to custom packages.
+8. **How projects start**: scoped per project, with scope and cost agreed before work; one CTA into the conversation. There is deliberately no link to /pricing, which sells SEO plans.
 9. **FAQs**: five real buying questions (cost, data, risk, scope, fit).
 10. **Related insights and services**: two or three articles, two sibling services.
 11. **Closing CTA**: service-specific heading and button.

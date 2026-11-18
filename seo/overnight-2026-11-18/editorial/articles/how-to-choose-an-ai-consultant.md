@@ -2,16 +2,16 @@
 status: draft — for owner review, not published
 slug: how-to-choose-an-ai-consultant
 url: /insights/how-to-choose-an-ai-consultant
-seo_title: "Hiring an AI Consultant: A Guide for UK Small Businesses"
+seo_title: "How to Choose an AI Consultant"
 meta_description: "Whether you need an AI consultant at all, what a good one does, the questions that separate practical help from hype, and how AI consultancy is usually priced."
 h1: "How to choose an AI consultant for a small business"
 primary_keyword: how to choose an ai consultant
 secondary_keywords:
-  - ai consultant for small business
   - hiring an ai consultant uk
   - ai consultant cost uk
   - questions to ask an ai consultant
-  - ai consultancy for smes
+  - what does an ai consultant do
+# 'ai consultant for small business' and 'ai consultancy for smes' belong to /services/ai-integration.
 search_intent: commercial investigation
 audience: Owners and MDs of UK SMEs shortlisting outside help with AI, often after trying AI subscriptions without much change
 funnel_stage: decision
@@ -39,6 +39,7 @@ schema: Article, BreadcrumbList
 review_notes:
   - "Figures: ONS 30% of UK businesses used at least one AI technology in Sept 2026 (9% Sept 2023); DSIT 2026 survey 32% adoption, and "Limited AI skills, expertise or knowledge affected 67% of businesses that had adopted AI, and 78% of those planning to adopt it". Both verified against the published pages on 18 Nov 2026; re-check on the day of publishing."
   - "Pricing is described by model, not by numbers, because published UK figures are vendor-stated and vary widely (day rates claimed from about £400 to over £1,000; assessments from hundreds to over £10,000). Add our own first-engagement price here if the owner sets one."
+  - "Can you show me something you've built?" will be asked of us too. Before publishing, have one AI build (even an internal one) you can demonstrate, or accept that risk knowingly.
   - The article should not claim Chinvat Bridge passes every test it lists. It is written so the reader can apply it to anyone, including us.
 ---
 
@@ -57,7 +58,7 @@ Outside help starts to pay when:
 - mistakes would reach customers, money or legal commitments, so you need review steps and a record;
 - nobody on the team has the time or skills to work it out.
 
-That last point is common. The government's 2026 AI adoption survey found that the most significant barriers were capability-related: limited AI skills, expertise or knowledge affected 67% of businesses that had already adopted AI, and 78% of those planning to ([DSIT, October 2026](https://www.gov.uk/government/publications/ai-adoption-survey-2026/ai-adoption-survey-report-2026-executive-summary)). And adoption is still a minority activity: the ONS reported that 30% of UK businesses used at least one AI technology in September 2026 ([ONS, October 2026](https://www.ons.gov.uk/businessindustryandtrade/business/businessservices/bulletins/businessinsightsandimpactontheukeconomy/8october2026)). If you are only starting, you are not late.
+That last point is common. The government's 2026 AI adoption survey found that the most significant barriers were capability-related: limited AI skills, expertise or knowledge affected 67% of businesses that had already adopted AI, and 78% of those planning to ([DSIT, October 2026](https://www.gov.uk/government/publications/ai-adoption-survey-2026/ai-adoption-survey-report-2026-executive-summary)). And adoption is still a minority activity: the ONS reported that 30% of UK businesses used at least one AI technology in September 2026 ([ONS, October 2026](https://www.ons.gov.uk/businessindustryandtrade/business/businessservices/bulletins/businessinsightsandimpactontheukeconomy/8october2026)). If you are only starting, you are not late. (You can read [how we approach AI projects](/services/ai-integration); everything below applies to anyone you speak to, including us.)
 
 ## What a good AI consultant actually does
 
@@ -121,4 +122,4 @@ One task. A "before" number recorded. A tool chosen on your examples. An integra
 
 You may not need a consultant for your first AI task. You probably do once AI has to work with your own systems and data, at volume, with mistakes that matter. Choose someone who starts from your work, tells you where AI doesn't fit, builds and integrates what they recommend, and is specific about data and measurement. Ask the seven questions above of anyone you speak to, including us.
 
-You can read [how we approach AI projects](/services/ai-integration), or [describe the task you'd like to improve](/#contact) and we'll tell you honestly whether AI is the right answer.
+You can read about [our AI integration work](/services/ai-integration), or [describe the task you'd like to improve](/#contact) and we'll tell you honestly whether AI is the right answer.

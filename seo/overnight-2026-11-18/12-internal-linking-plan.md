@@ -44,13 +44,16 @@ The homepage plates no longer link to the three articles, so those articles lose
 
 ## Planned links for the drafted articles
 
-| Article | Up-link anchor → page | Sibling link |
+| Article | Early up-link (first third) → page | Sibling link |
 |---|---|---|
-| Outgrown your spreadsheets? | "custom software built around the way you work" → /services/custom-software | When should a business build custom software? |
-| How much does SEO cost in the UK? | "our SEO plans" → /pricing; "what our SEO service includes" → /services/seo | Why your website isn’t bringing you enough customers |
-| How to connect business systems | "workflow automation and integration" → /services/workflow-automation | What should you automate first? |
-| How to choose an AI consultant | "how we approach AI projects" → /services/ai-integration | Where AI can actually save your business time |
-| What a technical SEO audit should include | "technical SEO audits and fixes" → /services/seo | How much does SEO cost in the UK? |
+| When to replace spreadsheets with software | "custom software" → /services/custom-software (closing: "custom software built around the way you work") | When should a business build custom software? |
+| How much does SEO cost in the UK? | "our SEO service" → /services/seo; later "what our SEO service includes" → /services/seo and "our SEO plans" → /pricing | Why your website isn’t bringing you enough customers |
+| How to connect business systems | "workflow automation and integration" → /services/workflow-automation (closing: "how we approach automation projects") | What should you automate first? |
+| How to choose an AI consultant | "how we approach AI projects" → /services/ai-integration (closing: "our AI integration work") | Where AI can actually save your business time |
+| What a technical SEO audit should include | "technical SEO audits and fixes" → /services/seo (closing: "our SEO plans") |
+| AI subscriptions or AI integration? | "AI integration" → /services/ai-integration (closing: "proper integration into your systems") | How to choose an AI consultant |
+| Does your business need a client portal? | "software we build" → /services/custom-software (closing: "building your own") | How we built our own site, client portal and checkout |
+| How we built our own site, client portal and checkout | "custom software" → /services/custom-software; "SEO service" → /services/seo | When should a business build custom software? | How much does SEO cost in the UK? |
 | Zapier, Make or a custom integration? (planned) | "custom API integrations" → /services/workflow-automation | How to connect business systems |
 
 ## Orphans and dead ends

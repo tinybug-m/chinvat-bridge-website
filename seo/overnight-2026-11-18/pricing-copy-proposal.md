@@ -11,7 +11,7 @@
 | All | "8 / 15 / 35 assets / mo" with no definition of an asset |
 | Growth | "content velocity", "dynamic schema engineering" |
 | Scale | "Enterprise-grade positioning", "Bespoke SEO automation & schema pipelines", "Dedicated senior SEO consultant": claims to keep only if literally true for a small firm |
-| All | No statement on VAT |
+| All | No statement on VAT on the page (the terms say prices exclude applicable tax) |
 
 ## Proposed wording
 
@@ -36,7 +36,7 @@ The owner must fill in the **[brackets]**; they are facts only the owner knows.
 - **Capabilities:** "Multi-region site structure and hreflang" · "Automated reporting and structured data at scale [keep only if delivered]" · "A named lead consultant [or: 'A senior consultant on every call', whichever is true]"
 
 ### Page-level additions (in code, `src/components/organisms/sections/Pricing.tsx`, when approved)
-- Under the plans: **"Prices [exclude / include] VAT. Billed monthly; cancel with 30 days' notice."**
+- Under the plans: **"Prices exclude VAT, which is added at checkout where applicable. Billed monthly; cancel with 30 days' notice."** (The terms already say prices are shown exclusive of applicable tax.)
 - A definition line: **"A ‘piece’ is [one optimised page or article of about N words / …]."**
 - Under the custom card: **"AI, automation and software projects are quoted individually."** with links to the three service pages.
 

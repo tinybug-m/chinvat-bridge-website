@@ -19,7 +19,7 @@ Day 1 is the day the owner starts acting on this plan. Each task names its owner
 | Day 5 | Record the baseline: GSC indexed pages, impressions and clicks (brand vs non-brand), enquiries | Owner | R2 | Baseline row in the tracker |
 | Days 5–7 | Fix the /pricing contradictions and jargon; state VAT | Owner | R6 | Plans read plainly |
 | Day 7 | Upgrade Next.js for the security advisory; rerun the e2e suite | Dev | R20 | Build clean |
-| Days 7–10 | Google Business Profile (service-area), Bing Places | Owner | R7 | Verified |
+| Days 7–10 | LinkedIn company page; Google Business Profile and Bing Places **only if** the business meets clients in person (Google excludes online-only businesses) | Owner | R7 | Profiles live, or GBP consciously skipped |
 | Days 10–14 | Publish "Outgrown your spreadsheets?" | Editor | R8 | Live, linked from the software page |
 | Days 14–21 | Publish "How much does SEO cost in the UK?" | Editor | R8 | Live, linked from the SEO page and /pricing |
 | Days 21–30 | Ask Scornik Gerstein for permission for a case study and a "website by" credit | Owner | R9 | Answer |
@@ -34,7 +34,7 @@ Day 1 is the day the owner starts acting on this plan. Each task names its owner
 | When | Task | Who | ID |
 |---|---|---|---|
 | Days 31–40 | Write and publish the Scornik Gerstein case study (if approved): brief, constraints, what was built, what changed; no invented numbers | Owner/Editor | R9 |
-| Days 31–45 | "How we built this site": the client portal, subscription checkout and technical SEO, from the repo's own history | Editor/Dev | R10 |
+| Days 31–45 | Publish "How we built this site" (already drafted from the repo's own facts) | Editor | R10 |
 | Days 35–45 | Decide on a productised first engagement (an "operations review" or a "technical SEO audit"), its scope and its price; add it to the relevant service pages | Owner | R11 |
 | Days 35–45 | Name the founder on the About section and as article author, with a short bio | Owner | R12 |
 | Days 40–50 | Publish "How to connect business systems that don’t talk to each other" | Editor | R13 |
@@ -70,6 +70,6 @@ Day 1 is the day the owner starts acting on this plan. Each task names its owner
 - Enquiry attribution (first page, referrer, page before contact) in every enquiry email, with a privacy-policy line
 - Article structured data and breadcrumbs
 - The Scornik Gerstein link
-- Six article drafts and one case study ready for review in [editorial/articles](editorial/articles/)
+- Seven article drafts and one case study ready for review in [editorial/articles](editorial/articles/)
 
 Nothing has been deployed, pushed or published.

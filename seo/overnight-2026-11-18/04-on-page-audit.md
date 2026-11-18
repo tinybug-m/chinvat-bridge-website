@@ -50,7 +50,7 @@ Each is about 1,400–1,700 words, built from the same blocks as the SEO page: p
 
 ## /pricing
 
-**Intent:** "SEO packages UK", "SEO pricing UK" and bottom-funnel buyers. Publishing pounds-sterling prices is a real differentiator; about half of competitors hide theirs.
+**Intent:** "SEO packages UK", "SEO pricing UK" and bottom-funnel buyers. Publishing pounds-sterling prices is a real differentiator; several of the competitors reviewed hide theirs.
 
 | Issue | Evidence | Recommendation (owner; plans live in the production database) |
 |---|---|---|
@@ -58,7 +58,7 @@ Each is about 1,400–1,700 words, built from the same blocks as the SEO page: p
 | Jargon headings | "Core Protocols", "Expanded Capability", "Full Scope", "content velocity", "dynamic schema engineering", "schema pipelines" | Plain labels: "Also included", "Adds", and concrete descriptions of what is done |
 | "Assets" undefined | 8 / 15 / 35 "assets / mo" | Define an asset (an article? an optimised page? a social post?). 35 pieces a month at £799 invites doubts about quality unless it is explained. |
 | Possible over-claims for a small firm | Scale: "Enterprise-grade positioning", "Dedicated senior SEO consultant" | Keep only what is literally true today |
-| VAT not stated | Prices shown without "+ VAT" or "inc. VAT" | State it |
+| VAT not stated on the page | Prices shown without "+ VAT"; the terms say prices exclude applicable tax | Say "plus VAT where applicable" next to the prices |
 | The page sells only SEO, but the custom card lists all four services | Correct structure | Add one line that AI, automation and software are quoted per project, linking to the three service pages |
 
 ## /insights and the articles

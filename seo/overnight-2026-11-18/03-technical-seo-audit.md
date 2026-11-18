@@ -82,13 +82,13 @@ The most credible proof the business has currently sends visitors to an error pa
 
 Without this the programme cannot answer its own primary question: which pages and queries produce qualified enquiries.
 
-**Correction:** see [measurement framework](15-measurement-framework.md). The short version: verify Search Console for `.com` now; add a cookieless analytics tool (no consent banner needed under PECR for strictly cookieless, aggregate measurement, though the privacy policy should still describe it); record the landing page and referrer with each enquiry. Choosing a vendor and updating the privacy policy are owner decisions, so nothing was installed.
+**Correction:** see [measurement framework](15-measurement-framework.md). The short version: verify Search Console for `.com` now; add an analytics tool that stores nothing on, and reads nothing from, the visitor's device beyond what is strictly necessary (PECR covers any storage or access, not only cookies, so check the vendor's documentation) and describe it in the privacy policy. Enquiry attribution is now built locally (commit `21afd32`). Choosing an analytics vendor is an owner decision, so none was installed.
 
 ## T5. Company identity is not verifiable — High (trust and compliance)
 
 **Evidence:** the footer says "© 2026 Chinvat Bridge Ltd", the Organization schema sets `legalName: "Chinvat Bridge Ltd"`, and the terms refer to the company. A Companies House name search for "chinvat" on 18 Nov 2026 returned no companies at all, and the research agent's six name variants also returned nothing. No company number or registered office appears anywhere on the site.
 
-Two consequences. First, buyers, directories (Clutch, G-Cloud) and Google's quality raters all look for a verifiable business; an untraceable "Ltd" weakens every trust signal the strategy depends on. Second, a registered UK company must show its registered name, number and registered office on its website under the Companies (Trading Disclosures) Regulations 2008, and only a registered limited company may describe itself as "Ltd".
+Two consequences. First, buyers, directories (Clutch, G-Cloud) and Google's quality raters all look for a verifiable business; an untraceable "Ltd" weakens every trust signal the strategy depends on. Second, a registered UK company must show its registered name, number and registered office on its website under the Company, Limited Liability Partnership and Business (Names and Trading Disclosures) Regulations 2015 (SI 2015/17), and only a registered limited company may describe itself as "Ltd". The same name appears in the terms (as the contracting party), the checkout shell and the Organization schema, all of which were already live before this branch.
 
 **Correction (owner):** confirm the exact registered name and number. If the company is registered under another name, use that name in the footer and schema. If incorporation is pending, remove "Ltd" until it completes. Then add the company number and registered office to the footer and to the Organization schema (`legalName`, `identifier`, `address`). Nothing was changed, because the facts aren't known.
 
@@ -138,7 +138,7 @@ LCP and CLS are comfortably inside Google's "good" thresholds, so this isn't hol
 
 **Evidence:** `.com/robots.txt` is the app's own (`Allow: /` plus the sitemap). `.uk/robots.txt` is a Cloudflare-managed file that adds `Content-Signal: search=yes,ai-train=no,use=reference` and disallows GPTBot, ClaudeBot, Google-Extended, CCBot, GoogleOther, Applebot-Extended, Bytespider and about 25 others, before repeating the app's rules.
 
-Per the crawler operators' documentation (sources in the [source register](source-register.md)), those are training crawlers. The agents that fetch pages for AI search answers (OAI-SearchBot, ChatGPT-User, Claude-SearchBot, Claude-User, PerplexityBot) and Googlebot are not blocked. Blocking Google-Extended does not affect Google Search; it may limit Gemini's use of the content for grounding.
+Per the operators' documentation (sources in the [source register](source-register.md)), most of those are AI-training crawlers; Google-Extended and Applebot-Extended are usage-control tokens rather than separate crawlers, and GoogleOther is a generic Google fetcher not used for Search. The agents that fetch pages for AI search answers (OAI-SearchBot, ChatGPT-User, Claude-SearchBot, Claude-User, PerplexityBot) and Googlebot are not blocked. Blocking Google-Extended does not affect Google Search; it may limit Gemini's use of the content for grounding.
 
 **Correction:** once `.com` is canonical, its robots.txt is the one that counts, and today it blocks nothing. That is a reasonable default for a business that wants to be cited by AI assistants. If the owner prefers the `.uk` stance (no training, yes to search), add the same Cloudflare-managed robots to `.com` by moving it behind Cloudflare, or add explicit `Disallow` groups for the training agents in `src/app/robots.ts`. Recorded as a decision; not changed.
 
@@ -166,6 +166,6 @@ Per the crawler operators' documentation (sources in the [source register](sourc
 
 ## Not applicable or deliberately not recommended
 
-- **hreflang:** the site is English for a UK market, with international clients served from the same pages. One locale needs no hreflang. Revisit only if a non-English or region-specific version is created.
+- **hreflang:** the site is English for a UK market; it says it works globally, and any international enquiries are served from the same pages. One locale needs no hreflang. Revisit only if a non-English or region-specific version is created.
 - **Pagination:** the Insights index has five articles; no pagination exists or is needed yet.
-- **City or country landing pages:** the keyword research found London modifiers on SEO and software queries, but the business has no office there. Pages for places it doesn't operate in would be doorway pages. Not recommended.
+- **City or country landing pages:** the keyword research found London modifiers on SEO and software queries, but the site shows no presence there (confirm with the owner). Pages for places it doesn't operate in would be doorway pages. Not recommended.

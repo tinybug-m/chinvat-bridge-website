@@ -15,7 +15,7 @@
 | Opportunity | Type | Cost | Effort | Value | Prerequisite | Notes |
 |---|---|---|---|---|---|---|
 | Scornik Gerstein "Website by Chinvat Bridge" footer credit | Client credit | Free | S | High: relevant, earned, from a regulated firm's site | Client agreement | Ask alongside the case-study permission. A discreet, plain-text credit is normal; leave it to the client whether it's followed. |
-| Google Business Profile (service-area business) | Entity / local | Free | S | High for brand panel and trust | Verified business details | Not a backlink, but the strongest entity signal for a new brand |
+| Google Business Profile (service-area business) | Entity / local | Free | S | High for brand panel and trust, **if eligible** | Verified business details; the business must make in-person contact with customers (Google's rule; online-only businesses are excluded) | Not a backlink. Skip it if all client contact is remote. |
 | LinkedIn company page | Entity / social | Free | S | Medium | None | Add to Organization `sameAs` |
 | Bing Places, Apple Business Connect | Entity | Free | S | Low-medium | GBP done | Same details everywhere |
 | Clutch free profile | Directory with verified reviews | Free (Verified tier about $499/yr) | S, then reviews | Medium: Clutch ranks for software and automation queries | One or more client reviews | Clutch verifies reviews with the client. Don't pay until there's lead data. |
@@ -24,7 +24,7 @@
 | Small Business UK contributor | Expert contribution | Free | M | Medium | As above | Contributor FAQ: don't pitch stories they've covered; editors rewrite headlines |
 | Featured.com free tier | Journalist requests | Free tier | S per answer | Low-medium | Real expertise on the question | US-skewed; answer only where the expertise is genuine |
 | #journorequest on LinkedIn and X | Journalist requests | Free | S per answer | Low-medium | — | Free alternative to paid UK services (ResponseSource is paid; pricing unverified) |
-| Original data piece: UK SME AI adoption, explained | Digital PR | Time | L | Medium-high (citable) | Two months of articles first | See below |
+| Data explainer: UK SME AI adoption figures, read properly | Digital PR | Time | L | Medium-high (citable) | Two months of articles first | See below |
 | Zapier Solution Partner directory | Ecosystem | Free to apply | M | Medium: the directory ranks for "Zapier expert" queries | Genuine Zapier delivery; requirements not verified | Apply only if Zapier is part of real client work |
 | n8n Expert Partner programme | Ecosystem | Free | M | Medium | **At least three active n8n customers** (stated on n8n.io/experts) | Not yet eligible |
 | Local chamber of commerce / FSB | Membership | Paid (prices unverified) | M | Low as links; useful for networking | Membership | Worth it only if the owner will network there |
@@ -37,9 +37,9 @@
 - Pay-to-rank directories (DesignRush, Sortlist and similar) until reviews exist and lead data justifies the spend.
 - Guest posts on sites that exist to sell guest posts.
 
-## Original-data idea: "What UK SME AI adoption figures actually say"
+## Data-explainer idea: "What UK SME AI adoption figures actually say"
 
-**Why it could earn links:** journalists and bloggers cite AI-adoption statistics constantly, and the official figures are easy to misread. For example, the ONS's 8 October 2026 bulletin reports that **30%** of UK businesses used AI in September 2026, up from 9% in September 2023 (51% among firms with 250+ employees). The 38% figure in the same bulletin is *not* an adoption rate: it is the share of AI-using firms naming admin roles as most affected. DSIT's 2026 survey reports **32%** adoption (16% in 2025), and says limited AI skills, expertise or knowledge affected **67%** of businesses that had adopted AI (78% of those planning to).
+**Why it could earn links:** journalists and bloggers cite AI-adoption statistics constantly, and the official figures are easy to misread. For example, the ONS's 8 October 2026 bulletin reports that **30%** of UK businesses used AI in September 2026, up from 9% in September 2023 (51% among firms with 250+ employees). The same bulletin contains **two different 38% figures**: 38% of businesses with 10 or more employees used AI (an adoption rate), and, separately, 38% of AI-using businesses with 10 or more employees said administrative and clerical roles were the most affected (not an adoption rate). Both were verified against the bulletin text on 18 Nov 2026. DSIT's 2026 survey reports **32%** adoption (16% in 2025), and says limited AI skills, expertise or knowledge affected **67%** of businesses that had adopted AI (78% of those planning to).
 
 **The piece:** a plain-English explainer of what the ONS and DSIT figures do and don't show for small businesses, with a chart, a "common misreadings" box, and Chinvat's practical read on what the skills gap means for an SME. Optionally, add a short survey of the owner's own network (n≈50–100), clearly labelled with its method and size.
 
@@ -72,7 +72,7 @@ None found. Set a free Google Alert for `"Chinvat Bridge" -zoroastrian -zoroastr
 >
 > Hello [editor],
 >
-> I run Chinvat Bridge, a UK consultancy that helps small businesses with AI, automation and software. The ONS and DSIT figures on business AI adoption are quoted often and misread almost as often. A 38% figure from the October ONS bulletin, for example, is not an adoption rate at all. I'd like to offer your readers a practical 800-word piece on what the official numbers actually show for firms under 50 staff, and what a sensible first AI project looks like given the skills gap DSIT identifies.
+> I run Chinvat Bridge, a UK consultancy that helps small businesses with AI, automation and software. The ONS and DSIT figures on business AI adoption are quoted often and misread almost as often. The October ONS bulletin, for example, contains two different 38% figures for firms with ten or more staff, one an adoption rate and one about which roles AI affects, and they are easy to conflate. I'd like to offer your readers a practical 800-word piece on what the official numbers actually show for firms under 50 staff, and what a sensible first AI project looks like given the skills gap DSIT identifies.
 >
 > I haven't pitched this elsewhere. Happy to adjust the angle to suit your coverage.
 >

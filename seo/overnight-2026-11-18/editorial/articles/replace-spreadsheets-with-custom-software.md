@@ -2,7 +2,7 @@
 status: draft — for owner review, not published
 slug: replace-spreadsheets-with-custom-software
 url: /insights/replace-spreadsheets-with-custom-software
-seo_title: "Outgrown Your Spreadsheets? When to Replace Them With Software"
+seo_title: "When to Replace Spreadsheets With Software"
 meta_description: "How to tell when a business spreadsheet has become a system, the four ways out from cheapest to most tailored, and how to move without breaking anything."
 h1: "Outgrown your spreadsheets? When to replace them with software"
 primary_keyword: replace spreadsheets with custom software
@@ -17,13 +17,15 @@ audience: Owners and operations leads of UK businesses (5–50 staff) whose jobs
 funnel_stage: consideration
 strategic_purpose: >
   The flagship article for the custom-software cluster. UK search results for replacing
-  spreadsheets with software are almost entirely US low-code vendors, with no UK SME answer.
+  spreadsheets with software are mostly US low-code vendors, with few UK SME-focused answers.
   It should rank for the problem, then hand readers to /services/custom-software.
 service_page: /services/custom-software
 category: Software Strategy
 tags: [software, operations, spreadsheets]
 reading_minutes: 8
 internal_links:
+  - anchor: "custom software"
+    href: /services/custom-software
   - anchor: "custom software built around the way you work"
     href: /services/custom-software
   - anchor: "When should a business build custom software?"
@@ -43,7 +45,7 @@ review_notes:
 
 # Outgrown your spreadsheets? When to replace them with software
 
-A spreadsheet is the right tool until three things are true at once: several people depend on the same file, it holds your business's records rather than doing sums, and a mistake in it would cost real money. When all three apply, the spreadsheet has quietly become a system, and it is worth asking whether something built for the job would serve you better. That something isn’t always custom software. Often it is a tidier spreadsheet or an off-the-shelf tool, and this guide covers how to tell which.
+A spreadsheet is the right tool until three things are true at once: several people depend on the same file, it holds your business's records rather than doing sums, and a mistake in it would cost real money. When all three apply, the spreadsheet has quietly become a system, and it is worth asking whether something built for the job would serve you better. That something isn’t always [custom software](/services/custom-software). Often it is a tidier spreadsheet or an off-the-shelf tool, and this guide covers how to tell which.
 
 ## Why spreadsheets win in the first place
 

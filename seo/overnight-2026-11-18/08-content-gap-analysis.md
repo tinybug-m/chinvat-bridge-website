@@ -45,6 +45,10 @@ Bold items are drafted in [editorial/articles](editorial/articles/) or built in 
 | /services/custom-software vs "When should a business build custom software?" vs "Outgrown your spreadsheets?" | Medium | Three distinct intents: service, build-vs-buy decision, spreadsheet-specific problem. Each links to the others with distinct anchors. |
 | /services/seo vs /pricing vs "How much does SEO cost in the UK?" | Medium | /pricing = our packages (transactional); the article = market cost explainer (investigation); the service page = the service. The article links to /pricing with "our plans", never "SEO pricing UK". |
 | /services/seo vs "What a technical SEO audit should include" | Low | Audit-specific investigation |
+| /services/seo vs the audit article on "seo audit services uk" | Medium | Service intent stays with /services/seo; the article targets "what should a technical SEO audit include" and the audit checklist |
+| /pricing vs the SEO cost article on "seo pricing uk" / "seo packages uk" | Medium | Those two go to /pricing only; the article keeps "how much does SEO cost UK", "SEO cost UK" and "monthly SEO cost UK" |
+| /services/ai-integration vs "AI subscriptions or AI integration?" | Low-medium | The article targets the comparison ("AI integration vs AI subscriptions"); "AI integration for small business" stays with the service page |
+| /services/custom-software vs "How we built this site" and "Does your business need a client portal?" | Low-medium | "Client portal development" stays with the service page; the drafts target the case study and "client portal for small business" (build or buy) |
 
 ## Vertical opportunities, assessed
 

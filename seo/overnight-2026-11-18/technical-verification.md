@@ -27,6 +27,29 @@ All checks run on 18 November 2026 against the branch `seo/overnight-2026-11-18`
 | Sanitiser (`lib/enquiry-journey.ts`), compiled and run on edge cases | Normal journeys produce "First page: /services/ai-integration (from www.google.com)" and "Page before contact: …"; `javascript:` paths, CR/LF header-injection attempts, hosts with spaces and non-string values are all dropped |
 | Real email sending | Not exercised: `.env.local` has no Gmail credentials, and the e2e sends fall inside the action's three-second bot window, which returns before any mail is attempted. No enquiry email was sent during testing. |
 
+## After the review fixes (`6a5e7e3`)
+
+| Check | Result |
+|---|---|
+| Full e2e suite after the code-review fixes | **283 passed, 0 failed, 95 skipped by design** (378 tests, 15.3 min) |
+| Lint, types, production build after the content-review copy fixes | Pass |
+| `routes`, `service-pages`, `services`, `hero`, `contact` specs on the final build | **126 passed, 0 failed, 63 skipped by design** |
+| Sanitiser re-run | Percent-encoded entry kept; `javascript:` entry dropped while a valid "page before contact" is kept; CR/LF values dropped |
+
+## Independent review
+
+Two reviews ran at the end of the session. A code review of `main...seo/overnight-2026-11-18` raised 8 findings; all are fixed (see the [implementation log](implementation-log.md)). An adversarial content review raised 4 must-fix, 11 should-fix and 17 could-improve items. All must-fix and should-fix items are corrected, as are most could-improve items. These were deliberately left:
+
+| Item | Why left |
+|---|---|
+| The legal entity named in the terms, footer, checkout and schema | The facts aren't known; it is the first owner decision and a blocker for listings |
+| The Scornik Gerstein mention in the software page's "How we build" isn't a link | The detail block renders plain text; the homepage Recent work links the live site |
+| The AI service's schema name "AI & Automation Integration" overlaps the automation page | It matches the homepage plate name; changing the service's name is the owner's call |
+| The homepage title shares "for UK SMEs" with two service titles | Different head terms (brand router vs service); monitor in Search Console |
+| The AI-consultant draft asks readers to request a demo, which we can't yet give | Flagged in the draft's review notes for the owner |
+
+The reviewer independently re-verified the ONS and DSIT figures, the Google and ICO sources, plan prices and terms, and every repository fact in the case study.
+
 ## Rendered output checked by hand (local production server)
 
 | Check | Result |

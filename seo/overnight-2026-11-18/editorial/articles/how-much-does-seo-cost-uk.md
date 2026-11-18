@@ -2,16 +2,16 @@
 status: draft — for owner review, not published
 slug: how-much-does-seo-cost-uk
 url: /insights/how-much-does-seo-cost-uk
-seo_title: "How Much Does SEO Cost in the UK? A Plain Guide for Small Businesses"
+seo_title: "How Much Does SEO Cost in the UK?"
 meta_description: "What UK small businesses typically pay for SEO, how retainers, audits and day rates differ, what drives the price, and the red flags to avoid at any budget."
 h1: "How much does SEO cost in the UK?"
 primary_keyword: how much does seo cost uk
 secondary_keywords:
-  - seo pricing uk
+  - seo cost uk
   - monthly seo cost uk
-  - seo packages uk
   - seo cost for small business uk
-  - seo audit cost uk
+  - how much should i pay for seo
+# 'seo packages uk' and 'seo pricing uk' belong to /pricing; 'seo audit cost uk' to the audit article.
 search_intent: commercial investigation
 audience: Owners and marketing leads of UK SMEs budgeting for SEO for the first time, or questioning what they pay now
 funnel_stage: consideration to decision
@@ -38,8 +38,8 @@ external_references:
 cta: "Compare plans → /pricing; or Discuss your SEO goals → /#contact"
 schema: Article, BreadcrumbList
 review_notes:
-  - "The market ranges are summarised from agency price guides seen on 18 Nov 2026 (ProfileTree: 'from around £300 to £1,200 a month'; SEO Sherpa: £500–£8,000/month and audits £1,000–£5,000; Ink Digital: audit £495 + VAT; Whitehat, Visionary Marketing, Limelight: SME ranges roughly £500–£3,000). They are deliberately described in words, not quoted, because they are vendor-stated. Re-check before publishing."
-  - "Our plan details are copied from the live plans table. Before publishing: (a) fix the Starter 'Basic' vs 'Full' audit contradiction on /pricing, (b) define what an 'asset' is, and (c) say whether prices include VAT. Then update the plan paragraph to match."
+  - "The market ranges are summarised from agency price guides seen on 18 Nov 2026 (ProfileTree: 'from around £300 to £1,200 a month'; SEO Sherpa, an international agency, on its UK pages: £500–£8,000/month and audits £1,000–£5,000; Ink Digital: audit £495 + VAT; Whitehat, Visionary Marketing, Limelight: SME ranges roughly £500–£3,000). They are deliberately described in words, not quoted, because they are vendor-stated. Re-check before publishing."
+  - "Our plan details are copied from the live plans table. Before publishing: (a) fix the Starter 'Basic' vs 'Full' audit contradiction on /pricing; (b) define what an 'asset' is, and do not publish until it is defined, because at £799 for 35 undefined assets the article's own warning about very high volumes at very low prices would appear to apply to us; (c) VAT: the terms say prices exclude applicable tax, and the article now says so. Then update the plan paragraph to match."
   - "The 'no long-term contract, 30 days' notice' line comes from data/seo-service.ts and the terms. Confirm it is still accurate."
   - Check the two Google URLs resolve on the day of publishing.
 ---
@@ -54,7 +54,7 @@ Most small UK businesses buy SEO as a monthly retainer, and published price guid
 
 The most common arrangement. You pay a fixed amount each month for an agreed set of work: technical fixes, on-page optimisation, content and, at higher levels, link building and digital PR. Retainers suit SEO because results build over months, and the work is never truly finished as your site, your competitors and search engines change.
 
-Look for a retainer that states *what* is delivered each month (how many pieces of content, how many link-building campaigns, what the report contains), not just a number of hours.
+Look for a retainer that states *what* is delivered each month (how many pieces of content, how many link-building campaigns, what the report contains), not just a number of hours. It is how we set out [our SEO service](/services/seo), and a fair test to apply to anyone.
 
 ### One-off projects and audits
 
@@ -95,10 +95,10 @@ These are typical patterns, not rules.
 
 ## What our plans cost
 
-We publish our prices, because comparing SEO offers is hard enough already. Our monthly plans are:
+We publish our prices, because comparing SEO offers is hard enough already. Our monthly plans (plus VAT where applicable) are:
 
-- **Starter, £299 a month:** keyword research, on-page SEO, a technical SEO audit with ongoing fixes, Core Web Vitals monitoring, structured data, content each month, a monthly report and email support.
-- **Growth, £499 a month:** everything in Starter with a fuller audit and deeper technical work, more content, competitor analysis, one link-building and digital PR campaign a month, fortnightly strategy briefings and priority support.
+- **Starter, £299 a month:** keyword research, on-page SEO, a technical SEO audit with ongoing fixes, Core Web Vitals monitoring, structured data, a basic content strategy and competitor analysis, content each month, a monthly report and email support.
+- **Growth, £499 a month:** everything in Starter with a fuller audit and deeper technical work, more content, fuller competitor analysis and content strategy, one link-building and digital PR campaign a month, fortnightly strategy briefings and priority support.
 - **Scale, £799 a month:** more content again, two link-building campaigns a month, multi-region site architecture and hreflang for international sites, and a lead consultant.
 
 Plans are billed monthly with no long-term contract, and we ask for 30 days' notice to cancel. The [pricing page](/pricing) lists exactly what each plan includes, and [what our SEO service includes](/services/seo) explains how the work fits together. Like anyone honest about SEO, we don't guarantee rankings.
