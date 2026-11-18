@@ -30,7 +30,7 @@ No numeric traffic targets are set, because there is no baseline yet. Set them o
 | Search data | Google Search Console (Domain property for `chinvatbridge.com`) and Bing Webmaster Tools | Only source of query data | Free |
 | Site analytics | A cookieless tool: Vercel Web Analytics (already on Vercel) or Plausible | Aggregate, no cookie banner needed when no cookies or personal identifiers are stored. Describe it in the privacy policy either way. | Vercel: free tier available; Plausible: paid (check current pricing) |
 | If GA4 is preferred | GA4 with Consent Mode and a consent banner | UK PECR requires consent for analytics cookies | Free; adds a banner |
-| Enquiry attribution | First-touch landing page, referrer and UTM stored in `sessionStorage`, sent with the enquiry | Works with any analytics choice; no cookies | Dev time |
+| Enquiry attribution | First page (with utm_ parameters), referring host and page before contact, sent with the enquiry | **Built locally** (commit `21afd32`); in memory only, no cookies or storage; works with any analytics choice | Done |
 | Backlinks | Ahrefs Webmaster Tools (free with site verification) | Replaces the missing backlink data | Free |
 | Keyword volumes | Google Keyword Planner (needs a Google Ads account, no spend required) | Fills the "not measured" column | Free |
 

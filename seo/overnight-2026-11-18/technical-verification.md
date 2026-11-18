@@ -18,6 +18,15 @@ All checks run on 18 November 2026 against the branch `seo/overnight-2026-11-18`
 | Production build | `NEXT_PUBLIC_SITE_URL=https://www.chinvatbridge.com pnpm build` | **Pass.** 37 static pages generated; the three new routes are static (○). The first attempt stopped on a Next.js security advisory for 16.4.3 (`SecurityFatalError`, a prompt to upgrade); the identical re-run completed and printed the advisory as a warning. No code issue. |
 | End-to-end | `BASE_URL=http://localhost:3000 npx playwright test` against `pnpm start` | **280 passed, 0 failed, 95 skipped** in 15.7 min across desktop (1440×900), tablet (768×1024) and mobile (390×844). The skips are the suite's own per-viewport `test.skip` conditions. The new `service-pages.spec.ts` ran 6 tests × 3 viewports, all passing. |
 
+## After the enquiry-attribution commit (`21afd32`)
+
+| Check | Result |
+|---|---|
+| Lint, types, production build | Pass (same Next.js advisory on the first build attempt; the re-run completes) |
+| `contact`, `routes`, `service-pages` specs, all viewports | **76 passed, 0 failed, 62 skipped by design.** The new test "a message sent after reading a service page says which page prompted it" passes on desktop, tablet and mobile. |
+| Sanitiser (`lib/enquiry-journey.ts`), compiled and run on edge cases | Normal journeys produce "First page: /services/ai-integration (from www.google.com)" and "Page before contact: …"; `javascript:` paths, CR/LF header-injection attempts, hosts with spaces and non-string values are all dropped |
+| Real email sending | Not exercised: `.env.local` has no Gmail credentials, and the e2e sends fall inside the action's three-second bot window, which returns before any mail is attempted. No enquiry email was sent during testing. |
+
 ## Rendered output checked by hand (local production server)
 
 | Check | Result |

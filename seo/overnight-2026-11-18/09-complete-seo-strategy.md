@@ -132,7 +132,7 @@ No purchased links, link exchanges, private networks or mass directory submissio
 
 ## Conversion optimisation
 
-See [conversion optimisation](14-conversion-optimisation.md). Highest leverage: record the landing page with each enquiry; give the service pages a specific first step; add named people and company details; publish one case study.
+See [conversion optimisation](14-conversion-optimisation.md). Highest leverage: enquiry attribution (built locally); give the service pages a specific first step; add named people and company details; publish one case study.
 
 ## Analytics and measurement
 
@@ -147,7 +147,7 @@ See [measurement framework](15-measurement-framework.md). The north-star metric 
 | R1 | Consolidate on `www.chinvatbridge.com`: set the env var, Supabase URL and redirect `.uk`, then Change of Address in Search Console | P1 | High | S | High | Owner access to Vercel, Supabase, Cloudflare, GSC | [T1](03-technical-seo-audit.md#t1-two-live-domains-canonicals-on-the-wrong-one--critical) | `.uk` URLs redirect; `.com` indexed |
 | R2 | Verify Search Console (Domain property) and Bing Webmaster Tools; submit the sitemap | P1 | High (enables everything) | S | High | DNS access | [baseline](02-current-seo-baseline.md#data-we-do-not-have) | Data flowing |
 | R3 | Deploy the three service pages and new internal links | P1 | High | S (built) | Medium-high | R1 ideally first; owner review of claims | [T2](03-technical-seo-audit.md#t2-three-services-have-no-url-of-their-own--high) | Impressions per service page within 4–8 weeks |
-| R4 | Add cookieless analytics and record landing page and referrer with each enquiry | P1 | High | M | High | Owner picks tool; privacy policy update | [T4](03-technical-seo-audit.md#t4-no-measurement--high) | Enquiries attributable by page |
+| R4 | Add cookieless analytics. Enquiry attribution (first page, referrer, page before contact) is **built locally**. | P1 | High | S (attribution done) | High | Owner picks tool; approves privacy line | [T4](03-technical-seo-audit.md#t4-no-measurement--high) | Enquiries attributable by page |
 | R5 | Resolve the legal-entity question; add company number and registered office to the footer and schema | P1 | Medium (trust; directories) | S | High | Owner | [T5](03-technical-seo-audit.md#t5-company-identity-is-not-verifiable--high-trust-and-compliance) | Footer shows verifiable details |
 | R6 | Fix the Starter-plan contradiction and jargon on /pricing; state VAT | P1 | Medium | S | High | Owner; DB edit | [on-page audit](04-on-page-audit.md#pricing) | Fewer "what's included" questions |
 | R7 | Create Google Business Profile (service-area) | P1 | Medium (brand, trust) | S | Medium | R5 | [local SEO](#local-and-uk-seo-strategy) | Brand panel shows |

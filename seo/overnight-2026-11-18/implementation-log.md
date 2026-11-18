@@ -31,9 +31,20 @@ All work is on the local branch **`seo/overnight-2026-11-18`**, created from `ma
 | `tests/e2e/{hero,routes,services}.spec.ts` | Expected hrefs, new routes, metadata and sitemap dates | Follows the data |
 | `docs/redesign/COPY_CHANGES.md` | New section listing every wording change | The project's convention for owner review |
 
-## Commit (documents) — docs(seo): research, strategy, editorial drafts and handoff
+## Commit `04af081` — docs(seo): research, strategy, editorial drafts and handoff
 
 Everything under `seo/overnight-2026-11-18/`. See the [handoff](HANDOFF.md#files-created) for the list.
+
+## Commit `21afd32` — feat(contact): each enquiry says which page prompted it
+
+| File | Change | Justification |
+|---|---|---|
+| `src/components/site/journey.ts` (new) | In-memory record of the visit's first page (with any `utm_` parameters), referring host and the page before the current one. No cookies or storage. | [T4](03-technical-seo-audit.md#t4-no-measurement--high), [conversion leak](14-conversion-optimisation.md#current-journey): enquiries could not be traced to pages |
+| `src/components/site/JourneyRecorder.tsx` (new), `src/components/site/SiteShell.tsx` | Records each route change; mounted once in the site shell (every page) | Same |
+| `src/components/home/contact/ContactChat.tsx` | Sends `journey` with the enquiry | Same |
+| `src/lib/enquiry-journey.ts` (new), `src/actions/enquiry.ts` | Server keeps only plain paths and bare host names; adds "First page: … (from host)" and "Page before contact: …" to the email | Untrusted input; checked against hostile values (script URLs, header-injection attempts, non-strings), which are dropped |
+| `src/app/(pages)/privacy/page.tsx`, `src/lib/legal.ts` | Privacy policy lists this information; "Last updated" 18 Nov 2026 | The policy must describe what an enquiry includes. **Owner to approve the wording.** |
+| `tests/e2e/contact.spec.ts`, `tests/e2e/routes.spec.ts` | New test: an enquiry sent after a service page carries that page; privacy `lastmod` expectation | Covers the behaviour |
 
 ## Deliberately not changed
 

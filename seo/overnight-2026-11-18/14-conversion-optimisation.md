@@ -15,7 +15,7 @@ What leaks:
 
 | Leak | Evidence | Fix | Who | Effort |
 |---|---|---|---|---|
-| No record of the page or query behind an enquiry | `enquiry.ts` emails name, email, company, interest and message only | Capture the first landing page, referrer and UTM in `sessionStorage` on arrival and send them with the enquiry; add them to the email | Dev | S–M |
+| No record of the page or query behind an enquiry | `enquiry.ts` emailed name, email, company, interest and message only | **Done locally (commit `21afd32`):** first page (with utm_ parameters), referring host and page before contact, held in memory only, are added to the enquiry email | Dev | Done |
 | Every CTA sends the visitor to the homepage, away from the page they were reading | All CTAs go to `/#contact` | Pre-select the "Interested in" option from the page they came from (pass `?need=automation`), so the form starts where the visitor's thinking is | Dev | S |
 | No proof near the CTA | No case studies; one client link (was dead) | Case studies (Scornik Gerstein; "how we built this site"); a "Recent work" block on the service pages | Owner/Editor | M |
 | No named person | Competitors that convert show the founder | "Who you'll work with" with name, photo and two lines | Owner | S |

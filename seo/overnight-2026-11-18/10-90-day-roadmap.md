@@ -15,7 +15,7 @@ Day 1 is the day the owner starts acting on this plan. Each task names its owner
 | Day 2 | Redirect `.uk` and `www.chinvatbridge.uk` → `https://www.chinvatbridge.com/$path` (301/308) | Owner | R1 | `curl -I` shows the redirect |
 | Day 2 | Search Console: Domain property for `chinvatbridge.com`; Change of Address from `.uk` if it was verified; submit the sitemap. Same in Bing Webmaster Tools. | Owner | R1, R2 | Sitemap "Success" |
 | Day 3 | Request indexing for the four service pages and the homepage | Owner | R2 | Requested |
-| Days 3–5 | Choose analytics (see [measurement](15-measurement-framework.md#tooling)); update the privacy policy; add landing-page capture to enquiries | Owner/Dev | R4 | First enquiry shows its landing page |
+| Days 3–5 | Choose analytics (see [measurement](15-measurement-framework.md#tooling)); approve the privacy-policy line for enquiry attribution, which is already built | Owner/Dev | R4 | First enquiry email shows its first page and referrer |
 | Day 5 | Record the baseline: GSC indexed pages, impressions and clicks (brand vs non-brand), enquiries | Owner | R2 | Baseline row in the tracker |
 | Days 5–7 | Fix the /pricing contradictions and jargon; state VAT | Owner | R6 | Plans read plainly |
 | Day 7 | Upgrade Next.js for the security advisory; rerun the e2e suite | Dev | R20 | Build clean |
@@ -67,6 +67,7 @@ Day 1 is the day the owner starts acting on this plan. Each task names its owner
 - The `.com` fallback in code, the Supabase config and the enquiry email footer
 - Three service pages, wired into the nav, footer, hero, homepage plates, sitemap and articles
 - Homepage title and description
+- Enquiry attribution (first page, referrer, page before contact) in every enquiry email, with a privacy-policy line
 - Article structured data and breadcrumbs
 - The Scornik Gerstein link
 - Six full article drafts ready for review in [editorial/articles](editorial/articles/)

@@ -47,6 +47,7 @@ Softomate (price-led, sprawling), Whitehat (pillar and cluster, high prices), Cl
 - Article structured data linked to the Organization, with image; breadcrumbs from Home.
 - Scornik Gerstein link → `https://www.scornik.com/`.
 - Sitemap includes the new service pages with their own dates.
+- **Enquiry attribution:** every enquiry email now says which page started the visit, the referring site, and the page read just before contacting. It is held in memory only (no cookies or storage), sanitised on the server, and disclosed in the privacy policy.
 
 ## Existing pages optimised
 
@@ -73,17 +74,17 @@ Client credit from Scornik Gerstein; Google Business Profile; LinkedIn page; Clu
 
 ## Tests and verification
 
-Lint pass; typecheck pass; production build pass (Next.js prints a security advisory for 16.4.3); **e2e 280 passed / 0 failed / 95 skipped by design** on desktop, tablet and mobile; rendered metadata, sitemap, robots and visual layout checked; all article references and quoted figures verified against their sources. See [technical verification](technical-verification.md).
+Lint pass; typecheck pass; production build pass (Next.js prints a security advisory for 16.4.3); **e2e 280 passed / 0 failed / 95 skipped by design** on desktop, tablet and mobile for the service-page work, then **76 passed / 0 failed** for the contact, routes and service-page specs after the attribution commit; rendered metadata, sitemap, robots and visual layout checked; all article references and quoted figures verified against their sources. See [technical verification](technical-verification.md).
 
 ## Files created
 
 `seo/overnight-2026-11-18/`: `00-executive-summary.md`, `01-business-positioning.md`, `02-current-seo-baseline.md`, `03-technical-seo-audit.md`, `04-on-page-audit.md`, `05-keyword-research.csv`, `06-keyword-to-url-map.csv`, `07-competitor-analysis.md`, `08-content-gap-analysis.md`, `09-complete-seo-strategy.md`, `10-90-day-roadmap.md`, `11-service-page-strategy.md`, `12-internal-linking-plan.md`, `13-backlink-opportunities.md`, `14-conversion-optimisation.md`, `15-measurement-framework.md`, `source-register.md`, `implementation-log.md`, `technical-verification.md`, `HANDOFF.md`, `editorial/README.md`, `editorial/editorial-calendar.csv`, and six files in `editorial/articles/`.
 
-Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, three `page.tsx` routes under `src/app/(pages)/services/`, `tests/e2e/service-pages.spec.ts`.
+Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, three `page.tsx` routes under `src/app/(pages)/services/`, `tests/e2e/service-pages.spec.ts`, `src/components/site/journey.ts`, `src/components/site/JourneyRecorder.tsx`, `src/lib/enquiry-journey.ts`.
 
 ## Files modified
 
-`src/lib/constants.ts`, `supabase/config.toml`, `src/actions/enquiry.ts`, `src/app/(pages)/insights/[slug]/page.tsx`, `src/app/sitemap.ts`, `src/components/home/work/projects.ts`, `src/components/site/nav.ts`, `src/components/home/hero/content.ts`, `src/data/services.ts`, `src/data/seo-service.ts`, three files in `src/content/blog/posts/`, `tests/e2e/{hero,routes,services,work}.spec.ts`, `docs/redesign/COPY_CHANGES.md`.
+`src/lib/constants.ts`, `supabase/config.toml`, `src/actions/enquiry.ts`, `src/app/(pages)/insights/[slug]/page.tsx`, `src/app/sitemap.ts`, `src/components/home/work/projects.ts`, `src/components/site/nav.ts`, `src/components/home/hero/content.ts`, `src/data/services.ts`, `src/data/seo-service.ts`, three files in `src/content/blog/posts/`, `src/components/site/SiteShell.tsx`, `src/components/home/contact/ContactChat.tsx`, `src/app/(pages)/privacy/page.tsx`, `src/lib/legal.ts`, `tests/e2e/{contact,hero,routes,services,work}.spec.ts`, `docs/redesign/COPY_CHANGES.md`.
 
 ## Decisions requiring human approval
 
@@ -92,7 +93,8 @@ Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, th
 | Canonical domain | `www.chinvatbridge.com`; redirect `.uk` | [T1](03-technical-seo-audit.md#t1-two-live-domains-canonicals-on-the-wrong-one--critical) |
 | Legal entity on the site | Confirm the registered name and number; show the number and registered office; drop "Ltd" if not incorporated | [T5](03-technical-seo-audit.md#t5-company-identity-is-not-verifiable--high-trust-and-compliance) |
 | Service-page claims to confirm before deploying | (a) "scope and cost are agreed before any work starts" for AI, automation and software; (b) automation: "we build in alerts and logs, and write down how each workflow works"; (c) software: support "agreed before the build begins, whether we support it or your own team"; (d) software: "We also designed and built the website of Scornik Gerstein LLP"; (e) "we use Zapier or Make where they fit"; (f) "We’re based in the UK and work remotely with businesses elsewhere" (AI FAQ) | `src/data/service-pages.ts` |
-| Analytics vendor and privacy wording | Cookieless (Vercel Web Analytics or Plausible), plus enquiry landing-page capture | [measurement](15-measurement-framework.md#tooling) |
+| Analytics vendor | Cookieless (Vercel Web Analytics or Plausible) | [measurement](15-measurement-framework.md#tooling) |
+| Privacy-policy line for enquiry attribution (added locally, dated 18 Nov 2026) | Approve or edit: "With a message you send us, the page you were reading, the first page of your visit, and the address of the website that referred you, if any, so we know what prompted it (the page keeps this in memory while you browse; nothing is saved to your device)." | `src/app/(pages)/privacy/page.tsx` |
 | Pricing page copy | Fix the Starter "Basic" vs "Full" audit contradiction; define "asset"; state VAT; drop jargon | [on-page audit](04-on-page-audit.md#pricing) |
 | A productised first engagement | Operations review and/or technical SEO audit, with a published price | [strategy R11](09-complete-seo-strategy.md#recommendations) |
 | Naming the founder | Yes, with a short bio; also as article author | R12 |
@@ -117,11 +119,11 @@ Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, th
 4. **Redirect** `chinvatbridge.uk` and `www.chinvatbridge.uk` to `https://www.chinvatbridge.com` (path-preserving 301/308) in Vercel or Cloudflare.
 5. **Search Console:** Domain property for `chinvatbridge.com`; Change of Address from `.uk` if it was verified; submit the sitemap; request indexing of the four service pages. Bing Webmaster Tools too.
 6. **Confirm the company details** and add them to the footer.
-7. **Choose analytics**, then have the enquiry landing-page capture added.
+7. **Choose analytics** (enquiry attribution is already built; approve its privacy-policy line).
 8. **Fix the /pricing wording.**
 9. **Publish** the spreadsheet article, then the SEO cost guide (process in the [editorial README](editorial/README.md#publishing-an-article-when-approved)).
 10. **Ask Scornik Gerstein** about the case study and credit.
 
 ## Continuation point
 
-If work resumes in a new session: start from the [90-day roadmap](10-90-day-roadmap.md). The next technical task with the most value that needs no owner decision is the **enquiry landing-page and referrer capture** described in [conversion optimisation](14-conversion-optimisation.md#current-journey), implemented in `src/components/home/contact/ContactChat.tsx` and `src/actions/enquiry.ts`, with a privacy-policy sentence drafted for approval. After that comes the **"how we built this site" case study**, whose facts are all in this repository's history.
+If work resumes in a new session: start from the [90-day roadmap](10-90-day-roadmap.md). Enquiry attribution is done. The next task that needs no owner decision is the **"how we built this site" case study**, whose facts are all in this repository's history. Everything else waits on the owner decisions above.
