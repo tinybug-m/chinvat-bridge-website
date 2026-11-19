@@ -159,8 +159,25 @@ function collisions(points: Pt[], obstacles: Box[], from: Box[] | null, to: Box[
   let last = points.length - 1;
   if (from) while (first < points.length && inAny(points[first], from)) first++;
   if (to) while (last > first && inAny(points[last], to)) last--;
+  // Only a box that overlaps the samples' bounding box can hold one of them. Routing tries a great
+  // many curves against every text box on the page, so this cut is what keeps it off the main
+  // thread's long tasks; the count is exactly what testing every box would give.
+  let x0 = Infinity;
+  let y0 = Infinity;
+  let x1 = -Infinity;
+  let y1 = -Infinity;
+  for (let i = first; i <= last; i++) {
+    const p = points[i];
+    if (p.x < x0) x0 = p.x;
+    if (p.x > x1) x1 = p.x;
+    if (p.y < y0) y0 = p.y;
+    if (p.y > y1) y1 = p.y;
+  }
+  const near = obstacles.filter(
+    (b) => b.x0 - CLEARANCE < x1 && b.x1 + CLEARANCE > x0 && b.y0 - CLEARANCE < y1 && b.y1 + CLEARANCE > y0,
+  );
   let hits = 0;
-  for (let i = first; i <= last; i++) for (const b of obstacles) if (inside(points[i], b, CLEARANCE)) hits++;
+  for (let i = first; i <= last; i++) for (const b of near) if (inside(points[i], b, CLEARANCE)) hits++;
   return hits;
 }
 
@@ -241,20 +258,32 @@ function hop(outs: Port[], ins: Port[], obstacles: Box[], from: Box[] | null, to
   const grid = new Set<number>([lane, width - lane]);
   for (let x = lane + 12; x <= width - lane; x += width < 640 ? 12 : 24) grid.add(x);
 
+  const curve = (c: Cubic | null, arrive: Dir, ff: Box[] | null, tt: Box[] | null): Curve | null => {
+    if (!c) return null;
+    const pts = sample([{ kind: "cubic", c }]);
+    return {
+      c,
+      length: pts[pts.length - 1].at,
+      cost: cramp(c, arrive) + collisions(pts, obstacles, ff, tt) * 10000,
+    };
+  };
+  // A lane's curves in from p depend only on p, and its curves out to q only on q, so each is
+  // worked out once per port and lane rather than again for every pairing of ports.
+  const intoCache = new Map<Port, Map<number, (Curve | null)[]>>();
+  const exitCache = new Map<Port, Map<number, (Curve | null)[]>>();
+  const cached = (cache: Map<Port, Map<number, (Curve | null)[]>>, port: Port, x: number, make: () => (Curve | null)[]) => {
+    let byLane = cache.get(port);
+    if (!byLane) cache.set(port, (byLane = new Map()));
+    let curves = byLane.get(x);
+    if (!curves) byLane.set(x, (curves = make()));
+    return curves;
+  };
+
   for (const p of outs) {
     const f = from?.filter((b) => inside(p, b, CLEARANCE)) ?? null;
     for (const q of ins) {
       const t = to?.filter((b) => inside(q, b, CLEARANCE)) ?? null;
       const runObstacles = obstacles.filter((b) => !f?.includes(b) && !t?.includes(b));
-      const curve = (c: Cubic | null, arrive: Dir, ff: Box[] | null, tt: Box[] | null): Curve | null => {
-        if (!c) return null;
-        const pts = sample([{ kind: "cubic", c }]);
-        return {
-          c,
-          length: pts[pts.length - 1].at,
-          cost: cramp(c, arrive) + collisions(pts, obstacles, ff, tt) * 10000,
-        };
-      };
       const penalty = (p.penalty ?? 0) + (q.penalty ?? 0);
 
       const direct = curve(connector(p, p.dir, q, q.dir), q.dir, f, t);
@@ -268,14 +297,18 @@ function hop(outs: Port[], ins: Port[], obstacles: Box[], from: Box[] | null, to
       const exitAt = new Map<number, Curve>();
       for (const x of lanes) {
         if (x < lane || x > width - lane) continue;
-        const intos = SPANS.map((h) => curve(connector(p, p.dir, { x, y: p.y + h }, "down"), "down", f, null));
+        const intos = cached(intoCache, p, x, () =>
+          SPANS.map((h) => curve(connector(p, p.dir, { x, y: p.y + h }, "down"), "down", f, null)),
+        );
         const cheapest = (cs: (Curve | null)[]) =>
           cs.reduce<Curve | null>((m, c) => (c && (!m || c.length + c.cost < m.length + m.cost) ? c : m), null);
         const into = cheapest(intos);
         if (into) intoAt.set(x, into);
         if (q.dir === "right" && q.x - x < MIN_RUN) continue;
         if (q.dir === "left" && x - q.x < MIN_RUN) continue;
-        const exits = SPANS.map((h) => curve(connector({ x, y: q.y - h }, "down", q, q.dir), q.dir, null, t));
+        const exits = cached(exitCache, q, x, () =>
+          SPANS.map((h) => curve(connector({ x, y: q.y - h }, "down", q, q.dir), q.dir, null, t)),
+        );
         const exit = cheapest(exits);
         if (exit) exitAt.set(x, exit);
         for (const i of intos) {
