@@ -22,7 +22,7 @@ No production publication, deployment, GitHub push, email, message or external o
 2. Three of the four services had **no indexable page**.
 3. **No analytics** of any kind, so qualified enquiries can't be traced to pages.
 4. The only real client link was **dead** (`scornik.vercel.app` → `DEPLOYMENT_NOT_FOUND`).
-5. **No Companies House record** for "Chinvat Bridge", although the footer says "Chinvat Bridge Ltd"; there is no company number or registered office on the site.
+5. **No Companies House record** for "Chinvat Bridge", although the footer said "Chinvat Bridge Ltd". Resolved 19 Nov 2026: the business is not a limited company, so "Ltd" was removed from the footer, checkout footer, terms and Organization schema (`legalName` dropped).
 6. The homepage title led with a brand name whose search results are entirely Zoroastrian mythology.
 7. Technical hygiene is otherwise good: clean metadata, correct noindex on private pages, real sitemap dates, LCP and CLS within thresholds. The homepage carries about 1.7 s of mobile main-thread work in lab tests.
 
@@ -104,7 +104,6 @@ Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, th
 | Decision | Recommendation | Where |
 |---|---|---|
 | Canonical domain | `www.chinvatbridge.com`; redirect `.uk` | [T1](03-technical-seo-audit.md#t1-two-live-domains-canonicals-on-the-wrong-one--critical) |
-| Legal entity on the site (**blocker** for directory listings, Clutch and any outreach; not introduced by this branch, but it should be fixed before or with the deploy) | Confirm the registered name and number. If incorporated: show the number and registered office (Company, LLP and Business (Names and Trading Disclosures) Regulations 2015). If not: remove "Ltd" from the footer, terms, checkout shell and schema. | [T5](03-technical-seo-audit.md#t5-company-identity-is-not-verifiable--high-trust-and-compliance) |
 | Service-page commitments to confirm before deploying | **Engagement:** scope and cost agreed before any work starts (all three). **AI:** answers "show where each answer came from"; "after launch we check it against" the agreed measure; data handling (where data is processed, retention, training use, keeping personal data out of AI steps). **Automation:** alerts, logs and written documentation for each workflow; using Zapier or Make where they fit; the data-handling FAQ. **Software:** testing "with them before it replaces anything"; development "in short cycles, shown to you as it takes shape"; support "agreed before the build begins"; "We also designed and built the website of Scornik Gerstein LLP". **All:** "We’re based in the UK and work remotely with businesses elsewhere". | `src/data/service-pages.ts` |
 | Analytics vendor | Cookieless (Vercel Web Analytics or Plausible) | [measurement](15-measurement-framework.md#tooling) |
 | Privacy-policy line for enquiry attribution (added locally, dated 18 Nov 2026) | Approve or edit: "With a message you send us, the page you were reading, the first page of your visit (including any campaign tags in the link you followed), and the name of the website that referred you, if any, so we know what prompted it. The page keeps this in memory while you browse; nothing is saved to your device." | `src/app/(pages)/privacy/page.tsx` |

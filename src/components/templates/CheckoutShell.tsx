@@ -26,7 +26,7 @@ export function CheckoutShell({ children }: { children: ReactNode }) {
       <footer className="border-t border-line bg-paper-raised">
         <Container className="py-6">
           <p className="text-small text-ink-muted">
-            &copy; {new Date().getFullYear()} Chinvat Bridge Ltd. All rights reserved.
+            &copy; {new Date().getFullYear()} Chinvat Bridge. All rights reserved.
           </p>
         </Container>
       </footer>

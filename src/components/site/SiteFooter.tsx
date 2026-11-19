@@ -63,7 +63,7 @@ export function SiteFooter() {
       <Container className="flex flex-col gap-2 pb-6 text-small text-ink-muted lg:flex-row lg:items-center lg:justify-between">
         <p>UK Based // Working Globally</p>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-          <p>&copy; {year} Chinvat Bridge Ltd. All rights reserved.</p>
+          <p>&copy; {year} Chinvat Bridge. All rights reserved.</p>
           <Link href="/privacy" prefetch={false} className="inline-flex min-h-11 items-center transition-[color,text-decoration-color] duration-200 ease-out-quart hover:text-ink motion-reduce:transition-none">
             Privacy Policy
           </Link>

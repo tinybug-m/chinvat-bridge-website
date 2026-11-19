@@ -3,4 +3,4 @@
  * sitemap uses it as lastmod, so change it here whenever the document's text changes.
  */
 export const PRIVACY_UPDATED = "2026-11-18";
-export const TERMS_UPDATED = "2026-09-14";
+export const TERMS_UPDATED = "2026-11-19";

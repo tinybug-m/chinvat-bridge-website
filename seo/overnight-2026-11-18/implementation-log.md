@@ -53,7 +53,6 @@ Everything under `seo/overnight-2026-11-18/`. See the [handoff](HANDOFF.md#files
 | `NEXT_PUBLIC_SITE_URL` in Vercel and `.env.local` | Production configuration and the owner's credentials file |
 | Homepage H1 | Design-critical; options in the [on-page audit](04-on-page-audit.md#h1-options-for-the-owner) |
 | Pricing plan copy | Lives in the production database; pricing changes need approval |
-| Footer "Ltd", company number and address | The facts aren't confirmed (T5) |
 | Analytics | Vendor and privacy-policy choice for the owner |
 | Homepage performance work | No field evidence of harm; design-critical code (T10) |
 | robots.txt AI-crawler rules | Policy choice (T11) |
@@ -108,3 +107,7 @@ Two moderate advisories (GHSA-mfr8-8qww-v76h, GHSA-vc7v-qv4w-wrv8) affect 16.2.0
 - T10 now records a CPU profile of the homepage, with the energy wire's relayout identified as the longest task and a specific fix to apply when field data justifies it.
 - Enquiry and monthly tracker templates (`measurement-tracker-*.csv`).
 - The editorial README describes the draft-in-code workflow.
+
+## 19 Nov 2026: "Ltd" removed
+
+The owner confirmed the business is not a limited company. "Ltd" was removed from `SiteFooter.tsx`, `CheckoutShell.tsx` and the terms page; `legalName` was dropped from the Organization JSON-LD in `src/app/layout.tsx`; `TERMS_UPDATED` moved to 2026-11-19. This closes the T5 blocker.

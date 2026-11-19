@@ -27,7 +27,7 @@ export default function TermsOfServicePage() {
         </aside>
         <Prose className="lg:col-span-7 lg:col-start-4">
           <p className="text-lede text-ink">
-            These terms govern your use of subscription services provided by Chinvat Bridge Ltd
+            These terms govern your use of subscription services provided by Chinvat Bridge
             (&ldquo;we&rdquo;, &ldquo;us&rdquo;), a UK-based technology consultancy. By subscribing to a
             plan, you agree to these terms.
           </p>

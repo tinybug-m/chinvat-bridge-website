@@ -39,7 +39,6 @@ const jsonLd = {
       "@type": "Organization",
       "@id": ORGANIZATION_ID,
       name: SITE_NAME,
-      legalName: "Chinvat Bridge Ltd",
       description: `${SITE_DESCRIPTION} ${SITE_ORIGIN}`,
       url: SITE_URL,
       logo: `${SITE_URL}/brand/chinvat-bridge-mark.png`,
