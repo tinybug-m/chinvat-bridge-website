@@ -126,7 +126,7 @@ Lab numbers on this machine under emulated throttling; they show the direction a
 | Every page reached from `/` | 200 (or the expected 307 to /login or /pricing); none 4xx/5xx |
 | Titles | `/pricing` "SEO Packages & Pricing — Chinvat Bridge"; `/services/seo` "SEO Services for UK Small Businesses — Chinvat Bridge"; `/insights` "Insights: AI, Automation, Software & SEO for SMEs — Chinvat Bridge"; others unchanged |
 | JSON-LD (parsed, every page) | Valid. Organization + WebSite on every page (no `legalName`); Service + BreadcrumbList on the four service pages; BreadcrumbList on /pricing; CollectionPage + BreadcrumbList on /insights; Article + BreadcrumbList on articles. No Review, AggregateRating or Person. |
-| Private routes | `/login`, `/client-portal`, `/subscribe/*`, design studies: `noindex, nofollow`; `/dashboard`, `/admin` redirect to `/login`; 404 now carries one robots tag |
+| Private routes | `/login`, `/client-portal`, `/subscribe/*`, design studies: `noindex, nofollow`; `/dashboard`, `/admin` redirect to `/login`; 404's own robots tag removed. **Wrong:** 404s then inherited the layout's `index, follow` beside Next.js's `noindex`; corrected in the [pre-deployment audit](#19-nov-2026-pre-deployment-audit) |
 | Drafts in production | 404; not in the sitemap or the Insights index; not linked from any service page or article (draft-only `WhenPublished` sentences render nothing) |
 | Drafts under `next dev` | Render with "Draft, not published", every cross-link in place; service pages list them |
 | Verification meta | Not emitted when `GOOGLE_SITE_VERIFICATION` / `BING_SITE_VERIFICATION` are unset |
@@ -150,3 +150,46 @@ Lab numbers on this machine under emulated throttling; they show the direction a
 | Trace of a failure | 27 scroll steps; each `page.evaluate(scrollTo)` 0.3–7 s, waiting on a main thread busy with software WebGL; the reveal order was never wrong |
 | After `test.slow()`, run once | **Passed (54.1 s)** |
 | Complete suite after that last change | **Not run** (owner's instruction) |
+
+## 19 Nov 2026: pre-deployment audit
+
+An independent review of `main...0b4dd43` (21 commits; `main` at `64a4fc0`, unchanged locally and on GitHub). Runs against a local production build (`NEXT_PUBLIC_SITE_URL=https://www.chinvatbridge.com pnpm build`, then `next start`), Next.js 16.4.5. The live domains were checked read-only with `curl`.
+
+| Check | Result |
+|---|---|
+| Git state | Clean tree; `HEAD` `0b4dd43`, as reported; branch not pushed |
+| Secrets and stray files in the diff | None: no key- or token-shaped strings; no env file other than `.env.example` (blank values); no deletions, renames or mode changes. The only binaries are the four H1 screenshots in `assets/`, which the site doesn't serve. The only email address is the public contact address |
+| `pnpm lint`, `pnpm typecheck`, production build | Pass, pass, pass first time; 37 static pages; only the five published articles generated |
+| `pnpm audit --prod` | No known vulnerabilities |
+| Built output | No `.uk` string anywhere in the build. On all 14 sitemap pages, canonical and `og:url` equal the sitemap URL; JSON-LD parses on every page, with no `legalName`, Review or AggregateRating; no title names a country |
+| Drafts | All ten `draft: true`; each returns 404; none in the sitemap, `/insights` or the homepage; the three links from published articles to drafts are inside `WhenPublished` |
+| Sign-in and Stripe returns | Magic-link, Google sign-in and Stripe success/cancel URLs come from `getSiteOrigin()`, which returns `SITE_URL` in production; the auth callback redirects on the origin it was reached on |
+| Focused e2e: `routes`, `service-pages`, `services`, `insights`, `hero`, `work`, `contact` (desktop, tablet, mobile) | **159 passed, 0 failed**, 75 skipped by the specs' own per-viewport conditions (7.0 min) |
+| "The energy wire reveals the plates in order" (run only once after `test.slow()`) | **3 passed** of 3: desktop 44.3 s, tablet 22.7 s, mobile 27.1 s |
+| Robots tags on 404 responses | **Regression:** `noindex` (from Next.js) and `index, follow` (inherited from the root layout), since `20d596c` removed the not-found page's own robots. The "404 now carries one robots tag" entry above was wrong |
+| Complete suite | Not run: no change called for it |
+
+### After the 404 fix
+
+`robots: { index: false, follow: false }` restored in `src/app/not-found.tsx`.
+
+| Check | Result |
+|---|---|
+| `pnpm lint`, `pnpm typecheck`, production build | Pass, pass, pass |
+| Built `_not-found.html`, and served 404s (`/this-does-not-exist`, `/services/nope`, a draft URL) | `noindex` and `noindex, nofollow`: two tags that agree, as on `main` |
+| Crawl of the build (14 sitemap URLs, ten draft URLs, private routes) | Canonical, `og:url`, robots and JSON-LD unchanged and correct; drafts 404; private routes `noindex, nofollow` |
+| `routes` spec | **33 passed, 0 failed**, 66 skipped by the spec's own per-viewport conditions |
+
+### Live domains (read-only, 17:54 and 18:06 UTC)
+
+| Check | Result |
+|---|---|
+| `www.chinvatbridge.com` | Production has been redeployed with the `.com` variable: canonical and `og:url` `https://www.chinvatbridge.com`; robots `Sitemap: https://www.chinvatbridge.com/sitemap.xml`; every sitemap URL on `.com`. Still `main`'s code (old title; the three new service pages return 404) |
+| `chinvatbridge.uk` and `www.chinvatbridge.uk`, on `http` and `https` | 301 to `https://www.chinvatbridge.com/<same path>`, **query string dropped** (`/auth/callback?code=TEST…` → `/auth/callback`), answered by Cloudflare with no cache headers. The owner reports "Preserve query string" on; it is not in effect |
+| `www.chinvatbridge.uk/robots.txt` | 200, Cloudflare's managed file: Googlebot and Bingbot allowed, so they can follow the redirects |
+| `chinvatbridge.com` → `www`; `http` → `https` | 308, path and query kept |
+
+### Not verified
+
+- Supabase Site URL and redirect allowlist, reported done by the owner: production's Supabase project isn't visible from outside, and checking it would mean sending a sign-in email.
+- The Stripe dashboard: the webhook endpoint, and any return URLs set there.

@@ -1,22 +1,51 @@
 # Handoff
 
 **Session:** 18 November 2026. **Branch:** `seo/overnight-2026-11-18` (from `main` at `64a4fc0`; `main` is untouched).
-**Status:** the research, strategy, technical audit, three service pages, technical fixes, enquiry attribution, nine article drafts and a case study are complete and verified locally. **19 November 2026:** an implementation pass (below) finished the website-side work the strategy calls for. Owner actions are needed before any of it reaches the live site; the infrastructure steps are in the [owner infrastructure checklist](OWNER-INFRASTRUCTURE-CHECKLIST.md).
+**Status:** the research, strategy, technical audit, three service pages, technical fixes, enquiry attribution, nine article drafts and a case study are complete and verified locally. **19 November 2026:** an implementation pass (below) finished the website-side work the strategy calls for. Owner actions are needed before any of it reaches the live site; the infrastructure steps are in the [owner infrastructure checklist](OWNER-INFRASTRUCTURE-CHECKLIST.md). **19 November 2026, evening:** an independent [pre-deployment audit](#19-november-2026-pre-deployment-audit) found the branch ready to merge once the copy is approved, and fixed one regression (the 404 robots tag).
 
 ## Confirmation
 
 No production publication, deployment, GitHub push, email, message or external outreach occurred. No account was created, no form was submitted, and no CMS, database, DNS, hosting, pricing or credential was changed. All research was read-only. Changes are local commits on a new branch, plus documents in this folder.
 
-## Urgent: the live site right now (verified 19 Nov 2026, 10:45 UTC)
+## The live site now (re-verified 19 Nov 2026, 18:06 UTC)
 
-The `.uk` → `.com` redirect has been switched on in Cloudflare, but it **drops the query string**, while production still uses `.uk` as its own address (`NEXT_PUBLIC_SITE_URL`; `main`'s fallback is also `.uk`). Together these very likely **break client sign-in** (the `?code=` on `/auth/callback` is lost) and **the page after a Stripe checkout** (`?session_id=` is lost). They also make every live `.com` canonical point at a URL that redirects. Inferred from the code and the observed redirect; not tested end to end, because that would send a real sign-in email.
+At 10:45 UTC the `.uk` redirect dropped the query string while production still used `.uk` as its own address, which very likely broke sign-in and the page after checkout. The owner has since reported doing all three urgent fixes. What can be seen from outside (read-only):
 
-Fix in this order (exact steps in the [owner infrastructure checklist](OWNER-INFRASTRUCTURE-CHECKLIST.md#do-these-first-urgent)):
-1. Cloudflare → `chinvatbridge.uk` → Rules → the redirect rule → **Preserve query string: on**.
-2. Supabase: Site URL `https://www.chinvatbridge.com`, add `https://www.chinvatbridge.com/**`.
-3. Vercel: `NEXT_PUBLIC_SITE_URL=https://www.chinvatbridge.com` (Production) and **redeploy**. Current `main` already reads the variable, so this fixes canonicals, sitemap, robots, sign-in links and Stripe returns before the branch is merged.
+| Item | Status | Evidence |
+|---|---|---|
+| Vercel `NEXT_PUBLIC_SITE_URL` (Production) and redeploy | **Done and in effect** | Live `https://www.chinvatbridge.com/` (still `main`'s code) has canonical and `og:url` `https://www.chinvatbridge.com`; robots and the sitemap name only `.com` URLs |
+| Supabase Site URL and `.com` redirect allowlist | **Reported done; not verifiable from outside** without sending a sign-in email | Sign in once at `/login` after the deploy ([checklist](OWNER-INFRASTRUCTURE-CHECKLIST.md#1-supabase-site-url-and-redirect-urls), step 5) |
+| Cloudflare "Preserve query string" on the `.uk` redirect | **Reported on, but not in effect.** Both `.uk` hosts still 301 to the right `.com` path without the query | `https://www.chinvatbridge.uk/auth/callback?code=TEST…` → `https://www.chinvatbridge.com/auth/callback` at 17:54 and 18:06 UTC, answered by Cloudflare with no cache headers |
 
-Already correct and verified: `.com` apex → `www` (308, path and query kept, by Vercel); `http` → `https`; `www.chinvatbridge.com` served by Vercel with HSTS; no website DNS change needed; mail records unchanged.
+Production now builds sign-in links and Stripe returns on `.com`, so new sign-ins and checkouts no longer pass through the `.uk` redirect. The lost query now affects older `.uk` links that carry parameters (campaign tags, shared links). Fix it before the Search Console Change of Address: in the `chinvatbridge.uk` zone, check that the rule's "Preserve query string" is saved and deployed, and that no other rule (another redirect rule, a Page Rule or a Bulk Redirect) answers first.
+
+**Check the Stripe dashboard today:** the webhook endpoint must be `https://www.chinvatbridge.com/api/webhooks/stripe`. If it still names `.uk`, every delivery since the redirect went live got a 301, which Stripe treats as a failed delivery, and this webhook is what provisions a paying customer's account. Resend any failed events from the dashboard.
+
+Re-checked at 17:54 UTC: `.com` apex → `www` (308, path and query kept, by Vercel); `http` → `https`; `www.chinvatbridge.com` served by Vercel with HSTS. From the 10:45 check: no website DNS change needed; mail records unchanged.
+
+## 19 November 2026: pre-deployment audit
+
+An independent review of the whole branch (`main...0b4dd43`, 21 commits) before merging, with a read-only check of the live domains. Details in [technical verification](technical-verification.md#19-nov-2026-pre-deployment-audit).
+
+**Ready to merge** once the owner approves the copy listed under [decisions](#decisions-requiring-human-approval): the service-page commitments and the privacy-policy line. Nothing else found needs a code change.
+
+**Fixed: the 404 robots tag.** The implementation pass (`20d596c`) removed the not-found page's own `robots`, reasoning that Next.js already marks 404s `noindex`. Without it the page inherited the root layout's `index, follow`, so every 404, draft URLs included, carried two contradictory tags: `noindex` and `index, follow`. The practical effect was small (a 404 status is never indexed, and Google applies the more restrictive directive), but the earlier note that the 404 "now carries one robots tag" was wrong. `robots: { index: false, follow: false }` is restored in `src/app/not-found.tsx`. 404s now carry `noindex` and `noindex, nofollow`, which agree, as on `main`.
+
+**Confirmed:**
+- No secrets, env files, deletions or stray files in the diff.
+- Every canonical, `og:url`, structured-data URL, sitemap entry and robots line in the build is `https://www.chinvatbridge.com`; there is no `.uk` string in the build output.
+- The four service pages are indexable, distinctly named, and name no country in their titles.
+- All ten drafts 404 in production and are absent from the sitemap, Insights and the homepage.
+- Sign-in and Stripe return URLs follow `NEXT_PUBLIC_SITE_URL` in production.
+- Lint, typecheck, build, the focused tests and `pnpm audit --prod` pass.
+
+**Commits to merge:** all 22 on the branch, from `445b617` to this audit's commit, onto `main` at `64a4fc0`. `main` is unchanged locally and on GitHub, so a fast-forward is possible. The branch has not been pushed.
+
+**Left as they are, for the owner:**
+- Three published articles (already on `main`) whose descriptions still address UK businesses specifically ("small UK businesses", "a UK small business website", "mid-sized UK businesses"); `/insights` shows them too.
+- `docs/redesign/COPY_CHANGES.md` still lists the superseded "for UK SMEs" title, and the [implementation log](implementation-log.md) still records the 404 robots removal as a fix.
+- The [owner checklist](OWNER-INFRASTRUCTURE-CHECKLIST.md)'s "Status at a glance" describes the 10:45 state; the current state is in [the live site now](#the-live-site-now-re-verified-19-nov-2026-1806-utc).
+- The local `.env.local` still sets `NEXT_PUBLIC_SITE_URL=https://www.chinvatbridge.uk`, so a local build without an override emits `.uk` URLs. Production is unaffected.
 
 ## 19 November 2026: final focused review
 
@@ -52,7 +81,7 @@ Commits `5bd0645` (owner-confirmed "Ltd" removal, committed as it stood), `1e8c8
 - **/pricing:** title "SEO Packages & Pricing"; a "Billing and terms" summary taken from the terms (monthly billing, tax excluded and added at checkout where relevant, 30 days' notice, no guarantees); links to the three quoted services; breadcrumbs. Prices and plan wording untouched.
 - **Articles:** draft-to-draft links can no longer 404 whatever the publishing order (`WhenPublished`). Each service page already lists its drafts and shows them from publication day. A published article's "full technical audit on every tier" claim corrected and its missing service-page link added. Sibling links added. The SEO cost draft follows the terms on tax instead of asserting VAT.
 - **Structured data:** breadcrumbs on /pricing and /insights; fuller CollectionPage; articles part of the WebSite; one breadcrumb builder. No ratings, reviews or invented credentials anywhere; no `legalName`.
-- **Indexing:** canonical, Open Graph, schema, sitemap and robots all `https://www.chinvatbridge.com` in the build; private routes `noindex`; the duplicate 404 robots tag removed; optional Search Console and Bing meta-tag verification via environment variables.
+- **Indexing:** canonical, Open Graph, schema, sitemap and robots all `https://www.chinvatbridge.com` in the build; private routes `noindex`; the 404's own robots tag removed (a mistake: it made 404s inherit `index, follow`; restored in the [pre-deployment audit](#19-november-2026-pre-deployment-audit)); optional Search Console and Bing meta-tag verification via environment variables.
 - **Tests:** all ten drafts guarded; a new check that no sitemap page links to a missing internal page.
 
 **Found while preparing the owner checklist (not changed):** both domains' DNS is on Cloudflare. The `.com` apex already 308-redirects to `www` with the path kept. Both `.uk` hosts still serve the full site. On `.com`, the SPF record authorises only Namecheap's forwarder although Google Workspace receives the mail, and there is no DMARC record. Worth a look for deliverability; see the checklist.
@@ -130,6 +159,8 @@ Client credit from Scornik Gerstein; LinkedIn page; Clutch free profile; Google 
 
 ## Tests and verification
 
+**19 Nov 2026, pre-deployment audit:** lint, types and build pass; the focused specs (`routes`, `service-pages`, `services`, `insights`, `hero`, `work`, `contact`) 159 passed, 0 failed, 75 skipped by design; the energy-wire test passed on all three viewports. After the 404 fix: lint, types and build pass, and `routes` 33 passed, 0 failed, 66 skipped by design. The full suite was not re-run. Details in [technical verification](technical-verification.md#19-nov-2026-pre-deployment-audit).
+
 **19 Nov 2026, final:** lint, types and build pass. The contact-form timing dependency is fixed in the spec. The last complete run: 287 passed, 1 failed (the energy-wire test timing out, since given `test.slow()`; it passed when run once afterwards), 99 skipped by design. Details in the [final focused review](#19-november-2026-final-focused-review). Earlier results follow.
 
 - Lint, typecheck and production build pass. Next.js prints a security advisory for 16.4.3 and stops the first build attempt; the re-run completes.
@@ -154,6 +185,8 @@ Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, th
 `src/lib/constants.ts`, `supabase/config.toml`, `src/actions/enquiry.ts`, `src/app/(pages)/insights/[slug]/page.tsx`, `src/app/sitemap.ts`, `src/components/home/work/projects.ts`, `src/components/site/nav.ts`, `src/components/home/hero/content.ts`, `src/data/services.ts`, `src/data/seo-service.ts`, three files in `src/content/blog/posts/`, `src/components/site/SiteShell.tsx`, `src/components/home/contact/ContactChat.tsx`, `src/app/(pages)/privacy/page.tsx`, `src/lib/legal.ts`, `tests/e2e/{contact,hero,routes,services,work}.spec.ts`, `docs/redesign/COPY_CHANGES.md`.
 
 19 Nov: `src/components/home/services/energy/route.ts`, `src/components/organisms/sections/Pricing.tsx`, `src/app/(pages)/pricing/page.tsx`, `src/app/(pages)/insights/page.tsx`, `src/app/(pages)/insights/[slug]/page.tsx`, `src/app/layout.tsx`, `src/app/not-found.tsx`, `src/components/services/structured-data.tsx`, `src/components/site/nav.ts`, `src/data/service-pages.ts`, `src/data/seo-service.ts`, ten files in `src/content/blog/posts/`, `.env.example`, `tests/e2e/{routes,service-pages}.spec.ts`; in this folder, `HANDOFF.md`, `implementation-log.md`, `technical-verification.md`, `03-technical-seo-audit.md`, `pricing-copy-proposal.md`, `editorial/README.md`.
+
+19 Nov, pre-deployment audit: `src/app/not-found.tsx` (robots restored); in this folder, `HANDOFF.md`, `technical-verification.md`.
 
 ## Decisions requiring human approval
 
@@ -181,7 +214,7 @@ Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, th
 
 ## Exact next actions
 
-1. **Today:** the three [urgent fixes](OWNER-INFRASTRUCTURE-CHECKLIST.md#do-these-first-urgent): Cloudflare "Preserve query string", Supabase URLs, and the Vercel variable with a redeploy. Sign-in and checkout returns depend on the first.
+1. **Today:** see [the live site now](#the-live-site-now-re-verified-19-nov-2026-1806-utc). The Vercel variable is in effect and Supabase is reported done. Cloudflare's "Preserve query string" is not yet in effect, so check the rule. Check that the Stripe webhook endpoint is on `.com`.
 2. **Read and approve** the service-page copy in `src/data/service-pages.ts` (about 20 minutes), checking the commitments listed above. Then merge the branch and deploy, and work through the rest of the [owner infrastructure checklist](OWNER-INFRASTRUCTURE-CHECKLIST.md): Vercel domains, Search Console (sitemap, Change of Address) and Bing. Keep every mail record.
 3. **Choose analytics** (enquiry attribution is already built; approve its privacy-policy line).
 4. **Fix the /pricing plan wording** in the database (the page-level part is done).
