@@ -24,11 +24,49 @@ async function fillContact(page: Page, name: string, email: string, company = ""
   await contact(page).getByLabel("Name").fill(name);
   await contact(page).getByLabel("Email").fill(email);
   if (company) await contact(page).getByLabel(/Company/).fill(company);
+  // A message sent within three seconds of the conversation opening is treated as a bot and quietly
+  // "succeeds" without being processed (actions/enquiry.ts). Moving the page's clock past that
+  // window means every send takes the real path, however fast or slow the run is.
+  await page.clock.fastForward(3_000);
   await contact(page).getByRole("button", { name: "Send message" }).click();
 }
 
+/*
+ * The suite runs against a production build with no mail credentials, where the enquiry action
+ * ends at its mail step with "unavailable". Each send still goes to the real server action
+ * (validation, rate limit, composing the email); only that one outcome, which means "no mail
+ * transport here", is replaced with "sent". Any other result (invalid, limited, error) reaches the
+ * page as it is, so a real failure still fails the test.
+ */
+const NO_MAIL_TRANSPORT = /\{"status":"unavailable","message":"[^"]*"\}/;
+async function stubMailDelivery(page: Page) {
+  await page.route("**/*", async (route) => {
+    if (route.request().method() !== "POST" || !route.request().headers()["next-action"]) return route.fallback();
+    const response = await route.fetch();
+    await route.fulfill({ response, body: (await response.text()).replace(NO_MAIL_TRANSPORT, '{"status":"sent"}') });
+  });
+}
+
+/*
+ * The action allows five sends per client address per ten minutes, keyed on x-forwarded-for, and
+ * remembers them in the server's memory. Each test sends from its own address in the IPv6
+ * documentation range (RFC 3849), with a random segment per run, so no two tests share that
+ * allowance, even across runs against the same long-lived server.
+ */
+const hex4 = () => Math.floor(Math.random() * 0x10000).toString(16);
+const RUN = `2001:db8:${hex4()}:${hex4()}`;
+let client = 0;
+
 test.describe("contact section", () => {
   test.use({ reducedMotion: "reduce" });
+
+  test.beforeEach(async ({ page }, testInfo) => {
+    client += 1;
+    await page.setExtraHTTPHeaders({ "x-forwarded-for": `${RUN}:${testInfo.parallelIndex.toString(16)}::${client.toString(16)}` });
+    // The real clock keeps running; fillContact only moves it forward.
+    await page.clock.install();
+    await stubMailDelivery(page);
+  });
 
   test("shows the closing heading, direct details and the first question with topics", async ({ page }) => {
     await page.goto("/");

@@ -135,3 +135,18 @@ Lab numbers on this machine under emulated throttling; they show the direction a
 ### Live domains (read-only, 19 Nov 2026)
 
 `https://chinvatbridge.com/insights?x=1` → 308 → `https://www.chinvatbridge.com/insights?x=1` (apex to www already correct). `https://chinvatbridge.uk/…` → 308 → `https://www.chinvatbridge.uk/…`, and `https://www.chinvatbridge.uk/…` → 200 (still a second copy). Production canonical still `.uk` (the branch isn't deployed). DNS for both domains is on Cloudflare. See the [owner infrastructure checklist](OWNER-INFRASTRUCTURE-CHECKLIST.md).
+
+## 19 Nov 2026: final focused review
+
+| Check | Result |
+|---|---|
+| Lint, typecheck | Pass |
+| Production build (international positioning copy) | Pass; titles and descriptions checked on the rendered pages |
+| Contact spec after the fix, `--repeat-each 5` | 135 passed, 0 failed |
+| Raw action response probe | With the clock fast-forward: `{"status":"unavailable",…}` (real server path, then stubbed); without: `{"status":"sent"}` (bot branch) |
+| Full suite, first run after the contact fix | 285 passed, 3 failed: desktop contact tests rate-limited because addresses repeated across runs on the same server. Fixed with per-run IPv6 documentation addresses. |
+| Full suite, second run | **287 passed, 1 failed, 99 skipped by design** (21.5 min). All contact tests passed. Failure: method "energy wire reveals the plates in order" (desktop), 60 s timeout in its scroll loop. |
+| That test, isolated, before the fix | 6 passed, 2 failed out of 8; passing runs 54–57 s |
+| Trace of a failure | 27 scroll steps; each `page.evaluate(scrollTo)` 0.3–7 s, waiting on a main thread busy with software WebGL; the reveal order was never wrong |
+| After `test.slow()`, run once | **Passed (54.1 s)** |
+| Complete suite after that last change | **Not run** (owner's instruction) |

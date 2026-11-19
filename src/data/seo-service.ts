@@ -15,9 +15,9 @@ export const SEO_SERVICE = {
   name: "SEO & Digital Growth",
   /** When this page's content last changed (sitemap lastmod). */
   updated: "2026-11-19",
-  title: "SEO Services for UK Small Businesses",
+  title: "SEO Services for Small Businesses",
   description:
-    "SEO services for UK small businesses: technical SEO, content strategy, link building and digital PR, on a monthly plan with published prices or a custom scope.",
+    "SEO services for small businesses, from a UK-based team: technical SEO, content strategy, link building and digital PR, on a monthly plan or a custom scope.",
   h1: "SEO that makes your business easier to find",
   lede: "We fix what stops search engines understanding your site, plan and write content around what your customers search for, and build authority through link building and digital PR.",
 } as const;

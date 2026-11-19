@@ -7,7 +7,7 @@ import { pageMetadata } from "@/lib/metadata";
 export const metadata: Metadata = pageMetadata({
   title: "SEO Packages & Pricing",
   description:
-    "SEO packages for UK small businesses with published monthly prices: technical SEO, keyword research, content and link building. No long-term contract.",
+    "SEO packages for small businesses with published monthly prices in pounds: technical SEO, keyword research, content and link building. No long-term contract.",
   path: "/pricing",
 });
 

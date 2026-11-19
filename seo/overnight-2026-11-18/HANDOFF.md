@@ -7,6 +7,41 @@
 
 No production publication, deployment, GitHub push, email, message or external outreach occurred. No account was created, no form was submitted, and no CMS, database, DNS, hosting, pricing or credential was changed. All research was read-only. Changes are local commits on a new branch, plus documents in this folder.
 
+## Urgent: the live site right now (verified 19 Nov 2026, 10:45 UTC)
+
+The `.uk` → `.com` redirect has been switched on in Cloudflare, but it **drops the query string**, while production still uses `.uk` as its own address (`NEXT_PUBLIC_SITE_URL`; `main`'s fallback is also `.uk`). Together these very likely **break client sign-in** (the `?code=` on `/auth/callback` is lost) and **the page after a Stripe checkout** (`?session_id=` is lost). They also make every live `.com` canonical point at a URL that redirects. Inferred from the code and the observed redirect; not tested end to end, because that would send a real sign-in email.
+
+Fix in this order (exact steps in the [owner infrastructure checklist](OWNER-INFRASTRUCTURE-CHECKLIST.md#do-these-first-urgent)):
+1. Cloudflare → `chinvatbridge.uk` → Rules → the redirect rule → **Preserve query string: on**.
+2. Supabase: Site URL `https://www.chinvatbridge.com`, add `https://www.chinvatbridge.com/**`.
+3. Vercel: `NEXT_PUBLIC_SITE_URL=https://www.chinvatbridge.com` (Production) and **redeploy**. Current `main` already reads the variable, so this fixes canonicals, sitemap, robots, sign-in links and Stripe returns before the branch is merged.
+
+Already correct and verified: `.com` apex → `www` (308, path and query kept, by Vercel); `http` → `https`; `www.chinvatbridge.com` served by Vercel with HSTS; no website DNS change needed; mail records unchanged.
+
+## 19 November 2026: final focused review
+
+**International positioning.** Chinvat Bridge is UK-based and serves clients internationally, so titles now name the buyer, not a country, and "UK-based" stays as a fact in descriptions:
+
+| Page | Title before → after |
+|---|---|
+| Home | AI, Automation & Custom Software for ~~UK~~ SMEs |
+| AI integration | AI Consultancy & Integration for ~~UK~~ SMEs |
+| Custom software | Custom Software Development for ~~UK~~ SMEs |
+| SEO | SEO Services for ~~UK~~ Small Businesses |
+
+Descriptions for home, the four service pages, /pricing ("prices in pounds") and /insights no longer say "UK small businesses". The data-protection copy keeps UK GDPR and adds "or the law that applies where you are". **Kept as genuine UK opportunities or facts:** "UK-based" and "UK Based // Working Globally"; the FAQ "Do you work with businesses outside the UK?"; the UK-specific articles (UK SEO cost, ONS and DSIT figures), which target real UK searches; `en-GB`; prices in pounds. No country pages were created, per the [strategy](09-complete-seo-strategy.md#international-expansion-opportunities): revisit when Search Console shows demand from one country. The [keyword map](06-keyword-to-url-map.csv) still lists the earlier UK title proposals; the titles above supersede them.
+
+**Contact-form test stability.** Root cause: the suite runs against a production build with no mail credentials. The enquiry action treats a send within three seconds of the conversation opening as a bot and quietly returns "sent"; anything slower reaches the mail step and returns "unavailable". So the tests passed only by being mistaken for bots. A second hidden coupling: every send shared one rate-limit bucket (five per ten minutes). Fixed in the spec only, with Playwright's clock, routing and headers (production behaviour unchanged):
+- `page.clock.fastForward(3_000)` before each send, so the real server path always runs (validation, rate limit, composing the email);
+- only the "no mail transport" outcome is replaced with "sent", and any other result still fails the test;
+- each test sends from its own IPv6 documentation-range address, with a random segment per run. A first version numbered addresses from 1 on every run; a full run straight after a repeat run, on the same server, reused addresses the limiter still remembered and three tests correctly failed as "limited". That is why the addresses are now unique per run.
+
+Probed: with the fast-forward the raw action response is `unavailable` (then stubbed); without it, the bot branch answers `sent`. Contact spec with `--repeat-each 5`: 135 passed, 0 failed.
+
+**Test status (actual).** Final production build passes; lint and typecheck pass. Last complete e2e run (after the contact fix, same long-lived server): **287 passed, 1 failed, 99 skipped by design**. Every contact test passed. The one failure was the homepage test "the energy wire reveals the plates in order and ends on Improve" (desktop), which timed out at 60 s. **Cause, from its Playwright trace:** the test scrolls the homepage in 27 steps, and each step's `page.evaluate` waits 0.3–7 s for a main thread busy rendering WebGL in software (headless Chromium has no GPU). The test normally takes 48–57 s, so it sits at the edge of the 60 s default; every failure was a timeout in the scroll loop, never a wrong order. In isolation it passed 6 times out of 8 before the fix. **Fix (test only):** `test.slow()` for this test, with the evidence in a comment. **Run once after the fix: passed (54.1 s).** The complete suite was not re-run after this last change, at the owner's request; the next full run will confirm it. A broader question for the separate test-strategy review: the suite takes about 20 minutes serially, mostly on software WebGL.
+
+**Domain consistency.** The checklist was reconciled with what is live (table above): apex `.com` now goes to Vercel directly; the `.uk` redirect exists but needs "Preserve query string"; Vercel's dashboard state (whether the `.uk` domains are still listed, "Valid Configuration") can't be seen from outside and is listed for the owner to check.
+
 ## 19 November 2026: implementation pass
 
 Commits `5bd0645` (owner-confirmed "Ltd" removal, committed as it stood), `1e8c8b4`, `dfe485a`, `20d596c`, plus the documentation commit. Details in the [implementation log](implementation-log.md#19-nov-2026-implementation-pass); results in [technical verification](technical-verification.md#19-nov-2026-implementation-pass).
@@ -95,7 +130,7 @@ Client credit from Scornik Gerstein; LinkedIn page; Clutch free profile; Google 
 
 ## Tests and verification
 
-**19 Nov 2026:** lint, types and build pass. Full e2e: **287 passed, 1 failed, 99 skipped by design**. The failure is a pre-existing contact-form timing dependency (no mail credentials locally; see [technical verification](technical-verification.md#19-nov-2026-implementation-pass)), and that test passed three times out of three on re-run. The 18 Nov results follow.
+**19 Nov 2026, final:** lint, types and build pass. The contact-form timing dependency is fixed in the spec. The last complete run: 287 passed, 1 failed (the energy-wire test timing out, since given `test.slow()`; it passed when run once afterwards), 99 skipped by design. Details in the [final focused review](#19-november-2026-final-focused-review). Earlier results follow.
 
 - Lint, typecheck and production build pass. Next.js prints a security advisory for 16.4.3 and stops the first build attempt; the re-run completes.
 - **Full e2e suite: 283 passed, 0 failed** (378 tests, 95 skipped by the suite's own per-viewport conditions) on desktop, tablet and mobile, after the code-review fixes.
@@ -146,8 +181,8 @@ Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, th
 
 ## Exact next actions
 
-1. **Read and approve** the service-page copy in `src/data/service-pages.ts` (about 20 minutes), checking the commitments listed above.
-2. **Infrastructure, in order:** follow the [owner infrastructure checklist](OWNER-INFRASTRUCTURE-CHECKLIST.md): Supabase URLs, the Vercel variable, deploy, the `.uk` redirect (a Cloudflare redirect rule is the documented path- and query-preserving option), Search Console (sitemap, Change of Address) and Bing. Keep every mail record.
+1. **Today:** the three [urgent fixes](OWNER-INFRASTRUCTURE-CHECKLIST.md#do-these-first-urgent): Cloudflare "Preserve query string", Supabase URLs, and the Vercel variable with a redeploy. Sign-in and checkout returns depend on the first.
+2. **Read and approve** the service-page copy in `src/data/service-pages.ts` (about 20 minutes), checking the commitments listed above. Then merge the branch and deploy, and work through the rest of the [owner infrastructure checklist](OWNER-INFRASTRUCTURE-CHECKLIST.md): Vercel domains, Search Console (sitemap, Change of Address) and Bing. Keep every mail record.
 3. **Choose analytics** (enquiry attribution is already built; approve its privacy-policy line).
 4. **Fix the /pricing plan wording** in the database (the page-level part is done).
 5. **Publish** the spreadsheet article, then the SEO cost guide: read them under `pnpm dev`, then delete `draft: true` (process in the [editorial README](editorial/README.md#publishing-an-article-when-approved)).

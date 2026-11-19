@@ -1,21 +1,50 @@
 # Owner infrastructure checklist
 
-**For:** the account owner. **Prepared:** 19 November 2026. Nothing here has been done; every step needs your accounts (Cloudflare, Vercel, Supabase, Google, Microsoft).
+**For:** the account owner. **Prepared:** 19 November 2026; **status re-verified 19 Nov 2026, 10:45 UTC** from public DNS and HTTP responses (read-only; no account was accessed and nothing was changed). Every step needs your accounts (Cloudflare, Vercel, Supabase, Google, Microsoft).
 
 **Goal:** one public website at `https://www.chinvatbridge.com`. The apex and both `.uk` hosts redirect to it permanently, keeping the path and query string. Search engines are told about the move.
 
-Work through the sections in order. Steps 1 to 3 can be done before the branch is deployed. Steps 4 onwards need the deploy (step 3) to be live first.
+## Status at a glance
 
-## What the domains look like today
+Between the first check this morning and the re-check at 10:45 UTC, the `.uk` redirect was switched on and the `.com` apex moved to Vercel directly. Where things stand:
 
-Observed on 19 Nov 2026 from public DNS and HTTP responses (read-only). Re-check before you start, in case anything has changed.
-
-| Host | DNS | What it does now |
+| Item | Status | Evidence |
 |---|---|---|
-| `chinvatbridge.com` | Cloudflare nameservers (`alla.ns.cloudflare.com`, `damon.ns.cloudflare.com`). Apex A records are Cloudflare proxy addresses, so the record is proxied (orange cloud). | `https://chinvatbridge.com/insights?x=1` → **308** → `https://www.chinvatbridge.com/insights?x=1`. **Already correct:** the apex goes to `www` with the path and query kept. |
-| `www.chinvatbridge.com` | CNAME → `c867ec7f1aa9e613.vercel-dns-017.com` (served by Vercel directly, not through Cloudflare's proxy) | **200** from Vercel. Its canonical, sitemap and robots still say `.uk`, because production `NEXT_PUBLIC_SITE_URL` is still `.uk` and this branch isn't deployed yet. |
-| `chinvatbridge.uk` | Cloudflare nameservers; proxied | **308** → `https://www.chinvatbridge.uk/…` (it should go to `.com`) |
-| `www.chinvatbridge.uk` | Proxied through Cloudflare to Vercel | **200**: a full second copy of the site (it should redirect) |
+| `.com` apex → `www` | **Done.** 308, path and query kept | `https://chinvatbridge.com/services/seo?utm_source=t` → `https://www.chinvatbridge.com/services/seo?utm_source=t` (issued by Vercel) |
+| `http` → `https` (`.com`) | **Done.** 308, path and query kept; HSTS on `https` | `http://www.chinvatbridge.com/insights?a=1` → `https://www.chinvatbridge.com/insights?a=1` |
+| `.uk` (apex and `www`) → `.com` | **Partly done.** 301 to the same path on `www.chinvatbridge.com`, **but the query string is dropped** | `https://www.chinvatbridge.uk/services/seo?utm_source=t` → `https://www.chinvatbridge.com/services/seo` (issued by Cloudflare) |
+| Production canonical, sitemap, robots | **Not done.** Still `.uk` | Live `https://www.chinvatbridge.com/` has `<link rel="canonical" href="https://www.chinvatbridge.uk"/>`; the sitemap and robots point at `.uk` |
+| Website DNS records | **No change needed** (verified below) | All four hosts resolve and route as intended |
+| Mail records | Unchanged since this morning | See the mail table |
+
+## Do these first (urgent)
+
+The `.uk` redirect is live while production still uses `.uk` as its own address. Those two together break things today:
+
+- **Client sign-in is very likely broken.** Sign-in emails and Google sign-in return to `https://www.chinvatbridge.uk/auth/callback?code=…`. The redirect drops `?code=…`, so `/auth/callback` on `.com` gets no code and sign-in fails (`src/actions/auth.ts`, `src/app/auth/callback/route.ts`). Inferred from the code and the observed redirect; not tested end to end, because that would send a real sign-in email.
+- **The page after checkout loses its session.** Stripe returns to `https://www.chinvatbridge.uk/subscribe/success?session_id=…`, and the `session_id` is dropped (`src/actions/checkout.ts`). The payment itself is taken by Stripe; what breaks is the success page's "sign in to your portal" link.
+- **Search engines get contradictory signals.** `.uk` redirects to `.com`, while every `.com` page names a `.uk` URL as its canonical, so each canonical points at a redirect.
+
+In this order:
+
+1. **Cloudflare → `chinvatbridge.uk` → Rules → the redirect rule you created → Edit → turn on "Preserve query string" → Save.** This alone repairs sign-in and checkout returns. Check:
+   ```bash
+   curl -sI "https://www.chinvatbridge.uk/auth/callback?code=TEST" | grep -i '^location'
+   # expect: location: https://www.chinvatbridge.com/auth/callback?code=TEST
+   ```
+2. **Supabase:** do section 1 below (Site URL and `https://www.chinvatbridge.com/**`).
+3. **Vercel:** do section 2 below, then **redeploy production**. Even the current `main` reads `NEXT_PUBLIC_SITE_URL`, so this alone moves canonicals, sitemap, robots, sign-in links and Stripe returns to `.com`, without waiting for the branch. Then merge and deploy the branch (section 3).
+
+## What the domains look like now
+
+Observed 19 Nov 2026, 10:45 UTC. Re-check before you start, in case anything has changed.
+
+| Host | DNS (answered by Cloudflare's nameservers `alla`/`damon.ns.cloudflare.com`) | What it does now |
+|---|---|---|
+| `chinvatbridge.com` | A `64.29.17.65`, `216.198.79.65`: served by Vercel directly (responses carry `server: Vercel` and `x-vercel-id`), not through Cloudflare's proxy | 308 → `https://www.chinvatbridge.com/<same path and query>`. Correct. |
+| `www.chinvatbridge.com` | CNAME → `c867ec7f1aa9e613.vercel-dns-017.com` (Vercel, not proxied) | 200 from Vercel, HSTS. Correct host; canonical still `.uk` (see above). |
+| `chinvatbridge.uk` | A `104.21.75.118`, `172.67.175.146`: Cloudflare proxy (orange cloud) | 301 → `https://www.chinvatbridge.com/<same path>`; **query dropped** |
+| `www.chinvatbridge.uk` | Same Cloudflare proxy addresses | 301 → `https://www.chinvatbridge.com/<same path>`; **query dropped**. Exception: `/robots.txt` returns 200 with Cloudflare's managed robots file, which allows normal search crawling, so Google can still fetch the old host's robots and follow the redirects. |
 
 ## Before you change anything: protect the mail records
 
@@ -29,7 +58,7 @@ Records seen on 19 Nov 2026 (keep all of them):
 |---|---|---|
 | `chinvatbridge.com` | MX | `smtp.google.com` (priority 1); `eforward1`–`eforward5.registrar-servers.com` (priorities 10–20) |
 | `chinvatbridge.com` | TXT (SPF) | `v=spf1 include:spf.efwd.registrar-servers.com ~all` |
-| `chinvatbridge.com` | TXT | `google-site-verification=CdG5-…` (Search Console ownership: keep it) |
+| `chinvatbridge.com` | TXT | `google-site-verification=CdG5-…` and, new since this morning, `google-site-verification=oM4a8I…` (Search Console ownership: keep both) |
 | `chinvatbridge.uk` | MX | `route1/2/3.mx.cloudflare.net` (Cloudflare Email Routing) |
 | `chinvatbridge.uk` | TXT | `v=spf1 include:_spf.mx.cloudflare.net ~all`; `brevo-code:…`; `google-site-verification=aR5nV-…` |
 | `_dmarc.chinvatbridge.uk` | TXT | `v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com` |
@@ -85,11 +114,14 @@ In Vercel → the project → **Settings → Domains**, the target state is:
 | `chinvatbridge.uk` | Redirect to `www.chinvatbridge.com`, or handled by Cloudflare (step 6) |
 | `www.chinvatbridge.uk` | Redirect to `www.chinvatbridge.com`, or handled by Cloudflare (step 6) |
 
-Don't remove the `.uk` domains from the Vercel project until the redirect in step 6 is live and checked. Removing them first would make `.uk` show an error instead of redirecting.
+What could be verified from outside (19 Nov, 10:45 UTC): `www.chinvatbridge.com` is served by Vercel. `chinvatbridge.com` is answered by Vercel with a 308 to `www`, which is the Vercel domain redirect. The `.uk` hosts are now answered by Cloudflare's redirect before any request reaches Vercel. **Not verifiable without dashboard access:** whether Vercel still lists the `.uk` domains, and whether every domain shows "Valid Configuration". Open Settings → Domains and check.
+
+- If the `.uk` domains are still listed in Vercel, you can leave them while Cloudflare redirects: requests never reach them. Removing them is optional tidying, but only after the Cloudflare rule has been checked with "Preserve query string" on (step 6). If you ever turn Cloudflare's proxy off for `.uk`, the rule stops and traffic would reach Vercel again.
+- `www.chinvatbridge.com` should be the domain production deploys to, with no redirect of its own.
 
 ## 5. Apex to `www` (`.com`)
 
-Already working: `https://chinvatbridge.com/<path>?<query>` returns **308** to `https://www.chinvatbridge.com/<path>?<query>`. **No action**; re-run the check after any DNS change:
+**Done, verified 19 Nov 10:45 UTC.** `https://chinvatbridge.com/<path>?<query>` returns **308** to `https://www.chinvatbridge.com/<path>?<query>`, issued by Vercel; the apex now points at Vercel directly rather than through Cloudflare's proxy. **No action.** Re-run the check after any DNS change:
 
 ```bash
 curl -sI "https://chinvatbridge.com/insights?x=1" | grep -iE '^HTTP|^location'
@@ -97,6 +129,8 @@ curl -sI "https://chinvatbridge.com/insights?x=1" | grep -iE '^HTTP|^location'
 ```
 
 ## 6. Redirect both `.uk` hosts to `.com`, keeping path and query
+
+**Status 19 Nov 10:45 UTC: a Cloudflare redirect is live (301, path kept) but drops the query string.** Turn on **Preserve query string** in that rule (the first urgent action above), then run the check at the end of this section. The settings below describe the complete rule, for comparison with what you created.
 
 Both `.uk` hostnames are proxied by Cloudflare, so a **Cloudflare redirect rule** is the most direct way. Its documented settings keep the path and the query string.
 
@@ -113,7 +147,7 @@ Both `.uk` hostnames are proxied by Cloudflare, so a **Cloudflare redirect rule*
 
 If wildcard numbering in step 4 is unclear in the editor, create two rules instead: one for `http*://chinvatbridge.uk/*` and one for `http*://www.chinvatbridge.uk/*`, each with target `https://www.chinvatbridge.com/${2}`. That is the exact form in Cloudflare's "redirect all requests to another domain" example.
 
-**Option B: Vercel domain redirect.** Vercel → Settings → Domains → **Edit** on `www.chinvatbridge.uk` (then on `chinvatbridge.uk`) → **Redirect to** → `www.chinvatbridge.com`. Vercel's domain documentation doesn't state the status code or whether the path and query are kept. If you use this route, run the checks below and switch to option A if any fails.
+**Option B: Vercel domain redirect.** Vercel → Settings → Domains → **Edit** on `www.chinvatbridge.uk` (then on `chinvatbridge.uk`) → **Redirect to** → `www.chinvatbridge.com`. Vercel's documentation doesn't state the status code or whether the path and query are kept. In this project, Vercel's own apex-to-`www` redirect on `.com` keeps both, with a 308. That only works while the `.uk` records are not proxied by Cloudflare (or no Cloudflare rule answers first). Since option A is already in place, fixing its query-string setting is the smaller change.
 
 **Check (either option):**
 
@@ -131,13 +165,16 @@ Keep the redirects for at least **180 days**, and preferably permanently (Google
 
 ## 7. DNS records required by the hosting provider
 
-No change is needed for the website. `www.chinvatbridge.com` already points at the project's Vercel target (`c867ec7f1aa9e613.vercel-dns-017.com`), and the apex already redirects. If Vercel ever shows a domain as "Invalid Configuration", use **exactly** the record Vercel → Settings → Domains shows for that domain. Its values are specific to the project, so none is given here.
+**Verified 19 Nov 10:45 UTC: no website DNS change is needed.** Each host resolves, through Cloudflare's authoritative nameservers, to where it should, and was observed doing the right thing:
+- `www.chinvatbridge.com`: CNAME to the project's Vercel target `c867ec7f1aa9e613.vercel-dns-017.com`; served by Vercel.
+- `chinvatbridge.com`: A `64.29.17.65` and `216.198.79.65`; answered by Vercel with the apex-to-`www` redirect.
+- `chinvatbridge.uk`, `www.chinvatbridge.uk`: proxied by Cloudflare (orange cloud), which the redirect rule requires. **Keep them proxied.**
 
-One thing to know: `www.chinvatbridge.com` goes to Vercel directly, while the `.com` apex and both `.uk` hosts pass through Cloudflare's proxy. That works today. If you ever turn the proxy (orange cloud) off for the `.uk` hosts, the option A redirect stops working.
+Limits of this check: it shows behaviour from outside, not Vercel's dashboard. If Vercel → Settings → Domains shows any domain as "Invalid Configuration", use **exactly** the record it shows there. Those values are specific to the project, so none is given here.
 
 ## 8. Google Search Console: verify `chinvatbridge.com` as a Domain property
 
-A `google-site-verification` TXT record already exists on `chinvatbridge.com`, so the property may already be verified under some Google account.
+Two `google-site-verification` TXT records now exist on `chinvatbridge.com` (the second, `oM4a8I…`, appeared on 19 Nov), so a Domain property is probably verified or being verified. Keep both records.
 
 1. Sign in at `https://search.google.com/search-console` with the account that should own it.
 2. If `chinvatbridge.com` (Domain property) is listed, you are done.
@@ -186,7 +223,8 @@ If there is no `.uk` property, skip this. The redirects alone carry the signals.
 
 ```bash
 curl -sI "https://chinvatbridge.com/insights?x=1"      | grep -iE '^HTTP|^location'   # 308 → www.chinvatbridge.com/insights?x=1
-curl -sI "https://www.chinvatbridge.uk/insights?x=1"   | grep -iE '^HTTP|^location'   # 301 → www.chinvatbridge.com/insights?x=1
+curl -sI "https://www.chinvatbridge.uk/insights?x=1"   | grep -iE '^HTTP|^location'   # 301 → www.chinvatbridge.com/insights?x=1  (today: query missing)
+curl -sI "https://www.chinvatbridge.uk/auth/callback?code=TEST" | grep -i '^location' # → www.chinvatbridge.com/auth/callback?code=TEST
 curl -sI "https://chinvatbridge.uk/"                   | grep -iE '^HTTP|^location'   # 301 → www.chinvatbridge.com/
 curl -s  https://www.chinvatbridge.com/ | grep -o '<link rel="canonical"[^>]*>'        # href="https://www.chinvatbridge.com"
 curl -s  https://www.chinvatbridge.com/robots.txt | tail -1                            # Sitemap: https://www.chinvatbridge.com/sitemap.xml

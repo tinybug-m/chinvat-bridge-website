@@ -62,9 +62,9 @@ export const AI_SERVICE: ServicePageContent = {
   path: "/services/ai-integration",
   name: "AI Integration",
   updated: "2026-11-19",
-  title: "AI Consultancy & Integration for UK SMEs",
+  title: "AI Consultancy & Integration for SMEs",
   description:
-    "AI consultancy and integration for UK small businesses: we find the tasks where AI reliably saves time, choose the right tools and connect them to your systems.",
+    "AI consultancy and integration for small businesses, from a UK-based team: we find where AI reliably saves time, choose tools and connect them to your systems.",
   h1: "AI integration that earns its place in your business",
   lede: "We help small and growing businesses find the work AI can genuinely take on, choose tools that fit, and connect them to the systems and data you already use, with a person checking the output wherever it matters.",
   serviceType: "Artificial intelligence integration and consultancy",
@@ -88,7 +88,7 @@ export const AI_SERVICE: ServicePageContent = {
       },
       {
         title: "Data goes where it shouldn’t",
-        body: "Pasting customer or financial information into a consumer tool raises data-protection questions under UK GDPR that many small businesses haven’t had time to answer.",
+        body: "Pasting customer or financial information into a consumer tool raises data-protection questions under UK GDPR, or the law that applies where you are, that many small businesses haven’t had time to answer.",
       },
     ],
   },
@@ -182,7 +182,7 @@ export const AI_SERVICE: ServicePageContent = {
     {
       question: "Is it safe to use AI with our customers’ data?",
       answer:
-        "It can be, but it depends on the tool, its settings and the agreement behind it. The questions to settle are where data is processed and stored, how long it is kept, and whether it is used to train models; personal data should be kept out of AI steps that don’t need it. Your obligations under UK GDPR stay with you, so we raise these questions before anything is built.",
+        "It can be, but it depends on the tool, its settings and the agreement behind it. The questions to settle are where data is processed and stored, how long it is kept, and whether it is used to train models; personal data should be kept out of AI steps that don’t need it. Your obligations under UK GDPR, or the data-protection law that applies to you, stay with you, so we raise these questions before anything is built.",
     },
     {
       question: "How much does AI integration cost?",
@@ -247,7 +247,7 @@ export const AUTOMATION_SERVICE: ServicePageContent = {
   updated: "2026-11-19",
   title: "Business Process Automation & Integration",
   description:
-    "Workflow automation and API integration for UK small businesses. We connect your CRM, accounts, inbox and spreadsheets so information moves without being retyped.",
+    "Workflow automation and API integration for small businesses. We connect your CRM, accounts, inbox and spreadsheets so information moves without being retyped.",
   h1: "Workflow automation for the work between your systems",
   lede: "We design and build automated workflows that connect the tools you already use, so enquiries, orders, invoices and reports move between them without someone copying them across.",
   serviceType: "Business process automation and systems integration",
@@ -389,7 +389,7 @@ export const AUTOMATION_SERVICE: ServicePageContent = {
     {
       question: "Is our data handled safely?",
       answer:
-        "Automation moves data between systems, so we keep the data passing through each step to what that step needs, check where each platform processes and stores it, and use accounts and permissions that can be reviewed. Your obligations under UK GDPR stay with you, and we’ll flag anything that needs a decision.",
+        "Automation moves data between systems, so we keep the data passing through each step to what that step needs, check where each platform processes and stores it, and use accounts and permissions that can be reviewed. Your obligations under UK GDPR, or the data-protection law that applies to you, stay with you, and we’ll flag anything that needs a decision.",
     },
   ],
   relatedInsights: [
@@ -429,9 +429,9 @@ export const SOFTWARE_SERVICE: ServicePageContent = {
   path: "/services/custom-software",
   name: "Custom Software",
   updated: "2026-11-19",
-  title: "Custom Software Development for UK SMEs",
+  title: "Custom Software Development for SMEs",
   description:
-    "Custom software and web applications for UK small businesses: internal tools, client portals, dashboards and websites, built around how your business works.",
+    "Custom software and web applications for small businesses: internal tools, client portals, dashboards and websites, built around how your business works.",
   h1: "Custom software built around the way your business works",
   lede: "We build internal tools, client portals, dashboards, web applications and websites for businesses whose work has outgrown spreadsheets and off-the-shelf software.",
   serviceType: "Custom software and web application development",

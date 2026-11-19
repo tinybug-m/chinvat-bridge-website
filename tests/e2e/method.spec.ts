@@ -65,6 +65,11 @@ test.describe("method", () => {
   });
 
   test("the energy wire reveals the plates in order and ends on Improve", async ({ page }) => {
+    // Inherently long: it scrolls the whole homepage in small steps, and each step waits for a main
+    // thread busy rendering the WebGL scenes in software (headless Chromium has no GPU). Traces put
+    // single steps at 0.3–7 s and the desktop run at 48–57 s, too near the 60 s default; failures
+    // were all timeouts in the scroll loop, never a wrong order. test.slow() triples the budget.
+    test.slow();
     await page.goto("/");
     const figs = page.locator("#method li .svc-fig");
     await expect(figs.first()).toHaveAttribute("data-reveal-by", "energy");

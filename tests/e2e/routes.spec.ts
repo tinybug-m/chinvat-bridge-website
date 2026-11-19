@@ -57,10 +57,10 @@ test.describe("routes", () => {
   for (const [path, title] of [
     ["/insights", "Insights: AI, Automation, Software & SEO for SMEs"],
     ["/pricing", "SEO Packages & Pricing"],
-    ["/services/seo", "SEO Services for UK Small Businesses"],
-    ["/services/ai-integration", "AI Consultancy & Integration for UK SMEs"],
+    ["/services/seo", "SEO Services for Small Businesses"],
+    ["/services/ai-integration", "AI Consultancy & Integration for SMEs"],
     ["/services/workflow-automation", "Business Process Automation & Integration"],
-    ["/services/custom-software", "Custom Software Development for UK SMEs"],
+    ["/services/custom-software", "Custom Software Development for SMEs"],
     ["/privacy", "Privacy Policy"],
     ["/terms", "Terms of Service"],
   ]) {

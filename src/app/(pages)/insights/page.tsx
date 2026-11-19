@@ -10,7 +10,7 @@ import { pageMetadata } from "@/lib/metadata";
 export const metadata: Metadata = pageMetadata({
   title: "Insights: AI, Automation, Software & SEO for SMEs",
   description:
-    "Practical thinking on AI, automation, software and SEO for UK small businesses — written to help you make better, faster operational decisions.",
+    "Practical thinking on AI, automation, software and SEO for small businesses — written to help you make better, faster operational decisions.",
   path: "/insights",
 });
 
