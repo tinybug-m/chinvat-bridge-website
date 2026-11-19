@@ -12,6 +12,9 @@ import type { TitledText } from "@/data/seo-service";
  * There are no prices, timelines, results, clients or testimonials beyond the one project the
  * homepage already shows. AI, automation and software work is quoted per project, so each page
  * sends people to the conversation, not to /pricing.
+ *
+ * `relatedInsights` may list draft articles: relatedInsightLinks() skips any slug that isn't
+ * published, so each one appears here on the day it goes live, with no edit to this file.
  */
 
 export type ServiceDiagram = "ai" | "automation" | "software";
@@ -24,7 +27,10 @@ export interface ServiceSectionContent<T> {
 
 export interface ServicePageContent {
   path: string;
-  /** The service's name, as on the homepage plate; also the kicker and the breadcrumb. */
+  /**
+   * The service's own name: the kicker, the breadcrumb and the schema.org Service name. Shorter than
+   * the homepage plate title, and distinct per page, so the AI page doesn't also claim "automation".
+   */
   name: string;
   /** When this page's content last changed (sitemap lastmod). */
   updated: string;
@@ -54,8 +60,8 @@ export interface ServicePageContent {
 
 export const AI_SERVICE: ServicePageContent = {
   path: "/services/ai-integration",
-  name: "AI & Automation Integration",
-  updated: "2026-11-18",
+  name: "AI Integration",
+  updated: "2026-11-19",
   title: "AI Consultancy & Integration for UK SMEs",
   description:
     "AI consultancy and integration for UK small businesses: we find the tasks where AI reliably saves time, choose the right tools and connect them to your systems.",
@@ -104,7 +110,7 @@ export const AI_SERVICE: ServicePageContent = {
       },
       {
         title: "Assistants that work from your own information",
-        body: "Internal assistants that answer from your documents, policies and records rather than from general knowledge, and show where each answer came from so it can be checked.",
+        body: "Internal assistants that answer from your documents, policies and records rather than from general knowledge, and can point to the source each answer drew on, so it can be checked.",
       },
       {
         title: "Guardrails and human review",
@@ -112,7 +118,7 @@ export const AI_SERVICE: ServicePageContent = {
       },
       {
         title: "Measuring whether it works",
-        body: "Before anything is built we agree what “working” means in numbers: minutes per task, first-response time, errors caught. After launch we check it against that, and change course if it isn’t delivering.",
+        body: "Before anything is built we agree what “working” means in numbers, such as minutes per task, first-response time or errors caught, so the result can be checked against it after launch and the approach changed if it isn’t delivering.",
       },
     ],
   },
@@ -155,7 +161,7 @@ export const AI_SERVICE: ServicePageContent = {
         body: "Anything involving prices, legal terms, money or a customer’s trust gets a human check. Automation handles the volume; people keep the judgement.",
       },
     ],
-    note: "AI tools make mistakes, and their behaviour changes as vendors update them. We don’t promise accuracy or savings we haven’t measured. We agree what success looks like before building, and check the result against it afterwards.",
+    note: "AI tools make mistakes, and their behaviour changes as vendors update them. We don’t promise accuracy or savings we haven’t measured. We agree what success looks like before building, so the result can be checked against it.",
   },
   process: {
     Discover: "For AI: the tasks that eat your team’s time, the systems they touch, and the data involved.",
@@ -176,7 +182,7 @@ export const AI_SERVICE: ServicePageContent = {
     {
       question: "Is it safe to use AI with our customers’ data?",
       answer:
-        "It can be, but it depends on the tool, its settings and the agreement behind it. We look at where data is processed and stored, how long it is kept, and whether it is used to train models, and we keep personal data out of AI steps that don’t need it. Your obligations under UK GDPR stay with you, so we set this out plainly before anything is built.",
+        "It can be, but it depends on the tool, its settings and the agreement behind it. The questions to settle are where data is processed and stored, how long it is kept, and whether it is used to train models; personal data should be kept out of AI steps that don’t need it. Your obligations under UK GDPR stay with you, so we raise these questions before anything is built.",
     },
     {
       question: "How much does AI integration cost?",
@@ -203,6 +209,18 @@ export const AI_SERVICE: ServicePageContent = {
       slug: "what-should-you-automate-first",
       reason: "Many tasks people bring to AI are better solved by plain automation. This is how to tell, and where to start.",
     },
+    {
+      slug: "ai-subscriptions-vs-ai-integration",
+      reason: "Why buying AI licences often changes little, and how to tell when one task is worth integrating.",
+    },
+    {
+      slug: "how-to-choose-an-ai-consultant",
+      reason: "The questions that separate practical help from hype, to ask of anyone you speak to, including us.",
+    },
+    {
+      slug: "uk-small-business-ai-adoption-2026",
+      reason: "What the official UK figures on AI adoption do and don’t say about businesses of your size.",
+    },
   ],
   relatedServices: [
     {
@@ -225,8 +243,8 @@ export const AI_SERVICE: ServicePageContent = {
 
 export const AUTOMATION_SERVICE: ServicePageContent = {
   path: "/services/workflow-automation",
-  name: "Automation & Workflows",
-  updated: "2026-11-18",
+  name: "Workflow Automation",
+  updated: "2026-11-19",
   title: "Business Process Automation & Integration",
   description:
     "Workflow automation and API integration for UK small businesses. We connect your CRM, accounts, inbox and spreadsheets so information moves without being retyped.",
@@ -283,7 +301,7 @@ export const AUTOMATION_SERVICE: ServicePageContent = {
       },
       {
         title: "Alerts, logs and documentation",
-        body: "Automations fail quietly when a password, field or API changes. We build in alerts and logs, and write down how each workflow works, so it never becomes a black box nobody dares touch.",
+        body: "Automations fail quietly when a password, field or API changes. We build in alerts and logs, and write down how each workflow works, so it doesn’t become a black box nobody dares touch.",
       },
     ],
   },
@@ -383,6 +401,10 @@ export const AUTOMATION_SERVICE: ServicePageContent = {
       slug: "when-should-a-business-build-custom-software",
       reason: "Many “we need new software” problems turn out to be connection problems. How to tell which one you have.",
     },
+    {
+      slug: "how-to-connect-business-systems",
+      reason: "Deciding where each record lives, then choosing between built-in integrations, connectors and APIs.",
+    },
   ],
   relatedServices: [
     {
@@ -405,8 +427,8 @@ export const AUTOMATION_SERVICE: ServicePageContent = {
 
 export const SOFTWARE_SERVICE: ServicePageContent = {
   path: "/services/custom-software",
-  name: "Software & Web",
-  updated: "2026-11-18",
+  name: "Custom Software",
+  updated: "2026-11-19",
   title: "Custom Software Development for UK SMEs",
   description:
     "Custom software and web applications for UK small businesses: internal tools, client portals, dashboards and websites, built around how your business works.",
@@ -524,7 +546,7 @@ export const SOFTWARE_SERVICE: ServicePageContent = {
   },
   engagement: [
     "Software is scoped and quoted per project. A good starting brief is shorter than people expect: what the process is today, what is wrong with it, and what “solved” looks like for the people doing the work. From there we agree a defined first version, with its scope and cost settled before development starts.",
-    "Software needs looking after once it is live: hosting, security updates and changes as the business changes. We agree how that will work before the build begins, whether we support it or your own team takes it on.",
+    "Software needs looking after once it is live: hosting, security updates and changes as the business changes. How that will work should be settled before the build begins, whether we support it or your own team takes it on.",
   ],
   faqs: [
     {
@@ -555,6 +577,10 @@ export const SOFTWARE_SERVICE: ServicePageContent = {
   ],
   relatedInsights: [
     {
+      slug: "replace-spreadsheets-with-custom-software",
+      reason: "When a spreadsheet has become a system, and the four ways out, from a tidy-up to a tool of your own.",
+    },
+    {
       slug: "when-should-a-business-build-custom-software",
       reason: "The signals that off-the-shelf is still the right answer, the ones that say build, and the middle ground most businesses skip.",
     },
@@ -565,6 +591,14 @@ export const SOFTWARE_SERVICE: ServicePageContent = {
     {
       slug: "why-your-website-isnt-bringing-you-customers",
       reason: "If the website is the problem, three checks to run before assuming you need more traffic or a rebuild.",
+    },
+    {
+      slug: "does-your-business-need-a-client-portal",
+      reason: "When a client portal earns its keep, the build-or-buy decision, and the security questions to settle first.",
+    },
+    {
+      slug: "how-we-built-this-site",
+      reason: "How this site, its client portal and its checkout were built, on the stack described above.",
     },
   ],
   relatedServices: [

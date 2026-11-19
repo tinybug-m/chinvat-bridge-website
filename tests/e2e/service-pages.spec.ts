@@ -1,9 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const SERVICE_PAGES = [
-  { path: "/services/ai-integration", name: "AI & Automation Integration", h1: "AI integration that earns its place in your business", cta: "Discuss an AI project" },
-  { path: "/services/workflow-automation", name: "Automation & Workflows", h1: "Workflow automation for the work between your systems", cta: "Describe a process" },
-  { path: "/services/custom-software", name: "Software & Web", h1: "Custom software built around the way your business works", cta: "Describe what you need" },
+  { path: "/services/ai-integration", name: "AI Integration", h1: "AI integration that earns its place in your business", cta: "Discuss an AI project" },
+  { path: "/services/workflow-automation", name: "Workflow Automation", h1: "Workflow automation for the work between your systems", cta: "Describe a process" },
+  { path: "/services/custom-software", name: "Custom Software", h1: "Custom software built around the way your business works", cta: "Describe what you need" },
 ];
 
 /** Every JSON-LD block on the page, parsed. */
@@ -58,6 +58,22 @@ test.describe("service pages", () => {
       "/services/custom-software",
       "/services/seo",
     ]);
+  });
+});
+
+test.describe("pricing", () => {
+  test("summarises the terms and links each quoted service to its page", async ({ page }) => {
+    await page.goto("/pricing");
+    const billing = page.locator("#billing");
+    await expect(billing.getByRole("heading", { level: 2 })).toHaveText("Billing and terms.");
+    await expect(billing).toContainText("exclusive of any applicable tax");
+    await expect(billing).toContainText("30 days’ notice");
+    await expect(billing.getByRole("link", { name: "Read the full terms" })).toHaveAttribute("href", "/terms");
+    expect(await page.locator("#other-services a").evaluateAll((els) => els.map((el) => el.getAttribute("href")))).toEqual(
+      SERVICE_PAGES.map((service) => service.path),
+    );
+    const crumbs = (await jsonLd(page)).find((block) => block["@type"] === "BreadcrumbList")?.itemListElement as { name: string }[];
+    expect(crumbs.map((item) => item.name)).toEqual(["Home", "Pricing"]);
   });
 });
 

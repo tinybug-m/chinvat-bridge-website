@@ -28,6 +28,15 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  /*
+   * Search Console and Bing Webmaster Tools ownership, by meta tag. Only needed if a property is
+   * verified with the HTML-tag method rather than DNS (the Domain property uses DNS and needs
+   * nothing here). Each tag is emitted only when its variable is set in the environment.
+   */
+  verification: {
+    ...(process.env.GOOGLE_SITE_VERIFICATION && { google: process.env.GOOGLE_SITE_VERIFICATION }),
+    ...(process.env.BING_SITE_VERIFICATION && { other: { "msvalidate.01": process.env.BING_SITE_VERIFICATION } }),
+  },
 };
 
 const ORGANIZATION_ID = `${SITE_URL}/#organization`;

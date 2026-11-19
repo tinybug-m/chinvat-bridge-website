@@ -79,6 +79,7 @@ export default async function InsightArticlePage({ params }: PageProps) {
     // Every article is signed by the company; a named author waits for a real person's byline.
     author: post.meta.author === SITE_NAME ? organization : { "@type": "Person", name: post.meta.author },
     publisher: organization,
+    isPartOf: { "@id": `${SITE_URL}/#website` },
     mainEntityOfPage: url,
   };
 

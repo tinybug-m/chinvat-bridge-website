@@ -14,10 +14,10 @@ export const SEO_SERVICE = {
   /** The service's name, as on the homepage plate. */
   name: "SEO & Digital Growth",
   /** When this page's content last changed (sitemap lastmod). */
-  updated: "2026-11-18",
-  title: "SEO Services & Digital Growth",
+  updated: "2026-11-19",
+  title: "SEO Services for UK Small Businesses",
   description:
-    "Technical SEO, content strategy, link building and digital PR that improve how your business is found in search. Monthly SEO retainers or a custom scope.",
+    "SEO services for UK small businesses: technical SEO, content strategy, link building and digital PR, on a monthly plan with published prices or a custom scope.",
   h1: "SEO that makes your business easier to find",
   lede: "We fix what stops search engines understanding your site, plan and write content around what your customers search for, and build authority through link building and digital PR.",
 } as const;
@@ -185,6 +185,15 @@ export const SEO_RELATED_INSIGHTS: { slug: string; reason: string }[] = [
   {
     slug: "why-your-website-isnt-bringing-you-customers",
     reason: "Three checks to run before assuming you need more traffic, and the signs that the real problem is technical SEO.",
+  },
+  // Drafts: listed now, shown from the day each is published (relatedInsightLinks skips the rest).
+  {
+    slug: "how-much-does-seo-cost-uk",
+    reason: "What UK small businesses typically pay for SEO, what drives the price, and the red flags at any budget.",
+  },
+  {
+    slug: "what-a-technical-seo-audit-should-include",
+    reason: "The checks that matter, from crawling and indexing to Core Web Vitals, and the tool scores you can ignore.",
   },
 ];
 

@@ -15,6 +15,20 @@ interface ServiceSchemaInput {
   description: string;
 }
 
+/** A BreadcrumbList from Home through each named path, as absolute canonical URLs. */
+export function breadcrumbJsonLd(trail: { name: string; path: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [{ name: "Home", path: "" }, ...trail].map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.name,
+      item: `${SITE_URL}${item.path}`,
+    })),
+  };
+}
+
 export function serviceJsonLd({ path, name, serviceType, description }: ServiceSchemaInput) {
   const url = `${SITE_URL}${path}`;
   return [
@@ -29,14 +43,7 @@ export function serviceJsonLd({ path, name, serviceType, description }: ServiceS
       provider: { "@id": `${SITE_URL}/#organization` },
       areaServed: "Worldwide",
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-        { "@type": "ListItem", position: 2, name, item: url },
-      ],
-    },
+    breadcrumbJsonLd([{ name, path }]),
   ];
 }
 
@@ -49,7 +56,7 @@ export function relatedInsightLinks(items: { slug: string; reason: string }[]) {
 }
 
 /** One JSON-LD script per block. */
-export function JsonLdScripts({ data }: { data: { "@type": string }[] }) {
+export function JsonLdScripts({ data }: { data: ({ "@type": string } & Record<string, unknown>)[] }) {
   return data.map((block) => (
     <script
       key={block["@type"]}

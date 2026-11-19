@@ -55,9 +55,9 @@ test.describe("routes", () => {
 
   // Each inner page describes itself in social cards, not the homepage it would otherwise inherit.
   for (const [path, title] of [
-    ["/insights", "Insights"],
-    ["/pricing", "SEO & Content Pricing"],
-    ["/services/seo", "SEO Services & Digital Growth"],
+    ["/insights", "Insights: AI, Automation, Software & SEO for SMEs"],
+    ["/pricing", "SEO Packages & Pricing"],
+    ["/services/seo", "SEO Services for UK Small Businesses"],
     ["/services/ai-integration", "AI Consultancy & Integration for UK SMEs"],
     ["/services/workflow-automation", "Business Process Automation & Integration"],
     ["/services/custom-software", "Custom Software Development for UK SMEs"],
@@ -89,17 +89,30 @@ test.describe("routes", () => {
       expect.arrayContaining(["/", "/pricing", "/services/seo", "/services/ai-integration", "/services/workflow-automation", "/services/custom-software", "/insights", "/privacy", "/terms", "/insights/what-should-you-automate-first"]),
     );
     expect(lastmodOf("/pricing")).toBeUndefined();
-    expect(lastmodOf("/services/seo")).toBe("2026-11-18");
-    expect(lastmodOf("/services/custom-software")).toBe("2026-11-18");
+    expect(lastmodOf("/services/seo")).toBe("2026-11-19");
+    expect(lastmodOf("/services/custom-software")).toBe("2026-11-19");
     expect(lastmodOf("/privacy")).toBe("2026-11-18");
     expect(lastmodOf("/insights/what-should-you-automate-first")).toBe("2026-09-15");
-    // The index changes when its newest article does.
-    expect(lastmodOf("/insights")).toBe("2026-10-29");
+    // A revised article carries its own updated date, and the index changes when its newest article does.
+    expect(lastmodOf("/insights/why-your-website-isnt-bringing-you-customers")).toBe("2026-11-19");
+    expect(lastmodOf("/insights")).toBe("2026-11-19");
   });
 
   // Drafts live in the post registry with `draft: true`; a production build must never expose them.
   test("draft articles are not served, listed or in the sitemap", async ({ page, request }) => {
-    const drafts = ["how-much-does-seo-cost-uk", "replace-spreadsheets-with-custom-software", "how-we-built-this-site"];
+    // Remove a slug from this list when its article is published.
+    const drafts = [
+      "replace-spreadsheets-with-custom-software",
+      "how-much-does-seo-cost-uk",
+      "how-to-connect-business-systems",
+      "how-to-choose-an-ai-consultant",
+      "what-a-technical-seo-audit-should-include",
+      "ai-subscriptions-vs-ai-integration",
+      "uk-small-business-ai-adoption-2026",
+      "how-to-choose-a-technology-partner",
+      "does-your-business-need-a-client-portal",
+      "how-we-built-this-site",
+    ];
     const sitemap = await (await request.get("/sitemap.xml")).text();
     await page.goto("/insights");
     const listed = await page.locator("main a[href^='/insights/']").evaluateAll((els) => els.map((el) => el.getAttribute("href")));
@@ -107,6 +120,25 @@ test.describe("routes", () => {
       expect((await request.get(`/insights/${slug}`)).status(), slug).toBe(404);
       expect(sitemap).not.toContain(slug);
       expect(listed).not.toContain(`/insights/${slug}`);
+    }
+  });
+
+  // Drafts may link to each other (WhenPublished), and service pages list drafts in advance; none of
+  // it may surface as a link to a page that doesn't exist.
+  test("no page in the sitemap links to a missing page on the site", async ({ page, request }) => {
+    const xml = await (await request.get("/sitemap.xml")).text();
+    const paths = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(([, loc]) => new URL(loc).pathname);
+    const targets = new Map<string, string>();
+    for (const path of paths) {
+      await page.goto(path);
+      const hrefs = await page.locator("a[href^='/']").evaluateAll((els) => els.map((el) => el.getAttribute("href") ?? ""));
+      for (const href of hrefs) {
+        const target = href.split("#")[0].split("?")[0] || "/";
+        if (!targets.has(target)) targets.set(target, path);
+      }
+    }
+    for (const [target, from] of targets) {
+      expect((await request.get(target, { maxRedirects: 0 })).status(), `${target} (linked from ${from})`).toBeLessThan(400);
     }
   });
 

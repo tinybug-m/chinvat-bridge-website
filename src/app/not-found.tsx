@@ -10,7 +10,8 @@ import { archivo, martianMono } from "@/styles/fonts";
 
 export const metadata: Metadata = {
   title: "Page Not Found",
-  robots: { index: false, follow: false },
+  // No robots here: Next.js already marks every not-found response noindex, and a second tag only
+  // duplicated it.
 };
 
 const FONT_VARIABLES = `${archivo.variable} ${martianMono.variable}`;

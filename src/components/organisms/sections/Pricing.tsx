@@ -5,8 +5,42 @@ import { ArrowIcon } from "@/components/system/ArrowIcon";
 import { PricingCard } from "@/components/organisms/sections/PricingCard";
 import { CustomPlanCard } from "@/components/organisms/sections/CustomPlanCard";
 import { EmailLink } from "@/components/atoms/EmailLink";
+import { LinkList, ServiceSection, TextGrid } from "@/components/services/ServiceBlocks";
+import { Reveal } from "@/components/motion/Reveal";
 import { getPlans } from "@/data/pricing";
+import { SERVICE_PAGES } from "@/data/service-pages";
 import "./pricing.css";
+
+/*
+ * What the terms already say about billing, tax, cancellation and results, in brief. Each line is
+ * the terms page's own position (app/(pages)/terms/page.tsx); change both together. The plans'
+ * own wording lives in the database and is not repeated here.
+ */
+const TERMS_SUMMARY = [
+  {
+    title: "Billed monthly",
+    body: "Plans are billed monthly in advance through Stripe, our payment processor, and renew each month until cancelled.",
+  },
+  {
+    title: "Prices exclude tax",
+    body: "Prices are shown exclusive of any applicable tax, which is added at checkout where relevant.",
+  },
+  {
+    title: "No long-term contract",
+    body: "You can cancel at any time. We ask for 30 days’ notice, so active work can be wound down in an orderly way.",
+  },
+  {
+    title: "No ranking guarantees",
+    body: "Rankings, traffic and revenue depend on factors outside anyone’s control, so we commit to the work in your plan, not to a position in search results.",
+  },
+];
+
+/** The services quoted per project rather than sold as plans, each with its own page. */
+const QUOTED_SERVICES = SERVICE_PAGES.map((service) => ({
+  href: service.path,
+  title: service.name,
+  reason: service.description,
+}));
 
 /**
  * /pricing: the page header, then the plans as cards, each with its own tier
@@ -52,12 +86,29 @@ export async function Pricing() {
         </Container>
       </section>
 
-      <Container className="py-12 lg:py-16">
-        <TextLink href="/client-portal" className="inline-flex min-h-11 items-center gap-2 text-body">
-          <span>See what your client portal will look like</span>
-          <ArrowIcon />
-        </TextLink>
-      </Container>
+      <ServiceSection id="billing" ruled={false} title="Billing and terms." intro="The short version of our terms for SEO plans.">
+        <TextGrid items={TERMS_SUMMARY} />
+        <Reveal>
+          <p className="mt-8 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-x-8">
+            <TextLink href="/terms" className="inline-flex min-h-11 items-center gap-2 text-body">
+              <span>Read the full terms</span>
+              <ArrowIcon />
+            </TextLink>
+            <TextLink href="/client-portal" className="inline-flex min-h-11 items-center gap-2 text-body">
+              <span>See what your client portal will look like</span>
+              <ArrowIcon />
+            </TextLink>
+          </p>
+        </Reveal>
+      </ServiceSection>
+
+      <ServiceSection
+        id="other-services"
+        title="Other services."
+        intro="AI integration, workflow automation and custom software are quoted per project rather than sold as plans. Each starts with a conversation about the work, and scope and cost are agreed before it begins."
+      >
+        <LinkList items={QUOTED_SERVICES} />
+      </ServiceSection>
     </>
   );
 }

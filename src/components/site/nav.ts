@@ -38,10 +38,14 @@ export const SECTION_ALIASES: Record<string, string> = {
   method: "approach",
 };
 
-/** One link per discipline, to its service page. */
+/**
+ * One link per discipline, to its service page, named as the page names its service. These are on
+ * every page, so each anchor says what its page is about and no two point at the same idea
+ * ("AI & Automation" for the AI page overlapped the automation page).
+ */
 export const DISCIPLINE_LINKS: SiteLink[] = [
-  { label: "AI & Automation", href: "/services/ai-integration" },
-  { label: "Workflows", href: "/services/workflow-automation" },
-  { label: "Software & Web", href: "/services/custom-software" },
+  { label: "AI Integration", href: "/services/ai-integration" },
+  { label: "Workflow Automation", href: "/services/workflow-automation" },
+  { label: "Custom Software", href: "/services/custom-software" },
   { label: "SEO & Growth", href: "/services/seo" },
 ];
