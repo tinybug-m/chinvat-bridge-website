@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WhenPublished } from "@/components/insights/WhenPublished";
 import type { PostMeta } from "@/lib/blog";
 
 /*
@@ -36,7 +37,7 @@ export function Content() {
 
       <h3>One-off projects and audits</h3>
 
-      <p>A technical SEO audit, a site migration, or a content strategy delivered as a fixed piece of work. Audits are a sensible first step if you don’t know what’s wrong, but an audit on its own changes nothing: someone still has to make the fixes. Ask whether the price includes implementation, or only the report. We cover what a good audit contains in <Link href="/insights/what-a-technical-seo-audit-should-include">what a technical SEO audit should include</Link>.</p>
+      <p>A technical SEO audit, a site migration, or a content strategy delivered as a fixed piece of work. Audits are a sensible first step if you don’t know what’s wrong, but an audit on its own changes nothing: someone still has to make the fixes. Ask whether the price includes implementation, or only the report.<WhenPublished slug="what-a-technical-seo-audit-should-include"> We cover what a good audit contains in <Link href="/insights/what-a-technical-seo-audit-should-include">what a technical SEO audit should include</Link>.</WhenPublished></p>
 
       <h3>Hourly and day rates</h3>
 
@@ -77,7 +78,7 @@ export function Content() {
 
       <h2>What our plans cost</h2>
 
-      <p>We publish our prices, because comparing SEO offers is hard enough already. Our monthly plans (plus VAT where applicable) are:</p>
+      <p>We publish our prices, because comparing SEO offers is hard enough already. Our monthly plans are below; as our <Link href="/terms">terms</Link> set out, prices exclude any applicable tax, which is added at checkout where relevant.</p>
 
       <ul>
         <li><strong>Starter, £299 a month:</strong> keyword research, on-page SEO, a technical SEO audit with ongoing fixes, Core Web Vitals monitoring, structured data, a basic content strategy and competitor analysis, content each month, a monthly report and email support.</li>

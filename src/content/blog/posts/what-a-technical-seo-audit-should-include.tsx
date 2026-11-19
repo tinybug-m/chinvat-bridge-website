@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WhenPublished } from "@/components/insights/WhenPublished";
 import type { PostMeta } from "@/lib/blog";
 
 /*
@@ -141,7 +142,7 @@ export function Content() {
 
       <h2>What an audit costs</h2>
 
-      <p>It depends mostly on the size and complexity of the site and on whether fixes are included. Published UK prices for a small-site audit start at a few hundred pounds, and larger or more complex sites run to several thousand. See <Link href="/insights/how-much-does-seo-cost-uk">how much does SEO cost in the UK?</Link> for how audits compare with ongoing work.</p>
+      <p>It depends mostly on the size and complexity of the site and on whether fixes are included. Published UK prices for a small-site audit start at a few hundred pounds, and larger or more complex sites run to several thousand.<WhenPublished slug="how-much-does-seo-cost-uk"> See <Link href="/insights/how-much-does-seo-cost-uk">how much does SEO cost in the UK?</Link> for how audits compare with ongoing work.</WhenPublished></p>
 
       <h2>In short</h2>
 

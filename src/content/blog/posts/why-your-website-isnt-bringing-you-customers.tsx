@@ -7,6 +7,7 @@ export const meta: PostMeta = {
   description:
     "The most common, checkable reasons a UK small business website gets visitors but not enquiries — and what to check first before assuming you need more traffic.",
   date: "2026-09-15",
+  updated: "2026-11-19",
   author: "Chinvat Bridge",
   category: "SEO & Discovery",
   tags: ["seo", "local-seo", "website"],
@@ -104,12 +105,15 @@ export function Content() {
         titles, no clear site architecture connecting your pages, missing structured data that
         helps Google understand what a page is about, or pages that are technically blocking
         search engines from indexing them at all. These are fixable, but they require an
-        actual technical audit rather than guesswork &mdash; this is the kind of work covered
-        under our{" "}
+        actual technical audit rather than guesswork &mdash; this is the kind of work our{" "}
+        <Link href="/services/seo">
+          technical SEO service
+        </Link>{" "}
+        covers, and every one of our{" "}
         <Link href="/pricing">
           SEO plans
-        </Link>
-        , starting with a full technical audit on every tier.
+        </Link>{" "}
+        starts with a technical audit.
       </p>
 
       <h2>In short</h2>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WhenPublished } from "@/components/insights/WhenPublished";
 import type { PostMeta } from "@/lib/blog";
 
 /*
@@ -138,7 +139,7 @@ export function Content() {
         <li><strong>The cheap start is the normal start.</strong> Nearly half of businesses able to estimate their spending spent nothing in 2025, using free tools and features inside software they already had. Begin there, with one task; <Link href="/insights/where-ai-can-save-your-business-time">Where AI can actually save your business time</Link> suggests which.</li>
         <li><strong>The hard part is the work around the tool.</strong> Skills, a clear business case, and the time to implement and embed are the barriers businesses report, not licence fees. That is where <Link href="/services/ai-integration">practical AI integration</Link> helps: choosing the task, connecting the tool to your systems, and measuring the result.</li>
         <li><strong>Keep a person in the loop.</strong> Most businesses already do, and accuracy is the most common worry. Design for review from the start.</li>
-        <li><strong>Expect improvement, not transformation.</strong> Modest productivity gains on specific tasks are what most adopters report. That is worth having, and it is a sensible bar for any project or adviser; <Link href="/insights/how-to-choose-an-ai-consultant">How to choose an AI consultant</Link> covers how to hold someone to it.</li>
+        <li><strong>Expect improvement, not transformation.</strong> Modest productivity gains on specific tasks are what most adopters report. That is worth having, and it is a sensible bar for any project or adviser.<WhenPublished slug="how-to-choose-an-ai-consultant"> <Link href="/insights/how-to-choose-an-ai-consultant">How to choose an AI consultant</Link> covers how to hold someone to it.</WhenPublished></li>
       </ul>
 
       <h2>How to read these figures</h2>

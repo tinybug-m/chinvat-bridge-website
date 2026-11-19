@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WhenPublished } from "@/components/insights/WhenPublished";
 import type { PostMeta } from "@/lib/blog";
 
 export const meta: PostMeta = {
@@ -121,7 +122,19 @@ export function Content() {
         starts to make sense is when the off-the-shelf option doesn&rsquo;t understand your
         specific data, workflow, or terminology well enough to be trustworthy without heavy
         babysitting. That&rsquo;s a real threshold, not a marketing one &mdash; most businesses
-        should try the cheap, fast option first.
+        should try the cheap, fast option first. Often the simple automation rules are the whole
+        answer, and{" "}
+        <Link href="/insights/what-should-you-automate-first">
+          what should you automate first?
+        </Link>{" "}
+        helps pick the first one.
+        <WhenPublished slug="ai-subscriptions-vs-ai-integration">
+          {" "}
+          <Link href="/insights/ai-subscriptions-vs-ai-integration">
+            AI subscriptions or AI integration?
+          </Link>{" "}
+          sets out when the move from one to the other is worth making.
+        </WhenPublished>
       </p>
 
       <h2>

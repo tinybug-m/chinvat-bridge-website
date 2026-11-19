@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WhenPublished } from "@/components/insights/WhenPublished";
 import type { PostMeta } from "@/lib/blog";
 
 export const meta: PostMeta = {
@@ -111,7 +112,19 @@ export function Content() {
         database, or a process that spans tools with no existing connector between them.
         That&rsquo;s the point where custom integration work (built against the systems&rsquo;
         APIs directly) starts to make more sense than trying to force a no-code tool to do
-        something it wasn&rsquo;t designed for.
+        something it wasn&rsquo;t designed for. And if the real gap is a missing tool rather than a
+        missing connection,{" "}
+        <Link href="/insights/when-should-a-business-build-custom-software">
+          when should a business build custom software?
+        </Link>{" "}
+        covers how to tell the difference.
+        <WhenPublished slug="how-to-connect-business-systems">
+          {" "}
+          <Link href="/insights/how-to-connect-business-systems">
+            How to connect business systems that don&rsquo;t talk to each other
+          </Link>{" "}
+          goes further on choosing between connectors and custom integration.
+        </WhenPublished>
       </p>
 
       <h2>

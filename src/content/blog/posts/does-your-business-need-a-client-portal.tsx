@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WhenPublished } from "@/components/insights/WhenPublished";
 import type { PostMeta } from "@/lib/blog";
 
 /*
@@ -103,7 +104,7 @@ export function Content() {
         <li>What does your existing software already offer?</li>
       </ol>
 
-      <p>If the answers point to a product, use the product. If they point to a portal that pulls together your own systems in your own way, that is when <Link href="/services/custom-software">building your own</Link> earns its cost. <Link href="/insights/how-we-built-this-site">How we built our own client portal</Link> shows what that looks like in practice.</p>
+      <p>If the answers point to a product, use the product. If they point to a portal that pulls together your own systems in your own way, that is when <Link href="/services/custom-software">building your own</Link> earns its cost.<WhenPublished slug="how-we-built-this-site"> <Link href="/insights/how-we-built-this-site">How we built our own client portal</Link> shows what that looks like in practice.</WhenPublished></p>
 
       <h2>In short</h2>
 

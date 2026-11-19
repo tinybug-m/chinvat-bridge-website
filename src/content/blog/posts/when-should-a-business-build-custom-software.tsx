@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WhenPublished } from "@/components/insights/WhenPublished";
 import type { PostMeta } from "@/lib/blog";
 
 export const meta: PostMeta = {
@@ -57,6 +58,13 @@ export function Content() {
           If a genuinely core part of your operation runs through spreadsheets,
           copy-pasting, and manual reconciliation between systems that were never designed to
           work together, that&rsquo;s a real signal.
+          <WhenPublished slug="replace-spreadsheets-with-custom-software">
+            {" "}
+            <Link href="/insights/replace-spreadsheets-with-custom-software">
+              Outgrown your spreadsheets?
+            </Link>{" "}
+            covers the cheaper ways out to try first.
+          </WhenPublished>
         </li>
         <li>
           <strong>The thing that makes your business different is also the thing no software

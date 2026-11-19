@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WhenPublished } from "@/components/insights/WhenPublished";
 import type { PostMeta } from "@/lib/blog";
 
 /*
@@ -90,7 +91,12 @@ export function Content() {
         <li><strong>What would make it cost more?</strong> A partner who can name the risks up front is managing them.</li>
       </ul>
 
-      <p>For SEO specifically, <Link href="/insights/how-much-does-seo-cost-uk">How much does SEO cost in the UK?</Link> sets out typical arrangements; for AI help, <Link href="/insights/how-to-choose-an-ai-consultant">How to choose an AI consultant</Link> goes further on the questions specific to AI.</p>
+      <WhenPublished slug="how-much-does-seo-cost-uk">
+        <p>For SEO specifically, <Link href="/insights/how-much-does-seo-cost-uk">How much does SEO cost in the UK?</Link> sets out typical arrangements.</p>
+      </WhenPublished>
+      <WhenPublished slug="how-to-choose-an-ai-consultant">
+        <p>For AI help, <Link href="/insights/how-to-choose-an-ai-consultant">How to choose an AI consultant</Link> goes further on the questions specific to AI.</p>
+      </WhenPublished>
 
       <h2>Signs of a good fit</h2>
 

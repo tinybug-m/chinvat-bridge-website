@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WhenPublished } from "@/components/insights/WhenPublished";
 import type { PostMeta } from "@/lib/blog";
 
 /*
@@ -136,7 +137,7 @@ export function Content() {
 
       <p>Subscriptions help individuals; integration changes processes. Start with subscriptions, learn which tasks repeat, and integrate only the specific, frequent tasks where copy and paste has become the bottleneck, consistency matters, or you need a record. One well-integrated task usually does more for a small business than another round of licences.</p>
 
-      <p>If you’ve reached the point where one task deserves <Link href="/services/ai-integration">proper integration into your systems</Link>, <Link href="/#contact">tell us what it is</Link>. And if you’re weighing up outside help, <Link href="/insights/how-to-choose-an-ai-consultant">how to choose an AI consultant</Link> sets out what to ask.</p>
+      <p>If you’ve reached the point where one task deserves <Link href="/services/ai-integration">proper integration into your systems</Link>, <Link href="/#contact">tell us what it is</Link>.<WhenPublished slug="how-to-choose-an-ai-consultant"> And if you’re weighing up outside help, <Link href="/insights/how-to-choose-an-ai-consultant">how to choose an AI consultant</Link> sets out what to ask.</WhenPublished></p>
     </>
   );
 }
