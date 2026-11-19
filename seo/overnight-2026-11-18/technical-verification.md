@@ -90,3 +90,48 @@ The reviewer independently re-verified the ONS and DSIT figures, the Google and 
 - Behaviour on the real production domains after deploy: the redirect, Search Console indexing, Supabase magic links on `.com`. These depend on owner actions; the checks to run are in the [90-day roadmap](10-90-day-roadmap.md).
 - Field Core Web Vitals (no CrUX or Search Console access).
 - Stripe checkout end to end on `.com`. The URL comes from `getSiteOrigin()` and follows `NEXT_PUBLIC_SITE_URL`; worth one test purchase in Stripe test mode after the switch.
+
+## 19 Nov 2026: implementation pass
+
+All runs against a local production build (`NEXT_PUBLIC_SITE_URL=https://www.chinvatbridge.com pnpm build`, then `pnpm start`), Next.js 16.4.5.
+
+| Check | Result |
+|---|---|
+| `pnpm lint` | Pass, no issues |
+| `pnpm typecheck` | Pass |
+| Production build | Pass first time; 37 static pages; draft routes not generated |
+| Full e2e suite, desktop + tablet + mobile (387 tests, up from 378) | **287 passed, 1 failed, 99 skipped by the suite's own per-viewport conditions** (20.5 min). The failure is in the contact form; see below. |
+| Affected specs before the final build (`routes`, `service-pages`, `services`, `insights`, `shell`, `hero`) | **138 passed, 0 failed**, 81 skipped by design |
+| Contact spec, `--repeat-each 3` | 80 passed, 1 failed (a different contact test from the full run's failure) |
+
+**The contact failures are a pre-existing timing dependency, not a regression.** `.env.local` has no Gmail credentials. The contact tests therefore pass only when the form is completed within the enquiry action's three-second bot window, which returns a quiet "sent" before any mail is attempted (already noted in the 18 Nov entry above). On a slower run some sends take longer, reach the mail step and show "Our messages aren't going through right now", which the failure snapshots show. No contact, enquiry or journey file, nor the contact spec, changed in this pass (`git diff af7d789..HEAD` on those paths is empty), and "send another message starts over", the test that failed in the full run, passed three times out of three when repeated. **To make it deterministic:** run the contact spec against `next dev`, which logs messages instead of sending them, or give the test server a test-only mail transport. Neither was done, because both change how the app sends mail.
+
+### Performance: energy-wire routing (T10)
+
+| Measure | Before | After |
+|---|---|---|
+| `routeWire()` on captured real inputs, unthrottled median of 15 runs (390 / 768 / 1440 px) | 52.9 / 51.0 / 129.8 ms | 31.4 / 27.1 / 61.7 ms |
+| Output on those inputs | — | `isDeepStrictEqual` true at all three widths |
+| Rendered `.energy-wire` path data at 390, 768, 1440 px | recorded twice; deterministic | byte-identical to before |
+| Homepage, mobile 390×844, 4× CPU, 8 s after load, 5 loads: median TBT (sum of long-task time over 50 ms) | 607 ms | 491 ms |
+| Same: median longest task | 400 ms | 241 ms |
+
+Lab numbers on this machine under emulated throttling; they show the direction and size of the change, not field INP. The 18 Nov figure of about 1.7 s was a different run and setup (network throttling included), so compare within a row, not across sessions.
+
+### Rendered output (local production server, crawled from `/`)
+
+| Check | Result |
+|---|---|
+| Canonical, `og:url`, JSON-LD `@id`/`url`, sitemap `<loc>`, robots `Sitemap:` | All `https://www.chinvatbridge.com…`; no `.uk` in any SEO output. The only `.uk` strings in `src` are the own-domain list in `journey.ts` (so `.uk` visits aren't counted as referrals), placeholders in the checkout form and portal preview, and `.gov.uk`/`.ons.gov.uk` sources. `supabase/config.toml` keeps `.uk/**` as an allowed redirect during the switch-over, by design. |
+| Every page reached from `/` | 200 (or the expected 307 to /login or /pricing); none 4xx/5xx |
+| Titles | `/pricing` "SEO Packages & Pricing — Chinvat Bridge"; `/services/seo` "SEO Services for UK Small Businesses — Chinvat Bridge"; `/insights` "Insights: AI, Automation, Software & SEO for SMEs — Chinvat Bridge"; others unchanged |
+| JSON-LD (parsed, every page) | Valid. Organization + WebSite on every page (no `legalName`); Service + BreadcrumbList on the four service pages; BreadcrumbList on /pricing; CollectionPage + BreadcrumbList on /insights; Article + BreadcrumbList on articles. No Review, AggregateRating or Person. |
+| Private routes | `/login`, `/client-portal`, `/subscribe/*`, design studies: `noindex, nofollow`; `/dashboard`, `/admin` redirect to `/login`; 404 now carries one robots tag |
+| Drafts in production | 404; not in the sitemap or the Insights index; not linked from any service page or article (draft-only `WhenPublished` sentences render nothing) |
+| Drafts under `next dev` | Render with "Draft, not published", every cross-link in place; service pages list them |
+| Verification meta | Not emitted when `GOOGLE_SITE_VERIFICATION` / `BING_SITE_VERIFICATION` are unset |
+| Visual, 390 and 1440 px (reduced motion) | /pricing new sections and the footer render in the existing design; horizontal overflow 0 px at both widths |
+
+### Live domains (read-only, 19 Nov 2026)
+
+`https://chinvatbridge.com/insights?x=1` → 308 → `https://www.chinvatbridge.com/insights?x=1` (apex to www already correct). `https://chinvatbridge.uk/…` → 308 → `https://www.chinvatbridge.uk/…`, and `https://www.chinvatbridge.uk/…` → 200 (still a second copy). Production canonical still `.uk` (the branch isn't deployed). DNS for both domains is on Cloudflare. See the [owner infrastructure checklist](OWNER-INFRASTRUCTURE-CHECKLIST.md).

@@ -1,11 +1,26 @@
 # Handoff
 
 **Session:** 18 November 2026. **Branch:** `seo/overnight-2026-11-18` (from `main` at `64a4fc0`; `main` is untouched).
-**Status:** the research, strategy, technical audit, three service pages, technical fixes, enquiry attribution, nine article drafts and a case study are complete and verified locally. Owner actions, listed below, are needed before any of it reaches the live site.
+**Status:** the research, strategy, technical audit, three service pages, technical fixes, enquiry attribution, nine article drafts and a case study are complete and verified locally. **19 November 2026:** an implementation pass (below) finished the website-side work the strategy calls for. Owner actions are needed before any of it reaches the live site; the infrastructure steps are in the [owner infrastructure checklist](OWNER-INFRASTRUCTURE-CHECKLIST.md).
 
 ## Confirmation
 
 No production publication, deployment, GitHub push, email, message or external outreach occurred. No account was created, no form was submitted, and no CMS, database, DNS, hosting, pricing or credential was changed. All research was read-only. Changes are local commits on a new branch, plus documents in this folder.
+
+## 19 November 2026: implementation pass
+
+Commits `5bd0645` (owner-confirmed "Ltd" removal, committed as it stood), `1e8c8b4`, `dfe485a`, `20d596c`, plus the documentation commit. Details in the [implementation log](implementation-log.md#19-nov-2026-implementation-pass); results in [technical verification](technical-verification.md#19-nov-2026-implementation-pass).
+
+**Completed locally**
+- **Performance (T10):** the homepage's longest main-thread task was the energy wire's routing. It is now about twice as fast, with byte-identical output (mobile lab, 4× CPU: median TBT 607 → 491 ms, longest task 400 → 241 ms).
+- **Service pages:** one distinct name each (AI Integration, Workflow Automation, Custom Software, SEO & Digital Growth) in kicker, breadcrumb, schema and footer, ending the AI/automation overlap. Unconfirmed commitments softened. `/services/seo` titled "SEO Services for UK Small Businesses".
+- **/pricing:** title "SEO Packages & Pricing"; a "Billing and terms" summary taken from the terms (monthly billing, tax excluded and added at checkout where relevant, 30 days' notice, no guarantees); links to the three quoted services; breadcrumbs. Prices and plan wording untouched.
+- **Articles:** draft-to-draft links can no longer 404 whatever the publishing order (`WhenPublished`). Each service page already lists its drafts and shows them from publication day. A published article's "full technical audit on every tier" claim corrected and its missing service-page link added. Sibling links added. The SEO cost draft follows the terms on tax instead of asserting VAT.
+- **Structured data:** breadcrumbs on /pricing and /insights; fuller CollectionPage; articles part of the WebSite; one breadcrumb builder. No ratings, reviews or invented credentials anywhere; no `legalName`.
+- **Indexing:** canonical, Open Graph, schema, sitemap and robots all `https://www.chinvatbridge.com` in the build; private routes `noindex`; the duplicate 404 robots tag removed; optional Search Console and Bing meta-tag verification via environment variables.
+- **Tests:** all ten drafts guarded; a new check that no sitemap page links to a missing internal page.
+
+**Found while preparing the owner checklist (not changed):** both domains' DNS is on Cloudflare. The `.com` apex already 308-redirects to `www` with the path kept. Both `.uk` hosts still serve the full site. On `.com`, the SPF record authorises only Namecheap's forwarder although Google Workspace receives the mail, and there is no DMARC record. Worth a look for deliverability; see the checklist.
 
 ## What I learned about the market
 
@@ -80,6 +95,8 @@ Client credit from Scornik Gerstein; LinkedIn page; Clutch free profile; Google 
 
 ## Tests and verification
 
+**19 Nov 2026:** lint, types and build pass. Full e2e: **287 passed, 1 failed, 99 skipped by design**. The failure is a pre-existing contact-form timing dependency (no mail credentials locally; see [technical verification](technical-verification.md#19-nov-2026-implementation-pass)), and that test passed three times out of three on re-run. The 18 Nov results follow.
+
 - Lint, typecheck and production build pass. Next.js prints a security advisory for 16.4.3 and stops the first build attempt; the re-run completes.
 - **Full e2e suite: 283 passed, 0 failed** (378 tests, 95 skipped by the suite's own per-viewport conditions) on desktop, tablet and mobile, after the code-review fixes.
 - **Affected specs on the final build: 126 passed, 0 failed.**
@@ -95,19 +112,23 @@ See [technical verification](technical-verification.md).
 
 Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, three `page.tsx` routes under `src/app/(pages)/services/`, `tests/e2e/service-pages.spec.ts`, `src/components/site/journey.ts`, `src/components/site/JourneyRecorder.tsx`, `src/lib/enquiry-journey.ts`.
 
+19 Nov: `OWNER-INFRASTRUCTURE-CHECKLIST.md`; `src/components/insights/WhenPublished.tsx`.
+
 ## Files modified
 
 `src/lib/constants.ts`, `supabase/config.toml`, `src/actions/enquiry.ts`, `src/app/(pages)/insights/[slug]/page.tsx`, `src/app/sitemap.ts`, `src/components/home/work/projects.ts`, `src/components/site/nav.ts`, `src/components/home/hero/content.ts`, `src/data/services.ts`, `src/data/seo-service.ts`, three files in `src/content/blog/posts/`, `src/components/site/SiteShell.tsx`, `src/components/home/contact/ContactChat.tsx`, `src/app/(pages)/privacy/page.tsx`, `src/lib/legal.ts`, `tests/e2e/{contact,hero,routes,services,work}.spec.ts`, `docs/redesign/COPY_CHANGES.md`.
+
+19 Nov: `src/components/home/services/energy/route.ts`, `src/components/organisms/sections/Pricing.tsx`, `src/app/(pages)/pricing/page.tsx`, `src/app/(pages)/insights/page.tsx`, `src/app/(pages)/insights/[slug]/page.tsx`, `src/app/layout.tsx`, `src/app/not-found.tsx`, `src/components/services/structured-data.tsx`, `src/components/site/nav.ts`, `src/data/service-pages.ts`, `src/data/seo-service.ts`, ten files in `src/content/blog/posts/`, `.env.example`, `tests/e2e/{routes,service-pages}.spec.ts`; in this folder, `HANDOFF.md`, `implementation-log.md`, `technical-verification.md`, `03-technical-seo-audit.md`, `pricing-copy-proposal.md`, `editorial/README.md`.
 
 ## Decisions requiring human approval
 
 | Decision | Recommendation | Where |
 |---|---|---|
 | Canonical domain | `www.chinvatbridge.com`; redirect `.uk` | [T1](03-technical-seo-audit.md#t1-two-live-domains-canonicals-on-the-wrong-one--critical) |
-| Service-page commitments to confirm before deploying | **Engagement:** scope and cost agreed before any work starts (all three). **AI:** answers "show where each answer came from"; "after launch we check it against" the agreed measure; data handling (where data is processed, retention, training use, keeping personal data out of AI steps). **Automation:** alerts, logs and written documentation for each workflow; using Zapier or Make where they fit; the data-handling FAQ. **Software:** testing "with them before it replaces anything"; development "in short cycles, shown to you as it takes shape"; support "agreed before the build begins"; "We also designed and built the website of Scornik Gerstein LLP". **All:** "We’re based in the UK and work remotely with businesses elsewhere". | `src/data/service-pages.ts` |
+| Service-page commitments to confirm before deploying | Softened on 19 Nov where they were promises (source citations, post-launch measurement, data handling, support). **Still to confirm, as written:** **Automation:** "We build in alerts and logs, and write down how each workflow works"; workflows "fail loudly", failed steps can be retried; Zapier or Make used "where they are reliable enough". **Software:** tested "with them before it replaces anything"; built "in short cycles, shown to you as it takes shape". **AI:** review steps, limits and a record of outputs (the guardrails offering). Already backed by the live site, so not listed: scope and cost agreed first (the terms: other work "quoted and agreed separately"); the Scornik Gerstein credit (homepage Recent work); "based in the UK and work remotely" (footer). | `src/data/service-pages.ts` |
 | Analytics vendor | Cookieless (Vercel Web Analytics or Plausible) | [measurement](15-measurement-framework.md#tooling) |
 | Privacy-policy line for enquiry attribution (added locally, dated 18 Nov 2026) | Approve or edit: "With a message you send us, the page you were reading, the first page of your visit (including any campaign tags in the link you followed), and the name of the website that referred you, if any, so we know what prompted it. The page keeps this in memory while you browse; nothing is saved to your device." | `src/app/(pages)/privacy/page.tsx` |
-| Pricing page copy | Fix the Starter "Basic" vs "Full" audit contradiction; define "asset"; state VAT; drop jargon. Ready-to-apply wording and SQL (prices unchanged) in the proposal. | [pricing copy proposal](pricing-copy-proposal.md) |
+| Pricing page copy | The page-level part is done in code (terms summary, service links, title). **Still yours, in the database:** the Starter "Basic" vs "Full technical SEO audit" contradiction; what an "asset" is; the jargon labels ("Core Protocols", "content velocity", "Enterprise-grade"); whether Scale's "Dedicated senior SEO consultant" is literally true. Whether you are VAT-registered (the site says only "applicable tax", as the terms do). Wording and SQL in the proposal; prices unchanged. | [pricing copy proposal](pricing-copy-proposal.md) |
 | A productised first engagement | Operations review and/or technical SEO audit, with a published price. Copy, placement, market anchors and suggested price ranges are drafted; set the prices and delivery terms. | [first-engagement proposal](first-engagement-proposal.md) |
 | Naming the founder | Yes, with a short bio; also as article author | R12 |
 | Homepage H1 | Keep the current line (option A). A descriptive option B was rendered and grows the H1 to four lines; screenshots are in `assets/`. The new title and the lede carry the meaning. | [on-page audit](04-on-page-audit.md#h1-options-for-the-owner) |
@@ -126,15 +147,11 @@ Code: `src/data/service-pages.ts`, `src/components/services/ServicePage.tsx`, th
 ## Exact next actions
 
 1. **Read and approve** the service-page copy in `src/data/service-pages.ts` (about 20 minutes), checking the commitments listed above.
-2. **Supabase:** Site URL → `https://www.chinvatbridge.com`; add `https://www.chinvatbridge.com/**` to the redirect URLs.
-3. **Vercel:** set `NEXT_PUBLIC_SITE_URL=https://www.chinvatbridge.com` for Production; merge `seo/overnight-2026-11-18` into `main`; deploy.
-4. **Redirect** `chinvatbridge.uk` and `www.chinvatbridge.uk` to `https://www.chinvatbridge.com` (path-preserving 301/308) in Vercel or Cloudflare.
-5. **Search Console:** Domain property for `chinvatbridge.com`; Change of Address from `.uk` if it was verified; submit the sitemap; request indexing of the four service pages. Bing Webmaster Tools too.
-6. **Confirm the company details** and add them to the footer.
-7. **Choose analytics** (enquiry attribution is already built; approve its privacy-policy line).
-8. **Fix the /pricing wording.**
-9. **Publish** the spreadsheet article, then the SEO cost guide: read them under `pnpm dev`, then delete `draft: true` (process in the [editorial README](editorial/README.md#publishing-an-article-when-approved)).
-10. **Ask Scornik Gerstein** about the case study and credit.
+2. **Infrastructure, in order:** follow the [owner infrastructure checklist](OWNER-INFRASTRUCTURE-CHECKLIST.md): Supabase URLs, the Vercel variable, deploy, the `.uk` redirect (a Cloudflare redirect rule is the documented path- and query-preserving option), Search Console (sitemap, Change of Address) and Bing. Keep every mail record.
+3. **Choose analytics** (enquiry attribution is already built; approve its privacy-policy line).
+4. **Fix the /pricing plan wording** in the database (the page-level part is done).
+5. **Publish** the spreadsheet article, then the SEO cost guide: read them under `pnpm dev`, then delete `draft: true` (process in the [editorial README](editorial/README.md#publishing-an-article-when-approved)).
+6. **Ask Scornik Gerstein** about the case study and credit.
 
 ## Continuation point
 

@@ -111,3 +111,54 @@ Two moderate advisories (GHSA-mfr8-8qww-v76h, GHSA-vc7v-qv4w-wrv8) affect 16.2.0
 ## 19 Nov 2026: "Ltd" removed
 
 The owner confirmed the business is not a limited company. "Ltd" was removed from `SiteFooter.tsx`, `CheckoutShell.tsx` and the terms page; `legalName` was dropped from the Organization JSON-LD in `src/app/layout.tsx`; `TERMS_UPDATED` moved to 2026-11-19. This closes the T5 blocker.
+
+## 19 Nov 2026: implementation pass
+
+Commits `5bd0645`, `1e8c8b4`, `dfe485a` and `20d596c`. Main untouched; nothing pushed or deployed.
+
+### `1e8c8b4`: perf(home): energy-wire routing about twice as fast, identical output
+
+| File | Change | Justification |
+|---|---|---|
+| `src/components/home/services/energy/route.ts` | `collisions()` tests only boxes overlapping the samples' bounding box; each lane's curves into it (per out port) and out of it (per in port) are cached across port pairings | [T10](03-technical-seo-audit.md#t10-homepage-main-thread-cost-on-mobile--medium). A CPU profile showed the homepage's longest task was `routeWire()`'s pure geometry, not the DOM reads, so the audit's "split reads from routing" would have left a ~350 ms task in place. Both cuts are exact: on captured real inputs the output is deep-equal, and the rendered wire paths are byte-identical at 390, 768 and 1440 px. Figures in [technical verification](technical-verification.md#19-nov-2026-implementation-pass). |
+
+### `dfe485a`: feat(insights): drafts can link to each other in any order
+
+| File | Change | Justification |
+|---|---|---|
+| `src/components/insights/WhenPublished.tsx` (new) | Renders its children only while the target article is published (drafts count as published under `next dev`) | Seven draft-to-draft links would have 404'd if the drafts were published out of the planned order |
+| Six drafts | Each cross-reference sentence wrapped; the sentence reads without it | Same |
+| `how-much-does-seo-cost-uk.tsx` (draft) | "plus VAT where applicable" → the terms' own words (exclusive of any applicable tax, added at checkout where relevant), linked to /terms | No VAT position is confirmed beyond the terms |
+| `why-your-website-isnt-bringing-you-customers.tsx` | "a full technical audit on every tier" → "every one of our SEO plans starts with a technical audit"; now links `/services/seo`; `updated: 2026-11-19` | Contradicted Starter's "Basic" audit; the article never linked its service page |
+| `what-should-you-automate-first.tsx`, `where-ai-can-save-your-business-time.tsx` | One sibling link each to a published article, plus a `WhenPublished` link to their cluster's draft | [Linking plan](12-internal-linking-plan.md) rule 2; neither had a sibling link |
+| `when-should-a-business-build-custom-software.tsx` | `WhenPublished` link to the spreadsheet flagship | The flagship should receive a link from its closest article the day it goes live |
+
+### `20d596c`: feat(seo): distinct service names, pricing terms summary, breadcrumbs
+
+| File | Change | Justification |
+|---|---|---|
+| `src/data/service-pages.ts` | `name` (kicker, breadcrumb, Service name): AI Integration, Workflow Automation, Custom Software. `updated` 2026-11-19 | "AI & Automation Integration" on the AI page overlapped the automation page (a cannibalisation the content review flagged); the names match the owner's brief |
+| `src/data/service-pages.ts` | Softened: source citations ("can point to"), measuring after launch ("so the result can be checked"), data-handling FAQ (questions to settle), support ("should be settled"), "never" → "doesn't" | Commitments not confirmed by the owner, softened without changing the offer |
+| `src/data/service-pages.ts`, `src/data/seo-service.ts` | `relatedInsights` lists each cluster's drafts | `relatedInsightLinks()` skips unpublished slugs, so they appear on publication; publishing no longer needs an edit here |
+| `src/data/seo-service.ts` | Title "SEO Services for UK Small Businesses"; description names the buyer and the published prices | [Keyword map](06-keyword-to-url-map.csv) recommendation |
+| `src/components/site/nav.ts` | Footer discipline labels: AI Integration, Workflow Automation, Custom Software, SEO & Growth | Same overlap, on every page |
+| `src/components/organisms/sections/Pricing.tsx` | "Billing and terms" (billing, tax, cancellation, no guarantees: each the terms' own position) and "Other services" (the three quoted service pages) | [On-page audit](04-on-page-audit.md#pricing): VAT/tax unstated on the page, no links to the other services. Plan wording stays in the database (owner). |
+| `src/app/(pages)/pricing/page.tsx` | Title "SEO Packages & Pricing", new description, BreadcrumbList | Keyword map |
+| `src/app/(pages)/insights/page.tsx` | Title "Insights: AI, Automation, Software & SEO for SMEs"; CollectionPage `@id`, `isPartOf`, `publisher`, `inLanguage`; BreadcrumbList | Keyword map; schema consistency |
+| `src/app/(pages)/insights/[slug]/page.tsx` | Article `isPartOf` the WebSite | Schema consistency |
+| `src/components/services/structured-data.tsx` | Shared `breadcrumbJsonLd()`; `JsonLdScripts` accepts any block | One breadcrumb builder for every page type |
+| `src/app/layout.tsx`, `.env.example` | Optional `GOOGLE_SITE_VERIFICATION` / `BING_SITE_VERIFICATION` meta tags, only when set | Search Console and Bing can be verified by meta tag without code changes; DNS needs neither |
+| `src/app/not-found.tsx` | Own robots meta removed | [T15](03-technical-seo-audit.md#t15-duplicate-robots-meta-on-404--low): Next already marks 404s noindex |
+| `tests/e2e/routes.spec.ts`, `tests/e2e/service-pages.spec.ts` | Names, titles, dates; all ten drafts guarded; new test that no sitemap page links to a missing internal page; /pricing billing summary, service links and breadcrumbs | Covers the changes |
+
+### Reviewed and deliberately left
+
+| Item | Why |
+|---|---|
+| Homepage H1, hero lede, section headings | Option A was kept in the last review; the lede is held to three lines so the H1 stays the LCP element; the title, description, descriptive hero links and screen-reader plate anchors already carry relevance |
+| Plan wording on /pricing (Starter "Basic" vs "Full", "assets", jargon labels) | Lives in the production `plans` table; changing it needs the owner. Ready SQL in the [pricing proposal](pricing-copy-proposal.md). A migration was not added, because a migration could apply it without review. |
+| Enquiry attribution | Reviewed: in memory only, `utm_source/medium/campaign` only, referrer as bare host, server-side sanitiser drops anything else; the privacy line describes it accurately. No change. |
+| Footer column H2s | Headings label the footer's navigation for screen-reader users; SEO effect negligible |
+| Design-study routes (R19) | `noindex`, unlinked and not in the sitemap; may be the owner's review tool on production |
+| Article `seoTitle` for "Why your website…" (69 chars with suffix) | A live page; shortening its title for a cosmetic truncation isn't worth a ranking change |
+| Analytics vendor | Owner choice; nothing installed |

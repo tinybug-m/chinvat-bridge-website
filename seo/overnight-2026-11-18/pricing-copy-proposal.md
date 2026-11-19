@@ -35,7 +35,9 @@ The owner must fill in the **[brackets]**; they are facts only the owner knows.
 - **Capabilities label:** "Adds"
 - **Capabilities:** "Multi-region site structure and hreflang" · "Automated reporting and structured data at scale [keep only if delivered]" · "A named lead consultant [or: 'A senior consultant on every call', whichever is true]"
 
-### Page-level additions (in code, `src/components/organisms/sections/Pricing.tsx`, when approved)
+### Page-level additions (in code, `src/components/organisms/sections/Pricing.tsx`)
+
+**Done locally on 19 Nov 2026**, using only what the terms already say: a "Billing and terms" section (billed monthly in advance through Stripe; prices exclusive of any applicable tax, added at checkout where relevant; no long-term contract, 30 days' notice; no ranking guarantees) and an "Other services" section linking the three quoted service pages. The page title is now "SEO Packages & Pricing". What remains below is the database wording, and the definition of a "piece", which only the owner can give. The original proposal follows for the record; it said "VAT", but the terms only say "applicable tax", so the page uses the terms' words.
 - Under the plans: **"Prices exclude VAT, which is added at checkout where applicable. Billed monthly; cancel with 30 days' notice."** (The terms already say prices are shown exclusive of applicable tax.)
 - A definition line: **"A ‘piece’ is [one optimised page or article of about N words / …]."**
 - Under the custom card: **"AI, automation and software projects are quoted individually."** with links to the three service pages.

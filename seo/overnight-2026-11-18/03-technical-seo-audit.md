@@ -14,17 +14,17 @@ Severity scale: **Critical** blocks rankings or splits signals; **High** materia
 | T2. Three of the four services have no indexable URL | High | Three service pages built locally |
 | T3. The only real client project links to a dead deployment | High | Link corrected locally to the production site |
 | T4. No analytics or conversion measurement of any kind | High | Plan written; needs owner choice of tool and consent approach |
-| T5. Company identity cannot be verified on Companies House | High (trust/compliance) | Decision for the owner; nothing changed |
+| T5. Company identity cannot be verified on Companies House | High (trust/compliance) | Resolved 19 Nov: not a limited company, so "Ltd" and `legalName` were removed |
 | T6. Homepage title leads with a brand name the SERP gives to mythology | Medium | Title rewritten locally |
 | T7. Homepage H1 says nothing about what the company does | Medium | Options documented; visible copy unchanged |
 | T8. Article structured data is thin and disconnected from the Organization | Medium | Fixed locally |
 | T9. Article breadcrumbs skip Home | Low | Fixed locally |
-| T10. Homepage main-thread cost on mobile (lab TBT ≈ 1.7 s) | Medium | Documented with a measurement plan; not changed |
+| T10. Homepage main-thread cost on mobile (lab TBT ≈ 1.7 s) | Medium | 19 Nov: the wire's routing made about 2× faster with identical output (median lab TBT 607 → 491 ms, longest task 400 → 241 ms); field INP still to measure |
 | T11. Robots policy differs between the two domains | Medium | Decision documented |
 | T12. Generic internal anchors point at a homepage anchor | Medium | Fixed locally with the new service pages |
 | T13. Organization schema lacks `sameAs`, number and address detail | Low | Waiting on verified profiles and company details |
 | T14. Design-study routes are public | Low | Documented |
-| T15. 404 page emits two robots meta tags | Low | Documented; harmless |
+| T15. 404 page emits two robots meta tags | Low | Fixed 19 Nov |
 
 What is already good, and should be kept: HTTPS with HSTS; `http` and apex both 308 to `https://www.`; trailing slashes 308 to the slashless URL; query strings resolve to a clean canonical; one H1 per page; every indexable page has its own title, description, canonical, Open Graph and Twitter data (from `pageMetadata()`); private routes (`/login`, `/subscribe/*`, `/client-portal`, `/dashboard`, `/admin`) are `noindex, nofollow` or redirect to login; the sitemap's `lastmod` values come from real content dates; images carry descriptive alt text; LCP and CLS are healthy in lab tests on every page sampled.
 
@@ -145,6 +145,8 @@ LCP and CLS are comfortably inside Google's "good" thresholds, so this isn't hol
 The last and longest task (about 440 ms at 2.1 s) matches the energy wire's deferred relayout: `EnergyFlow` waits for an idle period, then in one animation frame calls `measure(section)`, which reads text boxes from the DOM and runs the pure-geometry `routeWire()`. Running it while idle protects loading, but a tap that lands during that one task would wait for it, which is an INP risk on mid-range phones.
 
 **Specific fix, when field data justifies it:** split the work into two tasks. Read the boxes in the frame as now, then run `routeWire()` in its own task (`scheduler.yield()` where available, otherwise `setTimeout(0)`), or in a Web Worker, since it takes plain data and returns plain data. Then call `setLayout`. Verify with the existing "energy wire reveals each plate" e2e test and a fresh profile.
+
+**Update, 19 Nov 2026:** a CPU profile showed the longest task's time is in `routeWire()` itself (pure geometry), so splitting the DOM reads from the routing would not have shortened it. Two exact optimisations were made instead (bounding-box prefilter of obstacles; per-port caching of lane curves): output identical, routing 1.7–2.1× faster. See the [implementation log](implementation-log.md#19-nov-2026-implementation-pass).
 
 **Correction:** measure first. Once field data exists (Search Console's Core Web Vitals report, or the analytics tool's web-vitals), act only if mobile INP is above 200 ms. Candidate fixes, in order of safety: defer the energy-flow routing until after first input, lazy-mount the WebGL scenes when they near the viewport, and render the large decorative SVGs from static files rather than inline JSX so they leave the RSC payload. Nothing was changed: it is design-critical code and there is no field evidence of harm.
 

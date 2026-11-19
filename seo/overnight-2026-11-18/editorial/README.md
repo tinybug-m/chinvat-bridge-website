@@ -1,6 +1,6 @@
 # Editorial
 
-Nine full article drafts and one case study, ready for owner review. **None is published.**
+Nine full article drafts and one case study, ready for owner review. **None is published**, and every one keeps `draft: true`.
 
 Each exists twice:
 - **Here, as Markdown:** the brief. Its front matter holds the keyword, audience, purpose, internal links and the review notes to check before publishing.
@@ -43,9 +43,13 @@ Each answers a question a buyer asks *between* reading a general article and mak
 
 1. Read it under `pnpm dev` at `/insights/<slug>`, and work through the review notes in its Markdown front matter.
 2. In `src/content/blog/posts/<slug>.tsx`: delete `draft: true`, and set `date` to the publishing day.
-3. Add it to the target service page's `relatedInsights` in `src/data/service-pages.ts` (or `SEO_RELATED_INSIGHTS` in `src/data/seo-service.ts`) with a one-line reason.
-4. Remove its slug from the draft list in the "draft articles are not served" test in `tests/e2e/routes.spec.ts` if it is one of the three listed there.
-5. Run `pnpm lint`, `pnpm typecheck`, `pnpm build`, and the insights and routes e2e specs.
-6. After deploy, request indexing in Search Console.
+3. Remove its slug from the draft list in the "draft articles are not served" test in `tests/e2e/routes.spec.ts` (all ten are listed).
+4. Run `pnpm lint`, `pnpm typecheck`, `pnpm build`, and the insights, routes and service-pages e2e specs.
+5. After deploy, request indexing in Search Console.
+
+Nothing else needs editing (since 19 Nov 2026):
+- **Service pages:** every draft is already listed in its service page's related insights (`src/data/service-pages.ts`, `SEO_RELATED_INSIGHTS` in `src/data/seo-service.ts`). Unpublished slugs are skipped, so the link appears on the day the article is published.
+- **Links between articles:** any sentence that points to another draft is wrapped in `<WhenPublished slug="…">` (`src/components/insights/WhenPublished.tsx`). It shows only once that article is published, so the drafts can go live in any order without a link to a missing page. Three published articles carry such sentences too: they link their cluster's drafts from publication day. Use the same wrapper when a new draft refers to another unpublished one.
+- **A guard:** the e2e test "no page in the sitemap links to a missing page on the site" fails the build check if a published page ever links to an unpublished one.
 
 The page heading is `meta.title` (the full, title-cased H1); the `<title>` and social title use the shorter `meta.seoTitle` when it is set.
