@@ -2,10 +2,8 @@ import Link from "next/link";
 import type { PostMeta } from "@/lib/blog";
 
 /*
- * DRAFT from seo/overnight-2026-11-18/editorial/articles/replace-spreadsheets-with-custom-software.md (its front matter holds the
- * keyword, audience and review notes). Hidden in production while `draft` is true; visible in
- * `next dev` for review. To publish: remove `draft`, set `date` to the publishing day, and add the
- * article to its service page's related insights.
+ * From seo/overnight-2026-11-18/editorial/articles/replace-spreadsheets-with-custom-software.md (its front matter holds the
+ * keyword, audience and review notes).
  */
 export const meta: PostMeta = {
   slug: "replace-spreadsheets-with-custom-software",
@@ -13,12 +11,11 @@ export const meta: PostMeta = {
   seoTitle: "When to Replace Spreadsheets With Software",
   description:
     "How to tell when a business spreadsheet has become a system, the four ways out from cheapest to most tailored, and how to move without breaking anything.",
-  date: "2026-11-18",
+  date: "2026-11-20",
   author: "Chinvat Bridge",
   category: "Software Strategy",
   tags: ["software", "operations", "spreadsheets"],
   readingMinutes: 8,
-  draft: true,
 };
 
 export function Content() {

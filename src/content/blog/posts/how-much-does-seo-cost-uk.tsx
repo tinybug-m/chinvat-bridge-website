@@ -3,10 +3,8 @@ import { WhenPublished } from "@/components/insights/WhenPublished";
 import type { PostMeta } from "@/lib/blog";
 
 /*
- * DRAFT from seo/overnight-2026-11-18/editorial/articles/how-much-does-seo-cost-uk.md (its front matter holds the
- * keyword, audience and review notes). Hidden in production while `draft` is true; visible in
- * `next dev` for review. To publish: remove `draft`, set `date` to the publishing day, and add the
- * article to its service page's related insights.
+ * From seo/overnight-2026-11-18/editorial/articles/how-much-does-seo-cost-uk.md (its front matter holds the
+ * keyword, audience and review notes).
  */
 export const meta: PostMeta = {
   slug: "how-much-does-seo-cost-uk",
@@ -14,12 +12,11 @@ export const meta: PostMeta = {
   seoTitle: "How Much Does SEO Cost in the UK?",
   description:
     "What UK small businesses typically pay for SEO, how retainers, audits and day rates differ, what drives the price, and the red flags to avoid at any budget.",
-  date: "2026-11-18",
+  date: "2026-11-20",
   author: "Chinvat Bridge",
   category: "SEO & Discovery",
   tags: ["seo", "pricing"],
   readingMinutes: 8,
-  draft: true,
 };
 
 export function Content() {
