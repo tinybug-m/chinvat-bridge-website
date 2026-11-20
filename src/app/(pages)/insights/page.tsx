@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { InsightIndex } from "@/components/insights/InsightIndex";
 import { PageHeader } from "@/components/system/PageHeader";
 import { SiteShell } from "@/components/templates/SiteShell";
-import { getAllPosts } from "@/lib/blog";
+import { getPublishedPosts } from "@/lib/blog";
 import { JsonLdScripts, breadcrumbJsonLd } from "@/components/services/structured-data";
 import { SITE_URL } from "@/lib/constants";
 import { pageMetadata } from "@/lib/metadata";
@@ -15,7 +15,8 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default function InsightsIndexPage() {
-  const posts = getAllPosts();
+  // Published articles only, as on the live site; drafts are reviewed at their own URL under `next dev`.
+  const posts = getPublishedPosts();
 
   return (
     <SiteShell>
