@@ -1,9 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const ROWS = [
+  { slug: "where-the-name-chinvat-bridge-comes-from", title: "Where the Name Chinvat Bridge Comes From", category: "Our Name" },
   { slug: "where-ai-can-save-your-business-time", title: "Where AI Can Actually Save Your Business Time", category: "AI & Workflows" },
   { slug: "what-should-you-automate-first", title: "What Should You Automate First?", category: "Process Automation" },
-  { slug: "why-your-website-isnt-bringing-you-customers", title: "Why Your Website Isn’t Bringing You Enough Customers", category: "SEO & Discovery" },
 ];
 
 /** The href of every link matching `selector`, in page order. */
@@ -11,7 +11,7 @@ const articleLinks = (page: Page, selector: string) =>
   page.locator(selector).evaluateAll((links) => links.map((a) => a.getAttribute("href")!));
 
 test.describe("insights section", () => {
-  test("the three newest published articles link to their pages; the origin article is left to About", async ({ page }) => {
+  test("the three newest published articles link to their pages", async ({ page }) => {
     await page.goto("/");
     const section = page.locator("#insights");
     await expect(section.getByRole("heading", { level: 2 })).toHaveText("Ideas and observations.");
@@ -29,7 +29,6 @@ test.describe("insights section", () => {
     await expect(section.getByRole("link", { name: /All insights/ })).toHaveAttribute("href", "/insights");
     // No summary line under the heading: the row categories already say what the writing covers.
     await expect(section).not.toContainText("Practical thinking about");
-    await expect(section.locator('a[href="/insights/where-the-name-chinvat-bridge-comes-from"]')).toHaveCount(0);
   });
 
   test("drafts stay off the homepage, even under next dev, while the archive keeps every article", async ({ page, request }, testInfo) => {

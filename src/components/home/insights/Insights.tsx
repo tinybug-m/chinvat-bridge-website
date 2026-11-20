@@ -18,10 +18,7 @@ const HOMEPAGE_POST_COUNT = 3;
  */
 export function Insights() {
   // Published articles only, even under `next dev`: drafts are reviewed from /insights, never here.
-  // The origin article is already linked from About, one screen up; the list keeps to client-facing writing.
-  const posts = getPublishedPosts()
-    .filter((post) => post.meta.slug !== "where-the-name-chinvat-bridge-comes-from")
-    .slice(0, HOMEPAGE_POST_COUNT);
+  const posts = getPublishedPosts().slice(0, HOMEPAGE_POST_COUNT);
 
   return (
     <Section id="insights" labelledBy="insights-title" className="py-16 md:py-24">
