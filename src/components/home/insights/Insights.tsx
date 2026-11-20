@@ -5,7 +5,10 @@ import { Container } from "@/components/system/Container";
 import { Section } from "@/components/system/Section";
 import { SectionHeading } from "@/components/system/SectionHeading";
 import { TextLink } from "@/components/system/TextLink";
-import { getAllPosts } from "@/lib/blog";
+import { getPublishedPosts } from "@/lib/blog";
+
+/** A teaser, not the archive: the rest are one click away through "All insights". */
+const HOMEPAGE_POST_COUNT = 3;
 
 /*
  * Calmer and tighter than Capabilities: a narrow heading column beside a
@@ -14,8 +17,11 @@ import { getAllPosts } from "@/lib/blog";
  * the writing covers.
  */
 export function Insights() {
+  // Published articles only, even under `next dev`: drafts are reviewed from /insights, never here.
   // The origin article is already linked from About, one screen up; the list keeps to client-facing writing.
-  const posts = getAllPosts().filter((post) => post.meta.slug !== "where-the-name-chinvat-bridge-comes-from");
+  const posts = getPublishedPosts()
+    .filter((post) => post.meta.slug !== "where-the-name-chinvat-bridge-comes-from")
+    .slice(0, HOMEPAGE_POST_COUNT);
 
   return (
     <Section id="insights" labelledBy="insights-title" className="py-16 md:py-24">

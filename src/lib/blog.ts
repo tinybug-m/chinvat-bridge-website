@@ -31,10 +31,23 @@ export interface Post {
   Content: ComponentType;
 }
 
+/**
+ * Every article the current build serves, newest first: published ones, plus drafts under
+ * `next dev`. Articles published the same day keep their order in the registry.
+ */
 export function getAllPosts(): Post[] {
   return ALL_POSTS.filter((post) => SHOW_DRAFTS || !post.meta.draft).sort(
     (a, b) => new Date(b.meta.date).getTime() - new Date(a.meta.date).getTime()
   );
+}
+
+/**
+ * Published articles only, newest first — drafts are left out even under `next dev`. For lists
+ * that stand in for the public site, such as the homepage teaser, where reviewing a draft in
+ * place must not change what the page shows.
+ */
+export function getPublishedPosts(): Post[] {
+  return getAllPosts().filter((post) => !post.meta.draft);
 }
 
 export function getPostBySlug(slug: string): Post | undefined {

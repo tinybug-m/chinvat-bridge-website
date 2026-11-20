@@ -1,20 +1,23 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const ROWS = [
   { slug: "where-ai-can-save-your-business-time", title: "Where AI Can Actually Save Your Business Time", category: "AI & Workflows" },
   { slug: "what-should-you-automate-first", title: "What Should You Automate First?", category: "Process Automation" },
   { slug: "why-your-website-isnt-bringing-you-customers", title: "Why Your Website Isn’t Bringing You Enough Customers", category: "SEO & Discovery" },
-  { slug: "when-should-a-business-build-custom-software", title: "When Should a Business Build Custom Software?", category: "Software Strategy" },
 ];
 
+/** The href of every link matching `selector`, in page order. */
+const articleLinks = (page: Page, selector: string) =>
+  page.locator(selector).evaluateAll((links) => links.map((a) => a.getAttribute("href")!));
+
 test.describe("insights section", () => {
-  test("four index rows link to their articles; the origin article is left to About", async ({ page }) => {
+  test("the three newest published articles link to their pages; the origin article is left to About", async ({ page }) => {
     await page.goto("/");
     const section = page.locator("#insights");
     await expect(section.getByRole("heading", { level: 2 })).toHaveText("Ideas and observations.");
     await expect(section).toHaveAttribute("aria-labelledby", "insights-title");
     const rows = section.locator("ol > li");
-    await expect(rows).toHaveCount(4);
+    await expect(rows).toHaveCount(ROWS.length);
     for (const [index, { slug, title, category }] of ROWS.entries()) {
       const row = rows.nth(index);
       await expect(row.getByRole("heading", { level: 3 })).toHaveText(title);
@@ -27,6 +30,28 @@ test.describe("insights section", () => {
     // No summary line under the heading: the row categories already say what the writing covers.
     await expect(section).not.toContainText("Practical thinking about");
     await expect(section.locator('a[href="/insights/where-the-name-chinvat-bridge-comes-from"]')).toHaveCount(0);
+  });
+
+  test("drafts stay off the homepage, even under next dev, while the archive keeps every article", async ({ page, request }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "once is enough");
+    await page.goto("/insights");
+    const archive = await articleLinks(page, 'main a[href^="/insights/"]');
+    // Under `next dev` the archive also lists drafts for review, each marked on its own page;
+    // a production build serves none, so there the list is empty and the rows above are the check.
+    const drafts: string[] = [];
+    for (const href of archive) {
+      const response = await request.get(href);
+      expect(response.status(), href).toBe(200);
+      if ((await response.text()).includes("Draft, not published")) drafts.push(href);
+    }
+
+    await page.goto("/");
+    const home = await articleLinks(page, "#insights ol a");
+    expect(home).toHaveLength(ROWS.length);
+    for (const href of home) {
+      expect(drafts, `${href} is a draft`).not.toContain(href);
+      expect(archive, `${href} is in the archive`).toContain(href);
+    }
   });
 
   test("rows and the footer link are large enough to tap, with no overflow", async ({ page }) => {
@@ -60,7 +85,7 @@ test.describe("insights section", () => {
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
     await page.goto("/");
-    await expect(page.locator("#insights ol > li")).toHaveCount(4);
+    await expect(page.locator("#insights ol > li")).toHaveCount(ROWS.length);
     await expect(page.locator("#insights ol a").first()).toBeVisible();
     await context.close();
   });
