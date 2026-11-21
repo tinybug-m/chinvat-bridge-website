@@ -102,7 +102,7 @@ test.describe("routes", () => {
     expect(lastmodOf("/services/seo")).toBe("2026-11-19");
     // Revised 21 Nov 2026: unverifiable delivery claims replaced (owner decision).
     expect(lastmodOf("/services/custom-software")).toBe("2026-11-21");
-    expect(lastmodOf("/privacy")).toBe("2026-11-18");
+    expect(lastmodOf("/privacy")).toBe("2026-11-21");
     expect(lastmodOf("/insights/what-should-you-automate-first")).toBe("2026-09-15");
     // A revised article carries its own updated date, and the index changes when its newest article does.
     expect(lastmodOf("/insights/why-your-website-isnt-bringing-you-customers")).toBe("2026-11-19");
