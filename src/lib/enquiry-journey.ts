@@ -12,10 +12,19 @@ export interface JourneyInput {
 
 const oneLine = (value: unknown, max: number) => (typeof value === "string" ? value.replace(/[\r\n]+/g, " ").trim().slice(0, max) : "");
 
-/** A site path, optionally with a query string of plain characters. */
+/** A path on this site; "//host" is another site (protocol-relative), so it is refused. */
+const PATH = /^\/(?!\/)[\w\-./%~@]*$/;
+/** URLSearchParams output: percent-encoded, with "+" for spaces; "*" is left unencoded. */
+const QUERY = /^[\w\-.=&%+*]*$/;
+
+/**
+ * A site path, optionally with a query string of plain characters. An unusable query is dropped
+ * on its own, so a campaign tag with odd characters never costs the landing page itself.
+ */
 export const sitePath = (value: unknown) => {
-  const path = oneLine(value, 300);
-  return /^\/[\w\-./%~@]*(\?[\w\-.=&%+]*)?$/.test(path) ? path : "";
+  const [path, query, ...rest] = oneLine(value, 300).split("?");
+  if (!PATH.test(path ?? "")) return "";
+  return query && !rest.length && QUERY.test(query) ? `${path}?${query}` : path;
 };
 
 /** A bare host name, such as www.google.com. */
