@@ -61,7 +61,7 @@ export interface ServicePageContent {
 export const AI_SERVICE: ServicePageContent = {
   path: "/services/ai-integration",
   name: "AI Integration",
-  updated: "2026-11-19",
+  updated: "2026-11-21",
   title: "AI Consultancy & Integration for Small Businesses",
   description:
     "AI consultancy and integration for small businesses, from a UK-based team: we find where AI reliably saves time, choose tools and connect them to your systems.",
@@ -114,7 +114,7 @@ export const AI_SERVICE: ServicePageContent = {
       },
       {
         title: "Guardrails and human review",
-        body: "Where output reaches a customer or informs a decision, we build in review steps, limits on what the system may do on its own, and a record of what it did, so problems are caught early and can be traced.",
+        body: "Where output reaches a customer or informs a decision, we recommend review steps, limits on what the system may do on its own and a record of what it did, and agree them with you before anything goes live.",
       },
       {
         title: "Measuring whether it works",
@@ -166,7 +166,7 @@ export const AI_SERVICE: ServicePageContent = {
   process: {
     Discover: "For AI: the tasks that eat your team’s time, the systems they touch, and the data involved.",
     Define: "Which task to start with, what “working” means in numbers, and which tool or model fits.",
-    Build: "The integration, the review steps and the guardrails, tested on real examples from your business.",
+    Build: "The integration, with the review steps and limits agreed with you.",
     Improve: "Measured against the agreed numbers, then extended to the next task if it earns it.",
   },
   engagement: [
@@ -192,7 +192,7 @@ export const AI_SERVICE: ServicePageContent = {
     {
       question: "What happens when the AI gets something wrong?",
       answer:
-        "We assume it sometimes will and design for it: review steps before anything reaches a customer, limits on what the system can do on its own, and a record of its outputs so mistakes can be spotted and traced. Where a task can’t tolerate errors, we’ll recommend keeping it manual.",
+        "We assume it sometimes will, and plan for it before anything goes live: we recommend review steps before anything reaches a customer, limits on what the system can do on its own and a record of its outputs, and agree them with you. Where a task can’t tolerate errors, we’ll recommend keeping it manual.",
     },
     {
       question: "Do you work with businesses outside the UK?",
@@ -244,7 +244,7 @@ export const AI_SERVICE: ServicePageContent = {
 export const AUTOMATION_SERVICE: ServicePageContent = {
   path: "/services/workflow-automation",
   name: "Workflow Automation",
-  updated: "2026-11-19",
+  updated: "2026-11-21",
   title: "Business Process Automation & Integration",
   description:
     "Workflow automation and API integration for small businesses. We connect your CRM, accounts, inbox and spreadsheets so information moves without being retyped.",
@@ -285,7 +285,7 @@ export const AUTOMATION_SERVICE: ServicePageContent = {
       },
       {
         title: "Connecting the tools you already use",
-        body: "Built-in automation and connector platforms such as Zapier or Make are often the fastest and cheapest route, and we use them where they are reliable enough for the job.",
+        body: "Built-in automation and connector platforms such as Zapier or Make are often the fastest and cheapest route, and where one is reliable enough for the job, we’ll tell you.",
       },
       {
         title: "Custom API integrations",
@@ -300,8 +300,8 @@ export const AUTOMATION_SERVICE: ServicePageContent = {
         body: "Where a step needs something read or written, such as classifying an email or pulling fields from an invoice, we add AI to the workflow with a review step where the result matters.",
       },
       {
-        title: "Alerts, logs and documentation",
-        body: "Automations fail quietly when a password, field or API changes. We build in alerts and logs, and write down how each workflow works, so it doesn’t become a black box nobody dares touch.",
+        title: "Problems reported, workflows documented",
+        body: "Automations fail quietly when a password, field or API changes. We agree with you how each workflow reports problems and how it is documented, so it doesn’t become a black box nobody dares touch.",
       },
     ],
   },
@@ -379,7 +379,7 @@ export const AUTOMATION_SERVICE: ServicePageContent = {
     {
       question: "What happens when an automation breaks?",
       answer:
-        "We build workflows to fail loudly rather than silently: errors raise an alert, failed steps can be retried, and there is a record of what happened. We also document how each workflow works, so you are not dependent on one person remembering.",
+        "We plan for failure from the start: how errors are reported, what happens to a failed step, and how the workflow is documented, so you are not dependent on one person remembering.",
     },
     {
       question: "How much does workflow automation cost?",
@@ -428,7 +428,7 @@ export const AUTOMATION_SERVICE: ServicePageContent = {
 export const SOFTWARE_SERVICE: ServicePageContent = {
   path: "/services/custom-software",
   name: "Custom Software",
-  updated: "2026-11-19",
+  updated: "2026-11-21",
   title: "Custom Software Development for Small Businesses",
   description:
     "Custom software and web applications for small businesses: internal tools, client portals, dashboards and websites, built around how your business works.",
@@ -532,8 +532,8 @@ export const SOFTWARE_SERVICE: ServicePageContent = {
         body: "The first release solves one real problem for a defined group of people. Scope creep, not technical difficulty, is what usually sinks custom software.",
       },
       {
-        title: "Built with the people who use it",
-        body: "We design around the staff and customers who will use the software every day, and test it with them before it replaces anything.",
+        title: "Designed around the people who use it",
+        body: "We design around the staff and customers who will use the software every day.",
       },
     ],
     note: "Most business problems don’t need custom software, and we’ll tell you when yours doesn’t. When it is the right call, a small tool that solves one problem well is usually worth more than a large platform that tries to solve everything at once.",
@@ -541,7 +541,7 @@ export const SOFTWARE_SERVICE: ServicePageContent = {
   process: {
     Discover: "For software: the process today, the people who’ll use the tool, and the systems it must work with.",
     Define: "A written brief: the problem, who it is for, and what the first version must do, and what it won’t.",
-    Build: "Design, development and integration in short cycles, shown to you as it takes shape.",
+    Build: "Design, development and integration, shown to you at agreed points as it takes shape.",
     Improve: "Launch, watch how it’s used, and add what the real work shows is missing.",
   },
   engagement: [

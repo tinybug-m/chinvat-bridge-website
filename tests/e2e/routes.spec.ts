@@ -14,7 +14,6 @@ const PAGES = [
   "/insights/why-your-website-isnt-bringing-you-customers",
   "/insights/where-the-name-chinvat-bridge-comes-from",
   "/insights/replace-spreadsheets-with-custom-software",
-  "/insights/how-much-does-seo-cost-uk",
   "/privacy",
   "/terms",
   "/login",
@@ -28,6 +27,7 @@ const REDIRECTS: [string, string][] = [
   ["/dashboard", "/login"],
   ["/admin", "/login"],
   ["/subscribe/details", "/pricing"],
+  ["/services", "/#services"],
 ];
 
 test.describe("routes", () => {
@@ -48,6 +48,13 @@ test.describe("routes", () => {
     test(`${from} redirects to ${to}`, async ({ page }) => {
       await page.goto(from);
       await expect(page).toHaveURL(new RegExp(`${to}$`));
+    });
+  }
+
+  // Design-review pages run under `next dev` only (owner, 21 Nov 2026).
+  for (const path of ["/bridge-studies", "/hero-studies/crossing", "/hero-studies/monument", "/hero-studies/portal"]) {
+    test(`${path} is not served in production`, async ({ request }) => {
+      expect((await request.get(path)).status()).toBe(404);
     });
   }
 
@@ -93,14 +100,14 @@ test.describe("routes", () => {
     );
     expect(lastmodOf("/pricing")).toBeUndefined();
     expect(lastmodOf("/services/seo")).toBe("2026-11-19");
-    expect(lastmodOf("/services/custom-software")).toBe("2026-11-19");
+    // Revised 21 Nov 2026: unverifiable delivery claims replaced (owner decision).
+    expect(lastmodOf("/services/custom-software")).toBe("2026-11-21");
     expect(lastmodOf("/privacy")).toBe("2026-11-18");
     expect(lastmodOf("/insights/what-should-you-automate-first")).toBe("2026-09-15");
     // A revised article carries its own updated date, and the index changes when its newest article does.
     expect(lastmodOf("/insights/why-your-website-isnt-bringing-you-customers")).toBe("2026-11-19");
     // Published 20 Nov 2026: the index takes the newest article's date.
     expect(lastmodOf("/insights/replace-spreadsheets-with-custom-software")).toBe("2026-11-20");
-    expect(lastmodOf("/insights/how-much-does-seo-cost-uk")).toBe("2026-11-20");
     expect(lastmodOf("/insights")).toBe("2026-11-20");
   });
 
@@ -108,6 +115,8 @@ test.describe("routes", () => {
   test("draft articles are not served, listed or in the sitemap", async ({ page, request }) => {
     // Remove a slug from this list when its article is published.
     const drafts = [
+      // Published 20 Nov, back to draft 21 Nov until /pricing defines its content unit.
+      "how-much-does-seo-cost-uk",
       "how-to-connect-business-systems",
       "how-to-choose-an-ai-consultant",
       "what-a-technical-seo-audit-should-include",
