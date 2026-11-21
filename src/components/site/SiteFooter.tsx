@@ -43,8 +43,10 @@ export function SiteFooter() {
             <nav key={column.title} aria-label={`Footer: ${column.title}`} className={column.className}>
               <h2 className="text-small font-medium text-ink">{column.title}</h2>
               <ul className="mt-3 flex flex-col">
+                {/* Keyed by label, never by href + label: keys are serialised into the page, and a string
+                    like "/pricingPricing" there was crawled by Google as a URL and 404'd. */}
                 {column.links.map((link) => (
-                  <li key={link.href + link.label}>
+                  <li key={link.label}>
                     <Link
                       href={link.href}
                       prefetch={prefetchFor(link.href)}

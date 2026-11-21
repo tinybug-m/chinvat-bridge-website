@@ -77,12 +77,13 @@ def main() -> None:
     if "Filters.csv" in data:
         print("Filters in the export: " + "; ".join(f"{r.get('Filter', '')}: {r.get('Value', '')}" for r in data["Filters.csv"]) + "\n")
 
-    dates = data.get("Dates.csv", [])
+    # Current UI exports name the daily file Chart.csv; older exports and gsc-api.py use Dates.csv.
+    dates = data.get("Dates.csv") or data.get("Chart.csv", [])
     if dates:
         days = sorted(r[first_key(dates)] for r in dates)
-        print(f"Days in Dates.csv: {len(days)} ({days[0]} to {days[-1]})\n")
+        print(f"Days in the daily file: {len(days)} ({days[0]} to {days[-1]})\n")
         print(head)
-        print(row("All queries (totals, from Dates.csv)", dates))
+        print(row("All queries (totals, from the daily file)", dates))
         print()
 
     queries = data.get("Queries.csv", [])
