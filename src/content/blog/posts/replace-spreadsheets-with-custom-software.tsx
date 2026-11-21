@@ -55,7 +55,7 @@ export function Content() {
 
       <h3>You need to control who sees what</h3>
 
-      <p>Client details, salaries, health or financial information. Under UK GDPR you are expected to take appropriate measures to keep personal data secure, and a widely shared spreadsheet makes that hard: anyone with the file sees everything, and a copy can leave the business as an email attachment.</p>
+      <p>Client details, salaries, health or financial information. Under UK GDPR you are expected to take appropriate measures to keep personal data secure (the <a href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/security/a-guide-to-data-security/" target="_blank" rel="noopener noreferrer">ICO’s guide to data security</a> sets out what that means), and a widely shared spreadsheet makes that hard: anyone with the file sees everything, and a copy can leave the business as an email attachment.</p>
 
       <h2>Four ways out, from cheapest to most tailored</h2>
 
