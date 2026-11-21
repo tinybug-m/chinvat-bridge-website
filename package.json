@@ -9,7 +9,9 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "test:e2e": "playwright test",
-    "shoot": "node scripts/qa/shoot.mjs"
+    "shoot": "node scripts/qa/shoot.mjs",
+    "seo:check-migration": "node scripts/seo/check-migration.mjs",
+    "seo:crawl": "node scripts/seo/crawl-live.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
