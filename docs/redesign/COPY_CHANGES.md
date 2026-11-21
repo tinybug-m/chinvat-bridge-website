@@ -237,3 +237,4 @@ Research and reasons: `seo/remediation-2026-11-21/`. Local branch `seo/remediati
 | Homepage `<title>` | AI, Automation & Custom Software for SMEs — Chinvat Bridge | AI, Automation & Software for Small Businesses — Chinvat Bridge | UK autocomplete rewrites "…for sme" queries to "…for small business", so buyers type "small business". "Custom software" is left to /services/custom-software, so the homepage and that page no longer compete for it. |
 | /services/ai-integration `<title>` | AI Consultancy & Integration for SMEs | AI Consultancy & Integration for Small Businesses | Same evidence; matches /services/seo ("SEO Services for Small Businesses"). |
 | /services/custom-software `<title>` | Custom Software Development for SMEs | Custom Software Development for Small Businesses | Same. |
+| Social-share card (`opengraph-image.png`) | chinvatbridge.uk | chinvatbridge.com | The .com is the primary domain; every shared link showed the old one. |

@@ -63,7 +63,7 @@ const og = `<div class="card">
     <p class="word">Chinvat Bridge</p>
     <p class="line">AI, Automation, Software &amp; SEO</p>
   </div>
-  <p class="foot">chinvatbridge.uk</p>
+  <p class="foot">chinvatbridge.com</p>
   <div class="caption"><span>Current state</span><span>Better systems</span></div>
   ${markSvg("glass", 'class="mark" width="430" height="418"')}
 </div>`;
