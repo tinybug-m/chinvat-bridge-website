@@ -109,7 +109,12 @@ export function PricingCard({ plan, index }: PricingCardProps) {
         </div>
         <p className="mt-4 flex items-baseline gap-2">
           <span className="font-display text-title font-medium tabular-nums text-ink">{plan.priceLabel}</span>
-          <span className="text-small text-ink-muted">{plan.billingPeriod}</span>
+          {/* "/month" on its own is serialised into the page as a quoted string, and Google reads
+              such strings as links (the footer's old "/pricingPricing" key was crawled as a 404).
+              Splitting off the slash renders the same text without a path-like string. */}
+          <span className="text-small text-ink-muted">
+            {plan.billingPeriod.startsWith("/") ? ["/", plan.billingPeriod.slice(1)] : plan.billingPeriod}
+          </span>
         </p>
         <p className="mt-5 max-w-[36ch] text-body text-pretty text-ink-soft">{plan.description}</p>
       </div>

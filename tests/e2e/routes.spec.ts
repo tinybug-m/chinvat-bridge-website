@@ -12,6 +12,9 @@ const PAGES = [
   "/insights/when-should-a-business-build-custom-software",
   "/insights/where-ai-can-save-your-business-time",
   "/insights/why-your-website-isnt-bringing-you-customers",
+  "/insights/where-the-name-chinvat-bridge-comes-from",
+  "/insights/replace-spreadsheets-with-custom-software",
+  "/insights/how-much-does-seo-cost-uk",
   "/privacy",
   "/terms",
   "/login",
@@ -140,6 +143,24 @@ test.describe("routes", () => {
     }
     for (const [target, from] of targets) {
       expect((await request.get(target, { maxRedirects: 0 })).status(), `${target} (linked from ${from})`).toBeLessThan(400);
+    }
+  });
+
+  // Google also reads quoted strings in the page's serialised data as links. A footer key of
+  // href + label ("/pricingPricing") was crawled that way and 404'd, so every path-like string in
+  // the raw HTML must be a page or file that exists.
+  test("no path-like string in a sitemap page's HTML is a missing page", async ({ request }) => {
+    const xml = await (await request.get("/sitemap.xml")).text();
+    const paths = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(([, loc]) => new URL(loc).pathname);
+    const strings = new Map<string, string>();
+    for (const path of paths) {
+      const html = await (await request.get(path)).text();
+      for (const [, found] of html.matchAll(/(?:"|\\")(\/[A-Za-z0-9_][A-Za-z0-9_\-./%~]*)(?=\\?")/g)) {
+        if (!found.startsWith("/_next/static/") && !strings.has(found)) strings.set(found, path);
+      }
+    }
+    for (const [found, from] of strings) {
+      expect((await request.get(found)).status(), `"${found}" (in the HTML of ${from})`).toBeLessThan(400);
     }
   });
 
