@@ -17,6 +17,9 @@ export const meta: PostMeta = {
   category: "SEO & Discovery",
   tags: ["seo", "pricing"],
   readingMinutes: 8,
+  // Back to draft on 21 Nov 2026 (owner): it warns against high volumes at low prices while /pricing
+  // sells 8 / 15 / 35 undefined "assets". Republish once the owner defines the unit.
+  draft: true,
 };
 
 export function Content() {

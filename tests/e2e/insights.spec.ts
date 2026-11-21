@@ -2,8 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 const ROWS = [
   { slug: "replace-spreadsheets-with-custom-software", title: "Outgrown Your Spreadsheets? When to Replace Them with Software", category: "Software Strategy" },
-  { slug: "how-much-does-seo-cost-uk", title: "How Much Does SEO Cost in the UK?", category: "SEO & Discovery" },
   { slug: "where-the-name-chinvat-bridge-comes-from", title: "Where the Name Chinvat Bridge Comes From", category: "Our Name" },
+  { slug: "where-ai-can-save-your-business-time", title: "Where AI Can Actually Save Your Business Time", category: "AI & Workflows" },
 ];
 
 /** The href of every link matching `selector`, in page order. */
