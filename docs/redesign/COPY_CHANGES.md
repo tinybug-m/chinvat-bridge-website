@@ -227,3 +227,13 @@ Research and reasons: `seo/overnight-2026-11-18/`. Local only, not deployed.
 | Recent work, Scornik Gerstein LLP | https://scornik.vercel.app/ | https://www.scornik.com/ | The preview link returned DEPLOYMENT_NOT_FOUND; this is the firm's production site. |
 | Article links | "process automation", "AI integration", "workflow automation", "software project" → /#services | → the matching service page | Descriptive anchors to pages that can rank. |
 | Enquiry email footer | Sent from the contact conversation on chinvatbridge.uk. | …on chinvatbridge.com. | The .com is the primary domain. |
+
+## SEO remediation (21 November 2026)
+
+Research and reasons: `seo/remediation-2026-11-21/`. Local branch `seo/remediation-2026-11-21`; not pushed or deployed.
+
+| Where | Before (live) | Now | Why |
+|---|---|---|---|
+| Homepage `<title>` | AI, Automation & Custom Software for SMEs — Chinvat Bridge | AI, Automation & Software for Small Businesses — Chinvat Bridge | UK autocomplete rewrites "…for sme" queries to "…for small business", so buyers type "small business". "Custom software" is left to /services/custom-software, so the homepage and that page no longer compete for it. |
+| /services/ai-integration `<title>` | AI Consultancy & Integration for SMEs | AI Consultancy & Integration for Small Businesses | Same evidence; matches /services/seo ("SEO Services for Small Businesses"). |
+| /services/custom-software `<title>` | Custom Software Development for SMEs | Custom Software Development for Small Businesses | Same. |

@@ -62,7 +62,7 @@ export const AI_SERVICE: ServicePageContent = {
   path: "/services/ai-integration",
   name: "AI Integration",
   updated: "2026-11-19",
-  title: "AI Consultancy & Integration for SMEs",
+  title: "AI Consultancy & Integration for Small Businesses",
   description:
     "AI consultancy and integration for small businesses, from a UK-based team: we find where AI reliably saves time, choose tools and connect them to your systems.",
   h1: "AI integration that earns its place in your business",
@@ -429,7 +429,7 @@ export const SOFTWARE_SERVICE: ServicePageContent = {
   path: "/services/custom-software",
   name: "Custom Software",
   updated: "2026-11-19",
-  title: "Custom Software Development for SMEs",
+  title: "Custom Software Development for Small Businesses",
   description:
     "Custom software and web applications for small businesses: internal tools, client portals, dashboards and websites, built around how your business works.",
   h1: "Custom software built around the way your business works",

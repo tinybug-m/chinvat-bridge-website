@@ -2,10 +2,12 @@ export const SITE_NAME = "Chinvat Bridge";
 /**
  * The homepage title leads with the offer, not the name: a search for "Chinvat Bridge" alone
  * returns the Zoroastrian bridge, so the name earns little on its own (seo/overnight-2026-11-18).
- * The business is UK-based and works internationally, so titles name the buyer (SMEs), not a
- * country; "UK-based" stays in descriptions as a fact.
+ * The business is UK-based and works internationally, so titles name the buyer, not a country;
+ * "UK-based" stays in descriptions as a fact. Buyers search "small business", not "SME" (UK
+ * autocomplete rewrites "…for sme" to "…for small business"; seo/remediation-2026-11-21). "Custom
+ * software" is left to /services/custom-software, which targets it, so the two titles don't compete.
  */
-export const SITE_TITLE = "AI, Automation & Custom Software for SMEs — Chinvat Bridge";
+export const SITE_TITLE = "AI, Automation & Software for Small Businesses — Chinvat Bridge";
 export const SITE_DESCRIPTION =
   "UK-based technology consultancy for small businesses worldwide: AI integration, workflow automation, custom software and technical SEO, built around your work.";
 /** Where the name comes from, for structured data. Sourced in the About section and docs/redesign/COPY_CHANGES.md. */
