@@ -7,8 +7,8 @@ Devices.csv, Dates.csv and Filters.csv. Prints Markdown tables to paste into
 seo/remediation-2026-11-21/SEO_MEASUREMENT_BASELINE.md.
 
 Limits that the output states, because they matter when reading it:
-- Totals come from Dates.csv (every day, all queries). Queries.csv is capped at 1,000 rows and omits
-  anonymised queries, so brand + non-brand query sums are lower than the totals.
+- Totals come from Dates.csv (every day, all queries). Queries.csv is capped (1,000 rows from the UI,
+  50,000 a day from the API, which scripts/seo/gsc-api.py uses) and omits anonymised queries, so brand + non-brand query sums are lower than the totals.
 - Brand = a query containing "chinvat" AND a business term (the rule in
   seo/overnight-2026-11-18/15-measurement-framework.md). Other "chinvat" queries are mythology
   traffic and are reported separately.
@@ -92,7 +92,7 @@ def main() -> None:
         brand = [r for r in chinvat if BUSINESS.search(r[key])]
         myth = [r for r in chinvat if not BUSINESS.search(r[key])]
         nonbrand = [r for r in queries if "chinvat" not in r[key].lower()]
-        print(f"Queries.csv rows: {len(queries)} (capped at 1,000; anonymised queries excluded)\n")
+        print(f"Queries.csv rows: {len(queries)} (UI exports cap at 1,000 rows, the API at 50,000 a day; anonymised queries are excluded either way)\n")
         print(head)
         print(row("Brand (chinvat + business term)", brand))
         print(row("Name only (likely mythology)", myth))

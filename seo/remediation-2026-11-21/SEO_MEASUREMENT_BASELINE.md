@@ -19,20 +19,31 @@ Keep reporting periods separate across these dates, and never sum figures across
 - **Domain property `chinvatbridge.com`.** Two `google-site-verification` TXT records exist on it, so it is probably verified.
 - **Domain property `chinvatbridge.uk`.** One TXT record exists. Needed for historical data and for Change of Address, which must run from a property you own on the *old* domain.
 
-**Access options, in order of preference:**
+**Access route (chosen 21 Nov 2026): the official Search Console API, read-only, authorised by you through Google's consent screen.**
 
-1. **You export, I analyse.** No account sharing. For each property, export from the Performance report → Search results:
-   - Date range "Last 16 months" (the maximum) → **Export → Download CSV**. It produces a zip with Queries, Pages, Countries, Devices, Dates and Filters.
-   - Pages report (Indexing → Pages) → **Export** of both "Indexed" and "Not indexed".
-   - Sitemaps page: a screenshot or the status text.
-   - Settings → Change of address: screenshot.
-   - URL Inspection on `https://www.chinvatbridge.com/` and `/services/custom-software`: screenshot of "Page indexing" and "User-declared vs Google-selected canonical".
-2. **Read-only API access.** A Google Cloud service account added to both properties as a **Restricted** user (read-only), with the Search Console API enabled. This allows Search Analytics and URL Inspection by script. More set-up for you, and you hold the key.
-3. **Add a person.** Search Console → Settings → Users and permissions → Add user, permission **Restricted**. This only helps if someone operates a browser session as that user. This environment can't sign in to Google on your behalf, so options 1 and 2 are the practical ones.
+- **Client:** `scripts/seo/gsc-api.py`. Standard library only.
+- **Scope:** only `https://www.googleapis.com/auth/webmasters.readonly`. A token with any other scope is refused and not saved.
+- **Endpoints:** every request passes an allow-list of read-only calls: sites.list, sitemaps.list, searchAnalytics.query, urlInspection.index.inspect. Nothing in Search Console can be changed from it.
+- **Credentials:** stored outside the repository in `~/.config/chinvat-gsc/`, mode 600. They are never printed. You can revoke them any time at myaccount.google.com/permissions.
+- **Raw data:** written outside the repository, to `~/Documents/project/artin/chinvat-gsc-data/<date>/`. Only summaries go into this file.
 
-**Permissions required:** read-only ("Restricted") is enough for every report. **Owner** permission on both properties is needed only for Change of Address, and you should run that yourself.
+**What the API returns** (checked against Google's API reference, 21 Nov 2026):
+- Up to 16 months of performance data by date, query, page, country and device. The query × page combination, and Google's branded classification where the property has enough volume (that data starts 21 Feb 2026).
+- Sitemap status: submitted and downloaded dates, pending, warnings and errors, and the URL count.
+- Per-URL index inspection (2,000 a day per property): verdict, coverage, Google-selected versus declared canonical, last crawl.
 
-**Processing:** `python3 scripts/seo/gsc-summary.py <export.zip> --label "<property>, <start>..<end>"`. It prints the tables below. The script is tested only on a synthetic fixture; no real data has gone through it.
+**What it does not return, so these still need the Search Console UI:**
+- The **Page indexing report**. The API has only per-URL inspection; I inspect all 16 sitemap URLs on both domains instead.
+- **Change of Address status.**
+- The URL list inside a submitted sitemap. That comes from the live sitemap itself.
+
+For the first two, a screenshot of Indexing → Pages and of Settings → Change of address, from each property, completes the picture.
+
+**Fallback if the API isn't set up:** for each property, Performance → Search results → "Last 16 months" → Export → Download CSV, plus the two screenshots above.
+
+**Permissions required:** read-only is enough for everything here. **Owner** permission on both properties is needed only for Change of Address, and you run that yourself.
+
+**Processing:** `python3 scripts/seo/gsc-api.py fetch`, then `python3 scripts/seo/gsc-summary.py <data>/<property> --label "<property>, <start>..<end>"`. Both are tested end to end on mocked data in the scratchpad; no real data has gone through them yet.
 
 ## Baseline tables (to be filled from exports)
 
