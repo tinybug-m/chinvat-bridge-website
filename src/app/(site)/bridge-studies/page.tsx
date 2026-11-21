@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Image from "next/image";
 import { CompareStudio } from "@/components/bridge-studies/CompareStudio";
 import { StudyThumbnail } from "@/components/bridge-studies/StudyPicture";
@@ -25,6 +26,8 @@ export const metadata: Metadata = {
 };
 
 export default function BridgeStudiesPage() {
+  // Design review only: served by `next dev`, a 404 in production builds (owner, 21 Nov 2026).
+  if (process.env.NODE_ENV === "production") notFound();
   return (
     <SiteShell>
       <header className="pt-32 pb-section md:pt-40">

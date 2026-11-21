@@ -5,6 +5,13 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   // No X-Powered-By: it only tells a scanner which framework (and so which advisories) to try.
   poweredByHeader: false,
+  async redirects() {
+    return [
+      // There is no services hub page; the homepage section is the hub, and the header's
+      // "Services" link already goes there (owner, 21 Nov 2026).
+      { source: "/services", destination: "/#services", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {
