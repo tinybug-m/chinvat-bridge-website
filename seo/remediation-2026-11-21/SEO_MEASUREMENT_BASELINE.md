@@ -15,11 +15,11 @@ Keep reporting periods separate across these dates, and never sum figures across
 
 ## Search Console: what is needed
 
-**Properties:**
-- **Domain property `chinvatbridge.com`.** Two `google-site-verification` TXT records exist on it, so it is probably verified.
-- **Domain property `chinvatbridge.uk`.** One TXT record exists. Needed for historical data and for Change of Address, which must run from a property you own on the *old* domain.
+**Properties (confirmed 21 Nov 2026):** `chinvatbridge.com` and `chinvatbridge.uk` are both Domain properties, and your account is a verified owner of each. Change of Address must run from the `.uk` property, the *old* domain.
 
-**Access route (chosen 21 Nov 2026): the official Search Console API, read-only, authorised by you through Google's consent screen.**
+**How the baseline was actually taken:** Search Console's own CSV exports and report pages, read in a browser session you signed into (below). The API client described next is built but **has never been authorised or run against real data**. It is the route for recurring monthly pulls once the browser session is signed out.
+
+**API route (built, not yet used): the official Search Console API, read-only, authorised by you through Google's consent screen.**
 
 - **Client:** `scripts/seo/gsc-api.py`. Standard library only.
 - **Scope:** only `https://www.googleapis.com/auth/webmasters.readonly`. A token with any other scope is refused and not saved.
@@ -43,7 +43,7 @@ For the first two, a screenshot of Indexing → Pages and of Settings → Change
 
 **Permissions required:** read-only is enough for everything here. **Owner** permission on both properties is needed only for Change of Address, and you run that yourself.
 
-**Processing:** `python3 scripts/seo/gsc-api.py fetch`, then `python3 scripts/seo/gsc-summary.py <data>/<property> --label "<property>, <start>..<end>"`. Both are tested end to end on mocked data in the scratchpad; no real data has gone through them yet.
+**Processing:** `python3 scripts/seo/gsc-api.py fetch`, then `python3 scripts/seo/gsc-summary.py <data>/<property> --label "<property>, <start>..<end>"`. `gsc-summary.py` has run on the real 21 Nov exports. `gsc-api.py` is tested only on a mocked API.
 
 ## Baseline, recorded 21 November 2026
 
@@ -56,13 +56,51 @@ For the first two, a screenshot of Indexing → Pages and of Settings → Change
 
 **Both properties are Domain properties, and the account is a verified owner of each.**
 
+### Verification against the raw exports (21 Nov 2026)
+
+Every Performance figure in this section was recomputed from the CSVs with a separate script, not with `gsc-summary.py`. All of these match the exports:
+- The totals.
+- The months.
+- Queries, pages, countries and devices.
+- Both properties.
+
+Each extracted CSV is byte-identical to its copy inside Google's zip. The indexing, sitemap and Change of Address figures come from the report pages, which have no export, so they cannot be checked this way.
+
+Corrections made on verification:
+- Non-brand position: was "64–91"; it is an average of 64.5 over positions 2–91.
+- Iran added: 8 of the 18 clicks.
+- The `.uk` start date: was 13 Sep (a zero row); it is 14 Sep.
+- Page impressions are not additive.
+
+**Raw exports are kept unchanged.** SHA-256 of each file, taken before verification and checked again after it:
+
+```
+# ~/Documents/project/artin/chinvat-gsc-data/2026-11-21/
+b64f511411ee6f9e03dcf2b987e2ef6028c1140de19d78ebc4942e0b40fe762d  ./chinvatbridge-com-Performance-on-Search-2026-11-21.zip
+634fd45ed29701df13569d832d6bbe33de28324f92f7af121b5fa491bdf6eb07  ./chinvatbridge-uk-Performance-on-Search-2026-11-21.zip
+c75172058c67960f6ef3f55af4991e9a0ff6291b8e089a577618802fdfaf0fe5  ./com/Chart.csv
+288851f9c3d92e7da953abf37f02ef9f81c6bb36a8af00476a37a92e9ed2051e  ./com/Countries.csv
+fe0559d987a4a247eda59678ee32e492d2f50c53e1b014e11b582ae1047b68d7  ./com/Devices.csv
+8f01689e4c22ebdb46389640291c85566379567db24b131ed6b00bb188198f8b  ./com/Filters.csv
+7488bf254b644198b9e882790d370c7448c3d37c7d63ddf40abaa8e8979158f3  ./com/Pages.csv
+3fd0862b0938e4bffe0f9c12dc8c0cbc3f307383cf1daa97188176e597eeb596  ./com/Queries.csv
+eed9ceafb9193e5e3d034f5897ad992bc851f1998204cd98f0b0f6873fbfc8b2  ./com/Search appearance.csv
+f231670e308a4d32ca5251d620ba19956ae2f3936013fde88662188c3fab4602  ./uk/Chart.csv
+f7479e32cfba1709e77b0a6376858f23afe53ac015a59686dfa4ee7ec08ff560  ./uk/Countries.csv
+40314563c31f74b2396f290a98609a6df1aa58ea6cf39e74fdf15e8bf82b7182  ./uk/Devices.csv
+8f01689e4c22ebdb46389640291c85566379567db24b131ed6b00bb188198f8b  ./uk/Filters.csv
+4c2de3bed404f9039983731de91a03a28e0b00095c6f1dac80ec44a3b3cc95d3  ./uk/Pages.csv
+518ae20c44f569a4c3306090e948989ac8ba0cc51a4a708c6ee793b78a670cde  ./uk/Queries.csv
+eed9ceafb9193e5e3d034f5897ad992bc851f1998204cd98f0b0f6873fbfc8b2  ./uk/Search appearance.csv
+```
+
 ### Performance
 
-Web search only, final data as exported. The `.uk` property's data starts 13 Sep 2026 (the site's first appearance); the `.com` property's starts 18 Nov 2026.
+Web search only, final data as exported. The `.uk` export starts 13 Sep 2026, a zero row; the first impression is on 14 Sep. The `.com` property's data starts 18 Nov 2026.
 
 | Property | Period with data | Clicks | Impressions | CTR | Avg. position |
 |---|---|---|---|---|---|
-| `chinvatbridge.uk` | 13 Sep – 19 Nov 2026 (68 days) | 18 | 2,374 | 0.76% | 8.9 |
+| `chinvatbridge.uk` | 14 Sep – 19 Nov 2026 (67 days) | 18 | 2,374 | 0.76% | 8.9 |
 | `chinvatbridge.com` | 18 Nov – 19 Nov 2026 (2 days) | 0 | 2 | 0% | 2.5 |
 
 **`.uk` by calendar month.** Never compare months of different lengths; November runs only to the 19th.
@@ -87,7 +125,8 @@ Web search only, final data as exported. The `.uk` property's data starts 13 Sep
 **Brand split:**
 - **Name-only:** 2,252 impressions, **95%** of the total.
 - **Brand with a business term:** 0.
-- **Non-brand:** 12 impressions and 0 clicks, at positions 64–91.
+- **Non-brand:** 12 impressions and 0 clicks, impression-weighted average position 64.5. Of those, 3 are relevant ("business ai productivity yorkshire", position 71.7), 7 irrelevant (positions 76–91) and 2 unclear ("are they good?", "rate them", position 2).
+- **Anonymised:** 110 impressions and 14 clicks are in no named query, so the named rows add up to 2,264 impressions, not 2,374.
 
 **Commercial non-brand visibility is effectively zero.**
 
@@ -101,6 +140,20 @@ Web search only, final data as exported. The `.uk` property's data starts 13 Sep
 | `/insights/what-should-you-automate-first` | 1 | 24 | 4.17% | 20.0 |
 | `/services/seo` | 0 | 3 | 0% | 59.7 |
 | `/insights/why-your-website-isnt-bringing-you-customers` | 0 | 1 | 0% | 6 |
+
+Page impressions add up to 2,439, more than the property's 2,374: Google counts an impression for each of your pages shown in one search, so page rows must never be summed into a total.
+
+**`.uk` countries, top by clicks:** 81 countries in all.
+
+| Country | Clicks | Impressions | CTR | Position |
+|---|---|---|---|---|
+| **Iran** | **8** | **20** | **40%** | 5.8 |
+| **United Kingdom** | **5** | **74** | **6.76%** | 12.5 |
+| Spain | 3 | 1,076 | 0.28% | 8.0 |
+| France | 1 | 559 | 0.18% | 8.8 |
+| Argentina | 1 | 44 | 2.27% | 12.7 |
+
+Every other country has 0 clicks.
 
 **`.uk` countries, top by impressions:**
 
@@ -124,8 +177,8 @@ Web search only, final data as exported. The `.uk` property's data starts 13 Sep
 ### What the data shows, and what it doesn't
 
 - **Almost all visibility is the bare name, from outside the UK.** 95% of impressions are "chinvat bridge" or "chinvat", mostly desktop searches in Spain, France and Latin America, with 0.18% CTR. These are overwhelmingly people looking up the Zoroastrian bridge, not buyers. The homepage still averages position **8.9** for the name, so the business does appear on page one for it. That corrects the 18 Nov research, which found "only mythology results" using a US-based search tool.
-- **The UK is small but engaged:** 74 impressions and 5 clicks (6.8% CTR). That is the only segment that behaves like interested visitors.
-- **No commercial query has reached page one, or page five.** Non-brand impressions total 12, at positions 64–91. The service pages launched on 20 Nov and have no data yet. `/services/seo` (live since 9 Nov) has 3 impressions at position 60.
+- **Clicks come from two small segments.** Iran gave 8 of the 18 clicks from 20 impressions (40% CTR, position 5.8), and the UK 5 from 74 (6.8%). The data cannot say who these were. The name is Persian, so Iranian searchers may want the bridge or the company. Searches by you or people you know would also look like this. Neither segment is evidence of buyers.
+- **No commercial query has reached page one, or page five.** The only relevant non-brand query ("business ai productivity yorkshire") sits at position 71.7; the two position-2 rows are unclear one-off queries. The service pages launched on 20 Nov and have no data yet. `/services/seo` (live since 9 Nov) has 3 impressions at position 60.
 - **The north-star figure (qualified organic enquiries) starts at zero by any measure.** Nothing shows a commercial query sending a visitor.
 - **What can't be concluded:**
   - Anything about the service pages, the new titles or the two new articles; they are too new.
@@ -142,7 +195,7 @@ Web search only, final data as exported. The `.uk` property's data starts 13 Sep
 | **Indexed (6)** | `/` (16 Nov); `/insights/why-your-website-isnt-bringing-you-customers` (16 Nov); `/services/seo` (13 Nov); `/insights/where-ai-can-save-your-business-time` (9 Nov); `/insights/where-the-name-chinvat-bridge-comes-from` (6 Nov); `/insights/what-should-you-automate-first` (6 Nov) |
 | Discovered – currently not indexed (5) | `/insights`, `/insights/when-should-a-business-build-custom-software`, `/pricing`, `/privacy`, `/terms`. **Never crawled** |
 | Page with redirect (3) | `http://chinvatbridge.uk/`, `https://chinvatbridge.uk/`, `http://www.chinvatbridge.uk/`. Expected: host variants |
-| Not found (404) (1) | `https://www.chinvatbridge.uk/pricingPricing` (crawled 6 Nov). A malformed URL; source not identified; a 404 is the correct answer |
+| Not found (404) (1) | `https://www.chinvatbridge.uk/pricingPricing` (crawled 6 Nov). Source found: the footer's React keys (href + label) were serialised into every page, and Google read them as links. Live pages also carry `/insightsInsights`, and `/pricing` carries `/month`. Fixed on the branch (`SEO_TECHNICAL_VERIFICATION.md`); a 404 was the correct answer meanwhile |
 | Blocked by robots.txt (1) | `https://r.mail.chinvatbridge.uk/`, the email-tracking subdomain. Harmless |
 | Crawled – currently not indexed (1) | A hashed favicon URL. Harmless |
 
@@ -203,7 +256,7 @@ The `.uk` sitemap URL now redirects to `.com`. Leaving it submitted is harmless;
 | UTM parameters | Correct for `utm_source`, `utm_medium` and `utm_campaign`; `utm_term` and `utm_content` deliberately not kept | `UTM_KEYS` |
 | Referring domain | Correct, as a bare host. The site's own domains (`.com` and `.uk`, with or without `www`) count as internal | `OWN_DOMAINS`. Referrer-Policy `strict-origin-when-cross-origin` still passes search engines' origins |
 | Previous page | Correct | — |
-| Server-side sanitisation | **Fixed on this branch.** Before: one character outside the allow-list in a campaign tag (for example `*`, which `URLSearchParams` leaves unencoded) dropped the *whole* entry, landing page included. Now an unusable query is dropped on its own and the path kept; `*` is allowed; a protocol-relative `//host` is refused | 12 edge cases run against the compiled module; `contact` spec passes on three viewports |
+| Server-side sanitisation | **Fixed on this branch.** Before: one character outside the allow-list in a campaign tag (for example `*`, which `URLSearchParams` leaves unencoded) dropped the *whole* entry, landing page included. Now an unusable query is dropped on its own and the path kept; `*` is allowed; a protocol-relative `//host` is refused | `pnpm test:unit` (`tests/unit/enquiry-journey.test.mjs`, 5 tests); `contact` spec passes on three viewports |
 | Through the `.uk` redirect | Campaign tags are lost (Cloudflare drops the query); the path and the original referrer survive | Live redirect check |
 | **Real email delivery** | **Never tested.** No mail credentials locally; e2e stubs the send | **Needs your approval:** one test enquiry from the live contact form to your own inbox, after the next deploy |
 

@@ -20,9 +20,9 @@
 | ID | Issue | Priority | Required action | Status | Verification |
 |---|---|---|---|---|---|
 | **Stage 1: domain migration** | | | | | |
-| M1 | `.uk` → `.com` redirect drops the query string | Critical | Cloudflare: one dynamic redirect rule, 301, preserve query string, deployed (exact settings in `SEO_TECHNICAL_VERIFICATION.md`) | **Waiting for owner** (approval to change Cloudflare, or you apply it) | Diagnosed from outside; `pnpm seo:check-migration` fails on exactly the 6 query cases today, and will pass when fixed |
-| M2 | Stripe webhook endpoint may still name `.uk` (deliveries would get a 301 and fail; this webhook creates paying customers' accounts) | Critical | You check: Stripe → Developers → Webhooks → the endpoint URL must be `https://www.chinvatbridge.com/api/webhooks/stripe`. Then check its recent deliveries for failures, and resend any failed events. Also check Settings → Customer portal for return URLs on `.uk` | **Waiting for owner** | Not visible from outside |
-| M3 | Supabase Site URL and redirect allow-list unverified. With `.uk` as the Site URL, sign-in breaks via M1 | Critical | You check: Supabase → Authentication → URL Configuration. Site URL `https://www.chinvatbridge.com`; Redirect URLs include `https://www.chinvatbridge.com/**` (keep `.uk/**` for now). Then one sign-in at `/login` with an email link | **Waiting for owner** | Reported done on 19 Nov; not verifiable from outside |
+| M1 | `.uk` → `.com` redirect drops the query string | Critical | Cloudflare: one Single Redirect naming exactly `chinvatbridge.uk` and `www.`, Dynamic, `concat("https://www.chinvatbridge.com", http.request.uri.path)`, 301, preserve query string on, deployed. Exact rule, impact table, order of work and rollback in `SEO_TECHNICAL_VERIFICATION.md` | **Waiting for owner** (approval to change Cloudflare, or you apply it) | Diagnosed from outside and checked against Cloudflare's docs (preserve is off by default). Brevo's `mail`/`r.mail` hosts on the same zone are deliberately not matched. `pnpm seo:check-migration` fails on exactly the 6 query cases today, and must show 27 passed after |
+| M2 | Stripe webhook endpoint may still name `.uk` (deliveries would get a 301 and fail; this webhook creates paying customers' accounts) | Critical | You check: Stripe → Developers → Webhooks → the endpoint URL must be `https://www.chinvatbridge.com/api/webhooks/stripe`. Then check its recent deliveries for failures, and resend any failed events. Seven-step check, including a test event that needs no payment, in `SEO_TECHNICAL_VERIFICATION.md` | **Waiting for owner** | From outside: the `www.…com` route answers (405 to GET); `.uk` 301s and apex 308s, so Stripe would fail on either. The endpoint itself is visible only in the dashboard |
+| M3 | Supabase Site URL and redirect allow-list unverified. With `.uk` as the Site URL, sign-in breaks via M1 | Critical | You check: Supabase → Authentication → URL Configuration. Site URL `https://www.chinvatbridge.com`; Redirect URLs include `https://www.chinvatbridge.com/**` (keep `.uk/**` for now). Then one sign-in at `/login` with an email link. Also email templates and the Google OAuth consent screen. Full list in `SEO_TECHNICAL_VERIFICATION.md` | **Waiting for owner** | The live site requests `redirect_to` = `.com/auth/callback`, and Google returns to the Supabase callback (checked 21 Nov from a signed-out browser). The Site URL and allow-list can't be read from outside: Supabase's `state` is opaque. Reported done on 19 Nov |
 | M4 | Search Console: state of both properties unknown | Critical | Read both properties (owner signed in to a browser session on 21 Nov; read-only). API client also available (`scripts/seo/gsc-api.py`) | **Verified** | Both are Domain properties; verified owner of each. Baseline in `SEO_MEASUREMENT_BASELINE.md` |
 | M5 | Sitemap submission and URL inspection of the 16 URLs | High | `.com` sitemap submitted by the owner on 19 Nov: read 21 Nov, Success, 16 discovered. `.com` indexing still "processing"; re-check in a few days. Indexing requests for the service pages: not recorded | **Implemented** | Search Console Sitemaps page, 21 Nov |
 | M6 | Change of Address `.uk` → `.com` | High | Not started (confirmed). Owner runs it from the `.uk` property once M1 passes `pnpm seo:check-migration` | **Blocked** (on M1 only; ownership confirmed) | Change of address page, 21 Nov: setup form only, no move in progress |
@@ -30,9 +30,9 @@
 | **Stage 2: measurement** | | | | | |
 | S1 | No analytics | Critical | Plausible Starter ($9/month) recommended; Vercel Web Analytics compared. Needs your approval and a privacy-policy line | **Waiting for owner** | Comparison in `SEO_MEASUREMENT_BASELINE.md` (vendor pages read 21 Nov) |
 | S2 | Vercel Terms: Hobby is "for your personal or non-commercial use" | High | Tell me which Vercel plan the project is on | **Waiting for owner** | Terms of Service, section 4 |
-| S3 | Enquiry attribution: one odd character in a campaign tag discarded the landing page | Medium | Keep the path when only the query is unusable; allow `*`; refuse `//host` | **Verified** | 12 edge cases; `contact` spec passes on 3 viewports |
+| S3 | Enquiry attribution: one odd character in a campaign tag discarded the landing page | Medium | Keep the path when only the query is unusable; allow `*`; refuse `//host` | **Verified** | `pnpm test:unit` (5 tests, in the repo); `contact` spec passes on 3 viewports |
 | S4 | Real enquiry email never tested | High | One test enquiry from the live form to your inbox, after the next deploy | **Waiting for owner** (approval to send) | — |
-| S5 | Search Console baseline tooling | High | `scripts/seo/gsc-summary.py` | **Implemented** | Synthetic fixture only; real data pending M4 |
+| S5 | Search Console baseline tooling | High | `scripts/seo/gsc-summary.py` | **Verified** | Run on the real 21 Nov exports. Figures cross-checked by a separate script; four corrections made in the baseline (non-brand position range, Iran's 8 clicks, start date, page impressions not additive) |
 | S6 | Baseline and trackers empty | High | Search Console baseline recorded; enquiry tracker and analytics still empty | **Implemented** | `SEO_MEASUREMENT_BASELINE.md` |
 | **Stage 3: trust** | | | | | |
 | T1 | /pricing: undefined "assets"; Starter "Basic" vs "Full" audit; "content velocity"; "Enterprise-grade"; "Dedicated senior SEO consultant" | High | `pricing-wording.sql`. Part 1 is wording only, ready. Part 2 needs your facts (what an asset is; which audit Starter gets; whether a senior consultant is dedicated; whether "SEO automation & schema pipelines" is delivered) | **Waiting for owner** | Live text checked 21 Nov |
@@ -63,10 +63,16 @@
 | A3 | `sameAs` in Organization schema | Medium | Add only verified profiles | **Blocked** (on A1) | — |
 | A4 | No named person or author | Medium | Your decision: name the founder, with a short bio? | **Waiting for owner** | — |
 | G1 | Search Console: 5 unread messages; "1 unused verification token" on `.com` | Medium | Owner reads the messages (opening them marks them read, so I left them) and reviews the leftover token under Users and permissions | **Waiting for owner** | Search Console overview, 21 Nov |
-| G2 | Google crawled `https://www.chinvatbridge.uk/pricingPricing` (404). Cause: footer list items were keyed `href + label`, and React serialises keys into every page, so strings like `/pricingPricing` and `/insightsInsights` (one per footer link) were in the HTML for Google to try | Low | Key footer items by label (`src/components/site/SiteFooter.tsx`) | **Verified** | Local build: 0 malformed keys on 5 pages (was 7 per page live); `shell` and `routes` specs 55 passed, 0 failed |
+| G2 | Google crawled `https://www.chinvatbridge.uk/pricingPricing` (404). Cause: footer list items were keyed `href + label`, and React serialises keys into every page, so strings like `/pricingPricing` and `/insightsInsights` (one per footer link) were in the HTML for Google to try | Low | Key footer items by label (`src/components/site/SiteFooter.tsx`) | **Verified** | Site-wide check: live has `/insightsInsights` and `/pricingPricing` on all 19 pages scanned; the branch has none on 24 pages. A new `routes` test fails on live and passes on the branch |
 | A5 | Outreach (Scornik credit, contributor pitch) | Medium | Drafts exist; sending them is yours | **Waiting for owner** | — |
+| G3 | `/pricing` HTML carries `"/month"` as a standalone string (the plan's billing period from the database), the same class as G2 | Low | Render the slash as its own text node (`PricingCard.tsx`); on-screen text unchanged; database untouched | **Verified** | Site-wide check; rendered `£299/<!-- -->month` |
+| G4 | Social-share card prints `chinvatbridge.uk` on every shared link | Medium | Re-render `opengraph-image.png` with `.com` (`scripts/brand/render-brand-assets.mjs`) | **Verified** | Image inspected; other brand assets byte-identical |
+| G5 | Missing tests: the sanitiser had none; three published articles were missing from the render list; nothing guarded against G2 recurring | Medium | `tests/unit/enquiry-journey.test.mjs` (`pnpm test:unit`); `routes.spec.ts` render list and path-string test | **Verified** | 5 unit tests; routes, shell and service-pages 80 passed, 0 failed |
+| M8 | `.com` indexing: monitor until all 16 sitemap URLs are indexed | High | Re-check Search Console Pages on `.com` around 24–25 Nov in the existing browser session, then **sign that session out** and confirm it has ended. Later checks use the API client (`gsc-api.py`) or your own exports | **Implementing** (waiting on Google) | 21 Nov: "Processing data"; sitemap read, 16 discovered |
 
 ## Decisions needed from you
+
+**All pricing, commitment and privacy decisions, with live wording, options, fallbacks and a reply template: `OWNER_DECISIONS.md`.** The tables below are the short form.
 
 ### Service-page commitments (T3)
 
@@ -128,3 +134,31 @@ If analytics is added (S1), the policy needs one more line.
 - No public trace of backlinks or a LinkedIn page.
 
 **Needs you:** K1 (Keyword Planner), A1 (LinkedIn), C3/C5, X6/X7.
+
+### Branch review (21 Nov 2026)
+
+Every commit on `seo/remediation-2026-11-21` was reviewed against `main`. There are eight commits, not six.
+
+**Regressions:** none found.
+- The one shared constant changed, `SITE_TITLE`, is used only in the root layout's metadata.
+- The sanitiser keeps every input the old one accepted, except a protocol-relative `//host`, which it now refuses on purpose.
+- Re-runs pass: lint, typecheck, build, unit, and routes, shell and service-pages on three viewports.
+
+**Unnecessary changes:** none in the site code.
+- `scripts/seo/gsc-api.py` (328 lines) has never been run against the real API, because the baseline came through the browser instead.
+- It stays as the read-only route for monthly pulls once the browser session is signed out.
+- It is a script, never deployed. Remove it before merge if you'd rather not authorise an OAuth client.
+
+**Missing tests, now added (G5):**
+- Sanitiser unit tests.
+- A path-string guard for G2: it fails on the live site and passes on the branch.
+- The three published articles in the render list.
+
+**Still untested by design:**
+- Real email delivery (S4).
+- Real sign-in and checkout (M2, M3; your dashboards).
+- The Cloudflare rule (M1; `pnpm seo:check-migration` once it changes).
+
+**Found during the review and fixed:**
+- G3, `/month`.
+- G4, the social card on `.uk`.

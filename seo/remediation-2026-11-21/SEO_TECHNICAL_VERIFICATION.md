@@ -37,17 +37,62 @@ That pattern means a single Cloudflare rule rewrites the path with "preserve que
 
 Which of these it is can only be seen in the dashboard.
 
-**Production-safe fix (owner to apply; not changed):**
+**Cloudflare's documented behaviour** (developers.cloudflare.com/rules/url-forwarding/, read 21 Nov 2026):
+- "Preserve query string" is "disabled by default".
+- Single Redirects run first. If a Single Redirect and a Bulk Redirect both match, "the product executed first will apply". The Rules products "take precedence over Page Rules".
+- Within one product, "Cloudflare will always use the URL redirect of the first rule that matches".
+- Single and Bulk Redirects "require that you proxy the DNS records".
 
-1. Cloudflare → `chinvatbridge.uk` zone → Rules → Overview. List every rule that can match the zone: Redirect Rules, Page Rules, Bulk Redirects (account level), and any Workers routes. There should be exactly one `.uk` → `.com` redirect. Disable or delete the others after noting them.
-2. Edit the remaining rule to this form:
-   - **If incoming requests match:** custom filter expression `(http.host eq "chinvatbridge.uk") or (http.host eq "www.chinvatbridge.uk")`.
-   - **Then:** URL redirect, type **Dynamic**, expression `concat("https://www.chinvatbridge.com", http.request.uri.path)`, status **301**, **Preserve query string: on**.
-   - **Deploy.** Not "Save as draft".
-3. Run `pnpm seo:check-migration`. Every line should pass. The sign-in callback, Stripe return and campaign-tag cases are in the script.
-4. Keep both `.uk` DNS records proxied (orange cloud), or the rule stops running. Keep the redirect for at least 180 days, and preferably for good.
+The live behaviour, path kept and query dropped on both hosts and both schemes, is exactly a redirect rule with that default left off.
 
-301 stays: it is the intended status, and Google treats 301 and 308 alike for indexing.
+**What else lives on the `.uk` zone** (public DNS, 21 Nov 2026), which the rule must not touch:
+
+| Host | What it is | Proxied |
+|---|---|---|
+| `chinvatbridge.uk`, `www.chinvatbridge.uk` | The old website: redirect only | Yes (Cloudflare IPs) |
+| `mail.chinvatbridge.uk`, `r.mail.chinvatbridge.uk` | Brevo's branded sending and click-tracking domain (`*.brand.brevosend.com`). Tracked links in emails already sent go through `r.mail` | No |
+| MX | Cloudflare Email Routing (`route1–3.mx.cloudflare.net`) | n/a (mail, not HTTP) |
+
+This is why the rule names the two hosts exactly. Cloudflare's own example uses a hostname wildcard (`http*://host/*`); a pattern like `*chinvatbridge.uk` would also catch `r.mail` and break the tracked links in every Brevo email.
+
+**Proposed production rule (not applied; for your approval):**
+
+| Field | Value |
+|---|---|
+| Where | Cloudflare → zone `chinvatbridge.uk` → Rules → Redirect Rules (Single Redirects) |
+| Rule name | `uk to com, path and query` |
+| When incoming requests match | Custom filter expression: `(http.host eq "chinvatbridge.uk") or (http.host eq "www.chinvatbridge.uk")` |
+| Then | URL redirect, type **Dynamic** |
+| Expression | `concat("https://www.chinvatbridge.com", http.request.uri.path)` |
+| Status code | **301** (unchanged; Google treats 301 and 308 alike) |
+| Preserve query string | **On** |
+| Position | First in the Redirect Rules list |
+| Save | **Deploy**, not "Save as draft" |
+
+`http.request.uri.path` is the path without the query, so the query is added once, by the setting. Putting the query in the expression *and* switching the setting on would duplicate it.
+
+**Order of work:**
+1. **Inventory first, change nothing.** Rules → Overview on the `.uk` zone; account → Bulk Redirects; Page Rules; Workers routes. Note every rule that can match `chinvatbridge.uk` or `www.`, with a screenshot. If the existing redirect is a **Single Redirect**, edit it to the table above. If it is a **Bulk Redirect or Page Rule**, create the Single Redirect above: it answers first, so the old rule becomes dead. Disable the old one only after step 3 passes, and never delete it the same day.
+2. **Deploy** the rule.
+3. **Verify:** `pnpm seo:check-migration` must show 27 passed, 0 failed. Then by hand: a magic-link sign-in, and one `.uk` link with `?utm_source=test` in a browser.
+4. Keep both `.uk` web records proxied, and keep the redirect for good, or at least 180 days.
+
+**Impact:**
+
+| Who or what | Before | After |
+|---|---|---|
+| Visitors on old `.uk` links with parameters (campaign tags, shared links) | Land on the right page; parameters lost | Same page, parameters kept, so enquiry attribution records the campaign |
+| A `.uk` auth callback (`/auth/callback?code=…`), only if Supabase still falls back to `.uk` (M3) | The code is stripped: sign-in fails | The code arrives: sign-in works |
+| Old Stripe return links (`/subscribe/success?session_id=…`) | The session ID is stripped: generic success page | The session ID is kept |
+| Search Console Change of Address | Blocked on working redirects | Can start once step 3 passes (M6) |
+| `.com` site, email, Brevo tracking, MX | Unaffected | Unaffected: not matched by the rule |
+| Stripe webhooks | A webhook pointed at `.uk` fails either way: Stripe does not follow redirects | Unchanged; that is M2, fixed in Stripe |
+
+**Risk and rollback:**
+- **Downtime:** none. Rule changes take effect in seconds, and the paths that work today are not changed.
+- **What could go wrong:** a typo in the expression makes `.uk` URLs redirect to the wrong place, or fail. Step 3 catches this within a minute.
+- **Rollback:** disable the new rule, and the old one answers again exactly as today. If the old rule was edited in place, set "Preserve query string" off and it is back to today's behaviour.
+- **Cost:** none expected. It edits the existing redirect or adds one rule beside it. Your plan's rule limit is shown on the Redirect Rules page.
 
 **What the dropped query breaks, given the current code:**
 
@@ -58,6 +103,39 @@ Which of these it is can only be seen in the dashboard.
 | **Supabase (unverified)** | **The remaining real risk.** If Supabase's Site URL is still `.uk`, or `.com/**` is missing from its redirect allow-list, Supabase falls back to the Site URL. The callback then goes to `.uk/auth/callback?code=…`, the redirect strips the code, and every magic-link and Google sign-in fails. Owner check in `SEO_REMEDIATION_REGISTER.md` |
 | Campaign links and shared links on `.uk` | Lose their parameters, so enquiry attribution records no campaign |
 | Search Console Change of Address | Should wait for the fix (Google's prerequisite is working redirects) |
+
+### Stripe and Supabase after the domain move: owner checks
+
+**Verified from outside (21 Nov 2026, read-only):**
+
+| Check | Result |
+|---|---|
+| `GET https://www.chinvatbridge.com/api/webhooks/stripe` | 405: the route exists and accepts only POST, as built |
+| Same path on `https://chinvatbridge.com` | 308 to `www` |
+| Same path on `https://www.chinvatbridge.uk` | 301 to `.com` |
+| Checkout success and cancel URLs (`src/actions/checkout.ts`) | Built from `SITE_URL`, so `.com` in production |
+| Sign-in: what the live site asks Supabase for | One "Continue with Google" click from a fresh, signed-out browser, stopped at Google's sign-in form. `redirect_to` = `https://www.chinvatbridge.com/auth/callback?next=/dashboard`. Google's return address is `ponsocflxgdufnvfesav.supabase.co/auth/v1/callback`, so the Google OAuth client does not depend on your domain. Supabase's `state` is opaque on this version, so its Site URL and allow-list **cannot** be read from outside. Each click left one abandoned sign-in record in Supabase (two in all), which expires on its own |
+| Magic-link email | Not tested: it sends an email |
+
+**Stripe (M2).** Stripe does **not follow redirects** for webhooks: any 3xx counts as a failed delivery. So the endpoint must be exactly the `www.…com` URL. The `.uk` and apex `.com` addresses both fail every event. The webhook handles `checkout.session.completed` (creates the customer's account), `invoice.payment_failed` and `customer.subscription.deleted`.
+
+1. **Live mode on.** Dashboard → Developers → Webhooks. The endpoint URL must read exactly `https://www.chinvatbridge.com/api/webhooks/stripe`. If it names `.uk` or `chinvatbridge.com` without `www`, edit the URL. Its signing secret stays the same, so Vercel needs no change.
+2. In that endpoint, **Event deliveries**, filtered to failed, from 19 Nov onwards. For each failed event, select **Resend**, after step 1.
+3. The endpoint listens for the three events above, at least.
+4. Settings → Billing → **Customer portal**: any default return link on `.uk` → `.com`.
+5. Settings → Business → **Public details**: the business website on `.uk` → `https://www.chinvatbridge.com`. This appears on receipts and invoices.
+6. Optionally, Payment Links or Checkout settings: any success URL on `.uk`. The code doesn't use them, but older links might.
+7. **Prove it without a payment:** the endpoint page → **Send test event** → `checkout.session.completed`. Expect a 400 or 200 from `www.chinvatbridge.com`, never a 3xx. A 400 is normal for a test event without real data; a 3xx means the URL is wrong.
+
+**Supabase (M3).**
+1. Authentication → **URL Configuration**:
+   - **Site URL:** exactly `https://www.chinvatbridge.com`.
+   - **Redirect URLs** include `https://www.chinvatbridge.com/**`. Keep `https://www.chinvatbridge.uk/**` until Change of Address completes; it does no harm.
+   - This matches the repo's `supabase/config.toml`.
+2. Authentication → **Email Templates**: any template with a hard-coded `chinvatbridge.uk` link → use `{{ .SiteURL }}` or `.com`.
+3. Authentication → **SMTP Settings** (if custom SMTP is on): the sender address and domain are yours to choose. Note it only; nothing breaks from `.uk` here.
+4. Google Cloud console → APIs & Services → **OAuth consent screen**: app home page and privacy-policy links on `.uk` → `.com`, and `chinvatbridge.com` added under Authorised domains. If the app's branding is verified, changing these may trigger a Google review, so plan for it. Leave **Credentials → Authorised redirect URIs** alone: it is the Supabase callback.
+5. **Prove it:** one magic-link sign-in at `https://www.chinvatbridge.com/login` to your own inbox. The link in the email must start with your Supabase project URL, and after clicking it you must land on `https://www.chinvatbridge.com/dashboard` (not `.uk`, not `/login?error=auth_failed`). Then one "Continue with Google". This sends one email to you; it is your action to take.
 
 ### Independent crawl (`pnpm seo:crawl -- --external`): 18 pages, 0 errors
 
@@ -91,7 +169,12 @@ Which of these it is can only be seen in the dashboard.
 | Enquiry attribution: an unusable campaign query no longer discards the landing page; `*` allowed (unencoded by `URLSearchParams`); protocol-relative `//host` refused | `src/lib/enquiry-journey.ts` | Compiled and run on 12 edge cases (all as expected); `contact` spec passes on desktop, tablet and mobile |
 | Spreadsheets article cites the ICO data-security guide for its UK GDPR sentence (the brief's source, omitted when it was converted) | `src/content/blog/posts/replace-spreadsheets-with-custom-software.tsx` | Link returns 200; build passes |
 | `routes.spec.ts` updated for the two articles published on 20 Nov. **The suite on `main` has failed since `5468f1a`**: that commit published two articles without removing them from the spec's draft list or updating the `/insights` lastmod | `tests/e2e/routes.spec.ts` | `routes`: 33 passed, 0 failed |
-| Footer list keys no longer produce URL-like strings (`/pricingPricing`, `/insightsInsights`…) in every page's serialised data. Google had crawled one of them as a 404 (Search Console, `.uk` Page indexing) | `src/components/site/SiteFooter.tsx` | Local build: 0 malformed keys on `/`, `/pricing`, `/insights`, `/services/seo`, `/login`; `shell` + `routes` specs 55 passed, 0 failed |
+| Footer list keys no longer produce URL-like strings (`/pricingPricing`, `/insightsInsights`) in every page's serialised data. Google had crawled one of them as a 404 (Search Console, `.uk` Page indexing) | `src/components/site/SiteFooter.tsx` | Site-wide check below |
+| The `/pricing` card's "/month" no longer appears as a standalone path-like string (same class, found by the site-wide check). Text on screen unchanged ("£299/month") | `src/components/organisms/sections/PricingCard.tsx` | Site-wide check below; rendered HTML reads `/<!-- -->month` |
+| New regression test: every path-like string in a sitemap page's HTML must resolve | `tests/e2e/routes.spec.ts` | Passes on the branch; **fails on the live site** with `"/insightsInsights" (in the HTML of /)`, so it catches the original bug |
+| The three articles published since the render list was written (name origin, spreadsheets, SEO cost guide) added to the routes render check | `tests/e2e/routes.spec.ts` | Pass |
+| Unit tests for the attribution sanitiser (`pnpm test:unit`, Node's built-in runner, no new dependency). It feeds only the enquiry email, which e2e cannot see | `tests/unit/enquiry-journey.test.mjs`, `package.json` | 5 passed |
+| Social-share card (`opengraph-image.png`) printed **chinvatbridge.uk**. Re-rendered with `.com`; nothing else on the card changed, and the other brand assets re-rendered byte-identical | `scripts/brand/render-brand-assets.mjs`, `src/app/opengraph-image.png` | Image inspected |
 | Stale editorial README ("None is published") | `seo/overnight-2026-11-18/editorial/README.md` | — |
 | Three SEO scripts and two `package.json` scripts | `scripts/seo/*`, `package.json` | Run against the live site; GSC script on a synthetic fixture (scratchpad only, never recorded as data) |
 
@@ -106,3 +189,18 @@ Which of these it is can only be seen in the dashboard.
 | `routes` spec after the fix | 33 passed, 0 failed, 66 skipped by design |
 | `home`, `shell` specs | 38 passed, 0 failed, 16 skipped by design |
 | Full suite | Not run: about 20 minutes on software WebGL, and nothing outside these specs was touched |
+| **Re-run after the footer, pricing-card and test changes** | |
+| `pnpm lint`, `pnpm typecheck`, `pnpm build` (39 static pages) | Pass |
+| `pnpm test:unit` | 5 passed, 0 failed |
+| `routes`, `shell`, `service-pages` specs, three viewports | **80 passed, 0 failed**, 88 skipped by design |
+
+### Site-wide check for crawlable fake paths (21 Nov 2026)
+
+**Method:** fetch each page's raw HTML. Collect every quoted string that looks like a site path, in the markup and in the escaped serialised data. Request each one and flag any that doesn't resolve to 200, directly or after one redirect. Build assets under `/_next/static/` are excluded.
+
+| Target | Pages | Path-like strings | Unresolved |
+|---|---|---|---|
+| Live site (`main`) | 16 sitemap pages + `/login`, `/client-portal`, a 404 page | 58 | `/insightsInsights` and `/pricingPricing` **on all 19 pages**; `/month` on `/pricing` |
+| Branch, local build | The same + `/subscribe/cancelled`, `/bridge-studies`, three `/hero-studies/*` | 66 | **None**, except `/_not-found` on the 404 page itself (Next.js's internal route name; not linked, and the page is never indexed) |
+
+Other keys built from links (`SiteHeader`, `MobileMenuSheet`, `CrossingHero`, `ServiceBlocks`, `not-found`) use the bare href, which is a real page, so they are harmless. The check confirms this.
