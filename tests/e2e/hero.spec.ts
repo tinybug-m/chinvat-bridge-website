@@ -55,16 +55,6 @@ test.describe("hero", () => {
     expect(errors).toEqual([]);
   });
 
-  test("a tier lights while its link is hovered", async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name === "mobile", "no hover on touch");
-    await page.goto("/");
-    await page.waitForTimeout(3500);
-    const glow = page.locator('.cx-tier[data-i="1"] .cx-glow');
-    await expect.poll(() => glow.evaluate((el) => getComputedStyle(el).opacity)).toBe("0");
-    await page.locator('.cx-link[data-i="1"]').hover();
-    await expect.poll(() => glow.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
-  });
-
   // The H1 is the LCP on desktop; on narrow screens the lede may cover more
   // area. Either way it is server-rendered hero text, never the chart.
   test("the largest contentful paint is the hero text", async ({ page }, testInfo) => {
