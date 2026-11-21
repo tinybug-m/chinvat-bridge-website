@@ -12,7 +12,29 @@
 
 ## Results: live site, 21 Nov 2026
 
-### Domain migration (`pnpm seo:check-migration`): 21 passed, 6 failed
+### Domain migration after the fix (22 Nov 2026): 27 passed, 0 failed
+
+The owner ticked **Preserve query string** on the existing rule "UK to COM Permanent Redirect" and saved it. `pnpm seo:check-migration` was then run against the live site:
+
+| Group | Result |
+|---|---|
+| `.uk` → `.com` with a query: auth callback (`www`, https), Stripe return (`www`), campaign tags (`www`), apex https, `www` http, apex http | **6 of 6 pass:** 301 to the same path and query on `https://www.chinvatbridge.com` |
+| `.uk` → `.com` without a query | Pass |
+| `.com` apex and `http://www.` with a query | Pass (308, query kept) |
+| `robots.txt`, sitemap (16 URLs, all 200, `index, follow`, self-canonical) | 19 of 19 pass |
+
+**Extra checks, not in the script (22 Nov, read-only):**
+- The auth callback on apex https, apex http and `www` http keeps `code` and `next`.
+- The Stripe return on the apex keeps `session_id`.
+- An encoded query (`%20`, `%E2%9C%93`, `+`) is kept byte-for-byte.
+- An empty `?` is dropped cleanly.
+- A trailing slash with a query is kept.
+- `http://chinvatbridge.uk/pricing?utm_source=hop` takes one 301, then 200: no chain.
+- `r.mail.chinvatbridge.uk` still resolves to Brevo and is not redirected.
+
+**Change of Address prerequisites are now met. It has not been initiated** (M6, owner's decision).
+
+### Domain migration before the fix (21 Nov 2026): 21 passed, 6 failed
 
 | Check | Result |
 |---|---|
