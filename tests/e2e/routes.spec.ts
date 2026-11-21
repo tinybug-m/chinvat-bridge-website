@@ -58,9 +58,9 @@ test.describe("routes", () => {
     ["/insights", "Insights: AI, Automation, Software & SEO for SMEs"],
     ["/pricing", "SEO Packages & Pricing"],
     ["/services/seo", "SEO Services for Small Businesses"],
-    ["/services/ai-integration", "AI Consultancy & Integration for SMEs"],
+    ["/services/ai-integration", "AI Consultancy & Integration for Small Businesses"],
     ["/services/workflow-automation", "Business Process Automation & Integration"],
-    ["/services/custom-software", "Custom Software Development for SMEs"],
+    ["/services/custom-software", "Custom Software Development for Small Businesses"],
     ["/privacy", "Privacy Policy"],
     ["/terms", "Terms of Service"],
   ]) {
@@ -95,15 +95,16 @@ test.describe("routes", () => {
     expect(lastmodOf("/insights/what-should-you-automate-first")).toBe("2026-09-15");
     // A revised article carries its own updated date, and the index changes when its newest article does.
     expect(lastmodOf("/insights/why-your-website-isnt-bringing-you-customers")).toBe("2026-11-19");
-    expect(lastmodOf("/insights")).toBe("2026-11-19");
+    // Published 20 Nov 2026: the index takes the newest article's date.
+    expect(lastmodOf("/insights/replace-spreadsheets-with-custom-software")).toBe("2026-11-20");
+    expect(lastmodOf("/insights/how-much-does-seo-cost-uk")).toBe("2026-11-20");
+    expect(lastmodOf("/insights")).toBe("2026-11-20");
   });
 
   // Drafts live in the post registry with `draft: true`; a production build must never expose them.
   test("draft articles are not served, listed or in the sitemap", async ({ page, request }) => {
     // Remove a slug from this list when its article is published.
     const drafts = [
-      "replace-spreadsheets-with-custom-software",
-      "how-much-does-seo-cost-uk",
       "how-to-connect-business-systems",
       "how-to-choose-an-ai-consultant",
       "what-a-technical-seo-audit-should-include",
