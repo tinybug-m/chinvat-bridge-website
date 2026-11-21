@@ -1,6 +1,6 @@
 # Editorial
 
-Nine full article drafts and one case study, ready for owner review. **None is published**, and every one keeps `draft: true`.
+Nine full article drafts and one case study, written for owner review. **Two are published** (20 Nov 2026: the spreadsheets article and the SEO cost guide); the other eight keep `draft: true`. Current status and publishing order: `seo/remediation-2026-11-21/SEO_90_DAY_EXECUTION_PLAN.md`.
 
 Each exists twice:
 - **Here, as Markdown:** the brief. Its front matter holds the keyword, audience, purpose, internal links and the review notes to check before publishing.
