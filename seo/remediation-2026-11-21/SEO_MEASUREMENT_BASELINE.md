@@ -11,6 +11,7 @@ Keep reporting periods separate across these dates, and never sum figures across
 | Before 19 Nov | Canonical origin was `www.chinvatbridge.uk`, and both domains served the site | Data sits mostly in the `.uk` property |
 | 19 Nov, evening (UTC) | Production redeployed with `.com` as the canonical; `.uk` starts redirecting (301, query dropped) | Canonical switch |
 | 20 Nov, about 03:00 UTC | Service pages, new titles and two articles deployed | Content and on-page changes |
+| 21 Nov, evening (UTC) | Cloudflare redirect keeps query strings; Change of Address submitted in Search Console | Start of Google's 180-day move window; `.uk` impressions should fall and `.com` rise over the following weeks |
 | Next deploy (pending approval) | Branch `seo/remediation-2026-11-21`: title changes | Title test boundary |
 
 ## Search Console: what is needed
@@ -217,7 +218,16 @@ The `.uk` sitemap URL now redirects to `.com`. Leaving it submitted is harmless;
 
 ### Change of Address
 
-**Not started.** The `.uk` property's Settings → Change of address page shows only the setup form ("Validate & update"), with no move in progress. Both prerequisites besides the redirect are met: Domain properties, verified owner of both. **The only blocker is the query-string redirect (M1).**
+**Submitted 21 Nov 2026 (about 21:03 UTC), and in progress.** On 21 Nov, before submission, the `.uk` property showed only the setup form. The move was submitted after the redirect fix passed 27/27.
+
+| Property | Status shown |
+|---|---|
+| `chinvatbridge.uk` | "This site is currently moving to chinvatbridge.com"; date started 21 November 2026 |
+| `chinvatbridge.com` | "1 of your other sites is moving to this site" (`chinvatbridge.uk`) |
+
+Google's own pre-move validation passed:
+- Required: "301-redirect from homepage" ✓ and "Verification for both sites" ✓.
+- Recommended: "301-redirects from sample pages" ⚠. Four sample pages showed "Redirect found". "Duplicate redirect targets" listed the old homepage, because its variants share one target.
 
 ### Other observations (read only, not acted on)
 

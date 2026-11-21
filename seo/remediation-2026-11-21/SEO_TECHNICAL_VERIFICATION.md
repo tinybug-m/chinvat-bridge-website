@@ -12,7 +12,7 @@
 
 ## Results: live site, 21 Nov 2026
 
-### Domain migration after the fix (22 Nov 2026): 27 passed, 0 failed
+### Domain migration after the fix (21 Nov 2026, evening UTC): 27 passed, 0 failed
 
 The owner ticked **Preserve query string** on the existing rule "UK to COM Permanent Redirect" and saved it. `pnpm seo:check-migration` was then run against the live site:
 
@@ -23,7 +23,7 @@ The owner ticked **Preserve query string** on the existing rule "UK to COM Perma
 | `.com` apex and `http://www.` with a query | Pass (308, query kept) |
 | `robots.txt`, sitemap (16 URLs, all 200, `index, follow`, self-canonical) | 19 of 19 pass |
 
-**Extra checks, not in the script (22 Nov, read-only):**
+**Extra checks, not in the script (21 Nov, evening UTC, read-only):**
 - The auth callback on apex https, apex http and `www` http keeps `code` and `next`.
 - The Stripe return on the apex keeps `session_id`.
 - An encoded query (`%20`, `%E2%9C%93`, `+`) is kept byte-for-byte.
