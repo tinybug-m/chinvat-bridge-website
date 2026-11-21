@@ -55,7 +55,27 @@ The live behaviour, path kept and query dropped on both hosts and both schemes, 
 
 This is why the rule names the two hosts exactly. Cloudflare's own example uses a hostname wildcard (`http*://host/*`); a pattern like `*chinvatbridge.uk` would also catch `r.mail` and break the tracked links in every Brevo email.
 
-**Proposed production rule (not applied; for your approval):**
+**Existing configuration, read in the Cloudflare dashboard on 21 Nov 2026 (read-only; nothing saved; session signed out afterwards):**
+
+| Where | What is there |
+|---|---|
+| Zone `chinvatbridge.uk` (free plan) → Redirect Rules | **One rule, active, order 1: "UK to COM Permanent Redirect"** (id `28e6d65c560f421b8c51ae81ce5e4d6c`). Custom filter `(http.host eq "chinvatbridge.uk") or (http.host eq "www.chinvatbridge.uk")`; URL redirect, Dynamic, `concat("https://www.chinvatbridge.com", http.request.uri.path)`; 301; **Preserve query string: unticked** |
+| `.uk` Page Rules | None (0 of 3 used) |
+| `.uk` Workers Routes | None |
+| `.uk` Snippets | Not available on the free plan |
+| `.uk` other rule types (rewrite, configuration, origin, header, cache) | None |
+| Account Bulk Redirects | No lists (0 of 5), so no bulk redirect rule can exist |
+| Zone `chinvatbridge.com` Redirect Rules / Page Rules | None / none. The apex → `www` 308 comes from Vercel |
+| `.uk` DNS | Apex (A, Vercel) and `www` (CNAME, Vercel): **Proxied**. `mail`, `r.mail`, `img.mail` (Brevo), the Brevo DKIM records and `panel`: **DNS only**. MX: Cloudflare Email Routing |
+
+**Conclusion:**
+- The existing rule is the only thing answering for the two `.uk` web hosts, and nothing overrides it.
+- It is already identical to the rule below in every field but one: Preserve query string is off.
+- It cannot affect Brevo. It names only the two web hosts, and Brevo's hosts are DNS-only, so no Cloudflare rule runs on them at all.
+
+**Smallest correction:** open "UK to COM Permanent Redirect" → tick **Preserve query string** → **Save**. Change nothing else, and create no new rule.
+
+**The rule as it should read after that one change** (for reference; it is the existing rule):
 
 | Field | Value |
 |---|---|
@@ -72,8 +92,8 @@ This is why the rule names the two hosts exactly. Cloudflare's own example uses 
 `http.request.uri.path` is the path without the query, so the query is added once, by the setting. Putting the query in the expression *and* switching the setting on would duplicate it.
 
 **Order of work:**
-1. **Inventory first, change nothing.** Rules → Overview on the `.uk` zone; account → Bulk Redirects; Page Rules; Workers routes. Note every rule that can match `chinvatbridge.uk` or `www.`, with a screenshot. If the existing redirect is a **Single Redirect**, edit it to the table above. If it is a **Bulk Redirect or Page Rule**, create the Single Redirect above: it answers first, so the old rule becomes dead. Disable the old one only after step 3 passes, and never delete it the same day.
-2. **Deploy** the rule.
+1. Inventory: done (above). One rule; no other rule interferes.
+2. Tick Preserve query string on the existing rule and **Save**.
 3. **Verify:** `pnpm seo:check-migration` must show 27 passed, 0 failed. Then by hand: a magic-link sign-in, and one `.uk` link with `?utm_source=test` in a browser.
 4. Keep both `.uk` web records proxied, and keep the redirect for good, or at least 180 days.
 
@@ -91,8 +111,8 @@ This is why the rule names the two hosts exactly. Cloudflare's own example uses 
 **Risk and rollback:**
 - **Downtime:** none. Rule changes take effect in seconds, and the paths that work today are not changed.
 - **What could go wrong:** a typo in the expression makes `.uk` URLs redirect to the wrong place, or fail. Step 3 catches this within a minute.
-- **Rollback:** disable the new rule, and the old one answers again exactly as today. If the old rule was edited in place, set "Preserve query string" off and it is back to today's behaviour.
-- **Cost:** none expected. It edits the existing redirect or adds one rule beside it. Your plan's rule limit is shown on the Redirect Rules page.
+- **Rollback:** untick Preserve query string and Save; it is back to today's behaviour.
+- **Cost:** none. It is one setting on an existing rule.
 
 **What the dropped query breaks, given the current code:**
 
