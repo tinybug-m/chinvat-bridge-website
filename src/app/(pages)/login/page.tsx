@@ -13,13 +13,23 @@ const ERROR_MESSAGES: Record<string, string> = {
   google_auth_failed: "We couldn’t start Google sign-in just now. Please try again.",
 };
 
+/** Outcomes of the post-checkout sign-in (src/app/auth/checkout-login/route.ts). Fixed text only. */
+const NOTICES: Record<string, string> = {
+  checkout_email_sent: "Your subscription is set up. We’ve emailed you a secure sign-in link — open it on this device to reach your portal.",
+  checkout_sign_in: "Enter the email you used at checkout and we’ll send you a secure sign-in link.",
+  checkout_payment_pending:
+    "Your payment is still being confirmed. We’ll email you once it clears; you can also request a sign-in link below.",
+  checkout_unavailable: "We couldn’t sign you in automatically just now. Request a sign-in link below and it will arrive by email.",
+};
+
 interface LoginPageProps {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; notice?: string }>;
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
-  const { error } = await searchParams;
+  const { error, notice } = await searchParams;
   const errorMessage = error ? (ERROR_MESSAGES[error] ?? "Something went wrong. Please try again.") : null;
+  const noticeMessage = !errorMessage && notice ? (NOTICES[notice] ?? null) : null;
 
   return (
     <CheckoutShell>
@@ -40,6 +50,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             {errorMessage ? (
               <p role="alert" className="mb-6 border-l-2 border-signal-error pl-4 text-small text-ink">
                 {errorMessage}
+              </p>
+            ) : null}
+            {noticeMessage ? (
+              <p role="status" className="mb-6 border-l-2 border-line-strong pl-4 text-small text-ink">
+                {noticeMessage}
               </p>
             ) : null}
             <LoginForm />

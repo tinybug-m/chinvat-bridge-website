@@ -1,5 +1,5 @@
 // Browser ground truth: window.__energy.art (the step-6 browser sampling) and each plate's screen matrix, at 7 widths.
-import { chromium } from "/home/tinybug/Documents/project/artin/chinvat-bridge-website/node_modules/@playwright/test/index.mjs";
+import { chromium } from "@playwright/test";
 import fs from "node:fs";
 import { stripTypeScriptTypes } from "node:module";
 const sigJs = stripTypeScriptTypes(fs.readFileSync(new URL("./ink-signature.ts", import.meta.url), "utf8")).replace(/export /g, "");

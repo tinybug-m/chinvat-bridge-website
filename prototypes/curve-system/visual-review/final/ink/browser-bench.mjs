@@ -1,6 +1,6 @@
 // usage: node browser-bench.mjs <ink.json> <baseUrl>
 // Times, in the page, the browser's own sampling (ink.ts, the step-6 build) against inkFromData() on the same nodes.
-import { chromium } from "/home/tinybug/Documents/project/artin/chinvat-bridge-website/node_modules/@playwright/test/index.mjs";
+import { chromium } from "@playwright/test";
 import fs from "node:fs";
 import { stripTypeScriptTypes } from "node:module";
 const [inkPath, base] = process.argv.slice(2);

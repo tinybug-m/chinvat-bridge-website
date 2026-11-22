@@ -1,5 +1,7 @@
 // usage: node zoom.mjs <capdir> <variant> <width> <kind> <layerX> <layerY> <half> <out> [scale]
-import sharp from "/home/tinybug/Documents/project/artin/chinvat-bridge-website/node_modules/.pnpm/sharp@0.35.5_@types+node@20.19.43/node_modules/sharp/dist/index.mjs";
+import { createRequire } from "node:module";
+// sharp ships with Next.js (not a direct dependency), so resolve it from Next's own location.
+const sharp = createRequire(createRequire(import.meta.url).resolve("next/package.json"))("sharp");
 import fs from "node:fs";
 const [dir, v, w, kind, x, y, half, out, scale] = process.argv.slice(2);
 const d = JSON.parse(fs.readFileSync(`${dir}/${v}-${w}.json`));

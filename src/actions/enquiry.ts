@@ -5,6 +5,8 @@ import nodemailer from "nodemailer";
 import { NEEDS, isEmail } from "@/components/home/contact/brief";
 import { CONTACT_EMAIL, SITE_URL } from "@/lib/constants";
 import { journeyLines, type JourneyInput } from "@/lib/enquiry-journey";
+import { clientAddress } from "@/lib/client-address";
+import { isRateLimited } from "@/lib/rate-limit";
 
 /*
  * Sends the contact conversation straight to the team's inbox through Gmail
@@ -35,19 +37,13 @@ export type EnquiryResult = { status: "sent" } | { status: "invalid" | "limited"
 const LIMITS = { name: 120, email: 254, company: 160, message: 5000 };
 /** Nobody reads the greeting, picks a topic, writes and fills in details in under three seconds. */
 const MIN_ELAPSED = 3000;
-/** Per address: at most this many sends per window. In-memory, so per server instance: a speed bump, not a wall. */
-const RATE = { max: 5, windowMs: 10 * 60 * 1000 };
-const recent = new Map<string, number[]>();
+/** Per client address, shared across every server instance (src/lib/rate-limit.ts). */
+const RATE_WINDOWS = [
+  { name: "10m", limit: 5, windowSeconds: 10 * 60 },
+  { name: "1d", limit: 20, windowSeconds: 24 * 60 * 60 },
+];
 
 const clean = (value: unknown, max: number) => (typeof value === "string" ? value.replace(/[\r\n]+/g, " ").trim().slice(0, max) : "");
-
-function limited(key: string) {
-  const now = Date.now();
-  const hits = (recent.get(key) ?? []).filter((at) => now - at < RATE.windowMs);
-  if (recent.size > 5000) recent.clear();
-  recent.set(key, [...hits, now]);
-  return hits.length >= RATE.max;
-}
 
 export async function sendEnquiry(input: EnquiryInput): Promise<EnquiryResult> {
   const name = clean(input?.name, LIMITS.name);
@@ -62,8 +58,9 @@ export async function sendEnquiry(input: EnquiryInput): Promise<EnquiryResult> {
   // Bots get a quiet success, so they learn nothing.
   if (input.website || typeof input.elapsed !== "number" || input.elapsed < MIN_ELAPSED) return { status: "sent" };
 
-  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  if (limited(ip)) {
+  const headerList = await headers();
+  const address = clientAddress((name) => headerList.get(name), process.env);
+  if (await isRateLimited("enquiry", address, RATE_WINDOWS)) {
     return { status: "limited", message: "That’s a few messages in a row. Please wait a few minutes and try again." };
   }
 
@@ -103,7 +100,9 @@ export async function sendEnquiry(input: EnquiryInput): Promise<EnquiryResult> {
     });
     return { status: "sent" };
   } catch (error) {
-    console.error("[enquiry] sendMail failed:", error);
+    // Name and code only: the error object can echo the message, addresses and SMTP replies.
+    const code = error instanceof Error && "code" in error ? String((error as { code?: unknown }).code) : "unknown";
+    console.error(`[enquiry] sendMail failed (${error instanceof Error ? error.name : "error"}, code=${code})`);
     return { status: "error", message: "That didn’t go through." };
   }
 }

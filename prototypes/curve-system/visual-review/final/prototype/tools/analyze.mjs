@@ -2,7 +2,9 @@
 // usage: node analyze.mjs <capdir> <variant> <width> [--debug]
 // Ink = every pixel that differs from its row's background (text, artwork, rules), taken from the page
 // rendered with the wire hidden. Distances are measured from the wire's centreline to the nearest ink.
-import sharp from "/home/tinybug/Documents/project/artin/chinvat-bridge-website/node_modules/.pnpm/sharp@0.35.5_@types+node@20.19.43/node_modules/sharp/dist/index.mjs";
+import { createRequire } from "node:module";
+// sharp ships with Next.js (not a direct dependency), so resolve it from Next's own location.
+const sharp = createRequire(createRequire(import.meta.url).resolve("next/package.json"))("sharp");
 import fs from "node:fs";
 import path from "node:path";
 

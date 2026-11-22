@@ -1,7 +1,9 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getStripeClient } from "@/lib/stripe";
+import { CHECKOUT_LOGIN_TTL_SECONDS, checkoutBindingCookieName, newBindingToken, sha256Hex } from "@/lib/checkout-login";
 import { getSiteOrigin } from "@/lib/site-origin";
 import { getPlanById } from "@/data/pricing";
 
@@ -22,9 +24,10 @@ export interface CheckoutFormState {
   values: CheckoutFormValues;
 }
 
-function fieldValue(formData: FormData, name: string): string {
+/** Stripe rejects metadata values over 500 characters; these also bound what the portal stores. */
+function fieldValue(formData: FormData, name: string, max = 200): string {
   const value = formData.get(name);
-  return typeof value === "string" ? value.trim() : "";
+  return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
 
 export async function createCheckoutSession(
@@ -50,12 +53,12 @@ export async function createCheckoutSession(
   const values: CheckoutFormValues = {
     fullName: fieldValue(formData, "fullName"),
     companyName: fieldValue(formData, "companyName"),
-    email: fieldValue(formData, "email"),
-    phone: fieldValue(formData, "phone"),
-    website: fieldValue(formData, "website"),
+    email: fieldValue(formData, "email", 254),
+    phone: fieldValue(formData, "phone", 40),
+    website: fieldValue(formData, "website", 300),
     country: fieldValue(formData, "country") || "UK",
-    targetMarket: fieldValue(formData, "targetMarket").slice(0, 500),
-    improvements: fieldValue(formData, "improvements").slice(0, 500),
+    targetMarket: fieldValue(formData, "targetMarket", 500),
+    improvements: fieldValue(formData, "improvements", 500),
   };
 
   if (!values.fullName || !values.companyName || !values.email || !values.phone || !values.website) {
@@ -66,7 +69,14 @@ export async function createCheckoutSession(
     };
   }
 
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+    return { status: "error", message: "Please enter a valid email address.", values };
+  }
+
   const origin = await getSiteOrigin();
+  // Binds the post-checkout sign-in to this browser (src/lib/checkout-login.ts): the token stays
+  // in an HttpOnly cookie, and only its hash goes to Stripe.
+  const bindingToken = newBindingToken();
 
   let sessionUrl: string | null;
 
@@ -80,17 +90,27 @@ export async function createCheckoutSession(
       customer_email: values.email,
       billing_address_collection: "auto",
       allow_promotion_codes: true,
-      metadata: { planId: plan.id, ...values },
+      metadata: { planId: plan.id, ...values, bindingHash: sha256Hex(bindingToken) },
     });
     sessionUrl = session.url;
   } catch (error) {
-    console.error("Stripe checkout session creation failed:", error);
+    const code = error instanceof Error && "code" in error ? String((error as { code?: unknown }).code) : "unknown";
+    console.error(`Stripe checkout session creation failed (code=${code})`);
     redirect("/subscribe/error?reason=stripe_error");
   }
 
   if (!sessionUrl) {
     redirect("/subscribe/error?reason=stripe_error");
   }
+
+  const secure = process.env.NODE_ENV === "production";
+  (await cookies()).set(checkoutBindingCookieName(secure), bindingToken, {
+    httpOnly: true,
+    secure,
+    sameSite: "lax", // sent on the top-level return from Stripe, never on cross-site POSTs
+    path: "/",
+    maxAge: CHECKOUT_LOGIN_TTL_SECONDS,
+  });
 
   redirect(sessionUrl);
 }

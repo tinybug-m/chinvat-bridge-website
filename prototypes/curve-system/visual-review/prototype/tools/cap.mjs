@@ -1,7 +1,7 @@
 // Capture: for each variant and width, the full wire (reduced motion), the page with the wire hidden
 // (for ink analysis), the router's data, and mid-scroll frames with motion on.
 // usage: node cap.mjs <outdir> <variants,comma> [widths,comma] [--no-live]
-import { chromium } from "/home/tinybug/Documents/project/artin/chinvat-bridge-website/node_modules/@playwright/test/index.mjs";
+import { chromium } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
 

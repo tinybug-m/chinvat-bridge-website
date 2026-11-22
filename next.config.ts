@@ -32,6 +32,22 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // Checkout return and sign-in steps: never cached, never send their URL (which carries a
+        // Stripe session id) as a referrer anywhere.
+        source: "/subscribe/success",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store, max-age=0" },
+          { key: "Referrer-Policy", value: "no-referrer" },
+        ],
+      },
+      {
+        source: "/auth/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store, max-age=0" },
+          { key: "Referrer-Policy", value: "no-referrer" },
+        ],
+      },
+      {
         // Brand textures keep their file names, so revalidate daily rather than
         // pinning them immutable (a replaced texture must not stay stale for a year).
         source: "/brand/:file*.webp",
