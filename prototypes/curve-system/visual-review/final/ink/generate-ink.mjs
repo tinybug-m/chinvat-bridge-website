@@ -1,7 +1,7 @@
 // usage: node generate-ink.mjs <baseUrl> <out.json> <repoRoot>
 // Needs the site running at <baseUrl> (pnpm dev or next start) and Playwright's Chromium.
 // Samples the static plate artwork once, in a browser, into ink data in SVG units (see inkdata.ts).
-import { chromium } from "/home/tinybug/Documents/project/artin/chinvat-bridge-website/node_modules/@playwright/test/index.mjs";
+import { chromium } from "@playwright/test";
 import fs from "node:fs";
 import crypto from "node:crypto";
 import path from "node:path";

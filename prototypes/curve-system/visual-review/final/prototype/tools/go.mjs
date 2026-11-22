@@ -1,6 +1,8 @@
 // usage: node go.mjs <router: next|final> <name> <outdir> <widths> [optionsJSON] [--runs N] [--noimg]
 // Routes the captured browser inputs (fx/next-<w>.json) offline. Timing: median of N timed runs after 2 warm-ups.
-import sharp from "/home/tinybug/Documents/project/artin/chinvat-bridge-website/node_modules/.pnpm/sharp@0.35.5_@types+node@20.19.43/node_modules/sharp/dist/index.mjs";
+import { createRequire } from "node:module";
+// sharp ships with Next.js (not a direct dependency), so resolve it from Next's own location.
+const sharp = createRequire(createRequire(import.meta.url).resolve("next/package.json"))("sharp");
 import fs from "node:fs";
 import os from "node:os";
 const [router, name, out, ws, optJson = "{}"] = process.argv.slice(2);

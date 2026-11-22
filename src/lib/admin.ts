@@ -1,3 +1,4 @@
+import "server-only";
 import { createClient } from "@/lib/supabase/server";
 
 function adminEmails(): string[] {
@@ -5,6 +6,10 @@ function adminEmails(): string[] {
     .split(",")
     .map((email) => email.trim().toLowerCase())
     .filter(Boolean);
+}
+
+export function isAdminEmail(email: string): boolean {
+  return adminEmails().includes(email.trim().toLowerCase());
 }
 
 /**
@@ -21,7 +26,8 @@ export async function requireAdmin() {
 
   const email = user?.email?.toLowerCase();
 
-  if (!email || !adminEmails().includes(email)) {
+  // A confirmed address only: an account whose email nobody has proven never gets admin.
+  if (!email || !user?.email_confirmed_at || !adminEmails().includes(email)) {
     return null;
   }
 

@@ -39,6 +39,21 @@ export type Database = {
   }
   public: {
     Tables: {
+      checkout_login_redemptions: {
+        Row: {
+          redeemed_at: string
+          session_hash: string
+        }
+        Insert: {
+          redeemed_at?: string
+          session_hash: string
+        }
+        Update: {
+          redeemed_at?: string
+          session_hash?: string
+        }
+        Relationships: []
+      }
       customer_progress_items: {
         Row: {
           completed_steps: number
@@ -276,12 +291,33 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limit_buckets: {
+        Row: {
+          bucket: string
+          hits: number
+          window_started_at: string
+        }
+        Insert: {
+          bucket: string
+          hits: number
+          window_started_at: string
+        }
+        Update: {
+          bucket?: string
+          hits?: number
+          window_started_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      consume_rate_limit: {
+        Args: { p_bucket: string; p_limit: number; p_window_seconds: number }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
