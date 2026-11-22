@@ -15,6 +15,9 @@ const eslintConfig = defineConfig([
     // Root-owned crash-reporter artifact from local sandbox testing (Chromium/crashpad);
     // unreadable by this project's user and unrelated to source code.
     ".sentry-native/**",
+    // Not part of the app: a design prototype and archived docs.
+    "prototypes/**",
+    "docs/archive/**",
   ]),
 ]);
 

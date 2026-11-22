@@ -1,0 +1,11 @@
+# Paths that ripgrep-based search (and so most coding agents) skips. Git still tracks them;
+# open them directly, or search with `rg --no-ignore`, when you actually need them.
+
+# Curve-system prototype: holds stale, diverged copies of shipped code (route.ts, ink files).
+/prototypes/
+
+# Historical docs that no longer describe the site.
+/docs/archive/
+
+# Generated data: large and not meant to be read or edited by hand.
+*.generated.json
