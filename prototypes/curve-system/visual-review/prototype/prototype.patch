@@ -1,0 +1,123 @@
+--- a/src/components/home/services/energy/EnergyFlow.tsx
++++ b/src/components/home/services/energy/EnergyFlow.tsx
+@@ -4,7 +4,10 @@
+ import { useReducedMotion } from "@/components/motion/useReducedMotion";
+ import { SWEEP_FROM, sweepSpan } from "../../bridge/sweep";
+ import { aimPlate } from "../current";
+-import { headAt, pointAt, routeWire, type Box, type Port, type Stop, type Wire } from "./route";
++import { headAt, pointAt, routeWire as routeP1, type Box, type Port, type Stop, type Wire } from "./route";
++import { routeWire as routeProd } from "./route-prod";
++import { routeWire as routeNext } from "./route-next";
++import { artwork } from "./ink";
+ import "./energy.css";
+ 
+ /**
+@@ -130,7 +133,15 @@
+     .filter((r) => r.right > r.left && r.bottom > r.top && r.top < last + vh && r.bottom > (mr?.top ?? 0) - vh)
+     .map(box);
+ 
+-  const all = nodes.map((node) => JSON.parse(node.dataset.energyPorts!) as EnergyPorts);
++  const variant = new URLSearchParams(location.search).get("wire") ?? "p1";
++  const all = nodes.map((node) => {
++    const e = JSON.parse(node.dataset.energyPorts!) as EnergyPorts & { mobile?: boolean };
++    if (variant !== "next") {
++      e.ins = e.ins.filter((p) => !(p as { proto?: boolean }).proto);
++      e.outs = e.outs.filter((p) => !(p as { proto?: boolean }).proto);
++    }
++    return e;
++  });
+   const stops: Stop[] = nodes.map((node, i) => {
+     const ports = all[i];
+     const r = node.getBoundingClientRect();
+@@ -174,7 +185,39 @@
+     return stop;
+   });
+ 
+-  const wire = routeWire(origin, stops, text, sr.width, lane, (PORT_MAX - LINE) * vh, (1 - LINE) * vh, margin);
++  const args = [origin, stops, text, sr.width, lane, (PORT_MAX - LINE) * vh, (1 - LINE) * vh, margin] as const;
++  const art = artwork(nodes, toLayer);
++  // PROTOTYPE: where the page's background changes (section and band edges), for route-next.ts.
++  const edges = [...document.querySelectorAll("main section, article[class*='before:bg-haze']")].flatMap((el) => {
++    const r = el.getBoundingClientRect();
++    return [toLayer(0, r.top).y, toLayer(0, r.bottom).y];
++  });
++  // PROTOTYPE: keep each figure with its own text. Where a plate's text and figure are stacked (every
++  // Method step; a service plate on a phone), the gap between them is solid for route-next.ts, so the
++  // wire never runs between a drawing and its caption.
++  const groups: Box[] = [];
++  nodes.forEach((node) => {
++    if (!(node instanceof SVGSVGElement)) return;
++    const item = node.closest("li");
++    if (!item || (node.closest("#services") && sr.width >= 640)) return;
++    const f = node.getBoundingClientRect();
++    const words = [...item.querySelectorAll(TEXT)].map(tight).filter((r) => r.right > r.left);
++    if (!words.length) return;
++    const t = {
++      left: Math.min(...words.map((r) => r.left)),
++      right: Math.max(...words.map((r) => r.right)),
++      top: Math.min(...words.map((r) => r.top)),
++      bottom: Math.max(...words.map((r) => r.bottom)),
++    };
++    const x0 = Math.max(f.left, t.left);
++    const x1 = Math.min(f.right, t.right);
++    if (x1 - x0 < 40) return;
++    const [y0, y1] = f.bottom <= t.top ? [f.bottom, t.top] : t.bottom <= f.top ? [t.bottom, f.top] : [0, 0];
++    if (y1 > y0) groups.push(box({ left: x0, right: x1, top: y0, bottom: y1 }));
++  });
++  const t0 = performance.now();
++  const wire = variant === "prod" ? routeProd(...(args.slice(0, 7) as unknown as Parameters<typeof routeProd>)) : variant === "next" ? routeNext(...args, art, edges, groups) : routeP1(...args);
++  (window as unknown as { __energy: unknown }).__energy = { variant, origin, stops, text, width: sr.width, lane, margin, top, wire, art, ms: performance.now() - t0 };
+   const height = Math.max(...wire.segments.flatMap((s) => s.points.map((p) => p.y))) + 32;
+   return {
+     top,
+--- a/src/components/home/services/energy/route.ts
++++ b/src/components/home/services/energy/route.ts
+@@ -23,6 +23,10 @@
+   dir: Dir;
+   /** Added to a route's score, so a plate can prefer one port to another. */
+   penalty?: number;
++  /** PROTOTYPE: the penalty on a phone, when it differs (read by route-next.ts only). */
++  phone?: number;
++  /** PROTOTYPE: the penalty route-next.ts uses on larger screens, when it differs. */
++  next?: number;
+ }
+ export interface Box {
+   x0: number;
+--- a/src/components/home/services/Services.tsx
++++ b/src/components/home/services/Services.tsx
+@@ -35,8 +35,8 @@
+     tone: { title: "heading", link: "text" },
+     energy: {
+       ins: [
+-        { x: 274, y: 34, dir: "down" },
+-        { x: 129, y: 126, dir: "right", penalty: 60 },
++        { x: 274, y: 34, dir: "down", phone: 60 },
++        { x: 129, y: 126, dir: "right", penalty: 60, phone: 0 },
+       ],
+       outs: [{ x: 225, y: 287, dir: "down" }],
+       keepout: [129, 34, 325, 287],
+@@ -72,8 +72,8 @@
+     tone: { title: "heading", lede: true, link: "button", band: true },
+     energy: {
+       ins: [
+-        { x: 200, y: 48, dir: "down" },
+-        { x: 120, y: 160, dir: "right", penalty: 60 },
++        { x: 200, y: 48, dir: "down", phone: 60 },
++        { x: 120, y: 160, dir: "right", penalty: 60, phone: 0 },
+       ],
+       outs: [{ x: 200, y: 264, dir: "down" }],
+       keepout: [120, 48, 280, 264],
+--- a/src/components/home/method/Method.tsx
++++ b/src/components/home/method/Method.tsx
+@@ -16,8 +16,9 @@
+  * the bridge stands, and the energy ends there. Board units (STONE_BOARD).
+  */
+ const ENERGY_IN = [
+-  { x: 45, y: 152, dir: "down" as const },
+-  { x: 10, y: 168, dir: "right" as const, penalty: 60 },
++  { x: 45, y: 152, dir: "down" as const, phone: 60 },
++  // PROTOTYPE: near neutral on desktop (the simpler route wins); preferred on a phone.
++  { x: 10, y: 168, dir: "right" as const, penalty: 60, next: 2, phone: 0 },
+ ];
+ const ENERGY_OUT = [{ x: 384, y: 46, dir: "down" as const }];
+ /** The deck's band across the board, as four boxes, so the wire may use the empty corners above and below it. */

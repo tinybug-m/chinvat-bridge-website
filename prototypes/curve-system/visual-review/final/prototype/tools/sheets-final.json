@@ -1,0 +1,8 @@
+[
+{"name":"d1440-heading","w":1440,"x0":0,"x1":760,"y0":-150,"y1":720,"scale":0.62,"caption":"Heading route, 1440 px. Production swings wide across the margin; Phase 1 drops to a square U-corner on the margin and returns under the heading; the final route leaves the plate on a 45 degree chamfer, runs down the margin and enters the left node on a second chamfer. No hook, no square corner."},
+{"name":"d1280-heading","w":1280,"x0":0,"x1":700,"y0":-150,"y1":720,"scale":0.66,"caption":"Same region at 1280 px: the route keeps the same geometry as at 1440 (same ports, same two chamfers, no hooks)."},
+{"name":"d1024-top","w":1024,"x0":0,"x1":560,"y0":-150,"y1":720,"scale":0.8,"caption":"1024 px: same geometry again; radius is 24 px here (page margin scale)."},
+{"name":"m390-top","w":390,"x0":0,"x1":390,"y0":-100,"y1":1500,"scale":0.42,"caption":"390 px, from the hero to the first plates. Final keeps Phase 1 ports (the spine proposal was not better) and routes them with the distance-field router."},
+{"name":"m390-mid","w":390,"x0":0,"x1":390,"y0":1500,"y1":3100,"scale":0.42},
+{"name":"m360-top","w":360,"x0":0,"x1":360,"y0":-100,"y1":1500,"scale":0.42,"caption":"360 px. Two short near-ink stretches (40 px in total) are the only remaining tight spots."}
+]

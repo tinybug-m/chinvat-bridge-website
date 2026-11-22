@@ -1,0 +1,22 @@
+[
+ {"name":"hero-into-ai-1440","w":1440,"x0":0,"x1":1000,"y0":-10,"y1":900,"scale":0.62,"rings":{"p1":[[40,300,46],[220,551,40]]},
+  "caption":"Phase 1 wraps the heading inside the page margin and enters the AI graph by a long flat run. The proposal still passes the heading on the margin side, the only clear way to the left node, but its flat run sits mid-gap and it enters through a 45° chamfer."},
+ {"name":"ai-into-automation-1440","w":1440,"x0":380,"x1":1060,"y0":800,"y1":1340,"scale":0.75,"rings":{"p1":[[570,975,38],[611,1160,34]]},
+  "caption":"Phase 1 makes a fussy 68 px jog, then squeezes between the paragraph and the trigger. The proposal drops once and arrives on a diagonal."},
+ {"name":"automation-exit-1440","w":1440,"x0":380,"x1":1440,"y0":1150,"y1":1720,"scale":0.6,"rings":{"p1":[[1233,1366,44],[960,1366,30]],"prod":[[1238,1377,28]]},
+  "caption":"Phase 1 runs 254 px along the bottom card and through the dot canvas; production grazes the card's corner. The proposal drops clear, then crosses in the middle of the gap."},
+ {"name":"method-1440","w":1440,"x0":0,"x1":1440,"y0":5040,"y1":5920,"scale":0.5,"rings":{"p1":[[751,5209,46],[751,5712,46]]},
+  "caption":"Phase 1 squeezes a two-turn bracket between neighbouring plates. The proposal drops beside the plate and enters the next plinth from the side, with one turn."},
+ {"name":"hero-into-ai-1024","w":1024,"x0":0,"x1":1024,"y0":-10,"y1":640,"scale":0.7,"rings":{"p1":[[190,102,36],[28,260,44],[150,461,40]]},
+  "caption":"Phase 1's flat run sits against the pyramid, it wraps the heading, and it hooks into the AI graph. The proposal centres its crossing and enters through a chamfer."},
+ {"name":"automation-to-software-1024","w":1024,"x0":100,"x1":1024,"y0":950,"y1":1520,"scale":0.65,"rings":{},
+  "caption":"Here the crossing sits in the middle of the gap, clear of both the drawing above and the grey band's edge below."},
+ {"name":"tablet-services-768","w":768,"x0":0,"x1":768,"y0":-10,"y1":2120,"scale":0.42,"rings":{"p1":[[560,84,40],[747,250,46],[690,485,40],[747,1530,46],[560,1744,40],[200,2048,40]]},
+  "caption":"Phase 1 runs flat right under the pyramid, then makes edge-hugging U-turns that switch back across the page into the top ports. The proposal uses long 45° runs, straight drops and chamfered entries."},
+ {"name":"tablet-method-768","w":768,"x0":0,"x1":768,"y0":4560,"y1":5260,"scale":0.6,"rings":{"p1":[[407,4666,36],[407,5039,36]]},
+  "caption":"Method at 768 px: the brackets between neighbouring plates become single-turn L routes."},
+ {"name":"phone-services-390","w":390,"x0":0,"x1":390,"y0":-10,"y1":2780,"scale":0.9,"rings":{"p1":[[300,46,30],[380,300,30],[290,540,30],[380,1560,30],[290,1805,30],[110,2068,30]]},
+  "caption":"Phase 1 switches between the two screen edges and crosses the column at every plate, ending each crossing in a hook. The proposal keeps one spine down the left margin and branches into every plate from it."},
+ {"name":"phone-method-390","w":390,"x0":0,"x1":390,"y0":3950,"y1":5800,"scale":0.9,"rings":{"p1":[[59,4560,30],[59,4910,30],[59,5260,30]]},
+  "caption":"Phone Method: Phase 1 drops onto each plinth from above after crossing the column. The proposal comes off the spine and enters the plinth from the side."}
+]

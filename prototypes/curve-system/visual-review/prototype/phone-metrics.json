@@ -1,0 +1,98 @@
+[
+ {
+  "w": 768,
+  "v": "prod",
+  "switches": 7,
+  "crossings": 3,
+  "sideEntries": 2,
+  "plates": 9
+ },
+ {
+  "w": 768,
+  "v": "p1",
+  "switches": 7,
+  "crossings": 3,
+  "sideEntries": 3,
+  "plates": 9
+ },
+ {
+  "w": 768,
+  "v": "next",
+  "switches": 5,
+  "crossings": 3,
+  "sideEntries": 5,
+  "plates": 9
+ },
+ {
+  "w": 430,
+  "v": "prod",
+  "switches": 6,
+  "crossings": 5,
+  "sideEntries": 3,
+  "plates": 9
+ },
+ {
+  "w": 430,
+  "v": "p1",
+  "switches": 6,
+  "crossings": 4,
+  "sideEntries": 2,
+  "plates": 9
+ },
+ {
+  "w": 430,
+  "v": "next",
+  "switches": 10,
+  "crossings": 6,
+  "sideEntries": 8,
+  "plates": 9
+ },
+ {
+  "w": 390,
+  "v": "prod",
+  "switches": 6,
+  "crossings": 5,
+  "sideEntries": 3,
+  "plates": 9
+ },
+ {
+  "w": 390,
+  "v": "p1",
+  "switches": 6,
+  "crossings": 4,
+  "sideEntries": 2,
+  "plates": 9
+ },
+ {
+  "w": 390,
+  "v": "next",
+  "switches": 10,
+  "crossings": 6,
+  "sideEntries": 8,
+  "plates": 9
+ },
+ {
+  "w": 360,
+  "v": "prod",
+  "switches": 6,
+  "crossings": 5,
+  "sideEntries": 3,
+  "plates": 9
+ },
+ {
+  "w": 360,
+  "v": "p1",
+  "switches": 6,
+  "crossings": 4,
+  "sideEntries": 2,
+  "plates": 9
+ },
+ {
+  "w": 360,
+  "v": "next",
+  "switches": 10,
+  "crossings": 6,
+  "sideEntries": 8,
+  "plates": 9
+ }
+]

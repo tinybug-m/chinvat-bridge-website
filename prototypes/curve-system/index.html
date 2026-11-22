@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curve System</title>
+<meta name="description" content="Prototype: a geometric curve system for the Chinvat Bridge site's animated lines, compared with the current geometry. Not production code.">
+<style>
+@font-face { font-family: "Archivo"; src: url("../../src/styles/fonts/Archivo-latin-wdth-wght.woff2") format("woff2"); font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; }
+@font-face { font-family: "Martian Mono"; src: url("../../src/styles/fonts/MartianMono-latin-wght.woff2") format("woff2"); font-weight: 100 800; font-display: swap; }
+:root {
+  --paper: #f6f4ef; --paper-raised: #fbfaf7; --haze: #eceeef;
+  --ink: #0b1a26; --ink-soft: #33414c; --ink-muted: #5b6872;
+  --line: #d6d9db; --line-strong: #b9c0c4; --control: #7d8a92;
+  --cobalt: #0f557d; --cobalt-600: #155f8c; --azure: #1c8ec3;
+  --saffron: #cf9c48; --saffron-600: #be8c3f; --saffron-700: #8e5a1e;
+  --error: #b42318;
+  --current: #be8c3f;
+  --gutter: clamp(1.25rem, -0.143rem + 5.714vw, 5rem);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 1rem/1.6 "Archivo", ui-sans-serif, system-ui, sans-serif; }
+.wrap { max-width: 90rem; margin: 0 auto; padding: 0 var(--gutter); }
+.mono { font-family: "Martian Mono", ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.75rem; letter-spacing: 0; }
+h1, h2, h3 { font-weight: 500; margin: 0; letter-spacing: -0.015em; }
+h1 { font-size: clamp(2.5rem, 1.6rem + 3.6vw, 4.75rem); line-height: 0.98; font-stretch: 112%; max-width: 16ch; }
+h2 { font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem); line-height: 1.05; font-stretch: 108%; max-width: 22ch; }
+h3 { font-size: 1.25rem; line-height: 1.2; }
+p { margin: 0; }
+.lede { font-size: clamp(1.125rem, 1.05rem + 0.3vw, 1.3rem); line-height: 1.5; color: var(--ink-soft); max-width: 40rem; }
+.soft { color: var(--ink-soft); }
+.muted { color: var(--ink-muted); }
+header.top { padding: 4.5rem 0 3rem; border-bottom: 1px solid var(--line); }
+header.top .eyebrow { margin-bottom: 1.25rem; color: var(--ink-muted); }
+header.top .lede { margin-top: 1.5rem; }
+.status { display: inline-flex; gap: .5rem; align-items: center; margin-top: 2rem; padding: .35rem .7rem; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--ink-soft); }
+.status::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: var(--saffron); }
+section.block { padding: 4.5rem 0; border-bottom: 1px solid var(--line); }
+section.block > .wrap > .intro { display: grid; gap: 1rem; margin-bottom: 2.5rem; }
+.principles { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 2.5rem; grid-template-columns: 1fr; }
+@media (min-width: 768px) { .principles { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1200px) { .principles { grid-template-columns: repeat(3, 1fr); } }
+.principles > div { background: var(--paper-raised); padding: 1.5rem; display: grid; gap: .5rem; align-content: start; }
+.principles h3 { font-size: 1.125rem; }
+.principles p { color: var(--ink-soft); font-size: .95rem; }
+
+/* Controls */
+.controls { display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; align-items: center; margin-bottom: 1.5rem; }
+.seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 6px; overflow: hidden; background: var(--paper-raised); }
+.seg button, .chip, .toggle, .btn { font: inherit; font-size: .85rem; color: var(--ink-soft); background: none; border: 0; cursor: pointer; }
+.seg button { padding: .45rem .8rem; min-height: 2.25rem; }
+.seg button + button { border-left: 1px solid var(--line-strong); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.chip { padding: .3rem .65rem; border: 1px solid var(--line-strong); border-radius: 999px; min-height: 2rem; background: var(--paper-raised); }
+.chip[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.toggle { display: inline-flex; align-items: center; gap: .45rem; min-height: 2.25rem; }
+.toggle::before { content: ""; width: 1.9rem; height: 1.1rem; border-radius: 999px; background: var(--line-strong); box-shadow: inset 0 0 0 2px var(--line-strong); transition: background-color .2s; }
+.toggle[aria-pressed="true"]::before { background: var(--cobalt); box-shadow: inset 0 0 0 2px var(--cobalt), inset 0.8rem 0 0 2px var(--cobalt); background-image: radial-gradient(circle at 70% 50%, var(--paper) 0 .35rem, transparent .36rem); }
+.toggle[aria-pressed="false"]::before { background-image: radial-gradient(circle at 30% 50%, var(--paper) 0 .35rem, transparent .36rem); }
+.btn { padding: .5rem .9rem; border: 1px solid var(--ink); border-radius: 6px; color: var(--ink); min-height: 2.25rem; }
+.btn:hover { background: var(--ink); color: var(--paper); }
+:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 2px; }
+.label { display: block; color: var(--ink-muted); margin-bottom: .35rem; }
+
+/* Specimens */
+.specimens { display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
+@media (min-width: 1100px) { .specimens { grid-template-columns: repeat(2, 1fr); } }
+.card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 4px; padding: 1.25rem; display: grid; gap: 1rem; align-content: start; min-width: 0; }
+.card header { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+.card .rule { color: var(--ink-soft); font-size: .92rem; }
+.card .rule li { margin: .2rem 0; }
+.card ul { margin: 0; padding-left: 1.1rem; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.pair figure { margin: 0; border: 1px solid var(--line); background: var(--paper); min-width: 0; }
+.pair figcaption { display: flex; justify-content: space-between; gap: .5rem; padding: .4rem .6rem; border-bottom: 1px solid var(--line); color: var(--ink-muted); }
+.pair svg { display: block; width: 100%; height: auto; }
+.kplot svg { display: block; width: 100%; height: 96px; }
+.kplot { border: 1px solid var(--line); background: var(--paper); }
+.kplot .cap { display: flex; gap: 1rem; flex-wrap: wrap; padding: .4rem .6rem; border-bottom: 1px solid var(--line); color: var(--ink-muted); }
+.key { display: inline-flex; align-items: center; gap: .35rem; }
+.key::before { content: ""; width: 1rem; height: 2px; background: currentColor; }
+.key.cur { color: var(--current); }
+.key.pro { color: var(--ink); }
+.slider { display: grid; gap: .25rem; }
+.slider input { width: 100%; accent-color: var(--ink); }
+.verdict { color: var(--ink-soft); font-size: .88rem; }
+
+/* Homepage comparison */
+.stage { display: grid; gap: .75rem; grid-template-columns: 1fr; }
+.stage.side { grid-template-columns: 1fr 1fr; }
+.panel { border: 1px solid var(--line); background: var(--paper-raised); min-width: 0; }
+.panel > .cap { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; padding: .5rem .75rem; border-bottom: 1px solid var(--line); }
+.panel .scroll { max-height: 78vh; overflow: auto; overscroll-behavior: contain; }
+.panel svg { display: block; width: 100%; }
+.metrics { width: 100%; border-collapse: collapse; margin-top: 1.5rem; font-size: .92rem; }
+.metrics th, .metrics td { text-align: left; padding: .55rem .75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+.metrics th { font-weight: 500; color: var(--ink-muted); }
+.metrics td.num { font-family: "Martian Mono", ui-monospace, monospace; font-size: .8rem; white-space: nowrap; }
+.metrics td.good { color: var(--ink); }
+.metrics td.bad { color: var(--error); }
+.tablewrap { overflow-x: auto; }
+.notes { display: grid; gap: .5rem; margin-top: 1.5rem; color: var(--ink-soft); font-size: .92rem; max-width: 60rem; }
+
+/* Tokens */
+.tokens td code, .tokens th code { font-family: "Martian Mono", ui-monospace, monospace; font-size: .78rem; }
+footer { padding: 3rem 0 4rem; color: var(--ink-muted); font-size: .9rem; }
+.twocol { display: grid; gap: 2rem; }
+@media (min-width: 1000px) { .twocol { grid-template-columns: 1fr 1fr; } }
+.flow-row { display: grid; gap: .5rem; }
+.flow-row svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1px solid var(--line); }
+@media (max-width: 700px) { .stage.side { grid-template-columns: 1fr; } .pair { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <p class="eyebrow mono">Chinvat Bridge / motion lines / prototype</p>
+    <h1>One geometry for every line that moves.</h1>
+    <p class="lede">Every bend in the wire, the diagram connectors and the currents becomes one kind of turn: curvature rises from zero, peaks at the role's radius and falls back to zero. Turns are joined by straight runs at 0, 45 and 90 degrees, on the layout grid. Below, the system is set against the current geometry, using the homepage's real layout measured at four widths.</p>
+    <p class="status mono">Isolated prototype. Nothing in production imports it.</p>
+  </div>
+</header>
+
+<section class="block" aria-labelledby="principles-title">
+  <div class="wrap">
+    <div class="intro">
+      <h2 id="principles-title">Principles</h2>
+      <p class="lede">The wire should read as engineered, like a survey line or a railway alignment, not freehand. A small set of rules is enough to get there.</p>
+    </div>
+    <div class="principles">
+      <div><h3>Straight runs, measured turns</h3><p>A line is straight runs joined by turns. It never curves over its whole length. Curvature belongs to the turns, so the straights read as structure and the turns as decisions.</p></div>
+      <div><h3>Transition curves only</h3><p>Every turn eases in and out: curvature grows linearly from zero to 1/R and back (an Euler spiral, as on railways and motorways). No turn starts abruptly, so the moving head never jolts where a straight meets a bend.</p></div>
+      <div><h3>One radius per role</h3><p>The wire turns at one radius, set from the page margin so it scales with the layout. Diagram connectors turn at one radius in board units, so they scale with the artwork. Nothing else turns.</p></div>
+      <div><h3>Three headings</h3><p>Runs go down, across, or down at 45 degrees. A small offset takes a shallower S at the same radius. Diagonals stay parallel wherever they occur, echoing the bridge deck in the Method plates.</p></div>
+      <div><h3>Lines live on the grid</h3><p>Vertical runs take the page margin's centre, the column gutters or a port's own line. Lane changes sit in the middle of the gap they cross, not hard against the text.</p></div>
+      <div><h3>Arrive straight</h3><p>A line leaves and reaches a port on a straight lead of at least half its radius. It never lands mid-curve and never hooks into a port.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="families-title">
+  <div class="wrap">
+    <div class="intro">
+      <h2 id="families-title">Curve families</h2>
+      <p class="lede">Four patterns cover every line that carries the current: the quarter turn, the lane change (45° diagonals and shallower S-curves), the port landing and the through-route. Each card draws the current construction beside the proposed one with the same ends, then plots curvature along the length. A step in the plot is a visible break. A spike is a kink.</p>
+    </div>
+    <div class="controls">
+      <div><span class="label mono">Viewport (sets R)</span><div class="seg" id="spec-vw" role="group" aria-label="Viewport width for the specimens"></div></div>
+      <button class="toggle" id="spec-comb" aria-pressed="true">Curvature comb</button>
+      <p class="mono muted" id="spec-tokens"></p>
+    </div>
+    <div class="specimens" id="specimens"></div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="home-title">
+  <div class="wrap">
+    <div class="intro">
+      <h2 id="home-title">The homepage wire, routed both ways</h2>
+      <p class="lede">The wire's real inputs were captured from the running homepage at four widths: the hero's origin, every plate's ports and keep-out artwork, and every text box the wire avoids. "Current" is the path production drew. "Proposed" is this system routed live in your browser from the same inputs.</p>
+    </div>
+    <div class="controls">
+      <div><span class="label mono">Viewport</span><div class="seg" id="home-vw" role="group" aria-label="Captured viewport"></div></div>
+      <div><span class="label mono">View</span><div class="seg" id="home-view" role="group" aria-label="Comparison view"></div></div>
+      <button class="toggle" id="home-comb" aria-pressed="false">Curvature comb</button>
+      <button class="toggle" id="home-layout" aria-pressed="true">Layout</button>
+      <button class="toggle" id="home-flags" aria-pressed="true">Mark tight bends</button>
+      <button class="btn" id="home-play">Run the current</button>
+    </div>
+    <div class="chips" id="home-hops" role="group" aria-label="Zoom to a hop" style="margin-bottom:1rem"></div>
+    <div class="stage side" id="home-stage"></div>
+    <div class="tablewrap"><table class="metrics" id="home-metrics"></table></div>
+    <div class="notes" id="home-notes"></div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="diagram-title">
+  <div class="wrap">
+    <div class="intro">
+      <h2 id="diagram-title">Inside the diagrams</h2>
+      <p class="lede">The Automation plate's connectors use rounded elbows drawn as quadratic curves. A quadratic is a parabola, not an arc, so its "6 unit" corner swings from a 12 unit radius at the ends to 4.2 at the apex, with a curvature step at both joins. The cobalt current and the saffron run travel these lines, so the break shows in motion.</p>
+    </div>
+    <div class="twocol">
+      <div class="card" id="diagram-card"></div>
+      <div class="card">
+        <h3>What stays sharp</h3>
+        <ul class="rule">
+          <li><strong>Annotation:</strong> the hero's dotted brackets, the Method gauges and the ruler follow drafting convention. Dimension and bracket lines meet at true corners. Rounding them would blur flow lines into notes.</li>
+          <li><strong>Data:</strong> the SEO trace keeps its vertices, because each one is a reading. The ambient run along it is a data cursor, not a flow.</li>
+          <li><strong>Projected stone:</strong> the deck line, inlay and slab edges are projections of the 3D bridge. Their geometry belongs to the scene.</li>
+          <li><strong>Graph links:</strong> the AI plate's spokes and rim are straight node-to-node links.</li>
+        </ul>
+        <p class="verdict">The rule: a line that carries the current (wire, connector, pulse route) uses the curve system. A line that measures, plots or depicts does not.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="motion-title">
+  <div class="wrap">
+    <div class="intro">
+      <h2 id="motion-title">Motion, kept apart from geometry</h2>
+      <p class="lede">Geometry produces a path and its length table. Motion reads only lengths and tokens. Today the ambient runs use <code class="mono">pathLength="100"</code> with one duration, so the speed and comet size follow the line's length. The plate pulses all take 0.68 s whatever their length. Proposed: one speed per role, so the duration comes from the length.</p>
+    </div>
+    <div class="controls">
+      <button class="toggle" id="motion-reduce" aria-pressed="false">Reduced motion</button>
+      <p class="mono muted" id="motion-note"></p>
+    </div>
+    <div class="twocol">
+      <div class="flow-row"><h3>Current: one duration</h3><p class="soft">Three runs of different lengths, each lasting 2.4 s, with a dash of 10% of the line. The longest moves 3.5 times faster than the shortest, with a comet 3.5 times longer.</p><svg id="flow-norm" viewBox="0 0 600 220" aria-hidden="true"></svg></div>
+      <div class="flow-row"><h3>Proposed: one speed</h3><p class="soft">The same lines at the ambient flow speed, with the wire's comet (16 px head, 44 and 84 px tail). Short lines finish sooner, and every comet looks the same.</p><svg id="flow-const" viewBox="0 0 600 220" aria-hidden="true"></svg></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="tokens-title">
+  <div class="wrap">
+    <div class="intro">
+      <h2 id="tokens-title">Tokens</h2>
+      <p class="lede">Geometry and motion tokens are kept separate. Radii derive from tokens the site already has, so the curve system follows any change to the page margin or the artwork's scale.</p>
+    </div>
+    <div class="tablewrap"><table class="metrics tokens" id="token-table"></table></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Layouts captured from the local dev server by <code class="mono">capture.mjs</code> (read-only). Geometry in <code class="mono">curves.js</code>, routing in <code class="mono">router.js</code>. Open this file directly, or serve the repository root and visit <code class="mono">/prototypes/curve-system/</code> for the site's fonts.</p>
+  </div>
+</footer>
+
+<script src="layouts.js"></script>
+<script src="curves.js"></script>
+<script src="router.js"></script>
+<script>
+(() => {
+  const { P, fillet, toD, parseD, analyse, metrics, extent, DEG, kappa, bez } = Curves;
+  const NS = "http://www.w3.org/2000/svg";
+  const el = (tag, attrs = {}, parent) => {
+    const n = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) if (v !== undefined && v !== null) n.setAttribute(k, v);
+    if (parent) parent.appendChild(n);
+    return n;
+  };
+  const h = (tag, attrs = {}, html = "") => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+    n.innerHTML = html;
+    return n;
+  };
+  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const C = { ink: css("--ink"), cur: css("--current"), azure: css("--azure"), cobalt: css("--cobalt"), saffron: css("--saffron"), line: css("--line"), lineStrong: css("--line-strong"), haze: css("--haze"), error: css("--error"), muted: css("--ink-muted"), paper: css("--paper") };
+  const osReduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const WIDTHS = [1440, 1024, 768, 390];
+  const NAMES = ["AI", "Automation", "Software", "SEO", "Approach", "Discover", "Define", "Build", "Improve"];
+  const hopName = (i) => `${i ? NAMES[i - 1] : "Hero"} to ${NAMES[i]}`;
+  const fmt = (n, d = 0) => (Number.isFinite(n) ? n.toFixed(d) : "none");
+
+  function segmented(host, options, value, onChange) {
+    host.innerHTML = "";
+    for (const o of options) {
+      const b = h("button", { type: "button", "aria-pressed": String(o.value === value) }, o.label);
+      b.addEventListener("click", () => {
+        for (const x of host.children) x.setAttribute("aria-pressed", "false");
+        b.setAttribute("aria-pressed", "true");
+        onChange(o.value);
+      });
+      host.appendChild(b);
+    }
+  }
+  function toggle(btn, onChange) {
+    btn.addEventListener("click", () => {
+      const on = btn.getAttribute("aria-pressed") !== "true";
+      btn.setAttribute("aria-pressed", String(on));
+      onChange(on);
+    });
+    return () => btn.getAttribute("aria-pressed") === "true";
+  }
+
+  /* -------------------------------------------- the current constructions */
+
+  /** route.ts connector(): one cubic, handles 0.55 of the travel along each end's heading. */
+  function currentConnector(a, da, b, db) {
+    const U = { down: P(0, 1), left: P(-1, 0), right: P(1, 0) };
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const ka = (da === "down" ? Math.abs(dy) : Math.abs(dx)) * 0.55;
+    const kb = (db === "down" ? Math.abs(dy) : Math.abs(dx)) * 0.55;
+    return [{ k: "C", p: [a, P(a.x + U[da].x * ka, a.y + U[da].y * ka), P(b.x - U[db].x * kb, b.y - U[db].y * kb), b] }];
+  }
+  /** route.ts corridor turn: a quarter circle as one cubic (KAPPA), radius 32 px at every width. */
+  function currentQuarter(a, corner, b, r = 32) {
+    const k = 0.5523 * r;
+    const t0 = P(corner.x, corner.y - r), t1 = P(corner.x + r, corner.y);
+    return [
+      { k: "L", p: [a, t0] },
+      { k: "C", p: [t0, P(corner.x, corner.y - r + k), P(corner.x + r - k, corner.y), t1] },
+      { k: "L", p: [t1, b] },
+    ];
+  }
+
+  /* ------------------------------------------------------- drawing helpers */
+
+  function drawPath(svg, pieces, attrs) {
+    return el("path", { d: toD(pieces), fill: "none", "stroke-linecap": "round", "vector-effect": "non-scaling-stroke", ...attrs }, svg);
+  }
+  /** Curvature comb: a tooth along the normal at every sample, length k * gain, plus the envelope. */
+  function drawComb(svg, an, gain, color, maxLen) {
+    let teeth = "", env = "";
+    const every = Math.max(1, Math.round(4 / Math.max(0.5, an.length / Math.max(1, an.samples.length))));
+    an.samples.forEach((s, i) => {
+      if (i % every) return;
+      let L = -s.k * gain;
+      if (Math.abs(L) > maxLen) L = Math.sign(L) * maxLen;
+      const x2 = s.x - s.ty * L, y2 = s.y + s.tx * L;
+      if (Math.abs(L) > 0.05) teeth += `M${s.x.toFixed(1)} ${s.y.toFixed(1)}L${x2.toFixed(1)} ${y2.toFixed(1)}`;
+      env += `${env ? "L" : "M"}${x2.toFixed(1)} ${y2.toFixed(1)}`;
+    });
+    el("path", { d: teeth, stroke: color, "stroke-width": 0.75, "stroke-opacity": 0.45, fill: "none", "vector-effect": "non-scaling-stroke" }, svg);
+    el("path", { d: env, stroke: color, "stroke-width": 1, "stroke-opacity": 0.8, fill: "none", "vector-effect": "non-scaling-stroke" }, svg);
+  }
+  function drawFlags(svg, an, R, r) {
+    for (const b of an.bends) if (b.deflection > 3 * DEG && 1 / b.kmax < R * 0.75 && b.at) {
+      el("circle", { cx: b.at.x, cy: b.at.y, r, fill: "none", stroke: C.error, "stroke-width": 1.5, "vector-effect": "non-scaling-stroke" }, svg);
+    }
+    for (const j of an.joins) if (j.dk > 1 / 400) el("circle", { cx: j.x, cy: j.y, r: r * 0.35, fill: C.error, "fill-opacity": 0.8 }, svg);
+  }
+  /** Signed curvature along the length, both constructions on one axis. */
+  function kPlot(host, series, R) {
+    host.innerHTML = "";
+    const cap = h("div", { class: "cap mono" }, `<span class="key cur">Current</span><span class="key pro">Proposed</span><span>dashed: &plusmn;1/R</span>`);
+    host.appendChild(cap);
+    const svg = el("svg", { viewBox: "0 0 600 96", preserveAspectRatio: "none" }, host);
+    const kref = 1 / R;
+    const kmax = Math.max(kref * 2.2, ...series.flatMap((s) => s.an.samples.map((q) => Math.min(Math.abs(q.k), kref * 6))));
+    const y = (k) => 48 - (Math.max(-kmax, Math.min(kmax, k)) / kmax) * 42;
+    el("line", { x1: 0, x2: 600, y1: 48, y2: 48, stroke: C.line, "vector-effect": "non-scaling-stroke" }, svg);
+    for (const k of [kref, -kref]) el("line", { x1: 0, x2: 600, y1: y(k), y2: y(k), stroke: C.lineStrong, "stroke-dasharray": "3 4", "vector-effect": "non-scaling-stroke" }, svg);
+    for (const s of series) {
+      const L = s.an.length || 1;
+      let d = "";
+      s.an.samples.forEach((q, i) => (d += `${i ? "L" : "M"}${((q.s / L) * 600).toFixed(1)} ${y(q.k).toFixed(1)}`));
+      el("path", { d, fill: "none", stroke: s.color, "stroke-width": 1.5, "vector-effect": "non-scaling-stroke", "stroke-linejoin": "round" }, svg);
+    }
+  }
+
+  /* ------------------------------------------------------------ specimens */
+
+  const spec = { vw: 1440, comb: true };
+  const tk = (vw) => Router.tokens(vw);
+
+  function lanePolyline(a, b, R, lead, gap) {
+    // The lane-change family: 45 degrees if the drop allows, else the shallower S, else a level run.
+    const dx = b.x - a.x;
+    const adx = Math.abs(dx);
+    const options = [];
+    const fits = (al) => adx / Math.sin(al) >= 2 * extent(al, R);
+    if (fits(45 * DEG)) options.push({ a: 45 * DEG, name: "45° lane change" });
+    else {
+      let lo = 1 * DEG, hi = 45 * DEG;
+      for (let i = 0; i < 24; i++) { const m = (lo + hi) / 2; if (fits(m)) lo = m; else hi = m; }
+      options.push({ a: lo, name: `S at ${(lo / DEG).toFixed(1)}°` });
+    }
+    options.push({ a: 90 * DEG, name: "level lane change" });
+    for (const o of options) {
+      const drop = o.a > 89 * DEG ? 0 : adx / Math.tan(o.a);
+      const y = (a.y + b.y - drop) / 2;
+      const pcs = fillet([a, P(a.x, y), P(b.x, y + drop), b], R, { lead, gap });
+      if (pcs) return { pcs, name: o.name };
+    }
+    return { pcs: null, name: "does not fit at this radius" };
+  }
+
+  const SPECIMENS = [
+    {
+      id: "quarter",
+      title: "Quarter turn",
+      sub: "90°, straight to straight",
+      rules: [
+        "A turn of peak radius R runs 1.85R along each leg (a circular arc runs 1R). It is longer and gentler, and curvature starts from zero.",
+        "The current corridor turn is a circular arc at 32 px at every width: a curvature step at both ends and a radius that ignores the layout.",
+      ],
+      view: [0, 0, 300, 220],
+      build(R, t) {
+        const a = P(60, 10), c = P(60, 150), b = P(290, 150);
+        return { cur: currentQuarter(a, c, b, 32), pro: fillet([a, c, b], R, { lead: t.lead, gap: t.gap }) };
+      },
+    },
+    {
+      id: "lane",
+      title: "Lane change",
+      sub: "S-curves between two vertical runs",
+      slider: { label: "Lateral offset", min: 4, max: 320, value: 120, unit: "px" },
+      rules: [
+        "The radius stays fixed and the angle adapts: 45° when the drop allows, a shallower S for small offsets, a level run when the drop is too short.",
+        "The current connector is one cubic with handles of 0.55 × the drop. When the offset grows faster than the drop, its peak radius collapses (5 px at 768 wide, a visible kink).",
+      ],
+      view: [0, 0, 420, 280],
+      build(R, t, v) {
+        const a = P(50, 10), b = P(50 + v, 270);
+        const lane = lanePolyline(a, b, R, t.lead, t.gap);
+        this.note = lane.name;
+        return { cur: currentConnector(a, "down", b, "down"), pro: lane.pcs };
+      },
+    },
+    {
+      id: "landing",
+      title: "Port landing",
+      sub: "down into a side port",
+      slider: { label: "Room before the port", min: 10, max: 220, value: 96, unit: "px" },
+      rules: [
+        "The line turns early and arrives on a straight lead of at least R/2. If there is no room for the turn plus the lead, this port is skipped and the router takes the plate's other port.",
+        "The current connector sets one handle from the drop and the other from the room, so a narrow approach packs the whole turn into the last few pixels: a hook (6 px radius on phones).",
+      ],
+      view: [0, 0, 300, 220],
+      build(R, t, v) {
+        const a = P(40, 10), q = P(40 + v, 200);
+        const pro = fillet([a, P(40, 200), q], R, { lead: t.lead });
+        this.note = pro ? "quarter turn and lead" : "no room: the router takes the other port";
+        return { cur: currentConnector(a, "down", q, "right"), pro };
+      },
+    },
+    {
+      id: "chain",
+      title: "Through-route",
+      sub: "several sections in one hop",
+      rules: [
+        "Same-hand turns are separated by at least R/2 of straight, so two bends never merge into one lumpy curve. Opposite turns may meet, at zero curvature.",
+        "Shown: the hop from Define to Build at 768 wide, the current and proposed paths from the captured layout.",
+      ],
+      real: { vw: 768, hop: 7 },
+    },
+  ];
+
+  function renderSpecimens() {
+    const t = tk(spec.vw);
+    document.getElementById("spec-tokens").textContent = `R = ${t.R} px · lead ${t.lead} px · gap ${t.gap} px · margin ${Math.round(t.gutter)} px`;
+    const host = document.getElementById("specimens");
+    host.innerHTML = "";
+    for (const S of SPECIMENS) {
+      const card = h("article", { class: "card" });
+      card.appendChild(h("header", {}, `<h3>${S.title}</h3><span class="mono muted">${S.sub}</span>`));
+      let value = S.slider ? (S.value ?? S.slider.value) : null;
+      let sliderNote = null;
+      if (S.slider) {
+        const box = h("label", { class: "slider" }, `<span class="mono muted">${S.slider.label}: <span data-v>${value}</span> ${S.slider.unit}</span>`);
+        const input = h("input", { type: "range", min: S.slider.min, max: S.slider.max, value });
+        input.addEventListener("input", () => {
+          S.value = Number(input.value);
+          box.querySelector("[data-v]").textContent = input.value;
+          draw();
+        });
+        box.appendChild(input);
+        card.appendChild(box);
+      }
+      const pair = h("div", { class: "pair" });
+      const figs = ["Current", "Proposed"].map((label) => {
+        const f = h("figure", {}, `<figcaption class="mono"><span>${label}</span><span data-r></span></figcaption>`);
+        pair.appendChild(f);
+        return f;
+      });
+      card.appendChild(pair);
+      const plot = h("div", { class: "kplot" });
+      card.appendChild(plot);
+      sliderNote = h("p", { class: "verdict mono" });
+      card.appendChild(sliderNote);
+      card.appendChild(h("ul", { class: "rule" }, S.rules.map((r) => `<li>${r}</li>`).join("")));
+      host.appendChild(card);
+
+      function draw() {
+        let cur, pro, view, R = t.R;
+        if (S.real) {
+          const L = LAYOUTS[S.real.vw];
+          const tt = tk(S.real.vw);
+          R = tt.R;
+          const routed = routedFor(S.real.vw);
+          cur = parseD(L.current[S.real.hop]);
+          pro = routed.hops[S.real.hop].pieces;
+          const all = [...analyse(cur).samples, ...analyse(pro).samples];
+          const xs = all.map((s) => s.x), ys = all.map((s) => s.y);
+          const pad = 30;
+          view = [Math.min(...xs) - pad, Math.min(...ys) - pad, Math.max(...xs) - Math.min(...xs) + 2 * pad, Math.max(...ys) - Math.min(...ys) + 2 * pad];
+          S.note = `768 px layout · R = ${R} px`;
+        } else {
+          const out = S.build(R, t, S.value ?? S.slider?.value);
+          cur = out.cur; pro = out.pro; view = S.view;
+        }
+        const ans = [cur, pro].map((p) => (p ? analyse(p) : null));
+        figs.forEach((f, i) => {
+          f.querySelector("svg")?.remove();
+          const svg = el("svg", { viewBox: view.join(" "), "aria-hidden": "true" });
+          f.appendChild(svg);
+          const pcs = i ? pro : cur;
+          if (!pcs) {
+            el("text", { x: view[0] + 12, y: view[1] + 24, fill: C.muted, "font-size": 12, "font-family": "Martian Mono, monospace" }, svg).textContent = "no fit";
+            f.querySelector("[data-r]").textContent = "";
+            return;
+          }
+          const an = ans[i];
+          const gain = 26 * R * (view[2] / 300) * 0.9;
+          if (spec.comb) drawComb(svg, an, gain, i ? C.azure : C.cur, view[2] * 0.22);
+          drawPath(svg, pcs, { stroke: C.ink, "stroke-width": 1.5 });
+          drawFlags(svg, an, R, view[2] * 0.03);
+          const radii = an.bends.filter((b) => b.deflection > 3 * DEG).map((b) => 1 / b.kmax);
+          f.querySelector("[data-r]").textContent = radii.length ? `min R ${fmt(Math.min(...radii), 1)}` : "straight";
+        });
+        kPlot(plot, ans.map((an, i) => (an ? { an, color: i ? C.ink : C.cur } : null)).filter(Boolean), R);
+        sliderNote.textContent = S.note ? `Proposed: ${S.note}` : "";
+      }
+      draw();
+    }
+  }
+
+  /* --------------------------------------------------- homepage comparison */
+
+  const routedCache = new Map();
+  function routedFor(vw) {
+    if (!routedCache.has(vw)) routedCache.set(vw, Router.route(LAYOUTS[vw], tk(vw)));
+    return routedCache.get(vw);
+  }
+
+  const home = { vw: 1440, view: "side", hop: -1, comb: false, layout: true, flags: true };
+  let playing = null;
+
+  function renderHome() {
+    const L = LAYOUTS[home.vw];
+    const t = tk(home.vw);
+    const routed = routedFor(home.vw);
+    const curPcs = L.current.map(parseD);
+    const proPcs = routed.hops.map((hp) => hp.pieces);
+    const curAn = curPcs.map((p) => analyse(p));
+    const proAn = proPcs.map((p) => analyse(p));
+
+    // Hop chips
+    const chips = document.getElementById("home-hops");
+    chips.innerHTML = "";
+    const addChip = (i, label) => {
+      const b = h("button", { type: "button", class: "chip", "aria-pressed": String(home.hop === i) }, label);
+      b.addEventListener("click", () => { home.hop = i; renderHome(); });
+      chips.appendChild(b);
+    };
+    addChip(-1, "Whole wire");
+    curPcs.forEach((_, i) => addChip(i, hopName(i)));
+
+    // View box
+    const pick = home.hop < 0 ? null : home.hop;
+    let vb;
+    if (pick === null) vb = [0, 0, L.width, Math.max(...[...curAn, ...proAn].flatMap((a) => a.samples.map((s) => s.y))) + 40];
+    else {
+      const pts = [...curAn[pick].samples, ...proAn[pick].samples];
+      const xs = pts.map((s) => s.x), ys = pts.map((s) => s.y);
+      const pad = Math.max(40, (Math.max(...ys) - Math.min(...ys)) * 0.08);
+      vb = [Math.max(-20, Math.min(...xs) - pad), Math.min(...ys) - pad, 0, 0];
+      vb[2] = Math.min(L.width + 40, Math.max(...xs) + pad) - vb[0];
+      vb[3] = Math.max(...ys) + pad - vb[1];
+    }
+
+    const stage = document.getElementById("home-stage");
+    stage.className = `stage ${home.view === "side" ? "side" : ""}`;
+    stage.innerHTML = "";
+    const panels = home.view === "side" ? [{ label: "Current", sets: ["cur"] }, { label: "Proposed", sets: ["pro"] }] : [{ label: "Overlay: current (saffron) and proposed (ink)", sets: ["cur", "pro"] }];
+    const scrolls = [];
+    for (const panel of panels) {
+      const box = h("div", { class: "panel" });
+      const tag = panel.sets.length > 1 ? "" : panel.sets[0] === "cur" ? "production, captured" : `routed in ${routed.ms.toFixed(0)} ms · R ${t.R} px`;
+      box.appendChild(h("div", { class: "cap" }, `<strong>${panel.label}</strong><span class="mono muted">${tag}</span>`));
+      const scroll = h("div", { class: "scroll" });
+      box.appendChild(scroll);
+      stage.appendChild(box);
+      scrolls.push(scroll);
+      const svg = el("svg", { viewBox: vb.join(" "), "aria-hidden": "true", preserveAspectRatio: "xMidYMin meet" }, scroll);
+      if (pick !== null) svg.style.height = "min(70vh, 640px)";
+      // screen px per layout px, for comb gain and marker size
+      const px = () => (scroll.clientWidth || 600) / vb[2];
+      const k = px();
+      if (home.layout) {
+        el("rect", { x: 0, y: vb[1] - 2000, width: L.width, height: vb[3] + 4000, fill: C.paper }, svg);
+        for (const x of routed.grid) el("line", { x1: x, x2: x, y1: vb[1] - 2000, y2: vb[1] + vb[3] + 2000, stroke: C.line, "stroke-dasharray": "2 6", "vector-effect": "non-scaling-stroke" }, svg);
+        for (const b of L.text) el("rect", { x: b.x0, y: b.y0, width: b.x1 - b.x0, height: b.y1 - b.y0, fill: C.haze, rx: 2 }, svg);
+        for (const s of L.stops) {
+          el("rect", { x: s.frame.x0, y: s.frame.y0, width: s.frame.x1 - s.frame.x0, height: s.frame.y1 - s.frame.y0, fill: "none", stroke: C.line, "vector-effect": "non-scaling-stroke" }, svg);
+          for (const b of s.keepout) el("rect", { x: b.x0, y: b.y0, width: b.x1 - b.x0, height: b.y1 - b.y0, fill: C.lineStrong, "fill-opacity": 0.18, stroke: C.lineStrong, "stroke-dasharray": "3 3", "vector-effect": "non-scaling-stroke" }, svg);
+          for (const p of [...s.ins, ...s.outs]) el("circle", { cx: p.x, cy: p.y, r: 3 / k, fill: C.paper, stroke: C.muted, "stroke-width": 1, "vector-effect": "non-scaling-stroke" }, svg);
+        }
+        el("circle", { cx: L.origin.x, cy: L.origin.y, r: 3.5 / k, fill: C.ink }, svg);
+      }
+      for (const set of panel.sets) {
+        const pcsList = set === "cur" ? curPcs : proPcs;
+        const anList = set === "cur" ? curAn : proAn;
+        const overlay = panel.sets.length > 1;
+        const color = overlay && set === "cur" ? C.cur : C.ink;
+        pcsList.forEach((pcs, i) => {
+          const dim = pick !== null && i !== pick;
+          if (home.comb && !dim) drawComb(svg, anList[i], (26 * t.R) / k, set === "cur" ? C.cur : C.azure, 90 / k);
+          const path = drawPath(svg, pcs, { stroke: color, "stroke-width": dim ? 1 : 1.5, "stroke-opacity": dim ? 0.3 : 1, "data-set": set, "data-hop": i });
+          void path;
+          if (home.flags && !dim) drawFlags(svg, anList[i], t.R, 9 / k);
+        });
+      }
+    }
+    if (scrolls.length === 2) {
+      let lock = false;
+      scrolls.forEach((s, i) => s.addEventListener("scroll", () => {
+        if (lock) return;
+        lock = true;
+        scrolls[1 - i].scrollTop = s.scrollTop;
+        requestAnimationFrame(() => (lock = false));
+      }));
+    }
+
+    // Metrics
+    const mc = metrics(pick === null ? curAn : [curAn[pick]], t.R);
+    const mp = metrics(pick === null ? proAn : [proAn[pick]], t.R);
+    const rows = [
+      ["Turn radii", `${fmt(mc.minR)} to ${fmt(mc.maxR)} px`, `${fmt(mp.minR)} to ${fmt(mp.maxR)} px`, mp.spread <= 1.05, "One radius per role is the point of the system."],
+      ["Distinct radii (within 10%)", mc.distinct, mp.distinct, mp.distinct <= 1, ""],
+      ["Curvature breaks at joins", mc.kBreak, mp.kBreak, mp.kBreak === 0, "Where a straight meets a bend with a jump in curvature. The moving head visibly jolts there."],
+      ["Bends tighter than 0.75 R", mc.tight, mp.tight, mp.tight === 0, "Kinks and hooks."],
+      ["Bends (lobes of curvature)", mc.bends, mp.bends, null, "Each lobe of curvature counts once, so an S is two. The proposed wire bends only where it changes heading."],
+      ["Length", `${fmt(mc.length)} px`, `${fmt(mp.length)} px (${mp.length >= mc.length ? "+" : ""}${fmt(((mp.length - mc.length) / mc.length) * 100)}%)`, null, "Octilinear routes are a little longer. The scroll mapping absorbs this, because the head's speed comes from the scroll."],
+    ];
+    const flagged = routed.hops.filter((hp) => hp.R < t.R - 0.01 || hp.hits);
+    const table = document.getElementById("home-metrics");
+    table.innerHTML = `<thead><tr><th>${pick === null ? `Whole wire at ${home.vw} px` : hopName(pick)}</th><th>Current</th><th>Proposed</th><th>Why it matters</th></tr></thead><tbody>${rows
+      .map(([name, a, b, ok, why]) => `<tr><td>${name}</td><td class="num">${a}</td><td class="num ${ok === null ? "" : ok ? "good" : "bad"}">${b}</td><td class="soft">${why}</td></tr>`)
+      .join("")}</tbody>`;
+    document.getElementById("home-notes").innerHTML = `<p>${flagged.length ? `Hops that needed a smaller radius or still collide: ${flagged.map((hp) => hopName(routed.hops.indexOf(hp))).join(", ")}.` : `Every hop routed clear of the text and artwork at the token radius (${t.R} px).`} Red rings mark bends tighter than 0.75 R. Red dots mark curvature breaks at joins. Dashed verticals are the grid lanes the router prefers.</p>`;
+  }
+
+  function play() {
+    if (playing) cancelAnimationFrame(playing.raf);
+    if (reduceOn()) return;
+    const SPEED = 900; // px/s of layout: a demonstration rate, not a token
+    const paths = [...document.querySelectorAll("#home-stage path[data-set]")].filter((p) => home.hop < 0 || Number(p.dataset.hop) === home.hop);
+    const comets = paths.map((p) => {
+      const len = p.getTotalLength();
+      const c = p.cloneNode();
+      c.setAttribute("stroke", C.cobalt);
+      c.setAttribute("stroke-width", "3");
+      c.setAttribute("stroke-opacity", "1");
+      c.setAttribute("stroke-dasharray", `16 ${len + 16}`);
+      p.after(c);
+      return { c, len, set: p.dataset.set, hop: Number(p.dataset.hop) };
+    });
+    // Hops play in order within each set.
+    const offsets = {};
+    for (const set of ["cur", "pro"]) {
+      let at = 0;
+      for (const cm of comets.filter((x) => x.set === set).sort((a, b) => a.hop - b.hop)) { offsets[`${set}${cm.hop}`] = at; at += cm.len; }
+    }
+    const t0 = performance.now();
+    const tick = (now) => {
+      const s = ((now - t0) / 1000) * SPEED;
+      let alive = false;
+      for (const cm of comets) {
+        const local = s - offsets[`${cm.set}${cm.hop}`];
+        cm.c.style.strokeDashoffset = `${16 - Math.max(0, Math.min(cm.len + 16, local))}`;
+        if (local < cm.len + 16) alive = true;
+      }
+      if (alive) playing.raf = requestAnimationFrame(tick);
+      else { comets.forEach((cm) => cm.c.remove()); playing = null; }
+    };
+    playing = { raf: requestAnimationFrame(tick) };
+  }
+
+  /* --------------------------------------------------------------- diagram */
+
+  function renderDiagram() {
+    const card = document.getElementById("diagram-card");
+    card.innerHTML = "";
+    card.appendChild(h("header", {}, `<h3>Automation connectors</h3><span class="mono muted">board units, shown at 3&times;</span>`));
+    const Y = 150;
+    const elbow = (x1, y1, xm, x2, y2) => { const s = Math.sign(y2 - y1) * 6; return `M${x1} ${y1} H${xm - 6} Q${xm} ${y1} ${xm} ${y1 + s} V${y2 - s} Q${xm} ${y2} ${xm + 6} ${y2} H${x2}`; };
+    const links = [[214, Y, 232, 248, 98], [214, Y, 232, 248, 202], [314, 98, 328, 341, Y], [314, 202, 328, 341, Y]];
+    const Rd = 6;
+    const cur = links.map((l) => parseD(elbow(...l)));
+    const pro = links.map(([x1, y1, xm, x2, y2]) => fillet([P(x1, y1), P(xm, y1), P(xm, y2), P(x2, y2)], Rd, { lead: 1, gap: 3 }));
+    const pair = h("div", { class: "pair" });
+    const view = [206, 88, 142, 124];
+    ["Current: quadratic elbows, r 6", `Proposed: turns at R ${Rd}`].forEach((label, i) => {
+      const f = h("figure", {}, `<figcaption class="mono"><span>${label}</span></figcaption>`);
+      const svg = el("svg", { viewBox: view.join(" "), "aria-hidden": "true" }, f);
+      // the cards and branch as context
+      for (const [cx, cy] of [[281, 98], [281, 202]]) el("rect", { x: cx - 30, y: cy - 16, width: 60, height: 32, rx: 4, fill: C.paper, stroke: C.lineStrong, "vector-effect": "non-scaling-stroke" }, svg);
+      el("path", { d: `M200 ${Y - 14} L214 ${Y} L200 ${Y + 14} L186 ${Y} Z`, fill: C.paper, stroke: C.lineStrong, "vector-effect": "non-scaling-stroke" }, svg);
+      el("circle", { cx: 354, cy: Y, r: 13, fill: C.lineStrong }, svg);
+      const set = i ? pro : cur;
+      set.forEach((pcs) => {
+        const an = analyse(pcs, 0.25);
+        if (spec.comb) drawComb(svg, an, 26 * Rd * (view[2] / 300) * 0.9, i ? C.azure : C.cur, 18);
+        drawPath(svg, pcs, { stroke: C.ink, "stroke-width": 1.5 });
+        drawFlags(svg, an, Rd, 3);
+      });
+      pair.appendChild(f);
+    });
+    card.appendChild(pair);
+    const plot = h("div", { class: "kplot" });
+    card.appendChild(plot);
+    kPlot(plot, [{ an: analyse(cur[0], 0.25), color: C.cur }, { an: analyse(pro[0], 0.25), color: C.ink }], Rd);
+    const mc = metrics(cur.map((p) => analyse(p, 0.25)), Rd), mp = metrics(pro.map((p) => analyse(p, 0.25)), Rd);
+    card.appendChild(h("p", { class: "verdict mono" }, `Current: radius ${fmt(mc.minR, 1)} to ${fmt(mc.maxR, 1)}, ${mc.kBreak} curvature breaks. Proposed: radius ${fmt(mp.minR, 1)}, ${mp.kBreak} breaks. Every run still holds its turns: the shortest approach (13 units, into the result) carries the 11.1 unit turn and a 1 unit lead.`));
+  }
+
+  /* ---------------------------------------------------------------- motion */
+
+  const reduceBtn = document.getElementById("motion-reduce");
+  if (osReduce) reduceBtn.setAttribute("aria-pressed", "true");
+  const reduceOn = toggle(reduceBtn, () => renderMotion());
+  const AMBIENT = 120; // px/s
+  const COMET = [{ len: 84, op: 0.22 }, { len: 44, op: 0.45 }, { len: 16, op: 1 }];
+  let motionRaf = 0;
+  function renderMotion() {
+    cancelAnimationFrame(motionRaf);
+    const t = tk(1440);
+    const rows = [{ y: 40, dx: 0, len: 140 }, { y: 110, dx: 0, len: 300 }, { y: 180, dx: 0, len: 480 }];
+    const build = (r) => fillet([P(40, r.y), P(40 + r.len * 0.5, r.y), P(40 + r.len * 0.5 + 24, r.y + 24 * 0), P(40 + r.len, r.y)], t.R, {}) || [{ k: "L", p: [P(40, r.y), P(40 + r.len, r.y)] }];
+    const anims = [];
+    for (const [id, mode] of [["flow-norm", "norm"], ["flow-const", "const"]]) {
+      const svg = document.getElementById(id);
+      svg.innerHTML = "";
+      rows.forEach((r) => {
+        const pcs = build(r);
+        drawPath(svg, pcs, { stroke: C.ink, "stroke-width": 1.25, "stroke-opacity": 0.85 });
+        if (reduceOn()) return;
+        const len = r.len;
+        const parts = mode === "norm" ? [{ len: len * 0.1, op: 1 }] : COMET;
+        const comets = parts.map((c) => {
+          const p = drawPath(svg, pcs, { stroke: mode === "norm" ? C.saffron : C.cobalt, "stroke-width": c.len < 20 || mode === "norm" ? 2.5 : 1.75, "stroke-opacity": c.op, "stroke-dasharray": `${c.len} ${len + c.len}` });
+          return { p, c };
+        });
+        anims.push({ comets, len, mode });
+      });
+    }
+    document.getElementById("motion-note").textContent = reduceOn()
+      ? "Reduced motion: nothing travels. Lines are drawn built, as the wire already does."
+      : `Ambient flow speed ${AMBIENT} px/s · comet 16 / 44 / 84 px`;
+    if (reduceOn()) return;
+    const t0 = performance.now();
+    const tick = (now) => {
+      const s = (now - t0) / 1000;
+      for (const a of anims) {
+        const period = a.mode === "norm" ? 2.4 : (a.len + 84) / AMBIENT + 0.6;
+        const phase = (s % period) / (a.mode === "norm" ? period : 1);
+        for (const { p, c } of a.comets) {
+          const head = a.mode === "norm" ? phase * (a.len * 1.1) : (s % period) * AMBIENT;
+          p.style.strokeDashoffset = `${c.len - head}`;
+        }
+      }
+      motionRaf = requestAnimationFrame(tick);
+    };
+    motionRaf = requestAnimationFrame(tick);
+  }
+
+  /* ---------------------------------------------------------------- tokens */
+
+  function renderTokens() {
+    const at = WIDTHS.slice().reverse().map((w) => tk(w));
+    const cols = WIDTHS.slice().reverse();
+    const rows = [
+      ["Geometry", "", "", ""],
+      ["<code>--curve-r-wire</code>", "4px × round(0.1 × <code>--spacing-gutter</code>)", at.map((t) => `${t.R}`), "The wire's single turn radius. It follows the page margin, so it scales with the layout."],
+      ["<code>--curve-r-detail</code>", "6 board units", at.map(() => "6u"), "Connector turns inside the 400-unit diagram board. They scale with the artwork (≈ 6 to 10 px)."],
+      ["<code>--curve-transition</code>", "euler", at.map(() => "euler"), "Turn shape: curvature linear in length, 0 → 1/R → 0. Two mirrored cubics per turn (fitted, under 2% from a true clothoid)."],
+      ["<code>--curve-turn-extent</code>", "1.85 R (90°) · 0.81 R (45°)", at.map((t) => `${fmt(extent(90 * DEG, t.R), 1)}`), "How far a turn runs along each leg (90° shown). Derived, not set."],
+      ["<code>--curve-headings</code>", "0°, 45°, 90°", at.map(() => "0 45 90"), "Allowed run directions. An S may go shallower than 45° when the offset is small; never steeper."],
+      ["<code>--curve-lead</code>", "0.5 R", at.map((t) => `${t.lead}`), "Minimum straight after a departure and before an arrival."],
+      ["<code>--curve-gap</code>", "0.5 R (same hand) · 0 (reversing)", at.map((t) => `${t.gap}`), "Minimum straight between consecutive turns."],
+      ["<code>--curve-clearance</code>", "7 px phones, 14 px wider", at.map((t) => `${t.clearance}`), "Distance from text and artwork (unchanged from today)."],
+      ["<code>--curve-lanes</code>", "margin centre · gutters · centre · ports", at.map((t, i) => `${Router.gridLanes(LAYOUTS[cols[i]]).length}`), "Preferred vertical lines (count shown). Off-grid lanes are allowed at a cost."],
+      ["Motion", "", "", ""],
+      ["<code>--flow-speed-active</code>", "250 board units/s · 400 px/s", at.map(() => "400"), "Energy arriving: the plate activation wave and the pulses it leads (matches today's WAVE_S)."],
+      ["<code>--flow-speed-ambient</code>", "120 px/s", at.map(() => "120"), "Idle runs (the explore flows). Replaces pathLength=100 with one duration."],
+      ["<code>--flow-comet</code>", "16 / 44 / 84 px at 1 / .45 / .22", at.map(() => "same"), "One comet shape for every travelling current (the wire's today)."],
+      ["<code>--follow-tau</code>", "110 ms", at.map(() => "110"), "Smoothing of scroll-driven heads (wire and seam already share it)."],
+      ["<code>--draw-speed</code>", "600 px/s, 400 to 1200 ms, --ease-drawn", at.map(() => "600"), "One-shot line draw: duration from length, clamped."],
+      ["<code>--arrive</code>", "900 ms --ease-out-quart", at.map(() => "900"), "Port ring and seam ring (already shared)."],
+    ];
+    document.getElementById("token-table").innerHTML = `<thead><tr><th>Token</th><th>Rule</th>${cols.map((c) => `<th class="mono">${c}</th>`).join("")}<th>Role</th></tr></thead><tbody>${rows
+      .map((r) => (r[1] === "" ? `<tr><th colspan="${cols.length + 3}" style="padding-top:1.25rem;color:var(--ink)">${r[0]}</th></tr>` : `<tr><td>${r[0]}</td><td class="soft">${r[1]}</td>${r[2].map((v) => `<td class="num">${v}</td>`).join("")}<td class="soft">${r[3]}</td></tr>`))
+      .join("")}</tbody>`;
+  }
+
+  /* ------------------------------------------------------------------ init */
+
+  segmented(document.getElementById("spec-vw"), WIDTHS.map((w) => ({ label: `${w}`, value: w })), spec.vw, (v) => { spec.vw = v; renderSpecimens(); });
+  toggle(document.getElementById("spec-comb"), (on) => { spec.comb = on; renderSpecimens(); renderDiagram(); });
+  segmented(document.getElementById("home-vw"), WIDTHS.map((w) => ({ label: `${w}`, value: w })), home.vw, (v) => { home.vw = v; renderHome(); });
+  segmented(document.getElementById("home-view"), [{ label: "Side by side", value: "side" }, { label: "Overlay", value: "overlay" }], home.view, (v) => { home.view = v; renderHome(); });
+  toggle(document.getElementById("home-comb"), (on) => { home.comb = on; renderHome(); });
+  toggle(document.getElementById("home-layout"), (on) => { home.layout = on; renderHome(); });
+  toggle(document.getElementById("home-flags"), (on) => { home.flags = on; renderHome(); });
+  document.getElementById("home-play").addEventListener("click", play);
+
+  // Deep links for screenshots: ?vw=390&hop=6&view=overlay&comb=1
+  const q = new URLSearchParams(location.search);
+  if (q.has("vw")) home.vw = Number(q.get("vw"));
+  if (q.has("hop")) home.hop = Number(q.get("hop"));
+  if (q.has("view")) home.view = q.get("view");
+  if (q.get("comb") === "1") home.comb = true;
+  if (q.has("svw")) spec.vw = Number(q.get("svw"));
+  for (const [id, val] of [["home-vw", home.vw], ["home-view", home.view], ["spec-vw", spec.vw]]) for (const b of document.getElementById(id).children) b.setAttribute("aria-pressed", String(b.textContent.toLowerCase().startsWith(String(val).slice(0, 4).toLowerCase()) || b.textContent === String(val)));
+  document.getElementById("home-comb").setAttribute("aria-pressed", String(home.comb));
+
+  renderSpecimens();
+  renderHome();
+  renderDiagram();
+  renderMotion();
+  renderTokens();
+  window.__ready = true;
+})();
+</script>
+</body>
+</html>
