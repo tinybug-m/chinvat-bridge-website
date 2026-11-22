@@ -1,24 +1,37 @@
 /*
- * Routing for the energy wire (EnergyFlow.tsx). Pure geometry: it takes the
- * measured layout (in the wire layer's own pixels) and returns the wire as
- * smooth segments, one per hop, from the hero's origin into a plate's in
- * port, and from each plate's out port into the next plate's in port.
+ * Routes the energy wire through the page. Same curve language as src/lib/curves (0/45/90 degree
+ * headings, Euler-spiral turns of one radius). The router:
  *
- * Each hop is one cubic, or a cubic into a vertical lane, the lane, and a
- * cubic out of it. Every candidate is sampled against the text and the
- * plates' artwork, and the shortest clear, least cramped one wins. Inside a
- * plate the wire is not drawn: the plate's own current carries it.
+ * 1. Sees the artwork as drawn. The plates' visible strokes and fills (ink-data.ts, from the
+ *    build-time sampling in ink.generated.json) are rasterised with the text into a distance field.
+ *    Each artwork is closed (gaps under CLOSE px filled) and its holes filled, so the wire never
+ *    threads between a drawing's parts. A plate's keepout boxes are used only for stops with no
+ *    sampled artwork (the Approach stage).
+ * 2. Exempts no plate's own artwork beyond the straight stub along a port's heading that is needed
+ *    to get clear of it; after that the wire keeps clear of its own plate like any other.
+ * 3. Treats spacing as a cost, not just a limit: every pixel of wire closer than COMFORT to anything
+ *    costs, so lane changes sit in the middle of gaps and long runs keep their distance.
+ * 4. Prefers gentle topology: turns cost by the square of their angle, so two 45 degree turns beat
+ *    one 90; a side port may be entered or left through a 45 degree chamfer; level runs may be
+ *    chamfered; fussy shallow S-jogs cost extra.
+ *
+ * Each hop is searched over candidate polylines (ports, lanes, levels), scored against the field,
+ * and the cheapest clear one is filleted into curves. Inside a plate the wire is not drawn: the
+ * plate's own current carries it.
  */
 
+import { fillet, turnExtent, type Cubic, type Piece, type Pt } from "@/lib/curves/geometry";
+import { CURVE, wireRadius } from "@/lib/curves/tokens";
+import type { Ink } from "./ink-core";
+
+export type { Pt };
 export type Dir = "down" | "left" | "right";
-export interface Pt {
-  x: number;
-  y: number;
-}
 export interface Port extends Pt {
   dir: Dir;
   /** Added to a route's score, so a plate can prefer one port to another. */
   penalty?: number;
+  /** The penalty on larger screens (from 640px), when it differs from `penalty`, which a phone keeps. */
+  next?: number;
 }
 export interface Box {
   x0: number;
@@ -26,90 +39,286 @@ export interface Box {
   x1: number;
   y1: number;
 }
-
-/**
- * A plate as the router sees it: where the wire may enter and leave, and the artwork it must not
- * cross, as one box or several (a diagonal deck is a band of boxes, leaving its empty corners free).
- */
 export interface Stop {
   ins: Port[];
   outs: Port[];
   keepout: Box[];
-  /**
-   * Where the trigger line is when the energy arrives and when it leaves, for a stop that carries
-   * the energy on its own scroll timing (the Approach seam's sweep). Default: arrive when the port
-   * or the middle of the artwork reaches the line, leave when the out port does.
-   */
   arriveY?: number;
   leaveY?: number;
 }
-
 export interface Segment {
   d: string;
   length: number;
-  /** Where the segment starts on the wire's global length axis. */
   start: number;
-  /** Polyline samples with cumulative length, for placing the head. */
   points: { x: number; y: number; at: number }[];
 }
-
 export interface Arrival {
-  /** The plate this port belongs to (index into the stops). */
   stop: number;
-  /** Which of the plate's ins the wire took. */
   port: number;
   x: number;
   y: number;
-  /** Global length at which the energy reaches the port. */
   at: number;
 }
-
 export interface Wire {
   segments: Segment[];
   arrivals: Arrival[];
-  /** Scroll keys: when the trigger line is at y, the head is at `at`. Monotonic in both. */
   keys: { y: number; at: number }[];
   total: number;
 }
 
-type Cubic = [Pt, Pt, Pt, Pt];
-type Piece = { kind: "cubic"; c: Cubic } | { kind: "line"; a: Pt; b: Pt };
-
-const UNIT: Record<Dir, Pt> = {
+const DEG = Math.PI / 180;
+const HEADING: Record<Dir, Pt> = {
   down: { x: 0, y: 1 },
   left: { x: -1, y: 0 },
   right: { x: 1, y: 0 },
 };
-/** How far the wire stays from text and artwork (px); phones have a 20px margin to run in, so less there. */
-let CLEARANCE = 14;
-/** Sampling step along a candidate (px). */
 const STEP = 6;
-/** Vertical spans tried for the curves into and out of a lane (px). */
-const SPANS = [36, 56, 80, 112, 150, 200, 270, 360];
-/** Smallest horizontal run into a side port (px). */
-const MIN_RUN = 14;
-/**
- * A plate is powered once this share of its artwork (from the top) has reached the trigger line, so
- * it builds as it comes on screen, not once the reader is past it.
- */
+const LEVEL_STEP = 6;
+const LEVEL_STEP_TWO = 16;
+const DIAGONAL = CURVE.headings[1] * DEG;
+const MIN_SCALE = 0.5;
+const SCALE_STEPS = 6;
+const PORT_WEIGHT = 40;
+const HIT = 10000;
+const GRID_FROM = 1004;
+const GRID_GAP = 24;
 const EARLY = 0.15;
 
-/** One cubic leaving `a` along `da` and arriving at `b` along `db`. */
-function connector(a: Pt, da: Dir, b: Pt, db: Dir): Cubic | null {
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-  if (db === "down" && dy < 1) return null;
-  if (db === "right" && (dx < MIN_RUN || dy < 1)) return null;
-  if (db === "left" && (-dx < MIN_RUN || dy < 1)) return null;
-  const ka = (da === "down" ? Math.abs(dy) : Math.abs(dx)) * 0.55;
-  const kb = (db === "down" ? Math.abs(dy) : Math.abs(dx)) * 0.55;
-  return [
-    a,
-    { x: a.x + UNIT[da].x * ka, y: a.y + UNIT[da].y * ka },
-    { x: b.x - UNIT[db].x * kb, y: b.y - UNIT[db].y * kb },
-    b,
-  ];
+/** Per-layout tuning: set at the top of routeWire from the width. */
+interface Tuning {
+  phone: boolean;
+  /** Hard clearance from text and artwork (px). */
+  clear: number;
+  /** Closer than this costs (px), running down the page... */
+  comfort: number;
+  /** ...and across it (a lane change sits in the middle of the gap it crosses). */
+  across: number;
+  /** Gaps in an artwork narrower than twice this are filled (px). */
+  close: number;
+  /** Raster cell (px). */
+  cell: number;
+  /** What a quarter turn costs (px of route). */
+  turn: number;
+  /** What reversing sideways costs (px of route): a hook. */
+  reversal: number;
 }
+let T: Tuning = { phone: false, clear: 14, comfort: 44, across: 56, close: 18, cell: 4, turn: 128, reversal: 576 };
+/** The best score found so far in the current hop: a candidate that cannot beat it is dropped early. */
+let BOUND = Infinity;
+
+/** Tuning from the layout: a turn or a hook costs in proportion to the page, not to the radius. */
+function tune(width: number, lane: number, R: number): Tuning {
+  const phone = width < 640;
+  return {
+    phone,
+    clear: phone ? 8 : 14,
+    // Running down the middle of the page margin is comfortable by definition.
+    comfort: phone ? 1.5 * lane : Math.max(36, Math.min(44, 1.5 * lane)),
+    across: phone ? 36 : 56,
+    close: phone ? 10 : 18,
+    cell: phone ? 3 : 4,
+    turn: Math.max(W.turn * R, W.turnPage * width),
+    reversal: W.reversal * width,
+  };
+}
+
+/** Score weights. */
+const W = {
+  /** A quarter turn costs this many radii (scaled by the square of the turn's share of 90 degrees). */
+  turn: 4,
+  offGrid: 1,
+  /** Px of route per px of wire at zero spacing (falls off with the square of the spacing). */
+  comfort: 2.4,
+  /** The same for runs across the page: a cramped crossing is the most visible kind. */
+  acrossW: 3,
+  /** Px of route per px of wire across decoration (the automation dot canvas). */
+  deco: 1,
+  /** A lane change shallower than 45 degrees (an S), in radii. */
+  shallow: 3,
+  /** A lane change of less than 3 radii sideways costs this many px per px short of it: make it decisive or not at all. */
+  smallJog: 3,
+  /** A quarter turn never costs less than this share of the page width. */
+  turnPage: 0.12,
+  /** A sideways reversal (a hook), as a share of the page width. */
+  reversal: 0.4,
+};
+
+// ---------------------------------------------------------------------------------------------
+// The field: distance from every cell to the nearest text or artwork, in px.
+
+interface Field {
+  y0: number;
+  w: number;
+  h: number;
+  cell: number;
+  d: Float32Array;
+  deco: Uint8Array;
+  /** Per row: distance to the nearest background edge (px). */
+  edge: Float32Array;
+}
+let F: Field | null = null;
+/** Where the page's background changes: a run across the page keeps its distance from these too. */
+let EDGES: number[] = [];
+function edt(mask: Uint8Array, w: number, h: number) {
+  const INF = 1e9;
+  const f = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) f[i] = mask[i] ? 0 : INF;
+  const n = Math.max(w, h);
+  const d = new Float64Array(n);
+  const v = new Int32Array(n);
+  const z = new Float64Array(n + 1);
+  const g = new Float64Array(n);
+  const pass = (count: number, len: number, idx: (a: number, q: number) => number) => {
+    for (let a = 0; a < count; a++) {
+      for (let q = 0; q < len; q++) g[q] = f[idx(a, q)];
+      let k = 0;
+      v[0] = 0;
+      z[0] = -INF;
+      z[1] = INF;
+      for (let q = 1; q < len; q++) {
+        let s = (g[q] + q * q - (g[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+        while (s <= z[k]) {
+          k--;
+          s = (g[q] + q * q - (g[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+        }
+        k++;
+        v[k] = q;
+        z[k] = s;
+        z[k + 1] = INF;
+      }
+      k = 0;
+      for (let q = 0; q < len; q++) {
+        while (z[k + 1] < q) k++;
+        d[q] = (q - v[k]) * (q - v[k]) + g[v[k]];
+      }
+      for (let q = 0; q < len; q++) f[idx(a, q)] = d[q];
+    }
+  };
+  pass(w, h, (x, y) => y * w + x);
+  pass(h, w, (y, x) => y * w + x);
+  return f;
+}
+
+/** Mark the cells whose centre lies inside the rectangle (at least the nearest cell, so thin shapes survive). */
+function fillRect(arr: Uint8Array, w: number, h: number, cell: number, yTop: number, x0: number, y0: number, x1: number, y1: number) {
+  let i0 = Math.ceil(x0 / cell - 0.5);
+  let i1 = Math.floor(x1 / cell - 0.5);
+  let j0 = Math.ceil((y0 - yTop) / cell - 0.5);
+  let j1 = Math.floor((y1 - yTop) / cell - 0.5);
+  if (i1 < i0) i0 = i1 = Math.round(((x0 + x1) / 2) / cell - 0.5);
+  if (j1 < j0) j0 = j1 = Math.round((((y0 + y1) / 2) - yTop) / cell - 0.5);
+  for (let j = Math.max(0, j0); j <= Math.min(h - 1, j1); j++) for (let i = Math.max(0, i0); i <= Math.min(w - 1, i1); i++) arr[j * w + i] = 1;
+}
+
+function buildField(width: number, yTop: number, yBottom: number, text: Box[], solids: Box[], art: Ink[]): Field {
+  const { cell, close } = T;
+  const w = Math.ceil(width / cell) + 1;
+  const h = Math.ceil((yBottom - yTop) / cell) + 1;
+  const solid = new Uint8Array(w * h);
+  const deco = new Uint8Array(w * h);
+  const cx = (x: number) => Math.max(0, Math.min(w - 1, Math.floor(x / cell)));
+  const cy = (y: number) => Math.max(0, Math.min(h - 1, Math.floor((y - yTop) / cell)));
+  const byStop = new Map<number, Ink[]>();
+  for (const a of art) {
+    if (a.faint) {
+      fillRect(deco, w, h, cell, yTop, a.x - a.r, a.y - a.r, a.x + a.r, a.y + a.r);
+    } else {
+      const list = byStop.get(a.stop);
+      if (list) list.push(a);
+      else byStop.set(a.stop, [a]);
+    }
+  }
+  // Each plate's artwork is closed (gaps under `close` filled, holes filled) in a grid of its own: the
+  // plates are small, so this costs a few percent of closing the whole page.
+  const pad = Math.ceil(close / cell) + 3;
+  const c2 = (close / cell) ** 2;
+  for (const pts of byStop.values()) {
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const a of pts) {
+      x0 = Math.min(x0, a.x - a.r); x1 = Math.max(x1, a.x + a.r);
+      y0 = Math.min(y0, a.y - a.r); y1 = Math.max(y1, a.y + a.r);
+    }
+    const gx = cx(x0) - pad, gy = cy(y0) - pad;
+    const lw = cx(x1) + pad - gx + 1, lh = cy(y1) + pad - gy + 1;
+    const ink = new Uint8Array(lw * lh);
+    // Local grid origin is (gx, gy) cells of the page grid: shift the rectangle into it.
+    const ox = gx * cell;
+    const oy = yTop + gy * cell;
+    for (const a of pts) fillRect(ink, lw, lh, cell, oy, a.x - a.r - ox, a.y - a.r, a.x + a.r - ox, a.y + a.r);
+    const grown = edt(ink, lw, lh);
+    const outside = new Uint8Array(lw * lh);
+    for (let i = 0; i < lw * lh; i++) outside[i] = grown[i] > c2 ? 1 : 0;
+    const shrink = edt(outside, lw, lh);
+    const sol = new Uint8Array(lw * lh);
+    for (let i = 0; i < lw * lh; i++) sol[i] = ink[i] || shrink[i] > c2 ? 1 : 0;
+    const seen = new Uint8Array(lw * lh);
+    const stack: number[] = [];
+    const push = (i: number) => {
+      if (!seen[i] && !sol[i]) {
+        seen[i] = 1;
+        stack.push(i);
+      }
+    };
+    for (let x = 0; x < lw; x++) { push(x); push((lh - 1) * lw + x); }
+    for (let y = 0; y < lh; y++) { push(y * lw); push(y * lw + lw - 1); }
+    while (stack.length) {
+      const i = stack.pop()!;
+      const x = i % lw;
+      if (x > 0) push(i - 1);
+      if (x < lw - 1) push(i + 1);
+      if (i >= lw) push(i - lw);
+      if (i < lw * (lh - 1)) push(i + lw);
+    }
+    for (let y = 0; y < lh; y++)
+      for (let x = 0; x < lw; x++) {
+        if (seen[y * lw + x]) continue;
+        const X2 = x + gx, Y2 = y + gy;
+        if (X2 >= 0 && Y2 >= 0 && X2 < w && Y2 < h) solid[Y2 * w + X2] = 1;
+      }
+  }
+  for (const b of text) fillRect(solid, w, h, cell, yTop, b.x0, b.y0, b.x1, b.y1);
+  for (const b of solids) fillRect(solid, w, h, cell, yTop, b.x0, b.y0, b.x1, b.y1);
+  const dist = edt(solid, w, h);
+  const d = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) d[i] = Math.max(0, Math.sqrt(dist[i]) * cell - cell / 2);
+  const edge = new Float32Array(h);
+  for (let j = 0; j < h; j++) {
+    const y = yTop + j * cell;
+    let m = 999;
+    for (const e of EDGES) m = Math.min(m, Math.abs(y - e));
+    edge[j] = m;
+  }
+  return { y0: yTop, w, h, cell, d, deco, edge };
+}
+
+/** Distance (px) from a point to the nearest text or artwork. No allocation: it is called millions of times. */
+function fd(x: number, y: number) {
+  const f = F!;
+  const i = Math.floor(x / f.cell);
+  const j = Math.floor((y - f.y0) / f.cell);
+  if (i < 0 || j < 0 || i >= f.w || j >= f.h) return 999;
+  return f.d[j * f.w + i];
+}
+const decoAt = (x: number, y: number) => {
+  const f = F!;
+  const i = Math.floor(x / f.cell);
+  const j = Math.floor((y - f.y0) / f.cell);
+  return i < 0 || j < 0 || i >= f.w || j >= f.h ? 0 : f.deco[j * f.w + i];
+};
+const edgeAt = (y: number) => {
+  const f = F!;
+  const j = Math.floor((y - f.y0) / f.cell);
+  return j < 0 || j >= f.h ? 999 : f.edge[j];
+};
+
+/** How far the wire must run straight along a port's heading (from the port outward) to be clear. */
+function escape(p: Pt, toward: Pt) {
+  // Plus one clearance: what lies right beside the port is part of the port.
+  for (let s = 0; s < 240; s += 2) if (fd(p.x + toward.x * s, p.y + toward.y * s) >= T.clear) return s + T.clear;
+  return 240;
+}
+
+// ---------------------------------------------------------------------------------------------
 
 const bez = ([p0, p1, p2, p3]: Cubic, t: number): Pt => {
   const u = 1 - t;
@@ -119,23 +328,17 @@ const bez = ([p0, p1, p2, p3]: Cubic, t: number): Pt => {
   };
 };
 
-function sample(pieces: Piece[]) {
+function sampleAt(pieces: Piece[], step: number) {
   const pts: Pt[] = [];
   for (const piece of pieces) {
     if (piece.kind === "line") {
-      const n = Math.max(1, Math.ceil(Math.hypot(piece.b.x - piece.a.x, piece.b.y - piece.a.y) / STEP));
+      const n = Math.max(1, Math.ceil(Math.hypot(piece.b.x - piece.a.x, piece.b.y - piece.a.y) / step));
       for (let i = pts.length ? 1 : 0; i <= n; i++)
-        pts.push({
-          x: piece.a.x + ((piece.b.x - piece.a.x) * i) / n,
-          y: piece.a.y + ((piece.b.y - piece.a.y) * i) / n,
-        });
+        pts.push({ x: piece.a.x + ((piece.b.x - piece.a.x) * i) / n, y: piece.a.y + ((piece.b.y - piece.a.y) * i) / n });
     } else {
       const [p0, p1, p2, p3] = piece.c;
-      const rough =
-        Math.hypot(p1.x - p0.x, p1.y - p0.y) +
-        Math.hypot(p2.x - p1.x, p2.y - p1.y) +
-        Math.hypot(p3.x - p2.x, p3.y - p2.y);
-      const n = Math.max(2, Math.ceil(rough / STEP));
+      const rough = Math.hypot(p1.x - p0.x, p1.y - p0.y) + Math.hypot(p2.x - p1.x, p2.y - p1.y) + Math.hypot(p3.x - p2.x, p3.y - p2.y);
+      const n = Math.max(4, Math.ceil(rough / step));
       for (let i = pts.length ? 1 : 0; i <= n; i++) pts.push(bez(piece.c, i / n));
     }
   }
@@ -145,52 +348,10 @@ function sample(pieces: Piece[]) {
     return { ...p, at };
   });
 }
-
-const inside = (p: Pt, b: Box, pad: number) =>
-  p.x > b.x0 - pad && p.x < b.x1 + pad && p.y > b.y0 - pad && p.y < b.y1 + pad;
-const inAny = (p: Pt, boxes: Box[]) => boxes.some((b) => inside(p, b, CLEARANCE));
-
-/**
- * Samples that hit an obstacle. The run of samples inside the plate the hop
- * leaves (or enters) is allowed: that is the wire reaching its port.
- */
-function collisions(points: Pt[], obstacles: Box[], from: Box[] | null, to: Box[] | null) {
-  let first = 0;
-  let last = points.length - 1;
-  if (from) while (first < points.length && inAny(points[first], from)) first++;
-  if (to) while (last > first && inAny(points[last], to)) last--;
-  // Only a box that overlaps the samples' bounding box can hold one of them. Routing tries a great
-  // many curves against every text box on the page, so this cut is what keeps it off the main
-  // thread's long tasks; the count is exactly what testing every box would give.
-  let x0 = Infinity;
-  let y0 = Infinity;
-  let x1 = -Infinity;
-  let y1 = -Infinity;
-  for (let i = first; i <= last; i++) {
-    const p = points[i];
-    if (p.x < x0) x0 = p.x;
-    if (p.x > x1) x1 = p.x;
-    if (p.y < y0) y0 = p.y;
-    if (p.y > y1) y1 = p.y;
-  }
-  const near = obstacles.filter(
-    (b) => b.x0 - CLEARANCE < x1 && b.x1 + CLEARANCE > x0 && b.y0 - CLEARANCE < y1 && b.y1 + CLEARANCE > y0,
-  );
-  let hits = 0;
-  for (let i = first; i <= last; i++) for (const b of near) if (inside(points[i], b, CLEARANCE)) hits++;
-  return hits;
-}
-
-/** How cramped a curve looks: a long sideways run over a short drop reads as a kink. */
-function cramp(c: Cubic, arrive: Dir) {
-  const dx = Math.abs(c[3].x - c[0].x);
-  const dy = Math.abs(c[3].y - c[0].y);
-  if (arrive === "down") return Math.max(0, dx / Math.max(dy, 1) - 2.2) * 140;
-  return Math.max(0, Math.max(dx, dy) / Math.max(Math.min(dx, dy), 1) - 4) * 50;
-}
+const sample = (pieces: Piece[]) => sampleAt(pieces, STEP);
 
 function toPath(pieces: Piece[]) {
-  const f = (n: number) => Math.round(n * 10) / 10;
+  const f = (n: number) => Math.round(n * 100) / 100;
   let d = "";
   for (const p of pieces) {
     if (p.kind === "line") d += `${d ? "" : `M${f(p.a.x)} ${f(p.a.y)}`}L${f(p.b.x)} ${f(p.b.y)}`;
@@ -202,199 +363,482 @@ function toPath(pieces: Piece[]) {
   return d;
 }
 
-/** Hits of a vertical run at x from y0 to y1, in samples (so it weighs like a sampled curve). */
-function runHits(x: number, y0: number, y1: number, obstacles: Box[]) {
-  let hits = 0;
-  for (const b of obstacles) {
-    if (x <= b.x0 - CLEARANCE || x >= b.x1 + CLEARANCE) continue;
-    const overlap = Math.min(y1, b.y1 + CLEARANCE) - Math.max(y0, b.y0 - CLEARANCE);
-    if (overlap > 0) hits += Math.ceil(overlap / STEP);
+function along(a: Pt, b: Pt, dir: Dir) {
+  const length = Math.hypot(b.x - a.x, b.y - a.y);
+  return ((b.x - a.x) * HEADING[dir].x + (b.y - a.y) * HEADING[dir].y) / length > 0.999;
+}
+
+interface Tokens {
+  R: number;
+  lead: number;
+  gap: number;
+}
+
+interface Hop {
+  outs: Port[];
+  ins: Port[];
+  width: number;
+  lane: number;
+  grid: number[];
+}
+
+interface Candidate {
+  pieces: Piece[];
+  hits: number;
+  score: number;
+  port: Port;
+}
+
+const better = (a: Candidate | null, b: Candidate | null) => {
+  if (b && b.score < BOUND) BOUND = b.score;
+  return !b ? a : !a || b.score < a.score ? b : a;
+};
+
+interface Pairing extends Tokens {
+  p: Port;
+  q: Port;
+  /** The straight stubs at either end that may cross artwork (px). */
+  free0: number;
+  free1: number;
+  penalty: number;
+  grid: number[];
+  /** First y at or below `from` where lane x is blocked (Infinity if it never is, up to the hop's end). */
+  below: (x: number) => number;
+  /** Last y at or above `from` where lane x is blocked (-Infinity if never, back to the hop's start). */
+  above: (x: number) => number;
+}
+
+type Jog = [Pt, Pt];
+
+/** Score a polyline on its true curve against the field. */
+function judge(pair: Pairing, raw: Pt[], jogs: Jog[], partial = false): Candidate | null {
+  const { R, lead, gap, p, q, penalty, grid } = pair;
+  const verts: Pt[] = [];
+  for (const v of raw) {
+    const last = verts[verts.length - 1];
+    if (!last || Math.hypot(v.x - last.x, v.y - last.y) > 0.01) verts.push(v);
   }
-  return hits;
-}
-
-interface Curve {
-  c: Cubic;
-  length: number;
-  cost: number;
-}
-
-/** Hits of a horizontal run at y from x0 to x1, in samples. */
-function rowHits(y: number, x0: number, x1: number, obstacles: Box[]) {
-  const [lo, hi] = x0 < x1 ? [x0, x1] : [x1, x0];
-  let hits = 0;
-  for (const b of obstacles) {
-    if (y <= b.y0 - CLEARANCE || y >= b.y1 + CLEARANCE) continue;
-    const overlap = Math.min(hi, b.x1 + CLEARANCE) - Math.max(lo, b.x0 - CLEARANCE);
-    if (overlap > 0) hits += Math.ceil(overlap / STEP);
+  if (verts.length < 2) return null;
+  if (!along(verts[0], verts[1], p.dir)) return null;
+  if (!partial && !along(verts[verts.length - 2], verts[verts.length - 1], q.dir)) return null;
+  // The exempt stubs must lie on the straight runs at either end.
+  if (Math.hypot(verts[1].x - verts[0].x, verts[1].y - verts[0].y) < pair.free0) return null;
+  const n = verts.length - 1;
+  if (!partial && Math.hypot(verts[n].x - verts[n - 1].x, verts[n].y - verts[n - 1].y) < pair.free1) return null;
+  let turning = 0;
+  let polyLength = 0;
+  for (let j = 0; j < n; j++) polyLength += Math.hypot(verts[j + 1].x - verts[j].x, verts[j + 1].y - verts[j].y);
+  for (let j = 1; j < n; j++) {
+    const ux = verts[j].x - verts[j - 1].x;
+    const uy = verts[j].y - verts[j - 1].y;
+    const wx = verts[j + 1].x - verts[j].x;
+    const wy = verts[j + 1].y - verts[j].y;
+    const a = Math.acos(Math.max(-1, Math.min(1, (ux * wx + uy * wy) / (Math.hypot(ux, uy) * Math.hypot(wx, wy)))));
+    turning += (a / (Math.PI / 2)) ** 2;
   }
-  return hits;
+  // Sideways reversals: the route heads one way across the page, then back.
+  let reversals = 0;
+  let side = 0;
+  for (let j = 0; j < n; j++) {
+    const dx = verts[j + 1].x - verts[j].x;
+    if (Math.abs(dx) < 0.5) continue;
+    if (side && Math.sign(dx) !== side) reversals++;
+    side = Math.sign(dx);
+  }
+  let shallow = 0;
+  let small = 0;
+  for (const [a, b] of jogs) {
+    const ang = Math.atan2(Math.abs(b.x - a.x), Math.abs(b.y - a.y));
+    if (ang > 1 * DEG && ang < 44 * DEG) shallow++;
+    small += Math.max(0, 3 * R - Math.abs(b.x - a.x));
+  }
+  const offGrid = verts.filter((v, i) => i > 0 && i < n && v.x !== p.x && v.x !== q.x && !grid.includes(Math.round(v.x))).length;
+  const fixed =
+    turning * T.turn + reversals * T.reversal + shallow * W.shallow * R + small * W.smallJog + offGrid * W.offGrid * R + penalty * PORT_WEIGHT;
+  // A turn shortens the line by well under a radius: what the polyline costs bounds what the curve costs.
+  let bound = fixed + polyLength - (n - 1) * R;
+  if (!partial && bound > BOUND) return null;
+  // The straight parts of the runs (clear of the turns at their ends) are where the curve and the
+  // polyline coincide: judge them first, coarsely, before building the curve.
+  {
+    let at = 0;
+    const step = 2 * T.cell;
+    for (let j = 0; j < n; j++) {
+      const a = verts[j];
+      const b = verts[j + 1];
+      const len = Math.hypot(b.x - a.x, b.y - a.y);
+      const lo = j === 0 ? 0 : turnExtent(Math.PI / 2, R);
+      const hi = j === n - 1 ? len : len - turnExtent(Math.PI / 2, R);
+      const steep = Math.abs(b.y - a.y) > 0.92 * len;
+      const C = steep ? T.comfort : T.across;
+      for (let t = lo; t < hi; t += step) {
+        const s0 = at + t;
+        if (s0 < pair.free0 || (!partial && s0 > polyLength - pair.free1)) continue;
+        const y = a.y + ((b.y - a.y) * t) / len;
+        const fv = fd(a.x + ((b.x - a.x) * t) / len, y);
+        if (fv < T.clear) {
+          if (partial || BOUND < HIT) return null;
+          bound += HIT;
+        }
+        const d = steep ? fv : Math.min(fv, edgeAt(y));
+        if (d < C) bound += ((C - d) / C) ** 2 * step * (steep ? W.comfort : W.acrossW) * 0.9;
+      }
+      at += len;
+    }
+    if (!partial && bound > BOUND) return null;
+  }
+
+  const pieces = fillet(verts, R, { lead, gap });
+  if (!pieces) return null;
+  let hits = 0;
+  let L = 0;
+  for (const piece of pieces) {
+    if (piece.kind === "line") L += Math.hypot(piece.b.x - piece.a.x, piece.b.y - piece.a.y);
+    else {
+      const [p0, p1, p2, p3] = piece.c;
+      L += (Math.hypot(p3.x - p0.x, p3.y - p0.y) + Math.hypot(p1.x - p0.x, p1.y - p0.y) + Math.hypot(p2.x - p1.x, p2.y - p1.y) + Math.hypot(p3.x - p2.x, p3.y - p2.y)) / 2;
+    }
+  }
+  let cost = fixed + L;
+  let at = 0;
+  let px = verts[0].x;
+  let py = verts[0].y;
+  const visit = (x: number, y: number) => {
+    const ds = Math.hypot(x - px, y - py);
+    const steep = Math.abs(y - py) > 0.92 * ds;
+    px = x;
+    py = y;
+    at += ds;
+    if (at < pair.free0 || (!partial && at > L - pair.free1)) return true;
+    const fv = fd(x, y);
+    if (fv < T.clear) {
+      hits++;
+      cost += HIT;
+      if (partial) return false;
+    }
+    const C = steep ? T.comfort : T.across;
+    const d = steep ? fv : Math.min(fv, edgeAt(y));
+    if (d < C) cost += ((C - d) / C) ** 2 * ds * (steep ? W.comfort : W.acrossW);
+    if (decoAt(x, y)) cost += ds * W.deco;
+    return partial || cost <= BOUND;
+  };
+  for (const piece of pieces) {
+    if (piece.kind === "line") {
+      const len = Math.hypot(piece.b.x - piece.a.x, piece.b.y - piece.a.y);
+      const k = Math.max(1, Math.ceil(len / T.cell));
+      for (let i = 1; i <= k; i++)
+        if (!visit(piece.a.x + ((piece.b.x - piece.a.x) * i) / k, piece.a.y + ((piece.b.y - piece.a.y) * i) / k)) return null;
+    } else {
+      const [p0, p1, p2, p3] = piece.c;
+      const rough = Math.hypot(p1.x - p0.x, p1.y - p0.y) + Math.hypot(p2.x - p1.x, p2.y - p1.y) + Math.hypot(p3.x - p2.x, p3.y - p2.y);
+      const k = Math.max(3, Math.ceil(rough / T.cell));
+      for (let i = 1; i <= k; i++) {
+        const t = i / k;
+        const u = 1 - t;
+        const x = u * u * u * p0.x + 3 * u * u * t * p1.x + 3 * u * t * t * p2.x + t * t * t * p3.x;
+        const y = u * u * u * p0.y + 3 * u * u * t * p1.y + 3 * u * t * t * p2.y + t * t * t * p3.y;
+        if (!visit(x, y)) return null;
+      }
+    }
+  }
+  const score = cost;
+  return { pieces, hits, score, port: q };
 }
 
-/** Radius of a corridor's two turns (px), and the cubic handle of a quarter circle. */
-const TURN = 32;
-const KAPPA = 0.5523;
+function jogAngles(dx: number, R: number) {
+  const angles = [90 * DEG];
+  const fits = (a: number) => dx / Math.sin(a) >= 2 * turnExtent(a, R);
+  if (fits(DIAGONAL)) angles.push(DIAGONAL);
+  else if (fits(1 * DEG)) {
+    let lo = 1 * DEG;
+    let hi = DIAGONAL;
+    for (let i = 0; i < 24; i++) {
+      const mid = (lo + hi) / 2;
+      if (fits(mid)) lo = mid;
+      else hi = mid;
+    }
+    angles.push(lo);
+  }
+  return angles;
+}
+
+const dropOf = (dx: number, a: number) => (a >= 89.9 * DEG ? 0 : Math.abs(dx) / Math.tan(a));
+
+function levels(yA: number, yB: number, drop: number, a: number, step: number, { R, lead, gap }: Tokens) {
+  const last = yB - drop;
+  if (last < yA) return [];
+  const e90 = turnExtent(90 * DEG, R);
+  const ea = turnExtent(a, R);
+  const fits = [lead + ea, e90 + ea, e90 + ea + gap];
+  const ys = new Set<number>();
+  for (let y = yA; y <= last; y += step) ys.add(y);
+  for (const o of fits) {
+    if (yA + o <= last) ys.add(yA + o);
+    if (last - o >= yA) ys.add(last - o);
+  }
+  ys.add(last);
+  return [...ys].sort((u, v) => u - v);
+}
+
+/** The smallest chamfer (px along each axis) whose diagonal holds two 45 degree turns. */
+const chamferMin = (R: number) => Math.ceil((2 * turnExtent(45 * DEG, R)) / Math.SQRT2) + 1;
+
+/** Ways into the first lane x: straight down, out sideways, or out sideways through a chamfer. */
+function heads(p: Port, x: number, R: number): Pt[][] {
+  if (p.dir === "down") return [[p]];
+  const out = [[p, { x, y: p.y }]];
+  const s = Math.sign(x - p.x);
+  for (const k of [1]) {
+    const c = chamferMin(R) * k;
+    if (Math.abs(x - p.x) > c + 2 * turnExtent(45 * DEG, R)) out.push([p, { x: x - s * c, y: p.y }, { x, y: p.y + c }]);
+  }
+  return out;
+}
+
+/** Ways out of the last lane x into q: straight down, or down then sideways in, or through a chamfer. */
+function tails(q: Port, x: number, R: number): Pt[][] {
+  if (q.dir === "down") return [[q]];
+  const out = [[{ x, y: q.y }, q]];
+  const s = Math.sign(q.x - x);
+  for (const k of [1]) {
+    const c = chamferMin(R) * k;
+    if (Math.abs(q.x - x) > c + 2 * turnExtent(45 * DEG, R)) out.push([{ x, y: q.y - c }, { x: x + s * c, y: q.y }, q]);
+  }
+  return out;
+}
 
 /**
- * The best hop from any of `outs` to any of `ins`. Tried in order of
- * simplicity: one cubic; a cubic into a vertical lane, the lane, a cubic
- * out of it; and only when neither is clear, a corridor: down one lane,
- * a quarter turn into a level run across the page, a quarter turn down
- * another lane, and out (the hop from the end of one row of plates to the
- * start of the next, under the text between them).
- *
- * A hop may run through the artwork right round its own ports (the box
- * each port is in): that is the wire reaching it. Every other box counts.
+ * Try a family of polylines that differ only in the level y of a lane change: every `step` px first, then
+ * every 3 px around the best level found (the cost is smooth in y except at an obstacle's edge).
  */
-function hop(outs: Port[], ins: Port[], obstacles: Box[], from: Box[] | null, to: Box[] | null, width: number, lane: number) {
-  type Best = { pieces: Piece[]; score: number; port: Port };
-  let best = null as Best | null;
-  const consider = (pieces: Piece[], score: number, port: Port) => {
-    if (!best || score < best.score) best = { pieces, score, port };
+function scanLevels(pair: Pairing, ys: number[], make: (y: number) => { verts: Pt[]; jogs: Jog[] }) {
+  let best: Candidate | null = null;
+  let bestY = NaN;
+  const tried = new Set<number>();
+  const one = (y: number) => {
+    tried.add(y);
+    const m = make(y);
+    const c = judge(pair, m.verts, m.jogs);
+    if (c && (!best || c.score < best.score)) [best, bestY] = [c, y];
+    return c;
   };
+  for (const y of ys) one(y);
+  if (!Number.isNaN(bestY)) {
+    const lo = ys[0];
+    const hi = ys[ys.length - 1];
+    const w = LEVEL_STEP;
+    for (let y = bestY - w; y <= bestY + w; y += 3) if (y >= lo && y <= hi && !tried.has(y)) one(y);
+  }
+  for (const c of best ? [best] : []) BOUND = Math.min(BOUND, (c as Candidate).score);
+  return best as Candidate | null;
+}
 
-  // The middle of each page margin, where a phone has its only free lanes, then every 12px between
-  // them on a phone (24px wider up). Nothing nearer the screen's edge: the wire runs inside the page.
-  const grid = new Set<number>([lane, width - lane]);
-  for (let x = lane + 12; x <= width - lane; x += width < 640 ? 12 : 24) grid.add(x);
-
-  const curve = (c: Cubic | null, arrive: Dir, ff: Box[] | null, tt: Box[] | null): Curve | null => {
-    if (!c) return null;
-    const pts = sample([{ kind: "cubic", c }]);
-    return {
-      c,
-      length: pts[pts.length - 1].at,
-      cost: cramp(c, arrive) + collisions(pts, obstacles, ff, tt) * 10000,
-    };
-  };
-  // A lane's curves in from p depend only on p, and its curves out to q only on q, so each is
-  // worked out once per port and lane rather than again for every pairing of ports.
-  const intoCache = new Map<Port, Map<number, (Curve | null)[]>>();
-  const exitCache = new Map<Port, Map<number, (Curve | null)[]>>();
-  const cached = (cache: Map<Port, Map<number, (Curve | null)[]>>, port: Port, x: number, make: () => (Curve | null)[]) => {
-    let byLane = cache.get(port);
-    if (!byLane) cache.set(port, (byLane = new Map()));
-    let curves = byLane.get(x);
-    if (!curves) byLane.set(x, (curves = make()));
-    return curves;
-  };
-
-  for (const p of outs) {
-    const f = from?.filter((b) => inside(p, b, CLEARANCE)) ?? null;
-    for (const q of ins) {
-      const t = to?.filter((b) => inside(q, b, CLEARANCE)) ?? null;
-      const runObstacles = obstacles.filter((b) => !f?.includes(b) && !t?.includes(b));
-      const penalty = (p.penalty ?? 0) + (q.penalty ?? 0);
-
-      const direct = curve(connector(p, p.dir, q, q.dir), q.dir, f, t);
-      if (direct) consider([{ kind: "cubic", c: direct.c }], direct.length + direct.cost + penalty, q);
-      // A clear, easy curve straight in is as short as a hop gets: no lane can beat it.
-      if (direct && direct.cost === 0) continue;
-
-      // Per lane, the cheapest way into it from p and out of it into q.
-      const lanes = new Set<number>([...grid, p.x, q.x - 40, q.x + 40]);
-      const intoAt = new Map<number, Curve>();
-      const exitAt = new Map<number, Curve>();
-      for (const x of lanes) {
-        if (x < lane || x > width - lane) continue;
-        const intos = cached(intoCache, p, x, () =>
-          SPANS.map((h) => curve(connector(p, p.dir, { x, y: p.y + h }, "down"), "down", f, null)),
+/** A route with at most one lane change, from lane x1 to lane xn. */
+function oneChange(pair: Pairing, x1: number, xn: number) {
+  let best: Candidate | null = null;
+  for (const start of heads(pair.p, x1, pair.R))
+    for (const end of tails(pair.q, xn, pair.R)) {
+      if (x1 === xn) {
+        best = better(best, judge(pair, [...start, ...end], []));
+        continue;
+      }
+      const yA = start[start.length - 1].y;
+      const yB = end[0].y;
+      const dx = xn - x1;
+      // The change must start before the first lane is blocked and end after the last lane's final obstacle.
+      const hi = pair.below(x1);
+      const lo = pair.above(xn);
+      for (const a of jogAngles(Math.abs(dx), pair.R)) {
+        const drop = dropOf(dx, a);
+        const ys = levels(yA, yB, drop, a, LEVEL_STEP, pair).filter((y) => y <= hi && y + drop >= lo);
+        if (!ys.length) continue;
+        best = better(
+          best,
+          scanLevels(pair, ys, (y) => {
+            const j0 = { x: x1, y };
+            const j1 = { x: xn, y: y + drop };
+            return { verts: [...start, j0, j1, ...end], jogs: [[j0, j1]] };
+          }),
         );
-        const cheapest = (cs: (Curve | null)[]) =>
-          cs.reduce<Curve | null>((m, c) => (c && (!m || c.length + c.cost < m.length + m.cost) ? c : m), null);
-        const into = cheapest(intos);
-        if (into) intoAt.set(x, into);
-        if (q.dir === "right" && q.x - x < MIN_RUN) continue;
-        if (q.dir === "left" && x - q.x < MIN_RUN) continue;
-        const exits = cached(exitCache, q, x, () =>
-          SPANS.map((h) => curve(connector({ x, y: q.y - h }, "down", q, q.dir), q.dir, null, t)),
-        );
-        const exit = cheapest(exits);
-        if (exit) exitAt.set(x, exit);
-        for (const i of intos) {
-          if (!i) continue;
-          for (const e of exits) {
-            if (!e) continue;
-            const a = i.c[3];
-            const b = e.c[0];
-            if (b.y < a.y) continue;
-            const score =
-              i.length + (b.y - a.y) + e.length + i.cost + e.cost + penalty + runHits(x, a.y, b.y, runObstacles) * 10000;
-            consider(
-              [
-                { kind: "cubic", c: i.c },
-                { kind: "line", a, b },
-                { kind: "cubic", c: e.c },
-              ],
-              score,
-              q,
-            );
-          }
+      }
+      // A level run with chamfered corners: down, 45, across, 45, down.
+      const c = chamferMin(pair.R);
+      const s = Math.sign(dx);
+      if (Math.abs(dx) > 2 * c + 2 * turnExtent(45 * DEG, pair.R)) {
+        const ys = levels(yA, yB, 2 * c, DIAGONAL, LEVEL_STEP, pair).filter((y) => y <= hi && y + 2 * c >= lo);
+        if (ys.length)
+          best = better(
+            best,
+            scanLevels(pair, ys, (y) => ({
+              verts: [...start, { x: x1, y }, { x: x1 + s * c, y: y + c }, { x: xn - s * c, y: y + c }, { x: xn, y: y + 2 * c }, ...end],
+              jogs: [],
+            })),
+          );
+      }
+    }
+  return best;
+}
+
+/** A route with two lane changes, through a middle lane. The first change is judged once per start. */
+function twoChanges(pair: Pairing, x1: number, xn: number, lanes: number[]) {
+  const { R } = pair;
+  const stub = turnExtent(90 * DEG, R) + pair.lead + R;
+  let best: Candidate | null = null;
+  const ends = tails(pair.q, xn, R);
+  const yB = Math.max(...ends.map((e) => e[0].y));
+  for (const start of heads(pair.p, x1, R).slice(0, 2)) {
+    const yA = start[start.length - 1].y;
+    for (const xm of lanes) {
+      if (xm === x1 || xm === xn) continue;
+      const firsts: { j0: Pt; j1: Pt; score: number }[] = [];
+      for (const a of jogAngles(Math.abs(xm - x1), R)) {
+        const drop = dropOf(xm - x1, a);
+        for (const y of levels(yA, yB, drop, a, LEVEL_STEP_TWO, pair)) {
+          const j0 = { x: x1, y };
+          const j1 = { x: xm, y: y + drop };
+          const first = judge(pair, [...start, j0, j1, { x: xm, y: j1.y + stub }], [[j0, j1]], true);
+          if (first && first.hits === 0) firsts.push({ j0, j1, score: first.score });
         }
       }
-
-      if (best && best.score < 10000) continue;
-      // A corridor, from lane xa (clear way in) to lane xb (clear way out), level at y.
-      const clear = (m: Map<number, Curve>) => [...m].filter(([, c]) => c.cost < 10000);
-      for (const [xa, into] of clear(intoAt)) {
-        for (const [xb, exit] of clear(exitAt)) {
-          if (Math.abs(xb - xa) < 2 * TURN) continue;
-          const a = into.c[3];
-          const b = exit.c[0];
-          const s = Math.sign(xb - xa);
-          for (let y = a.y + TURN; y <= b.y - TURN; y += STEP * 2) {
-            const hits =
-              runHits(xa, a.y, y, obstacles) + rowHits(y, xa, xb, obstacles) + runHits(xb, y, b.y, obstacles);
-            if (hits) continue;
-            const k = KAPPA * TURN;
-            const score =
-              into.length + (y - a.y) + Math.abs(xb - xa) + (b.y - y) + exit.length + into.cost + exit.cost + penalty;
-            consider(
-              [
-                { kind: "cubic", c: into.c },
-                { kind: "line", a, b: { x: xa, y: y - TURN } },
-                {
-                  kind: "cubic",
-                  c: [
-                    { x: xa, y: y - TURN },
-                    { x: xa, y: y - TURN + k },
-                    { x: xa + s * (TURN - k), y },
-                    { x: xa + s * TURN, y },
-                  ],
-                },
-                { kind: "line", a: { x: xa + s * TURN, y }, b: { x: xb - s * TURN, y } },
-                {
-                  kind: "cubic",
-                  c: [
-                    { x: xb - s * TURN, y },
-                    { x: xb - s * TURN + s * k, y },
-                    { x: xb, y: y + TURN - k },
-                    { x: xb, y: y + TURN },
-                  ],
-                },
-                { kind: "line", a: { x: xb, y: y + TURN }, b },
-                { kind: "cubic", c: exit.c },
-              ],
-              score,
-              q,
-            );
-            break;
+      if (!firsts.length) continue;
+      firsts.sort((u, v) => u.score - v.score);
+      for (const end of ends.slice(0, 2)) {
+        const yE = end[0].y;
+        for (const a of jogAngles(Math.abs(xn - xm), R)) {
+          const drop = dropOf(xn - xm, a);
+          for (const y of levels(yA, yE, drop, a, LEVEL_STEP_TWO, pair).reverse()) {
+            const k0 = { x: xm, y };
+            const k1 = { x: xn, y: y + drop };
+            let tried = 0;
+            for (const f of firsts) {
+              if (f.j1.y >= y) continue;
+              best = better(best, judge(pair, [...start, f.j0, f.j1, k0, k1, ...end], [[f.j0, f.j1], [k0, k1]]));
+              if (++tried >= 3) break;
+            }
           }
         }
       }
     }
   }
-  return best!;
+  return best;
+}
+
+const exact = (n: number) => Math.round(n * 1024) / 1024;
+
+const penaltyOf = (p: Port) => (T.phone ? (p.penalty ?? 0) : (p.next ?? p.penalty ?? 0));
+
+/**
+ * Lanes the field itself recommends: in each 320 px window of the hop, the columns that stay furthest from
+ * text and artwork over the whole window (the middles of the free corridors), best three.
+ */
+function corridorLanes(width: number, lane: number, yA: number, yB: number) {
+  const out: number[] = [];
+  const step = 2 * T.cell;
+  const cols: number[] = [];
+  for (let x = lane; x <= width - lane; x += step) cols.push(x);
+  const win = 320;
+  for (let y0 = yA; y0 < yB; y0 += win) {
+    const y1 = Math.min(yB, y0 + win);
+    const m = cols.map((x) => {
+      let v = 999;
+      for (let y = y0; y <= y1; y += 8) {
+        const d = fd(x, y);
+        if (d < v) v = d;
+        if (v < T.clear) break;
+      }
+      return v;
+    });
+    const peaks: [number, number][] = [];
+    for (let i = 1; i < cols.length - 1; i++) if (m[i] >= T.clear + 3 && m[i] >= m[i - 1] && m[i] > m[i + 1]) peaks.push([m[i], cols[i]]);
+    peaks.sort((u, v) => v[0] - u[0]);
+    for (const [, x] of peaks.slice(0, 3)) out.push(Math.round(x));
+  }
+  return out;
+}
+
+function hop({ outs, ins, width, lane, grid }: Hop, tk: Tokens) {
+  BOUND = Infinity;
+  const e90 = turnExtent(90 * DEG, tk.R);
+  let best: Candidate | null = null;
+
+  for (const p of outs) {
+    const free0 = escape(p, HEADING[p.dir]);
+    for (const q of ins) {
+      const back = HEADING[q.dir];
+      const free1 = escape(q, { x: -back.x, y: -back.y });
+      const startY = p.y + (p.dir === "down" ? free0 : 0);
+      const endY = q.y - (q.dir === "down" ? free1 : 0);
+      const cacheB = new Map<number, number>();
+      const cacheA = new Map<number, number>();
+      const below = (x: number) => {
+        let v = cacheB.get(x);
+        if (v === undefined) {
+          v = Infinity;
+          for (let y = startY; y <= endY; y += 4) if (fd(x, y) < T.clear) { v = y; break; }
+          cacheB.set(x, v);
+        }
+        return v;
+      };
+      const above = (x: number) => {
+        let v = cacheA.get(x);
+        if (v === undefined) {
+          v = -Infinity;
+          for (let y = endY; y >= startY; y -= 4) if (fd(x, y) < T.clear) { v = y; break; }
+          cacheA.set(x, v);
+        }
+        return v;
+      };
+      const pair: Pairing = { ...tk, p, q, free0, free1, penalty: penaltyOf(p) + penaltyOf(q), grid, below, above };
+      const room = tk.lead + e90;
+      const side = (xs: number[], port: Port, before: boolean) => xs.filter((x) => (before ? x <= port.x - room : x >= port.x + room));
+      const starts = (xs: number[]) => (p.dir === "down" ? [p.x] : side(xs, p, p.dir === "left"));
+      const ends = (xs: number[]) => (q.dir === "down" ? [q.x] : side(xs, q, q.dir === "right"));
+      const lanes = [...new Set([...grid, p.x, q.x, ...corridorLanes(width, lane, p.y, q.y)])]
+        .filter((x) => x >= lane && x <= width - lane)
+        .sort((a, b) => a - b);
+      // Lane pairs, cheapest lower bound first: the descent, the legs sideways, the port's penalty, and at
+      // least half a quarter turn for every side port.
+      const base = q.y - p.y + pair.penalty * PORT_WEIGHT + (p.dir !== "down" ? 0.5 * T.turn : 0) + (q.dir !== "down" ? 0.5 * T.turn : 0);
+      const pairs: [number, number, number][] = [];
+      for (const x1 of starts(lanes)) for (const xn of ends(lanes)) pairs.push([x1, xn, base + Math.abs(x1 - p.x) + Math.abs(xn - q.x) + (x1 === xn ? 0 : 0.4 * Math.abs(xn - x1))]);
+      pairs.sort((u, v) => u[2] - v[2]);
+      let local: Candidate | null = null;
+      for (const [x1, xn, lb] of pairs) {
+        if (lb > BOUND) break;
+        local = better(local, oneChange(pair, x1, xn));
+      }
+      // Two changes when one cannot get clear, or is crowded.
+      if (!local || local.hits || local.score > 1.6 * Math.hypot(q.x - p.x, q.y - p.y) + 4 * tk.R) {
+        for (const [x1, xn, lb] of pairs) {
+          if (lb > BOUND) break;
+          local = better(local, twoChanges(pair, x1, xn, lanes));
+        }
+      }
+      best = better(best, local);
+    }
+  }
+  return best;
+}
+
+function gridLanes(width: number, lane: number, margin: number) {
+  const xs = new Set([lane, Math.round(width - lane), Math.round(width / 2)]);
+  if (width >= GRID_FROM) {
+    const inner = width - 2 * margin;
+    const column = (inner - 11 * GRID_GAP) / 12;
+    for (let k = 1; k < 12; k++) xs.add(Math.round(margin + k * (column + GRID_GAP) - GRID_GAP / 2));
+  }
+  return [...xs].sort((a, b) => a - b);
 }
 
 /**
- * Route the wire from `origin` through every stop. A stop with no outs ends
- * the wire. `obstacles` are text boxes; each stop's keepout is added for the
- * hops that do not start or end in it. `lane` is the middle of the page
- * margin, the outermost the wire may run; `reach` is how far below the
- * trigger line a port may be when the energy reaches it (px), so the head is
- * still on screen there; `below` is the trigger line's distance from the
- * foot of the viewport (px).
+ * Route the wire from `origin` through every stop in order; a stop with no outs ends it. `text` are
+ * the boxes of the page's text; `art` the plates' sampled artwork; each stop's keepout boxes stand
+ * in for artwork that has none. `lane` is the middle of the page margin, the outermost the wire may
+ * run; `reach` is how far below the trigger line a port may be when the energy reaches it (px), so
+ * the head is still on screen there; `below` is the trigger line's distance from the foot of the
+ * viewport (px); `margin` is the page margin (px), which sets the turn radius (src/lib/curves/tokens.ts).
+ * `edges` are the y of every background change (section and band edges) and `groups` boxes the wire
+ * keeps out of (the gap between a figure and its own caption).
  */
 export function routeWire(
   origin: Pt,
@@ -404,53 +848,71 @@ export function routeWire(
   lane: number,
   reach: number,
   below: number,
+  margin = lane * 2,
+  art: Ink[] = [],
+  edges: number[] = [],
+  groups: Box[] = [],
 ): Wire {
-  CLEARANCE = width < 640 ? 7 : 14;
+  EDGES = edges;
+  const R = wireRadius(margin);
+  T = tune(width, lane, R);
+  const grid = gridLanes(width, lane, margin);
+  // Stops without sampled artwork (the Approach stage, a 3D render) keep their keepout boxes.
+  const drawn = new Set(art.map((a) => a.stop));
+  const solids = [...stops.flatMap((s, i) => (drawn.has(i) ? [] : s.keepout)), ...groups];
+  const yTop = origin.y - 200;
+  const yBottom = Math.max(...stops.flatMap((s) => s.keepout.map((b) => b.y1)), ...stops.flatMap((s) => s.ins.map((p) => p.y))) + 400;
+  F = buildField(width, yTop, yBottom, text, solids, art);
+
   const segments: Segment[] = [];
   const arrivals: Arrival[] = [];
   const keys: Wire["keys"] = [];
   let at = 0;
   let outs: Port[] = [{ ...origin, dir: "down" }];
-  let from: Box[] | null = null;
   let leaveY: number | undefined;
 
   for (let i = 0; i < stops.length; i++) {
     const stop = stops[i];
-    // Only what lies between the hop's ends can be hit: its curves and runs never leave that band.
-    const top = Math.min(...outs.map((p) => p.y)) - SPANS[SPANS.length - 1] - CLEARANCE;
-    const bottom = Math.max(...stop.ins.map((q) => q.y)) + CLEARANCE;
-    const obstacles = [...text, ...stops.flatMap((s) => s.keepout)].filter((b) => b.y1 > top && b.y0 < bottom);
-    const best = hop(outs, stop.ins, obstacles, from, stop.keepout, width, lane);
-    const points = sample(best.pieces);
-    const length = points[points.length - 1].at;
-    segments.push({ d: toPath(best.pieces), length, start: at, points });
-    // The energy arrives when the port or the top of the artwork (EARLY) reaches the line, whichever is
-    // first, so a plate builds as it comes on screen; but never while its port is more than `reach`
-    // below the line, so a low port (the SEO baseline) is on screen when the energy lands on it. A plate
-    // whose whole artwork is on screen is powered whatever: a small one (a tablet's) is never left
-    // unbuilt at the foot of the screen.
+    const job: Hop = { outs, ins: stop.ins, width, lane, grid };
+    // On a phone the straight before a turn is halved, so a plate's side port close to the margin can still be reached.
+    const lead = (T.phone ? CURVE.lead / 2 : CURVE.lead) * R;
+    const routeAt = (scale: number) => hop(job, { R: R * scale, lead: lead * scale, gap: CURVE.gap * R * scale });
+    let best = routeAt(1);
+    if (!best || best.hits) {
+      const least = routeAt(MIN_SCALE);
+      if (least && !least.hits) {
+        let [lo, hi] = [MIN_SCALE, 1];
+        best = least;
+        for (let k = 0; k < SCALE_STEPS; k++) {
+          const mid = (lo + hi) / 2;
+          const r = routeAt(mid);
+          if (r && !r.hits) [best, lo] = [r, mid];
+          else hi = mid;
+        }
+      } else if (least && (!best || least.hits < best.hits)) best = least;
+    }
+    const chosen = best ?? { pieces: [{ kind: "line" as const, a: outs[0], b: stop.ins[0] }], port: stop.ins[0], hits: 0, score: 0 };
+    const points = sample(chosen.pieces);
+    const length = exact(points[points.length - 1].at);
+    segments.push({ d: toPath(chosen.pieces), length, start: at, points });
     const y0 = Math.min(...stop.keepout.map((b) => b.y0));
     const y1 = Math.max(...stop.keepout.map((b) => b.y1));
-    const arrive =
-      stop.arriveY ?? Math.min(best.port.y, Math.max(y0 + EARLY * (y1 - y0), best.port.y - reach), y1 - below);
+    const arrive = stop.arriveY ?? Math.min(chosen.port.y, Math.max(y0 + EARLY * (y1 - y0), chosen.port.y - reach), y1 - below);
     keys.push({ y: leaveY ?? points[0].y, at }, { y: arrive, at: at + length });
     at += length;
-    arrivals.push({ stop: i, port: stop.ins.indexOf(best.port), x: best.port.x, y: best.port.y, at });
+    arrivals.push({ stop: i, port: stop.ins.indexOf(chosen.port), x: chosen.port.x, y: chosen.port.y, at });
     if (!stop.outs.length) break;
-    // Inside the plate the head is hidden; it spends the plate's height there.
     const out = stop.outs.reduce((a, b) => (a.y > b.y ? a : b));
-    at += Math.max(24, out.y - best.port.y);
+    at += exact(Math.max(24, out.y - chosen.port.y));
     outs = stop.outs;
-    from = stop.keepout;
     leaveY = stop.leaveY;
   }
 
-  // Keep the keys monotonic so a scroll position maps to one head position.
   for (let i = 1; i < keys.length; i++) keys[i].y = Math.max(keys[i].y, keys[i - 1].y);
+  F = null;
   return { segments, arrivals, keys, total: at };
 }
 
-/** Head position on the global length axis for a trigger line at y. */
 export function headAt(keys: Wire["keys"], y: number) {
   if (!keys.length || y <= keys[0].y) return 0;
   for (let i = 1; i < keys.length; i++) {
@@ -461,7 +923,6 @@ export function headAt(keys: Wire["keys"], y: number) {
   return keys[keys.length - 1].at;
 }
 
-/** The point at global length `at`, or null between segments (inside a plate). */
 export function pointAt(segments: Segment[], at: number): Pt | null {
   for (const s of segments) {
     if (at < s.start || at > s.start + s.length) continue;
@@ -481,3 +942,4 @@ export function pointAt(segments: Segment[], at: number): Pt | null {
   }
   return null;
 }
+

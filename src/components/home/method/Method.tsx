@@ -17,7 +17,8 @@ import "./method.css";
  */
 const ENERGY_IN = [
   { x: 45, y: 152, dir: "down" as const },
-  { x: 10, y: 168, dir: "right" as const, penalty: 60 },
+  // The side port is fallback on a phone (penalty), and nearly neutral on larger screens (next), where the simpler route wins.
+  { x: 10, y: 168, dir: "right" as const, penalty: 60, next: 2 },
 ];
 const ENERGY_OUT = [{ x: 384, y: 46, dir: "down" as const }];
 /** The deck's band across the board, as four boxes, so the wire may use the empty corners above and below it. */

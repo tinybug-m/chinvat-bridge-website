@@ -5,6 +5,8 @@ import { useReducedMotion } from "@/components/motion/useReducedMotion";
 import { SWEEP_FROM, sweepSpan } from "../../bridge/sweep";
 import { aimPlate } from "../current";
 import { headAt, pointAt, routeWire, type Box, type Port, type Stop, type Wire } from "./route";
+import { artworkInk, loadInk } from "./ink";
+import type { InkData } from "./ink-core";
 import "./energy.css";
 
 /**
@@ -96,7 +98,8 @@ const tight = (el: Element) => {
 const TEXT = ":is(h1, h2, h3, p, a, button, [data-energy-text]):not(svg *)";
 
 /** Measure the hero's origin, the text and every stop on the page, and route the wire through them. */
-function measure(section: HTMLElement): Layout | null {
+function measure(section: HTMLElement, inkData: InkData | null): Layout | null {
+  const t0 = performance.now();
   const nodes = [...document.querySelectorAll<HTMLElement | SVGSVGElement>("[data-energy-ports]")];
   const targets = nodes.map((node) => (node instanceof SVGSVGElement ? node.closest<HTMLElement>(".svc-fig") : node));
   if (!nodes.length || targets.some((t) => !t)) return null;
@@ -174,7 +177,44 @@ function measure(section: HTMLElement): Layout | null {
     return stop;
   });
 
-  const wire = routeWire(origin, stops, text, sr.width, lane, (PORT_MAX - LINE) * vh, (1 - LINE) * vh);
+  // Where the page's background changes (section and band edges): the wire keeps off them.
+  const edges = [...document.querySelectorAll("main section, article[class*='before:bg-haze']")].flatMap((el) => {
+    const r = el.getBoundingClientRect();
+    return [toLayer(0, r.top).y, toLayer(0, r.bottom).y];
+  });
+  // Each figure stays with its own text: where a plate's text and figure are stacked (every Method
+  // step; a service plate on a phone), the gap between them is solid, so the wire never runs between
+  // a drawing and its caption.
+  const groups: Box[] = [];
+  nodes.forEach((node) => {
+    if (!(node instanceof SVGSVGElement)) return;
+    const item = node.closest("li");
+    if (!item || (node.closest("#services") && sr.width >= 640)) return;
+    const f = node.getBoundingClientRect();
+    const words = [...item.querySelectorAll(TEXT)].map(tight).filter((r) => r.right > r.left);
+    if (!words.length) return;
+    const t = {
+      left: Math.min(...words.map((r) => r.left)),
+      right: Math.max(...words.map((r) => r.right)),
+      top: Math.min(...words.map((r) => r.top)),
+      bottom: Math.max(...words.map((r) => r.bottom)),
+    };
+    const x0 = Math.max(f.left, t.left);
+    const x1 = Math.min(f.right, t.right);
+    if (x1 - x0 < 40) return;
+    const [y0, y1] = f.bottom <= t.top ? [f.bottom, t.top] : t.bottom <= f.top ? [t.bottom, f.top] : [0, 0];
+    if (y1 > y0) groups.push(box({ left: x0, right: x1, top: y0, bottom: y1 }));
+  });
+  // The plates' artwork as drawn: from the build-time data, sampled in the browser only where it has none.
+  const t1 = performance.now();
+  const art = artworkInk(nodes as (HTMLElement | SVGSVGElement)[], toLayer, inkData);
+  const t2 = performance.now();
+  const wire = routeWire(origin, stops, text, sr.width, lane, (PORT_MAX - LINE) * vh, (1 - LINE) * vh, margin, art, edges, groups);
+  const t3 = performance.now();
+  // User Timing entries (visible in the performance panel): what the page measures, the artwork, the router.
+  performance.measure("energy:measure", { start: t0, end: t1 });
+  performance.measure("energy:ink", { start: t1, end: t2 });
+  performance.measure("energy:route", { start: t2, end: t3 });
   const height = Math.max(...wire.segments.flatMap((s) => s.points.map((p) => p.y))) + 32;
   return {
     top,
@@ -220,19 +260,30 @@ export function EnergyFlow() {
     let frame = 0;
     let wait = 0;
     let idle = 0;
+    let inkData: InkData | null = null;
+    let live = true;
+    let ready = false;
     // Routing the wire is the costliest thing it does, so a burst of changes (the observer's first
     // report, fonts settling, a window being dragged wider) is routed once, when the main thread is
     // free, and never later than RELAYOUT_MAX_MS. The wire only fades in after the hero's intro.
     const relayout = () => {
+      if (!ready) return;
       cancelAnimationFrame(frame);
       clearTimeout(wait);
       if (idle) cancelIdleCallback(idle);
       wait = window.setTimeout(() => {
-        const run = () => (frame = requestAnimationFrame(() => setLayout(measure(section))));
+        const run = () => (frame = requestAnimationFrame(() => setLayout(measure(section, inkData))));
         if ("requestIdleCallback" in window) idle = requestIdleCallback(run, { timeout: RELAYOUT_MAX_MS });
         else run();
       }, RELAYOUT_SETTLE_MS);
     };
+    // The artwork data is loaded off the main chunk; the first layout waits for it (or for its failure).
+    loadInk().then((data) => {
+      if (!live) return;
+      inkData = data;
+      ready = true;
+      relayout();
+    });
     const ro = new ResizeObserver(relayout);
     ro.observe(section);
     // Every section the wire runs through: the hero, and each one holding a stop.
@@ -240,6 +291,7 @@ export function EnergyFlow() {
       ro.observe(el.closest("section") ?? el);
     document.fonts?.ready.then(relayout);
     return () => {
+      live = false;
       cancelAnimationFrame(frame);
       clearTimeout(wait);
       if (idle) cancelIdleCallback(idle);

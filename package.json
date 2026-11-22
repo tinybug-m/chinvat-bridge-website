@@ -11,6 +11,7 @@
     "test:e2e": "playwright test",
     "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"tests/unit/*.test.mjs\"",
     "shoot": "node scripts/qa/shoot.mjs",
+    "energy:ink": "node scripts/energy/generate-ink.mjs",
     "seo:check-migration": "node scripts/seo/check-migration.mjs",
     "seo:crawl": "node scripts/seo/crawl-live.mjs"
   },
