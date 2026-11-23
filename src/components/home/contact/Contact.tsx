@@ -2,7 +2,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { Container } from "@/components/system/Container";
 import { Section } from "@/components/system/Section";
 import { SectionHeading } from "@/components/system/SectionHeading";
-import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/lib/constants";
+import type { HomePage } from "@/lib/content/schema";
 import { ContactChat } from "./ContactChat";
 
 /*
@@ -10,17 +10,16 @@ import { ContactChat } from "./ContactChat";
  * ground. One sentence of lede says what to send; the conversation and the
  * address do the rest.
  */
-export function Contact() {
+export function Contact({ content, email }: { content: HomePage["blocks"][8]; email: string }) {
+  const CONTACT_EMAIL = email;
+  const CONTACT_MAILTO = `mailto:${email}`;
   return (
     <Section id="contact" labelledBy="contact-title" className="bg-haze">
       <Container className="grid grid-cols-1 gap-x-6 gap-y-14 lg:grid-cols-12">
         <div className="lg:col-span-5 lg:sticky lg:top-28 lg:self-start">
           <Reveal>
-            <SectionHeading id="contact-title">Build a better way forward.</SectionHeading>
-            <p className="mt-6 max-w-measure text-pretty text-lede text-ink-soft">
-              Tell us what&rsquo;s slowing your business down, where you&rsquo;re trying to grow, or what you&rsquo;d
-              like to build.
-            </p>
+            <SectionHeading id="contact-title">{content.heading}</SectionHeading>
+            <p className="mt-6 max-w-measure text-pretty text-lede text-ink-soft">{content.lede}</p>
           </Reveal>
 
           <Reveal delay={80} className="mt-12 lg:mt-16">
@@ -36,10 +35,10 @@ export function Contact() {
         </div>
 
         <Reveal delay={120} className="lg:col-span-6 lg:col-start-7">
-          <ContactChat />
+          <ContactChat script={content.chat} />
           <noscript>
             <p className="mt-6 text-small text-ink-soft">
-              The conversation needs JavaScript. Please write to{" "}
+              {content.noscriptLead}{" "}
               <a className="text-cobalt-700 underline" href={CONTACT_MAILTO}>
                 {CONTACT_EMAIL}
               </a>

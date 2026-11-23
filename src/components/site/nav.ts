@@ -1,3 +1,5 @@
+import type { Navigation, SiteSettings } from "@/lib/content/schema";
+
 export interface SiteLink {
   label: string;
   href: string;
@@ -6,16 +8,38 @@ export interface SiteLink {
 }
 
 /**
- * Homepage chapters in the header, in page order. Insights goes to the /insights index rather than
- * the homepage teaser, but still lights while the teaser (#insights) is being read.
+ * What the header, mobile menu and footer render, from navigation:main and settings:site. The link
+ * labels and targets are content; which homepage section each header link lights, the prefetch
+ * policy and the section aliases below are code.
  */
-export const SECTION_LINKS: SiteLink[] = [
-  { label: "Services", href: "/#services" },
-  { label: "Work", href: "/#work" },
-  { label: "Approach", href: "/#approach" },
-  { label: "About", href: "/#about" },
-  { label: "Insights", href: "/insights", section: "insights" },
-];
+export interface ShellChrome {
+  /** Homepage chapters in the header, in page order. Insights goes to /insights but lights for the #insights teaser. */
+  sections: SiteLink[];
+  pricing: SiteLink;
+  login: SiteLink;
+  contact: SiteLink;
+  /** One link per discipline, to its service page, named as the page names its service. */
+  disciplines: SiteLink[];
+  contactEmail: string;
+  eyebrow: string;
+  header: SiteSettings["header"];
+  footer: SiteSettings["footer"];
+}
+
+export function shellChrome(navigation: Navigation, settings: SiteSettings): ShellChrome {
+  const link = ({ label, href }: { label: string; href: string }): SiteLink => ({ label, href });
+  return {
+    sections: navigation.sections.map((s) => ({ label: s.label, href: s.href, section: s.key })),
+    pricing: link(navigation.pricing),
+    login: link(navigation.login),
+    contact: link(navigation.contact),
+    disciplines: navigation.disciplines.map(link),
+    contactEmail: settings.contactEmail,
+    eyebrow: settings.eyebrow,
+    header: settings.header,
+    footer: settings.footer,
+  };
+}
 
 /** The homepage section id a header link stands for. */
 export const sectionOf = (link: SiteLink) => link.section ?? link.href.split("#")[1];
@@ -26,10 +50,6 @@ export const sectionOf = (link: SiteLink) => link.section ?? link.href.split("#"
  */
 export const prefetchFor = (href: string) => (href.startsWith("/#") || href !== "/" ? false : undefined);
 
-export const PRICING_LINK: SiteLink = { label: "Pricing", href: "/pricing" };
-export const LOGIN_LINK: SiteLink = { label: "Client login", href: "/login" };
-export const CONTACT_LINK: SiteLink = { label: "Start a conversation", href: "/#contact" };
-
 /**
  * Sections without a header link light up the nearest chapter instead.
  * Capabilities has none on purpose: reading it must not hand the highlight back to Services.
@@ -37,15 +57,3 @@ export const CONTACT_LINK: SiteLink = { label: "Start a conversation", href: "/#
 export const SECTION_ALIASES: Record<string, string> = {
   method: "approach",
 };
-
-/**
- * One link per discipline, to its service page, named as the page names its service. These are on
- * every page, so each anchor says what its page is about and no two point at the same idea
- * ("AI & Automation" for the AI page overlapped the automation page).
- */
-export const DISCIPLINE_LINKS: SiteLink[] = [
-  { label: "AI Integration", href: "/services/ai-integration" },
-  { label: "Workflow Automation", href: "/services/workflow-automation" },
-  { label: "Custom Software", href: "/services/custom-software" },
-  { label: "SEO & Growth", href: "/services/seo" },
-];

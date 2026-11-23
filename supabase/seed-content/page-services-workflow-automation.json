@@ -1,0 +1,328 @@
+{
+  "key": "page:/services/workflow-automation",
+  "kind": "page",
+  "schemaVersion": 1,
+  "data": {
+    "template": "service",
+    "seo": {
+      "title": "Business Process Automation & Integration",
+      "description": "Workflow automation and API integration for small businesses. We connect your CRM, accounts, inbox and spreadsheets so information moves without being retyped.",
+      "robots": "index",
+      "sitemap": {
+        "changeFrequency": "monthly",
+        "priority": 0.8
+      }
+    },
+    "updatedOn": "2026-11-21",
+    "service": {
+      "name": "Workflow Automation",
+      "serviceType": "Business process automation and systems integration"
+    },
+    "blocks": [
+      {
+        "type": "page_header",
+        "kicker": "Workflow Automation",
+        "title": "Workflow automation for the work between your systems",
+        "lede": "We design and build automated workflows that connect the tools you already use, so enquiries, orders, invoices and reports move between them without someone copying them across.",
+        "diagram": "automation",
+        "ctas": [
+          {
+            "label": "Describe a process",
+            "href": "/#contact",
+            "variant": "primary",
+            "arrow": "right"
+          },
+          {
+            "label": "See what we do",
+            "href": "#what-we-do",
+            "variant": "secondary",
+            "arrow": "down"
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "problem",
+        "title": "Where the hours go.",
+        "intro": "In most small businesses the slow part isn’t any one tool. It’s the manual work of moving information between them.",
+        "ruled": false,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "text_grid",
+            "columns": 2,
+            "items": [
+              {
+                "title": "The same details, typed twice",
+                "body": "A customer’s details arrive by form, get entered into the CRM, then again into the accounts package. Every copy takes time and is another chance for a typo or a missed row."
+              },
+              {
+                "title": "Handoffs that rely on memory",
+                "body": "A sale is won and someone has to remember to tell the person who handles onboarding. When they’re busy or away, things stall without anyone noticing."
+              },
+              {
+                "title": "Reports built by hand",
+                "body": "Someone spends part of every week exporting figures from three systems and pasting them into a spreadsheet, and the numbers are out of date as soon as it is finished."
+              },
+              {
+                "title": "Integrations that almost work",
+                "body": "The connector exists but doesn’t do quite what you need, or an automation someone set up years ago breaks quietly when a field changes and nobody finds out for weeks."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "what-we-do",
+        "title": "What we do.",
+        "intro": "Joining up the systems you already rely on, using the simplest approach that will run reliably.",
+        "ruled": true,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "offering_list",
+            "items": [
+              {
+                "title": "Mapping the process as it really runs",
+                "body": "We write down how the work actually happens today, not how it is supposed to, and find the steps worth automating. Steps that exist only “just in case” are fixed or removed first, because automating a broken process just makes it break faster."
+              },
+              {
+                "title": "Connecting the tools you already use",
+                "body": "Built-in automation and connector platforms such as Zapier or Make are often the fastest and cheapest route, and where one is reliable enough for the job, we’ll tell you."
+              },
+              {
+                "title": "Custom API integrations",
+                "body": "When systems have no connector between them, or the rules are too specific for one, we build the integration against each system’s API directly: webhooks, scheduled syncs, data clean-up and proper handling of errors."
+              },
+              {
+                "title": "Automated reporting",
+                "body": "Figures pulled on a schedule from the systems that hold them into one report or dashboard, so nobody has to compile it and everyone sees the same numbers."
+              },
+              {
+                "title": "AI steps inside a workflow",
+                "body": "Where a step needs something read or written, such as classifying an email or pulling fields from an invoice, we add AI to the workflow with a review step where the result matters."
+              },
+              {
+                "title": "Problems reported, workflows documented",
+                "body": "Automations fail quietly when a password, field or API changes. We agree with you how each workflow reports problems and how it is documented, so it doesn’t become a black box nobody dares touch."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "examples",
+        "title": "Where automation usually pays back first.",
+        "intro": "The processes small businesses most often automate first. Each is frequent, rule-based and involves moving information between systems.",
+        "ruled": true,
+        "background": "raised",
+        "stacked": false,
+        "content": [
+          {
+            "type": "text_grid",
+            "columns": 2,
+            "items": [
+              {
+                "title": "New enquiries and leads",
+                "body": "A form or email creates the CRM record, sends the acknowledgement and assigns a follow-up task, instead of someone doing all three by hand."
+              },
+              {
+                "title": "Invoices and expenses",
+                "body": "Supplier invoices and receipts read into your accounting software rather than retyped, using the accounting package’s own tools or an integration."
+              },
+              {
+                "title": "Reminders and follow-ups",
+                "body": "Appointment confirmations, review requests a set number of days after a job, and renewal reminders before a contract lapses."
+              },
+              {
+                "title": "Reports compiled by hand",
+                "body": "The weekly or monthly report someone builds by opening several tools. If the data lives in software with an API or an export, it can usually be automated."
+              },
+              {
+                "title": "Handoffs between teams",
+                "body": "A job marked won, complete or paid automatically tells the next person what to do, with the details they need."
+              },
+              {
+                "title": "Records that should match",
+                "body": "Customer, product or stock details changed in one system and updated everywhere else, so nobody is working from an old copy."
+              }
+            ]
+          },
+          {
+            "type": "note",
+            "size": "body",
+            "text": "To choose between candidates, weigh how often a task happens against how much the person doing it dreads it. Frequency multiplied by frustration is usually a better guide than frequency alone."
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "approach-principles",
+        "title": "Simple, reliable, written down.",
+        "intro": "How we decide what to automate and how to build it.",
+        "ruled": true,
+        "background": "paper",
+        "stacked": true,
+        "content": [
+          {
+            "type": "text_grid",
+            "columns": 3,
+            "items": [
+              {
+                "title": "Fix the process first",
+                "body": "Before automating anything, we check the process is worth repeating exactly as it is. Often the biggest saving comes from removing a step, not automating it."
+              },
+              {
+                "title": "Use what you already pay for",
+                "body": "Your CRM, accounts package or helpdesk may already automate part of the job. We check that before suggesting anything new, and tell you when it’s free."
+              },
+              {
+                "title": "Build for the day it breaks",
+                "body": "Every workflow eventually meets an input it didn’t expect. We plan for that with alerts, retries and a record of what happened, so problems surface rather than hide."
+              }
+            ]
+          },
+          {
+            "type": "note",
+            "size": "lede",
+            "text": "Automation pays for itself only if it keeps running. If a process happens too rarely to repay the work, or needs a judgement call every time, we’ll recommend leaving it manual."
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "how-we-work",
+        "title": "How we work.",
+        "intro": "The same four steps as all our work, applied to this service.",
+        "ruled": true,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "process_steps",
+            "notes": {
+              "discover": "For automation: the process as it runs today, the systems it touches and where the time goes.",
+              "define": "Which steps to automate first, which to remove, and whether a connector or a custom integration fits.",
+              "build": "The workflow, its error handling and alerts, and documentation of how it works.",
+              "improve": "Watching it run on real work, then automating the next process when the first has earned it."
+            }
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "engagement",
+        "title": "How projects start.",
+        "ruled": true,
+        "background": "haze",
+        "stacked": false,
+        "content": [
+          {
+            "type": "paragraphs",
+            "paragraphs": [
+              "Automation work is scoped per project. It starts with you describing the process: what happens, which tools are involved and where it hurts. We then tell you whether it is a quick win, a bigger project or something your existing software can already do, and agree scope and cost before any work starts.",
+              "If the work spans several areas, such as automation alongside AI, software or SEO, we can combine it into a custom package."
+            ],
+            "ctas": [
+              {
+                "label": "Describe a process",
+                "href": "/#contact",
+                "variant": "primary",
+                "arrow": "right"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "faq",
+        "title": "Questions we’re asked.",
+        "ruled": false,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "faq_list",
+            "items": [
+              {
+                "question": "Should we use Zapier or Make, or a custom integration?",
+                "answer": "Connector platforms are usually the right start: quick to set up, easy to change, and good for moderate volumes between popular tools. Custom integration makes more sense when a system has no connector, the logic is complex, the volume makes per-task pricing expensive, or the workflow is critical enough to need fuller control over errors and monitoring."
+              },
+              {
+                "question": "Which systems can you connect?",
+                "answer": "Most modern business software, including CRMs, accounting packages, e-commerce platforms, helpdesks, forms, email and spreadsheets, offers an API or a connector. Older or industry-specific systems sometimes only export files, which can still often be automated. We check what each of your systems allows before quoting."
+              },
+              {
+                "question": "What happens when an automation breaks?",
+                "answer": "We plan for failure from the start: how errors are reported, what happens to a failed step, and how the workflow is documented, so you are not dependent on one person remembering."
+              },
+              {
+                "question": "How much does workflow automation cost?",
+                "answer": "It depends on the number of steps and systems and how specific the rules are. A workflow on a connector platform usually costs less to build but carries a monthly subscription; a custom integration costs more to build but may cost little to run. We set out both before you decide."
+              },
+              {
+                "question": "Is our data handled safely?",
+                "answer": "Automation moves data between systems, so we keep the data passing through each step to what that step needs, check where each platform processes and stores it, and use accounts and permissions that can be reviewed. Your obligations under UK GDPR, or the data-protection law that applies to you, stay with you, and we’ll flag anything that needs a decision."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "related_insights",
+        "anchor": "related-insights",
+        "title": "Related insights.",
+        "curated": [
+          {
+            "slug": "what-should-you-automate-first",
+            "reason": "A simple test for picking your first automation, the five most common quick wins, and why not to automate a broken process."
+          },
+          {
+            "slug": "when-should-a-business-build-custom-software",
+            "reason": "Many “we need new software” problems turn out to be connection problems. How to tell which one you have."
+          },
+          {
+            "slug": "how-to-connect-business-systems",
+            "reason": "Deciding where each record lives, then choosing between built-in integrations, connectors and APIs."
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "related-services",
+        "title": "Related services.",
+        "ruled": true,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "link_list",
+            "items": [
+              {
+                "title": "AI integration",
+                "href": "/services/ai-integration",
+                "reason": "When a step in the workflow needs reading or writing, such as triaging email or extracting invoice details."
+              },
+              {
+                "title": "Custom software",
+                "href": "/services/custom-software",
+                "reason": "When the process needs a tool of its own rather than another connection, such as a spreadsheet that has become a database."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "closing",
+        "title": "Describe the process that slows you down.",
+        "lede": "Tell us what happens, which tools are involved and where it hurts. We’ll tell you whether it’s a quick win, a bigger project, or something your software can already do.",
+        "ctaLabel": "Describe a process"
+      }
+    ]
+  }
+}

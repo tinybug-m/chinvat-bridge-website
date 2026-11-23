@@ -1,0 +1,8 @@
+{
+  "id": "evt_test_sub_updated_1",
+  "object": "event",
+  "type": "customer.subscription.updated",
+  "created": 1800000200,
+  "livemode": false,
+  "data": { "object": { "id": "sub_test_1", "object": "subscription", "status": "past_due", "cancel_at_period_end": false, "metadata": { "planId": "growth" } } }
+}

@@ -2,7 +2,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { Container } from "@/components/system/Container";
 import { Section } from "@/components/system/Section";
 import { SectionHeading } from "@/components/system/SectionHeading";
-import { CAPABILITIES } from "@/data/capabilities";
+import type { CapabilitiesCollection, HomePage } from "@/lib/content/schema";
 
 /*
  * A type specimen, not a list of pitches. Services already says what each
@@ -13,24 +13,22 @@ import { CAPABILITIES } from "@/data/capabilities";
  * line, title left and category right on a shared baseline, so the six stay
  * short.
  */
-export function Capabilities() {
+export function Capabilities({ content, items }: { content: HomePage["blocks"][5]; items: CapabilitiesCollection["items"] }) {
   return (
     <Section id="capabilities" labelledBy="capabilities-title" className="pt-12 lg:pt-16">
       <span id="machines" aria-hidden="true" className="absolute -top-px block scroll-mt-20" />
       <Container>
         <div className="grid gap-x-6 gap-y-6 lg:grid-cols-12 lg:items-end">
           <Reveal className="lg:col-span-7">
-            <SectionHeading id="capabilities-title">What we build with.</SectionHeading>
+            <SectionHeading id="capabilities-title">{content.heading}</SectionHeading>
           </Reveal>
           <Reveal delay={80} className="lg:col-span-4 lg:col-start-9">
-            <p className="max-w-measure text-pretty text-lede text-ink-soft">
-              Modern businesses have more tools than ever. The challenge is knowing which ones actually create value.
-            </p>
+            <p className="max-w-measure text-pretty text-lede text-ink-soft">{content.lede}</p>
           </Reveal>
         </div>
 
         <ul className="mt-12 grid list-none border-b border-line sm:grid-cols-2 md:mt-16 lg:grid-cols-3">
-          {CAPABILITIES.map((capability, index) => (
+          {items.map((capability, index) => (
             <Reveal
               as="li"
               key={capability.title}

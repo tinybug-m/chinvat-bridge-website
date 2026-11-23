@@ -1,35 +1,33 @@
 import Link from "next/link";
 import { Lockup } from "@/components/brand/Lockup";
 import { Container } from "@/components/system/Container";
-import { CONTACT_EMAIL } from "@/lib/constants";
-import { CONTACT_LINK, DISCIPLINE_LINKS, LOGIN_LINK, PRICING_LINK, SECTION_LINKS, prefetchFor, type SiteLink } from "./nav";
+import { prefetchFor, type ShellChrome, type SiteLink } from "./nav";
 
 /*
  * On small screens Explore runs the full height of the first column and
  * Disciplines and Clients stack in the second; from sm they sit side by side.
  */
-const COLUMNS: { title: string; links: SiteLink[]; className: string }[] = [
+const columnsFor = (chrome: ShellChrome): { title: string; links: SiteLink[]; className: string }[] => [
   {
-    title: "Explore",
-    links: [...SECTION_LINKS, { label: "Contact", href: CONTACT_LINK.href }],
+    title: chrome.footer.columnTitles.explore,
+    links: [...chrome.sections, { label: chrome.footer.contactLinkLabel, href: chrome.contact.href }],
     className: "row-span-2 sm:row-span-1",
   },
-  { title: "Disciplines", links: DISCIPLINE_LINKS, className: "col-start-2" },
-  { title: "Clients", links: [PRICING_LINK, LOGIN_LINK], className: "col-start-2 sm:col-start-3" },
+  { title: chrome.footer.columnTitles.disciplines, links: chrome.disciplines, className: "col-start-2" },
+  { title: chrome.footer.columnTitles.clients, links: [chrome.pricing, chrome.login], className: "col-start-2 sm:col-start-3" },
 ];
 
-export function SiteFooter() {
+export function SiteFooter({ chrome }: { chrome: ShellChrome }) {
   const year = new Date().getFullYear();
+  const COLUMNS = columnsFor(chrome);
+  const CONTACT_EMAIL = chrome.contactEmail;
 
   return (
     <footer className="border-t border-line bg-paper-raised">
       <Container className="grid gap-10 py-12 md:grid-cols-12 md:gap-6 lg:py-20">
         <div className="md:col-span-5 lg:col-span-4">
           <Lockup className="min-h-11" />
-          <p className="mt-6 max-w-[34ch] text-small text-ink-soft">
-            Chinvat Bridge is a UK-based technology consultancy helping businesses use AI, automation, software and SEO
-            to work better and grow.
-          </p>
+          <p className="mt-6 max-w-[34ch] text-small text-ink-soft">{chrome.footer.blurb}</p>
           <a
             href={`mailto:${CONTACT_EMAIL}`}
             className="mt-6 inline-flex min-h-11 items-center text-small text-ink underline decoration-line-strong underline-offset-4 transition-[color,text-decoration-color] duration-200 ease-out-quart hover:decoration-ink motion-reduce:transition-none"
@@ -63,15 +61,21 @@ export function SiteFooter() {
       </Container>
 
       <Container className="flex flex-col gap-2 pb-6 text-small text-ink-muted lg:flex-row lg:items-center lg:justify-between">
-        <p>UK Based // Working Globally</p>
+        <p>{chrome.eyebrow}</p>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-          <p>&copy; {year} Chinvat Bridge. All rights reserved.</p>
-          <Link href="/privacy" prefetch={false} className="inline-flex min-h-11 items-center transition-[color,text-decoration-color] duration-200 ease-out-quart hover:text-ink motion-reduce:transition-none">
-            Privacy Policy
-          </Link>
-          <Link href="/terms" prefetch={false} className="inline-flex min-h-11 items-center transition-[color,text-decoration-color] duration-200 ease-out-quart hover:text-ink motion-reduce:transition-none">
-            Terms of Service
-          </Link>
+          <p>
+            &copy; {year} {chrome.footer.copyrightHolder}. {chrome.footer.rightsNotice}
+          </p>
+          {chrome.footer.legalLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              prefetch={false}
+              className="inline-flex min-h-11 items-center transition-[color,text-decoration-color] duration-200 ease-out-quart hover:text-ink motion-reduce:transition-none"
+            >
+              {link.label}
+            </Link>
+          ))}
         </div>
       </Container>
     </footer>

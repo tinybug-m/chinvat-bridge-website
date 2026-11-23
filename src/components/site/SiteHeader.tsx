@@ -8,15 +8,15 @@ import { ButtonLink } from "@/components/system/Button";
 import { Container } from "@/components/system/Container";
 import { cn } from "@/lib/utils";
 import { MobileMenu } from "./MobileMenu";
-import { CONTACT_LINK, LOGIN_LINK, PRICING_LINK, SECTION_LINKS, prefetchFor, sectionOf } from "./nav";
+import { prefetchFor, sectionOf, type ShellChrome } from "./nav";
 import { useActiveSection } from "./useActiveSection";
 
-const SECTION_IDS = SECTION_LINKS.map(sectionOf);
-const NAV_LINKS = [...SECTION_LINKS, PRICING_LINK];
-/** Links that are pages, not anchors: Insights and Pricing. */
-const PAGE_LINKS = NAV_LINKS.filter((link) => !link.href.includes("#"));
-
-export function SiteHeader() {
+export function SiteHeader({ chrome }: { chrome: ShellChrome }) {
+  const { sections: SECTION_LINKS, pricing: PRICING_LINK, login: LOGIN_LINK, contact: CONTACT_LINK } = chrome;
+  const SECTION_IDS = SECTION_LINKS.map(sectionOf);
+  const NAV_LINKS = [...SECTION_LINKS, PRICING_LINK];
+  /** Links that are pages, not anchors: Insights and Pricing. */
+  const PAGE_LINKS = NAV_LINKS.filter((link) => !link.href.includes("#"));
   const [scrolled, setScrolled] = useState(false);
   const active = useActiveSection(SECTION_IDS);
   const pathname = usePathname();
@@ -133,9 +133,9 @@ export function SiteHeader() {
           </ButtonLink>
           {/* Below sm the full label does not fit beside the menu; the conversion path stays one tap away. */}
           <ButtonLink href={CONTACT_LINK.href} className="px-3 min-[360px]:px-4 sm:hidden">
-            Contact
+            {chrome.header.contactShortLabel}
           </ButtonLink>
-          <MobileMenu />
+          <MobileMenu chrome={chrome} />
         </div>
       </Container>
     </header>

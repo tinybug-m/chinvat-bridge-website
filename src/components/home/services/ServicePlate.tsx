@@ -2,7 +2,9 @@ import type { ComponentType } from "react";
 import { Reveal } from "@/components/motion/Reveal";
 import { ArrowIcon } from "@/components/system/ArrowIcon";
 import { TextLink } from "@/components/system/TextLink";
-import type { Service } from "@/data/services";
+import type { ServicesCollection } from "@/lib/content/schema";
+
+type Service = ServicesCollection["items"][number];
 import { cn } from "@/lib/utils";
 import { ButtonLink } from "@/components/system/Button";
 import { PlateDiagram } from "./PlateDiagram";
@@ -12,7 +14,7 @@ import type { EnergyPorts } from "./energy/EnergyFlow";
  * How a plate sets its text. The plates share one short vocabulary
  * (strapline, title, description, link) and each picks its own scale and
  * link style, so the four read as one system without being stamped copies.
- * The tags and outcome in SERVICES are not shown here: the homepage keeps
+ * The tags and outcome in collection:services are not shown here: the homepage keeps
  * each plate to what it does and where to read more.
  */
 export interface PlateTone {

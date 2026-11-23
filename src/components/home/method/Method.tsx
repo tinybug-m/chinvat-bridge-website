@@ -4,7 +4,7 @@ import { Container } from "@/components/system/Container";
 import { Section } from "@/components/system/Section";
 import { SectionHeading } from "@/components/system/SectionHeading";
 import { PlateDiagram } from "@/components/home/services/PlateDiagram";
-import { PROCESS_STEPS } from "@/data/process";
+import type { HomePage, ProcessStepsCollection } from "@/lib/content/schema";
 import { METHOD_PLATES } from "./MethodDiagrams";
 import { STONE_BOARD } from "./stonePlates";
 import "./method.css";
@@ -28,9 +28,9 @@ const DECK: [number, number, number, number][] = [
   [200, 32, 300, 146],
   [300, 8, 392, 96],
 ];
-const energyFor = (index: number) => ({
+const energyFor = (index: number, count: number) => ({
   ins: ENERGY_IN,
-  outs: index < PROCESS_STEPS.length - 1 ? ENERGY_OUT : [],
+  outs: index < count - 1 ? ENERGY_OUT : [],
   keepout: DECK,
 });
 
@@ -42,22 +42,22 @@ const energyFor = (index: number) => ({
  * from the start without JavaScript or under reduced motion. Side by side
  * (lg), the right-hand text follows the left by one beat (method.css).
  */
-export function Method() {
+export function Method({ content, steps }: { content: HomePage["blocks"][4]; steps: ProcessStepsCollection["items"] }) {
   return (
     <Section id="method" labelledBy="method-title">
       <Container>
         <Reveal>
           <SectionHeading id="method-title" size="display">
-            How we work.
+            {content.heading}
           </SectionHeading>
         </Reveal>
 
         <ol className="mt-12 grid gap-x-8 gap-y-14 md:mt-16 md:grid-cols-2 lg:gap-x-10">
-          {PROCESS_STEPS.map((step, index) => {
+          {steps.map((step, index) => {
             const Plate = METHOD_PLATES[index];
             return (
               <li key={step.title} data-method-step={index}>
-                <PlateDiagram viewBox={STONE_BOARD.viewBox} energy={energyFor(index)} className={`method-plate method-col-${index % 2} w-full max-w-[40rem] text-ink`}>
+                <PlateDiagram viewBox={STONE_BOARD.viewBox} energy={energyFor(index, steps.length)} className={`method-plate method-col-${index % 2} w-full max-w-[40rem] text-ink`}>
                   <Plate uid={`method-plate-${index}`} />
                 </PlateDiagram>
                 <Reveal className={`method-text method-col-${index % 2} mt-6`}>
@@ -70,8 +70,8 @@ export function Method() {
         </ol>
 
         <div className="mt-12 md:mt-16">
-          <ButtonLink href="/#contact" variant="secondary" arrow="right" className="w-full sm:w-auto">
-            Start a conversation
+          <ButtonLink href={content.cta.href} variant="secondary" arrow="right" className="w-full sm:w-auto">
+            {content.cta.label}
           </ButtonLink>
         </div>
       </Container>

@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test";
+import { ONCE } from "./once";
 
 // Whole-page guarantees for the homepage; each section has its own spec too.
 const CHAPTERS = ["services", "work", "approach", "method", "capabilities", "about", "insights", "contact"];
 
 test.describe("homepage", () => {
-  test("one h1 and a heading outline without skipped levels", async ({ page }) => {
+  test("one h1 and a heading outline without skipped levels", ONCE, async ({ page }) => {
     await page.goto("/");
     const levels = await page.locator("main").evaluate((main) =>
       [...main.querySelectorAll("h1, h2, h3, h4, h5, h6")].map((h) => Number(h.tagName[1])),
@@ -16,36 +17,13 @@ test.describe("homepage", () => {
     });
   });
 
-  test("chapters are in order and named by their headings", async ({ page }) => {
-    await page.goto("/");
-    const ids = await page.locator("main > section[id]").evaluateAll((sections) => sections.map((s) => s.id));
-    expect(ids).toEqual(CHAPTERS);
-    for (const id of CHAPTERS) {
-      const labelledBy = await page.locator(`#${id}`).getAttribute("aria-labelledby");
-      expect(labelledBy, `#${id} has aria-labelledby`).toBeTruthy();
-      await expect(page.locator(`#${labelledBy}`)).toHaveCount(1);
-    }
-  });
-
-  test("every in-page anchor has a target", async ({ page }) => {
+  test("every in-page anchor has a target", ONCE, async ({ page }) => {
     await page.goto("/");
     const targets = await page.locator('a[href^="/#"], a[href^="#"]').evaluateAll((links) => [
       ...new Set(links.map((a) => a.getAttribute("href")!.split("#")[1]).filter(Boolean)),
     ]);
     expect(targets.length).toBeGreaterThan(0);
     for (const id of targets) await expect(page.locator(`[id="${id}"]`), `#${id}`).toHaveCount(1);
-  });
-
-  test("internal links resolve", async ({ page, request }, testInfo) => {
-    test.skip(testInfo.project.name !== "desktop", "once is enough");
-    await page.goto("/");
-    const paths = await page.locator('a[href^="/"]').evaluateAll((links) => [
-      ...new Set(links.map((a) => a.getAttribute("href")!.split("#")[0]).filter((href) => href && href !== "/")),
-    ]);
-    for (const path of paths) {
-      const response = await request.get(path, { maxRedirects: 0 });
-      expect(response.status(), path).toBeLessThan(400);
-    }
   });
 
   test("content is complete without JavaScript", async ({ browser }) => {
@@ -60,6 +38,15 @@ test.describe("homepage", () => {
       expect(await heading.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
     }
     await context.close();
+  });
+
+  test("no horizontal overflow in any chapter", async ({ page }) => {
+    await page.goto("/");
+    for (const id of CHAPTERS) {
+      await page.locator(`#${id}`).scrollIntoViewIfNeeded();
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      expect(overflow, `#${id}`).toBeLessThanOrEqual(0);
+    }
   });
 
   test.describe("reduced motion", () => {

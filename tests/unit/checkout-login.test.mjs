@@ -44,6 +44,7 @@ function deps(overrides = {}) {
       return true;
     },
     isAdminEmail: (email) => email === "owner@example.com",
+    isAdminUser: async (userId) => userId === "admin-user",
     async provisionLoginLink() {
       calls.provisioned++;
       return { user: { id: "user-1", created_at: new Date((NOW - 30) * 1000).toISOString(), last_sign_in_at: null }, hashedToken: "h" };
@@ -159,6 +160,28 @@ test("admin emails are never signed in from a checkout", async () => {
   assert.equal(await redeemCheckoutLogin(d, input), "email_sent");
   assert.equal(d.calls.established, 0);
   assert.equal(d.calls.provisioned, 0);
+});
+
+test("database admins are never signed in from a checkout, whatever their email", async () => {
+  const d = deps({
+    async provisionLoginLink() {
+      d.calls.provisioned++;
+      return { user: { id: "admin-user", created_at: new Date((NOW - 30) * 1000).toISOString(), last_sign_in_at: null }, hashedToken: "h" };
+    },
+  });
+  assert.equal(await redeemCheckoutLogin(d, input), "email_sent");
+  assert.equal(d.calls.established, 0);
+});
+
+test("admin lookup failure fails closed to an emailed link", async () => {
+  const d = deps({ isAdminUser: async () => Promise.reject(new Error("db down")) });
+  assert.equal(await redeemCheckoutLogin(d, input), "email_sent");
+  assert.equal(d.calls.established, 0);
+});
+
+test("without an email deny-list the database check alone decides", async () => {
+  const d = deps({ isAdminEmail: undefined });
+  assert.equal(await redeemCheckoutLogin(d, input), "signed_in");
 });
 
 test("customer mismatch: an account linked to a different subscription is not signed in", async () => {

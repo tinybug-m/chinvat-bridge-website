@@ -1,23 +1,20 @@
 import "server-only";
 import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
+import { supabaseConfig, supabaseServiceRoleKey } from "@/lib/env";
 
 let adminClient: SupabaseClient<Database> | null = null;
 
 /**
  * Service-role Supabase client — bypasses Row Level Security entirely.
  * Server-only. Never import this into a Client Component or expose its key to the browser.
+ * Use it only where no user session exists (Stripe webhook, checkout sign-in, rate limiting);
+ * signed-in reads and admin work go through the user's own client (src/lib/supabase/server.ts).
  */
 export function createAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url || !serviceRoleKey) {
-    throw new Error("Supabase admin client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.");
-  }
-
   if (!adminClient) {
-    adminClient = createSupabaseClient<Database>(url, serviceRoleKey, {
+    const { url } = supabaseConfig();
+    adminClient = createSupabaseClient<Database>(url, supabaseServiceRoleKey(), {
       auth: { autoRefreshToken: false, persistSession: false },
     });
   }

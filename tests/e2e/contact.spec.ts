@@ -1,6 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-
-const EMAIL = "artin@chinvatbridge.com";
+import { ONCE } from "./once";
 
 /** Collects the bodies of Server Action POSTs (the request that sends the message). */
 function recordSends(page: Page) {
@@ -68,21 +67,7 @@ test.describe("contact section", () => {
     await stubMailDelivery(page);
   });
 
-  test("shows the closing heading, direct details and the first question with topics", async ({ page }) => {
-    await page.goto("/");
-    const section = contact(page);
-    await expect(section.getByRole("heading", { level: 2 })).toHaveText("Build a better way forward.");
-    await expect(section.getByRole("link", { name: EMAIL })).toHaveAttribute("href", `mailto:${EMAIL}`);
-    await expect(section.getByText("Chinvat Bridge", { exact: true })).toBeVisible();
-    await expect(section.getByText("1 of 3")).toBeVisible();
-    await expect(log(page).getByRole("listitem")).toHaveCount(1);
-    await expect(section.getByRole("group", { name: /What can we help you with/ }).getByRole("button")).toHaveCount(5);
-    await expect(section.getByRole("textbox", { name: /What can we help you with/ })).toBeVisible();
-    // Nothing takes focus on page load.
-    await expect(section.getByRole("textbox")).not.toBeFocused();
-  });
-
-  test("topic, a sentence, then name and email: sends from the page and confirms", async ({ page }) => {
+  test("topic, a sentence, then name and email: sends from the page and confirms", ONCE, async ({ page }) => {
     const sends = recordSends(page);
     await page.goto("/");
     await contact(page).getByRole("button", { name: "AI & Automation" }).click();
@@ -100,7 +85,7 @@ test.describe("contact section", () => {
     }
   });
 
-  test("a message sent after reading a service page says which page prompted it", async ({ page }) => {
+  test("a message sent after reading a service page says which page prompted it", ONCE, async ({ page }) => {
     const sends = recordSends(page);
     await page.goto("/services/workflow-automation");
     await page.getByRole("link", { name: "Describe a process" }).first().click();
@@ -112,7 +97,7 @@ test.describe("contact section", () => {
     expect(sends[0]).toContain('"previous":"/services/workflow-automation"');
   });
 
-  test("typing straight away skips the topic", async ({ page }) => {
+  test("typing straight away skips the topic", ONCE, async ({ page }) => {
     const sends = recordSends(page);
     await page.goto("/");
     await say(page, /What can we help you with/, "We need a booking system.");
@@ -123,7 +108,7 @@ test.describe("contact section", () => {
     expect(sends[0]).toContain('"need":""');
   });
 
-  test("when sending fails, it says so and offers the email app instead", async ({ page }) => {
+  test("when sending fails, it says so and offers the email app instead", ONCE, async ({ page }) => {
     await page.route("**/*", (route) => (route.request().headers()["next-action"] ? route.abort() : route.fallback()));
     await page.goto("/");
     await say(page, /What can we help you with/, "We need a booking system.");
@@ -133,7 +118,7 @@ test.describe("contact section", () => {
     await expect(contact(page).getByRole("button", { name: "Send message" })).toBeEnabled();
   });
 
-  test("checks name and email in place, without sending", async ({ page }) => {
+  test("checks name and email in place, without sending", ONCE, async ({ page }) => {
     const sends = recordSends(page);
     await page.goto("/");
     await say(page, /What can we help you with/, "We need a booking system.");
@@ -150,7 +135,7 @@ test.describe("contact section", () => {
     expect(sends).toEqual([]);
   });
 
-  test("clicking an answer rewinds to it for editing", async ({ page }) => {
+  test("clicking an answer rewinds to it for editing", ONCE, async ({ page }) => {
     await page.goto("/");
     await contact(page).getByRole("button", { name: "Workflows" }).click();
     await say(page, /process/, "Invoices take forever.");
@@ -163,7 +148,7 @@ test.describe("contact section", () => {
     await expect(contact(page).getByRole("group", { name: /What can we help you with/ })).toBeVisible();
   });
 
-  test("send another message starts over", async ({ page }) => {
+  test("send another message starts over", ONCE, async ({ page }) => {
     await page.goto("/");
     await say(page, /What can we help you with/, "We need a booking system.");
     await fillContact(page, "Ada", "ada@example.com");

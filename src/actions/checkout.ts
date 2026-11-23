@@ -91,6 +91,9 @@ export async function createCheckoutSession(
       billing_address_collection: "auto",
       allow_promotion_codes: true,
       metadata: { planId: plan.id, ...values, bindingHash: sha256Hex(bindingToken) },
+      // Marks the subscription as this site's, so the webhook knows to wait for its checkout event
+      // (src/lib/stripe-sync.ts). Plan id only: no personal data on the subscription.
+      subscription_data: { metadata: { planId: plan.id } },
     });
     sessionUrl = session.url;
   } catch (error) {

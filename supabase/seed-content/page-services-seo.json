@@ -1,0 +1,339 @@
+{
+  "key": "page:/services/seo",
+  "kind": "page",
+  "schemaVersion": 1,
+  "data": {
+    "template": "service",
+    "seo": {
+      "title": "SEO Services for Small Businesses",
+      "description": "SEO services for small businesses, from a UK-based team: technical SEO, content strategy, link building and digital PR, on a monthly plan or a custom scope.",
+      "robots": "index",
+      "sitemap": {
+        "changeFrequency": "monthly",
+        "priority": 0.8
+      }
+    },
+    "updatedOn": "2026-11-19",
+    "service": {
+      "name": "SEO & Digital Growth",
+      "serviceType": "Search engine optimisation"
+    },
+    "blocks": [
+      {
+        "type": "page_header",
+        "kicker": "SEO & Digital Growth",
+        "title": "SEO that makes your business easier to find",
+        "lede": "We fix what stops search engines understanding your site, plan and write content around what your customers search for, and build authority through link building and digital PR.",
+        "diagram": "seo",
+        "ctas": [
+          {
+            "label": "Discuss your SEO goals",
+            "href": "/#contact",
+            "variant": "primary",
+            "arrow": "right"
+          },
+          {
+            "label": "Explore SEO plans",
+            "href": "/pricing",
+            "variant": "secondary",
+            "arrow": "right"
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "problem",
+        "title": "Why good businesses stay hard to find.",
+        "intro": "Most visibility problems come down to a few causes, and they compound: each one makes the others harder to fix.",
+        "ruled": false,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "text_grid",
+            "columns": 2,
+            "items": [
+              {
+                "title": "You don’t appear for the searches that matter",
+                "body": "Search engines rank pages for the words people type. If your pages don’t describe your services and the problems you solve in plain language, there is little for them to rank, however good the design."
+              },
+              {
+                "title": "Technical issues hold your pages back",
+                "body": "Missing or duplicate titles, pages blocked from indexing, no clear structure between pages, missing structured data, a site that is slow on a phone. Each one limits how well search engines can crawl and understand what you offer."
+              },
+              {
+                "title": "Content doesn’t match what people are looking for",
+                "body": "A page can be well written and still miss. If someone wants a comparison, a price or an answer to a question and lands on a general sales page, they leave, and the page has little reason to rank for that search."
+              },
+              {
+                "title": "Nothing is building your authority",
+                "body": "Links from relevant, credible sites help search engines judge which pages to trust. Without a steady way to earn them, good content can stay behind pages that are simply better known."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "what-we-do",
+        "title": "What we do.",
+        "intro": "Six kinds of work, from the technical foundations of your site to the links that point to it.",
+        "ruled": true,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "offering_list",
+            "items": [
+              {
+                "title": "Technical SEO audits and fixes",
+                "body": "We audit how search engines crawl, index and read your site: titles and meta data, duplicate pages, indexing directives, structured data and Core Web Vitals. Then we fix what we find and keep monitoring performance as the site changes.",
+                "scope": "Every plan. The depth of the audit depends on the plan."
+              },
+              {
+                "title": "Site architecture and on-page optimisation",
+                "body": "How your pages are organised and linked decides how easily people and search engines move through them. We tidy the structure and internal links, and optimise each important page’s title, headings and copy for the search it should answer.",
+                "scope": "On-page work in every plan. Deeper crawl and architecture work on Growth; multi-region architecture and hreflang on Scale."
+              },
+              {
+                "title": "Keyword research and content strategy",
+                "body": "We research the terms your customers actually use, look at which competitors appear for them and why, and plan which pages should answer which searches, so content is written with a purpose.",
+                "scope": "Every plan, from a basic strategy on Starter to a full one on Scale."
+              },
+              {
+                "title": "SEO content production",
+                "body": "We produce the content the strategy calls for, each piece planned around a specific search and written to be useful to the person making it.",
+                "scope": "Every plan. The plan sets how much content is produced each month."
+              },
+              {
+                "title": "Link building and digital PR",
+                "body": "We earn links through targeted digital PR and editorial outreach: putting your expertise and content in front of relevant publications and sites that link to sources their readers will find useful.",
+                "scope": "Growth and Scale plans."
+              },
+              {
+                "title": "Monitoring and reporting",
+                "body": "A monthly report sets out the work done and how your search performance is moving. Your client dashboard shows project progress, the current sprint and an archive of updates in between.",
+                "scope": "Every plan."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "seo-approach",
+        "title": "Foundations, content, authority.",
+        "intro": "The three depend on each other, so we start with the foundations and then keep all three moving together.",
+        "ruled": true,
+        "background": "raised",
+        "stacked": true,
+        "content": [
+          {
+            "type": "text_grid",
+            "columns": 3,
+            "items": [
+              {
+                "title": "Foundations",
+                "body": "Content and links do little for pages search engines can’t crawl, index or understand. Technical work comes first, and continues as the site changes."
+              },
+              {
+                "title": "Content",
+                "body": "With the foundations sound, content is planned around what people actually search for, so every page has a clear job and a clear search to answer."
+              },
+              {
+                "title": "Authority",
+                "body": "Links from relevant sites tell search engines which pages deserve trust. They work best pointing at content that is worth linking to."
+              }
+            ]
+          },
+          {
+            "type": "note",
+            "size": "lede",
+            "text": "Search engines decide rankings, and nobody can promise them. We don’t guarantee positions, traffic or revenue. What we do commit to is the work in your plan, done properly, with every month’s changes and results set out in your report."
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "deliverables",
+        "title": "What you receive.",
+        "ruled": false,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "list_pair",
+            "lists": [
+              {
+                "title": "When we begin",
+                "items": [
+                  "A technical SEO audit of your site",
+                  "Keyword research for your services and markets",
+                  "Competitor analysis",
+                  "A content strategy built on that research",
+                  "Access to your client dashboard"
+                ]
+              },
+              {
+                "title": "Every month",
+                "items": [
+                  "Technical fixes and Core Web Vitals monitoring",
+                  "On-page optimisation",
+                  "New SEO content, in the volume your plan sets",
+                  "Link building and digital PR, on Growth and Scale",
+                  "A monthly report",
+                  "Support by email, or priority support on Growth and Scale"
+                ]
+              }
+            ],
+            "note": "Plans differ in content volume, audit depth, link building and support. The pricing page sets out exactly what each one includes."
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "how-we-work",
+        "title": "How we work.",
+        "intro": "The same four steps as all our work, applied to search.",
+        "ruled": true,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "process_steps",
+            "notes": {
+              "discover": "For SEO: your site, your market and where you stand in search today, starting with the audit and keyword research.",
+              "define": "Which fixes, pages and searches matter most, set out in the content strategy.",
+              "build": "Technical fixes, on-page work and content, plus link building on Growth and Scale.",
+              "improve": "Each monthly report shows what changed, and the next month’s work follows from it."
+            }
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "plans",
+        "title": "Plans and engagement.",
+        "ruled": true,
+        "background": "haze",
+        "stacked": false,
+        "content": [
+          {
+            "type": "paragraphs",
+            "paragraphs": [
+              "SEO is offered as a monthly retainer in three plans: Starter, Growth and Scale. They share the same foundations and differ in content volume, audit depth, link building and level of support. The pricing page is where you’ll find the prices, what each plan includes, and how to subscribe.",
+              "Retainers are billed monthly with no long-term contract, and we ask for 30 days’ notice to cancel. If you need something a plan doesn’t cover, such as SEO alongside AI, automation or software work, we’ll scope a custom package."
+            ],
+            "ctas": [
+              {
+                "label": "Compare SEO plans",
+                "href": "/pricing",
+                "variant": "primary",
+                "arrow": "right"
+              },
+              {
+                "label": "Request a custom package",
+                "href": "/#contact",
+                "variant": "secondary",
+                "arrow": "right"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "faq",
+        "title": "Questions we’re asked.",
+        "ruled": false,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "faq_list",
+            "items": [
+              {
+                "question": "How long does SEO take to show results?",
+                "answer": "It depends on where your site starts, how competitive your searches are and how quickly changes can be made. Technical fixes can take effect once search engines recrawl the pages involved; content and authority build up over months rather than weeks. We’d rather say that plainly than promise a date, and your monthly report shows what is moving in the meantime."
+              },
+              {
+                "question": "Do you work with existing websites?",
+                "answer": "Yes. The SEO plans work on the site you already have. We’ll need access to systems such as your analytics and Google Search Console. If the site itself needs rebuilding, that is a software project, quoted and agreed separately."
+              },
+              {
+                "question": "What is included in your SEO services?",
+                "answer": "Every plan includes technical SEO, on-page optimisation, keyword research, competitor analysis, a content strategy, new content each month and a monthly report. Growth and Scale add link building and digital PR, and Scale adds multi-region architecture for international sites. The pricing page lists each plan in full."
+              },
+              {
+                "question": "Do you provide content and link building?",
+                "answer": "Content, yes, on every plan, planned from the keyword research and content strategy. Link building and digital PR are part of the Growth and Scale plans; Starter concentrates on technical and on-page foundations and content."
+              },
+              {
+                "question": "Do you work with businesses outside the UK?",
+                "answer": "Yes. We’re based in the UK and work remotely with businesses elsewhere. For sites that target more than one country or language, the Scale plan includes multi-region site architecture and hreflang, which tells search engines which version of a page is meant for which audience. Plans are priced in pounds sterling."
+              },
+              {
+                "question": "Do you guarantee rankings?",
+                "answer": "No. Rankings are decided by search engines, and a guarantee would be a promise about something nobody outside them controls. Our terms say the same. What we commit to is the work in your plan, done properly and reported every month."
+              },
+              {
+                "question": "How do we get started?",
+                "answer": "Choose a plan on the pricing page and subscribe: you enter your business details, pay securely through Stripe, and we get in touch to begin onboarding, with access to your client portal. If you’re not sure which plan fits, or need a custom scope, start a conversation and tell us about your website."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "related_insights",
+        "anchor": "related-insights",
+        "title": "Related insights.",
+        "curated": [
+          {
+            "slug": "why-your-website-isnt-bringing-you-customers",
+            "reason": "Three checks to run before assuming you need more traffic, and the signs that the real problem is technical SEO."
+          },
+          {
+            "slug": "how-much-does-seo-cost-uk",
+            "reason": "What UK small businesses typically pay for SEO, what drives the price, and the red flags at any budget."
+          },
+          {
+            "slug": "what-a-technical-seo-audit-should-include",
+            "reason": "The checks that matter, from crawling and indexing to Core Web Vitals, and the tool scores you can ignore."
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "related-services",
+        "title": "Related services.",
+        "ruled": true,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "link_list",
+            "items": [
+              {
+                "title": "Custom software development",
+                "href": "/services/custom-software",
+                "reason": "When the site itself is the problem, a rebuild or a new web application is software work, scoped separately from SEO."
+              },
+              {
+                "title": "Workflow automation and integration",
+                "href": "/services/workflow-automation",
+                "reason": "When enquiries arrive but follow-up is slow: connecting forms, inbox and CRM so no lead waits on someone retyping it."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "closing",
+        "title": "Tell us where search is holding you back.",
+        "lede": "Send us your website and what you’d like it to achieve, and we’ll tell you what we’d look at first.",
+        "ctaLabel": "Discuss your SEO goals"
+      }
+    ]
+  }
+}

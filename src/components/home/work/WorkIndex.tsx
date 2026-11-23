@@ -4,7 +4,20 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { ArrowIcon } from "@/components/system/ArrowIcon";
 import { Screen, loadImage } from "./screen";
-import type { Project } from "./projects";
+/** One row of the index, from collection:work_projects (the label already chosen by kind). */
+export interface Project {
+  key: string;
+  name: string;
+  /** One line on who it is for and what we did. */
+  context: string;
+  label: string;
+  href: string;
+  /** Screenshot of the home page. */
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
+}
 
 /*
  * The project index. Each row is a label, a large name and one line of
@@ -194,8 +207,8 @@ export function WorkIndex({ projects }: { projects: Project[] }) {
             <Image
               src={project.src}
               alt={project.alt}
-              width={2000}
-              height={1250}
+              width={project.width}
+              height={project.height}
               sizes="(min-width: 768px) 80vw, 100vw"
               className="block h-auto w-full border border-line md:col-span-10 md:col-start-3"
             />

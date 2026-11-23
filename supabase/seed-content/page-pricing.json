@@ -1,0 +1,86 @@
+{
+  "key": "page:/pricing",
+  "kind": "page",
+  "schemaVersion": 1,
+  "data": {
+    "template": "pricing",
+    "seo": {
+      "title": "SEO Packages & Pricing",
+      "description": "SEO packages for small businesses with published monthly prices in pounds: technical SEO, keyword research, content and link building. No long-term contract.",
+      "robots": "index",
+      "sitemap": {
+        "changeFrequency": "monthly",
+        "priority": 0.8
+      }
+    },
+    "breadcrumb": "Pricing",
+    "header": {
+      "kicker": "SEO & content retainers",
+      "title": "SEO & content plans",
+      "lede": "Ongoing content, technical SEO and link building — delivered on a predictable monthly retainer. For AI, automation or custom software work, get in touch for a scoped quote.",
+      "link": {
+        "label": "How our SEO service works",
+        "href": "/services/seo"
+      }
+    },
+    "plans": {
+      "emptyState": {
+        "beforeEmail": "Our plan details can’t be shown right now. Please try again shortly, or email",
+        "afterEmail": "and we’ll send you current pricing."
+      },
+      "custom": {
+        "title": "Custom Solutions",
+        "subtitle": "Scoped to your brief",
+        "body": "Need more than a retainer covers? Tell us what you’re working towards and we’ll put together a personalised package, with scope tailored across SEO, AI, automation and software.",
+        "listTitle": "Ask us about",
+        "cta": {
+          "label": "Request a custom package",
+          "href": "/#contact"
+        }
+      }
+    },
+    "billing": {
+      "anchor": "billing",
+      "title": "Billing and terms.",
+      "intro": "The short version of our terms for SEO plans.",
+      "items": [
+        {
+          "title": "Billed monthly",
+          "body": "Plans are billed monthly in advance through Stripe, our payment processor, and renew each month until cancelled."
+        },
+        {
+          "title": "Prices exclude tax",
+          "body": "Prices are shown exclusive of any applicable tax, which is added at checkout where relevant."
+        },
+        {
+          "title": "No long-term contract",
+          "body": "You can cancel at any time. We ask for 30 days’ notice, so active work can be wound down in an orderly way."
+        },
+        {
+          "title": "No ranking guarantees",
+          "body": "Rankings, traffic and revenue depend on factors outside anyone’s control, so we commit to the work in your plan, not to a position in search results."
+        }
+      ],
+      "links": [
+        {
+          "label": "Read the full terms",
+          "href": "/terms"
+        },
+        {
+          "label": "See what your client portal will look like",
+          "href": "/client-portal"
+        }
+      ]
+    },
+    "otherServices": {
+      "anchor": "other-services",
+      "title": "Other services.",
+      "intro": "AI integration, workflow automation and custom software are quoted per project rather than sold as plans. Each starts with a conversation about the work, and scope and cost are agreed before it begins.",
+      "pages": [
+        "/services/ai-integration",
+        "/services/workflow-automation",
+        "/services/custom-software"
+      ]
+    }
+  }
+}

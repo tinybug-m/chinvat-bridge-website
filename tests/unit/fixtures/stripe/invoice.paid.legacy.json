@@ -1,0 +1,8 @@
+{
+  "id": "evt_test_invoice_paid_1",
+  "object": "event",
+  "type": "invoice.paid",
+  "created": 1800000300,
+  "livemode": false,
+  "data": { "object": { "id": "in_test_2", "object": "invoice", "customer": "cus_test_1", "subscription": "sub_test_1" } }
+}

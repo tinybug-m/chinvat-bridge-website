@@ -2,13 +2,14 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
+import type { ShellChrome } from "./nav";
 
 // The sheet (Radix Dialog, scroll lock, focus scope) is its own chunk. Only the
 // button ships in the first bundle; the chunk is warmed up before it is needed.
 const loadSheet = () => import("./MobileMenuSheet");
 const MobileMenuSheet = dynamic(loadSheet, { ssr: false });
 
-export function MobileMenu() {
+export function MobileMenu({ chrome }: { chrome: ShellChrome }) {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -40,7 +41,7 @@ export function MobileMenu() {
           <path d="M2 5.5h12M2 10.5h12" />
         </svg>
       </button>
-      {mounted ? <MobileMenuSheet open={open} onOpenChange={setOpen} triggerRef={trigger} /> : null}
+      {mounted ? <MobileMenuSheet open={open} onOpenChange={setOpen} triggerRef={trigger} chrome={chrome} /> : null}
     </>
   );
 }

@@ -2,9 +2,11 @@ import type { CSSProperties } from "react";
 import { Mark } from "@/components/brand/Mark";
 import { ButtonLink } from "@/components/system/Button";
 import { Container } from "@/components/system/Container";
-import { HERO_COPY } from "./content";
 import Link from "next/link";
-import { CROSSING_COPY, TIERS } from "./crossing-content";
+import type { HomePage } from "@/lib/content/schema";
+
+type HeroContent = HomePage["blocks"][0];
+type Tier = HeroContent["disciplines"][number];
 import "./crossing.css";
 
 /*
@@ -73,7 +75,9 @@ const delay = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
 const rise = (ms: number) => ({ "--intro-delay": `${ms}ms` }) as CSSProperties;
 const round = (n: number) => Number(n.toFixed(2));
 
-export function CrossingHero() {
+/** The hero. Copy from the homepage document (hero block) and settings.eyebrow; geometry stays here. */
+export function CrossingHero({ hero, eyebrow }: { hero: HeroContent; eyebrow: string }) {
+  const TIERS = hero.disciplines;
   return (
     <section
       data-hero
@@ -86,14 +90,14 @@ export function CrossingHero() {
             {/* Above the waist: the running head and the headline, standing on the bridge. */}
             <div className="cx-above">
               <p className="intro-rise text-small text-ink-muted">
-                {HERO_COPY.eyebrow}
+                {eyebrow}
               </p>
               <h1 id="hero-title" className="cx-title intro-rise font-display">
                 <span className="block font-normal">
-                  {CROSSING_COPY.title[0]}
+                  {hero.titleLines[0]}
                 </span>{" "}
                 <span className="block font-semibold">
-                  {CROSSING_COPY.title[1]}
+                  {hero.titleLines[1]}
                 </span>
               </h1>
             </div>
@@ -104,7 +108,7 @@ export function CrossingHero() {
                 className="cx-lede intro-rise max-w-[30rem] text-lede text-pretty text-ink-soft lg:text-balance"
                 style={rise(120)}
               >
-                {CROSSING_COPY.lede}
+                {hero.lede}
               </p>
 
               <div
@@ -112,21 +116,21 @@ export function CrossingHero() {
                 style={rise(200)}
               >
                 <ButtonLink
-                  href={HERO_COPY.primary.href}
+                  href={hero.primaryCta.href}
                   size="lg"
                   arrow="right"
                   className="w-full sm:w-auto"
                 >
-                  {HERO_COPY.primary.label}
+                  {hero.primaryCta.label}
                 </ButtonLink>
                 <ButtonLink
-                  href={HERO_COPY.secondary.href}
+                  href={hero.secondaryCta.href}
                   size="lg"
                   variant="secondary"
                   arrow="down"
                   className="w-full sm:w-auto"
                 >
-                  {HERO_COPY.secondary.label}
+                  {hero.secondaryCta.label}
                 </ButtonLink>
               </div>
             </div>
@@ -134,7 +138,7 @@ export function CrossingHero() {
 
           <div className="cx-chart">
             <Orbits />
-            <Chart />
+            <Chart tiers={TIERS} chart={hero.chart} />
             {/* The bridge: the real mark, centred on the waist. */}
             <div
               className="cx-in absolute"
@@ -194,7 +198,7 @@ export function CrossingHero() {
   );
 }
 
-function Chart() {
+function Chart({ tiers: TIERS, chart }: { tiers: readonly Tier[]; chart: HeroContent["chart"] }) {
   const top = `${CX - TOP.half},0 ${CX + TOP.half},0 ${CX},${TOP.y}`;
   return (
     <svg
@@ -376,7 +380,7 @@ function Chart() {
         );
       })}
 
-      <Bracket />
+      <Bracket chart={chart} />
     </svg>
   );
 }
@@ -490,7 +494,7 @@ function Orbits() {
 }
 
 /** The dotted brackets: one per half, crossing at the bridge, with a lead to the halo. */
-function Bracket() {
+function Bracket({ chart }: { chart: HeroContent["chart"] }) {
   const dashed = {
     fill: "none",
     stroke: "var(--color-ink)",
@@ -511,13 +515,13 @@ function Bracket() {
         {...label}
         transform={`translate(28 ${TOP.y / 2 + 20}) rotate(-90)`}
       >
-        {CROSSING_COPY.above}
+        {chart.above}
       </text>
       <text
         {...label}
         transform={`translate(28 ${(TIER.y + 900) / 2}) rotate(-90)`}
       >
-        {CROSSING_COPY.below}
+        {chart.below}
       </text>
     </g>
   );

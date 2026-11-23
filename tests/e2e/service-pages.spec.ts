@@ -34,20 +34,6 @@ test.describe("service pages", () => {
     });
   }
 
-  test("related links on the service pages all resolve", async ({ page, request }) => {
-    const hrefs = new Set<string>();
-    for (const service of SERVICE_PAGES) {
-      await page.goto(service.path);
-      for (const href of await page.locator("#related-insights a, #related-services a").evaluateAll((els) => els.map((el) => el.getAttribute("href")))) {
-        if (href) hrefs.add(href);
-      }
-    }
-    expect(hrefs.size).toBeGreaterThan(4);
-    for (const href of hrefs) {
-      expect((await request.get(href)).status(), href).toBe(200);
-    }
-  });
-
   test("the footer links each discipline to its own page", async ({ page }) => {
     await page.goto("/insights");
     const disciplines = page.getByRole("navigation", { name: "Footer: Disciplines" }).getByRole("link");

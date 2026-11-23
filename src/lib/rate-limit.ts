@@ -1,12 +1,15 @@
 import "server-only";
 import { createHmac } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { rateLimitSecret } from "@/lib/env";
 
 /*
  * Shared rate limiting through Supabase (migration 20261122121000_rate_limit_buckets.sql): one
  * atomic database function call per window, so the limit holds across every Vercel instance.
  * Bucket keys are an HMAC of the address keyed by a server secret, so the table never holds an
- * IP address and a leaked table cannot be reversed by hashing all IPv4 addresses.
+ * IP address and a leaked table cannot be reversed by hashing all IPv4 addresses. The key is the
+ * dedicated RATE_LIMIT_SECRET (required in production, checked at startup by src/instrumentation.ts);
+ * it never falls back to another credential.
  */
 
 export interface RateWindow {
@@ -16,8 +19,7 @@ export interface RateWindow {
 }
 
 function bucketKey(scope: string, window: RateWindow, address: string): string {
-  const secret = process.env.RATE_LIMIT_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!secret) throw new Error("rate limit secret unavailable");
+  const secret = rateLimitSecret();
   const digest = createHmac("sha256", secret).update(`rate-limit:v1:${scope}:${address}`).digest("hex").slice(0, 40);
   return `${scope}:${window.name}:${digest}`;
 }

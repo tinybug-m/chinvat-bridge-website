@@ -25,7 +25,7 @@ interface SubscribeSuccessPageProps {
  * normal sign-in link, never the customer's email or plan.
  */
 async function getConfirmedEngagement(sessionId: string | undefined) {
-  if (!isCheckoutSessionId(sessionId) || !process.env.STRIPE_SECRET_KEY) return null;
+  if (!isCheckoutSessionId(sessionId)) return null;
 
   try {
     const bindingToken = (await cookies()).get(checkoutBindingCookieName(process.env.NODE_ENV === "production"))?.value;

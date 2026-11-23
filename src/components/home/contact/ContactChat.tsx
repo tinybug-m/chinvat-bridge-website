@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { EMPTY_BRIEF, NEEDS, buildMessage, isEmail, type BriefValues } from "./brief";
+import type { HomePage } from "@/lib/content/schema";
 import "./contact.css";
 
 /*
@@ -37,18 +38,9 @@ interface Line {
   step?: Step;
 }
 
-const GREETING = "Hi, thanks for stopping by. What can we help you with?";
+/** The conversation's lines: the homepage contact block (follow-ups keyed by topic, see brief.ts NEEDS). */
+export type ChatScript = HomePage["blocks"][8]["chat"];
 
-/** The follow-up question, shaped by the topic they tapped. */
-const FOLLOW_UP: Record<Need, string> = {
-  "AI & Automation": "Good. What would you like to automate, or hand over to AI?",
-  Workflows: "Good. Which process feels slow or messy right now?",
-  "Software & Web": "Good. What would you like built?",
-  "SEO & Growth": "Good. What would you like to grow, and where are you now?",
-  "Not sure yet": "That’s fine. What’s slowing your business down at the moment?",
-};
-
-const ASK_CONTACT = "Thanks, that’s clear. Where should we send our reply?";
 /** Our last line, once the message has reached us. */
 const sent = (values: BriefValues) =>
   `Got it, thanks ${values.name.trim().split(/\s+/)[0]}. Your message is with us, and we’ll reply to ${values.email.trim()}.`;
@@ -62,7 +54,8 @@ const typingTime = (text: string) => Math.min(800, 300 + text.length * 5);
 
 type ContactErrors = Partial<Record<"name" | "email", string>>;
 
-export function ContactChat() {
+export function ContactChat({ script }: { script: ChatScript }) {
+  const GREETING = script.greeting;
   const reduced = useReducedMotion();
   const baseId = useId();
   const [values, setValues] = useState<BriefValues>(EMPTY_BRIEF);
@@ -121,7 +114,7 @@ export function ContactChat() {
 
   function pickNeed(need: Need) {
     setValues((current) => ({ ...current, needs: [need] }));
-    advance(need, "start", FOLLOW_UP[need], "details");
+    advance(need, "start", script.followUps[need], "details");
   }
 
   function sendText(event?: FormEvent) {
@@ -130,7 +123,7 @@ export function ContactChat() {
     if (!text || typing) return;
     // Typing straight away at the start skips the topic: the message says it all.
     setValues((current) => ({ ...current, message: text, needs: step === "start" ? [] : current.needs }));
-    advance(text, step, ASK_CONTACT, "contact");
+    advance(text, step, script.askContact, "contact");
   }
 
   // Enter sends; Shift+Enter keeps a new line.
@@ -282,7 +275,7 @@ export function ContactChat() {
             <Textarea
               aria-labelledby={questionId}
               rows={1}
-              placeholder={step === "start" ? "Or tell us in your own words" : "A sentence or two is plenty"}
+              placeholder={step === "start" ? script.placeholders.start : script.placeholders.details}
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={onKeyDown}

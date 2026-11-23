@@ -1,0 +1,345 @@
+{
+  "key": "page:/services/custom-software",
+  "kind": "page",
+  "schemaVersion": 1,
+  "data": {
+    "template": "service",
+    "seo": {
+      "title": "Custom Software Development for Small Businesses",
+      "description": "Custom software and web applications for small businesses: internal tools, client portals, dashboards and websites, built around how your business works.",
+      "robots": "index",
+      "sitemap": {
+        "changeFrequency": "monthly",
+        "priority": 0.8
+      }
+    },
+    "updatedOn": "2026-11-21",
+    "service": {
+      "name": "Custom Software",
+      "serviceType": "Custom software and web application development"
+    },
+    "blocks": [
+      {
+        "type": "page_header",
+        "kicker": "Custom Software",
+        "title": "Custom software built around the way your business works",
+        "lede": "We build internal tools, client portals, dashboards, web applications and websites for businesses whose work has outgrown spreadsheets and off-the-shelf software.",
+        "diagram": "software",
+        "ctas": [
+          {
+            "label": "Describe what you need",
+            "href": "/#contact",
+            "variant": "primary",
+            "arrow": "right"
+          },
+          {
+            "label": "See what we do",
+            "href": "#what-we-do",
+            "variant": "secondary",
+            "arrow": "down"
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "problem",
+        "title": "Signs you’ve outgrown your tools.",
+        "intro": "Off-the-shelf software is the right default. These are the signs that it has stopped fitting.",
+        "ruled": false,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "text_grid",
+            "columns": 2,
+            "items": [
+              {
+                "title": "A spreadsheet is running the business",
+                "body": "One shared spreadsheet has become the database: several versions, formulas that break when someone sorts a column, and no way to control who changes what."
+              },
+              {
+                "title": "Several tools doing one job",
+                "body": "You pay for three subscriptions because none of them quite fits, and your team fills the gaps between them by hand, every day."
+              },
+              {
+                "title": "Customers chasing you for updates",
+                "body": "Clients email and call to ask where things stand or to find a document, because there is nowhere they can look for themselves."
+              },
+              {
+                "title": "A website that can’t do what you need",
+                "body": "The site looks fine but can’t take a booking with your rules, produce a quote, give customers an account, or connect to the systems behind it."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "what-we-do",
+        "title": "What we build.",
+        "intro": "Software with a clear job, connected to the systems you already use rather than replacing them for the sake of it.",
+        "ruled": true,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "offering_list",
+            "items": [
+              {
+                "title": "Internal tools",
+                "body": "A purpose-built tool for one job your team does every day, such as tracking jobs, preparing quotes, managing stock or approving requests, in place of the spreadsheet and email chain it runs on now."
+              },
+              {
+                "title": "Client portals",
+                "body": "A secure place for your customers to sign in and see progress, documents, updates and invoices, with each client seeing only their own information."
+              },
+              {
+                "title": "Dashboards and reporting",
+                "body": "Live figures drawn from the systems that hold them, laid out for the decisions you actually make, instead of a report someone assembles by hand."
+              },
+              {
+                "title": "Web applications",
+                "body": "Booking, ordering, quoting and subscription services, including sign-in, payments and the admin screens behind them."
+              },
+              {
+                "title": "Business websites",
+                "body": "Fast, accessible websites structured so customers and search engines understand what you do, built with the same care as the software behind them."
+              },
+              {
+                "title": "Integration with what you have",
+                "body": "New software connected to your CRM, accounting, payments and email, so it adds to the systems your business already relies on instead of becoming another island."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "examples",
+        "title": "Where custom software usually earns its cost.",
+        "intro": "The situations in which building tends to beat buying. If none of them sounds like you, keep the software you have.",
+        "ruled": true,
+        "background": "raised",
+        "stacked": false,
+        "content": [
+          {
+            "type": "text_grid",
+            "columns": 2,
+            "items": [
+              {
+                "title": "Your process is genuinely different",
+                "body": "The way you price, schedule or match customers to services is part of what makes you better, and generic software would force you to give it up."
+              },
+              {
+                "title": "The workaround is permanent",
+                "body": "A core part of your operation runs through spreadsheets, copying and reconciling between tools that were never meant to work together, and it isn’t going away."
+              },
+              {
+                "title": "Customers or staff use it daily",
+                "body": "Once a workaround is something people touch every day, the cost of the friction adds up quickly and a tool built for the job pays back."
+              },
+              {
+                "title": "You’ve costed the alternative",
+                "body": "The subscriptions plus the staff time spent on manual steps between them come to a real number over a year or two, not a guess."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "how-we-build",
+        "title": "How we build.",
+        "ruled": false,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "paragraphs",
+            "paragraphs": [
+              "We build on a modern, widely used stack: TypeScript, React and Next.js for the application, PostgreSQL through Supabase for data and sign-in, and Stripe for payments. Choosing mainstream tools matters to you as well as to us, because it keeps the software easy to host, secure and hand to another developer if you ever need to.",
+              "It is the stack this website runs on, including our client portal and subscription checkout. We also designed and built the website of Scornik Gerstein LLP, the London law firm shown in our recent work."
+            ],
+            "ctas": []
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "approach-principles",
+        "title": "Small, specific, useful.",
+        "intro": "Three principles keep custom projects on budget and in use.",
+        "ruled": true,
+        "background": "paper",
+        "stacked": true,
+        "content": [
+          {
+            "type": "text_grid",
+            "columns": 3,
+            "items": [
+              {
+                "title": "Off-the-shelf first",
+                "body": "If a mature product will do the job, or a connection between tools you already have, we’ll say so before suggesting a build."
+              },
+              {
+                "title": "A small first version",
+                "body": "The first release solves one real problem for a defined group of people. Scope creep, not technical difficulty, is what usually sinks custom software."
+              },
+              {
+                "title": "Designed around the people who use it",
+                "body": "We design around the staff and customers who will use the software every day."
+              }
+            ]
+          },
+          {
+            "type": "note",
+            "size": "lede",
+            "text": "Most business problems don’t need custom software, and we’ll tell you when yours doesn’t. When it is the right call, a small tool that solves one problem well is usually worth more than a large platform that tries to solve everything at once."
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "how-we-work",
+        "title": "How we work.",
+        "intro": "The same four steps as all our work, applied to this service.",
+        "ruled": true,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "process_steps",
+            "notes": {
+              "discover": "For software: the process today, the people who’ll use the tool, and the systems it must work with.",
+              "define": "A written brief: the problem, who it is for, and what the first version must do, and what it won’t.",
+              "build": "Design, development and integration, shown to you at agreed points as it takes shape.",
+              "improve": "Launch, watch how it’s used, and add what the real work shows is missing."
+            }
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "engagement",
+        "title": "How projects start.",
+        "ruled": true,
+        "background": "haze",
+        "stacked": false,
+        "content": [
+          {
+            "type": "paragraphs",
+            "paragraphs": [
+              "Software is scoped and quoted per project. A good starting brief is shorter than people expect: what the process is today, what is wrong with it, and what “solved” looks like for the people doing the work. From there we agree a defined first version, with its scope and cost settled before development starts.",
+              "Software needs looking after once it is live: hosting, security updates and changes as the business changes. How that will work should be settled before the build begins, whether we support it or your own team takes it on."
+            ],
+            "ctas": [
+              {
+                "label": "Describe what you need",
+                "href": "/#contact",
+                "variant": "primary",
+                "arrow": "right"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "faq",
+        "title": "Questions we’re asked.",
+        "ruled": false,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "faq_list",
+            "items": [
+              {
+                "question": "When is custom software worth it over an off-the-shelf product?",
+                "answer": "When your process is genuinely different from what the product category assumes, when you’re paying in subscriptions and staff time for a permanent workaround between tools, or when the thing your customers or staff need every day doesn’t exist as a product. Otherwise, off-the-shelf is cheaper, faster and maintained by someone else."
+              },
+              {
+                "question": "How much does custom software cost?",
+                "answer": "It depends on how many people use it, how many systems it connects to and how much it has to do on day one, which is why we start with a defined first version rather than a full wish list. Running costs such as hosting and maintenance are part of the estimate, not a surprise afterwards."
+              },
+              {
+                "question": "Can you work with our existing systems?",
+                "answer": "Yes, and we usually prefer to. Most of what we build connects to software you already use, such as a CRM, accounting package or payment provider, rather than replacing it."
+              },
+              {
+                "question": "Do you build websites as well as applications?",
+                "answer": "Yes. We design and build business websites, and because we also offer SEO, we build them to be found: clear structure, fast pages and the technical foundations search engines rely on."
+              },
+              {
+                "question": "Can we start small?",
+                "answer": "We’d recommend it. A first version that solves one problem for one group of people is quicker to deliver, cheaper to change and tells you far more about what to build next than a long specification written up front."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "related_insights",
+        "anchor": "related-insights",
+        "title": "Related insights.",
+        "curated": [
+          {
+            "slug": "replace-spreadsheets-with-custom-software",
+            "reason": "When a spreadsheet has become a system, and the four ways out, from a tidy-up to a tool of your own."
+          },
+          {
+            "slug": "when-should-a-business-build-custom-software",
+            "reason": "The signals that off-the-shelf is still the right answer, the ones that say build, and the middle ground most businesses skip."
+          },
+          {
+            "slug": "what-should-you-automate-first",
+            "reason": "Before building anything, check whether connecting the tools you have would solve the problem."
+          },
+          {
+            "slug": "why-your-website-isnt-bringing-you-customers",
+            "reason": "If the website is the problem, three checks to run before assuming you need more traffic or a rebuild."
+          },
+          {
+            "slug": "does-your-business-need-a-client-portal",
+            "reason": "When a client portal earns its keep, the build-or-buy decision, and the security questions to settle first."
+          },
+          {
+            "slug": "how-we-built-this-site",
+            "reason": "How this site, its client portal and its checkout were built, on the stack described above."
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "related-services",
+        "title": "Related services.",
+        "ruled": true,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "link_list",
+            "items": [
+              {
+                "title": "Workflow automation and integration",
+                "href": "/services/workflow-automation",
+                "reason": "When the problem is getting your existing tools to share information, not a missing tool."
+              },
+              {
+                "title": "SEO & Digital Growth",
+                "href": "/services/seo",
+                "reason": "Once the site is right, the work of making sure the right people find it."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "closing",
+        "title": "Tell us what your team is working around.",
+        "lede": "Describe the process and the tools involved, and we’ll tell you honestly whether it’s a build, a connection between tools you already have, or an off-the-shelf fit.",
+        "ctaLabel": "Describe what you need"
+      }
+    ]
+  }
+}

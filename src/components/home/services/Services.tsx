@@ -2,14 +2,14 @@ import { Container } from "@/components/system/Container";
 import { Section } from "@/components/system/Section";
 import { SectionHeading } from "@/components/system/SectionHeading";
 import { Reveal } from "@/components/motion/Reveal";
-import { SERVICES } from "@/data/services";
+import type { ServicesCollection } from "@/lib/content/schema";
 import { AiDiagram, AutomationDiagram, SeoDiagram, SoftwareDiagram } from "./diagrams";
 import { PLATE_VIEWBOX } from "./crops";
 import { ServicePlate, type PlateProps } from "./ServicePlate";
 import { EnergyFlow } from "./energy/EnergyFlow";
 
 /*
- * One entry per service, in the same order as SERVICES. The plates vary
+ * One entry per service key (collection:services). The plates vary
  * their placement (AI and Software on the left, Automation dropped below its
  * title on the right, SEO bleeding off the right edge; the section clips the
  * overhang) but every diagram draws at one scale: six columns on desktop
@@ -27,8 +27,10 @@ import { EnergyFlow } from "./energy/EnergyFlow";
  * energy runs along and leaves at the page edge, on its way down to the
  * Approach seam. The keepout is the artwork the wire must route around.
  */
-const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" | "energy" | "layout">[] = [
-  {
+type PlateConfig = Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" | "energy" | "layout">;
+
+const PLATES: Record<ServicesCollection["items"][number]["key"], PlateConfig> = {
+  ai: {
     slug: "ai",
     Diagram: AiDiagram,
     viewBox: PLATE_VIEWBOX.ai,
@@ -48,7 +50,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
       figure: "max-w-[40rem] md:max-w-[30rem] md:justify-self-end lg:col-span-6 lg:col-start-2 lg:max-w-none lg:justify-self-auto",
     },
   },
-  {
+  automation: {
     slug: "automation",
     Diagram: AutomationDiagram,
     viewBox: PLATE_VIEWBOX.automation,
@@ -65,7 +67,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
       figure: "max-w-[40rem] md:max-w-[34rem] lg:col-span-6 lg:col-start-7 lg:mt-32 lg:max-w-none",
     },
   },
-  {
+  software: {
     slug: "software",
     Diagram: SoftwareDiagram,
     viewBox: PLATE_VIEWBOX.software,
@@ -85,7 +87,7 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
       figure: "max-w-[40rem] md:max-w-[28rem] md:justify-self-center lg:col-span-6 lg:col-start-1 lg:max-w-none lg:justify-self-auto",
     },
   },
-  {
+  seo: {
     slug: "seo",
     Diagram: SeoDiagram,
     viewBox: PLATE_VIEWBOX.seo,
@@ -102,21 +104,21 @@ const PLATES: Pick<PlateProps, "slug" | "Diagram" | "viewBox" | "draw" | "tone" 
       figure: "svc-bleed-r md:max-w-[36rem] md:justify-self-end lg:col-span-6 lg:col-start-7 lg:max-w-none lg:justify-self-auto",
     },
   },
-];
+};
 
-export function Services() {
+export function Services({ heading, services }: { heading: string; services: ServicesCollection["items"] }) {
   return (
     <Section id="services" labelledBy="services-title" className="overflow-x-clip">
       <EnergyFlow />
       <Container>
         <Reveal>
           <SectionHeading id="services-title" measure="max-w-[20ch]">
-            Four disciplines, one way of working.
+            {heading}
           </SectionHeading>
         </Reveal>
         <ol className="list-none">
-          {SERVICES.map((service, position) => (
-            <ServicePlate key={service.title} service={service} {...PLATES[position]} />
+          {services.map((service) => (
+            <ServicePlate key={service.title} service={service} {...PLATES[service.key]} />
           ))}
         </ol>
       </Container>

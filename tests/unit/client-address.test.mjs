@@ -22,3 +22,17 @@ test("outside Vercel, client-supplied forwarding headers are ignored", () => {
   assert.equal(clientAddress(spoof, { NODE_ENV: "production" }), "unknown");
   assert.equal(clientAddress(spoof, { NODE_ENV: "development" }), "local");
 });
+
+test("the e2e-only opt-in trusts X-Forwarded-For off Vercel, and never changes Vercel's answer", () => {
+  const headers = { "x-forwarded-for": "2001:db8::7, 10.0.0.1", "x-vercel-forwarded-for": "203.0.113.9" };
+  const get = (name) => headers[name] ?? null;
+  const optIn = { RATE_LIMIT_TRUST_FORWARDED_FOR: "1" };
+  assert.equal(clientAddress(get, { NODE_ENV: "production", ...optIn }), "2001:db8::7");
+  assert.equal(clientAddress(get, { NODE_ENV: "development", ...optIn }), "2001:db8::7");
+  // Without the opt-in the header stays untrusted.
+  assert.equal(clientAddress(get, { NODE_ENV: "production" }), "unknown");
+  // On Vercel the edge's own header wins, opt-in or not.
+  assert.equal(clientAddress(get, { VERCEL: "1", NODE_ENV: "production", ...optIn }), "203.0.113.9");
+  // A malformed header falls back to the shared bucket.
+  assert.equal(clientAddress((n) => (n === "x-forwarded-for" ? "not-an-ip" : null), { NODE_ENV: "production", ...optIn }), "unknown");
+});

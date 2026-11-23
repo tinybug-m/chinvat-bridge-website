@@ -1,0 +1,29 @@
+{
+  "key": "collection:process_steps",
+  "kind": "collection",
+  "schemaVersion": 1,
+  "data": {
+    "items": [
+      {
+        "key": "discover",
+        "title": "Discover",
+        "description": "We understand your business, your existing systems and the problems worth solving."
+      },
+      {
+        "key": "define",
+        "title": "Define",
+        "description": "We identify the highest-impact opportunities and define a practical path forward."
+      },
+      {
+        "key": "build",
+        "title": "Build",
+        "description": "We design, develop and integrate the solution with care and engineering rigour."
+      },
+      {
+        "key": "improve",
+        "title": "Improve",
+        "description": "We measure what works, refine the system and help you build on it sustainably."
+      }
+    ]
+  }
+}

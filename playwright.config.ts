@@ -1,5 +1,9 @@
 import { defineConfig } from "@playwright/test";
 
+// Specs (and tests tagged @once, see tests/e2e/once.ts) whose checks don't depend on the viewport (routes, metadata, structured data, links,
+// endpoints) run once, on desktop.
+const DESKTOP_ONLY = ["**/routes.spec.ts", "**/editorial.spec.ts", "**/service-pages.spec.ts"];
+
 // Runs against a server that is already up: `pnpm start` for the release
 // check, or the shared dev server while building. BASE_URL overrides it.
 export default defineConfig({
@@ -17,7 +21,7 @@ export default defineConfig({
   },
   projects: [
     { name: "desktop", use: { viewport: { width: 1440, height: 900 } } },
-    { name: "tablet", use: { viewport: { width: 768, height: 1024 } } },
-    { name: "mobile", use: { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true } },
+    { name: "tablet", testIgnore: DESKTOP_ONLY, grepInvert: /@once/, use: { viewport: { width: 768, height: 1024 } } },
+    { name: "mobile", testIgnore: DESKTOP_ONLY, grepInvert: /@once/, use: { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true } },
   ],
 });

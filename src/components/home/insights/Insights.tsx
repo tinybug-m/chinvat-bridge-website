@@ -6,6 +6,7 @@ import { Section } from "@/components/system/Section";
 import { SectionHeading } from "@/components/system/SectionHeading";
 import { TextLink } from "@/components/system/TextLink";
 import { getPublishedPosts } from "@/lib/blog";
+import { getPage } from "@/lib/content/read";
 
 /** A teaser, not the archive: the rest are one click away through "All insights". */
 const HOMEPAGE_POST_COUNT = 3;
@@ -16,19 +17,25 @@ const HOMEPAGE_POST_COUNT = 3;
  * No summary line under the heading: each row's category already says what
  * the writing covers.
  */
-export function Insights() {
-  // Published articles only, even under `next dev`: drafts are reviewed from /insights, never here.
-  const posts = getPublishedPosts().slice(0, HOMEPAGE_POST_COUNT);
+export async function Insights() {
+  // Heading, link and count come only from the homepage document's insights_teaser block. The
+  // schema requires that block on the homepage, so its absence is broken content: fail the render
+  // (Next keeps serving the last good page) rather than show a second copy kept in code.
+  const home = await getPage("/");
+  const teaser = home?.data.template === "home" ? home.data.blocks.find((b) => b.type === "insights_teaser") : undefined;
+  if (!teaser) throw new Error("homepage document has no insights_teaser block");
+  const { heading, link } = teaser;
+  const posts = (await getPublishedPosts()).slice(0, teaser.count ?? HOMEPAGE_POST_COUNT);
 
   return (
     <Section id="insights" labelledBy="insights-title" className="py-16 md:py-24">
       <Container className="grid gap-x-6 gap-y-10 lg:grid-cols-12">
         <Reveal className="lg:col-span-5">
           <SectionHeading id="insights-title" measure="max-w-[12ch]">
-            Ideas and observations.
+            {heading}
           </SectionHeading>
-          <TextLink href="/insights" prefetch={false} className="mt-6 inline-flex min-h-11 items-center gap-2 text-body">
-            All insights
+          <TextLink href={link.href} prefetch={false} className="mt-6 inline-flex min-h-11 items-center gap-2 text-body">
+            {link.label}
             <ArrowIcon />
           </TextLink>
         </Reveal>

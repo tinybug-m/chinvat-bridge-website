@@ -1,5 +1,13 @@
-import type { ComponentType } from "react";
-import { ALL_POSTS } from "@/content/blog/posts";
+import { cache } from "react";
+import { getPublishedArticle, getPublishedArticles, getArticleRedirect, type ArticleSummary } from "@/lib/content/read";
+import type { ArticleContent } from "@/lib/editorial/content";
+import { pickRelated } from "@/lib/blog-helpers";
+
+/*
+ * Articles come from Supabase's public read functions through src/lib/content/read.ts (cached under
+ * the editorial:* tags, throwing when Supabase is unavailable). This module keeps the shapes the
+ * pages already use. Drafts never reach the website: the RPCs return published articles only.
+ */
 
 export interface PostMeta {
   slug: string;
@@ -8,59 +16,66 @@ export interface PostMeta {
   /** A shorter <title> and social title, when the heading is too long for a search result. */
   seoTitle?: string;
   description: string;
-  /** ISO date string (YYYY-MM-DD) — when the article was first published. */
+  /** ISO date (YYYY-MM-DD): when the article was first published. */
   date: string;
-  /** ISO date string — set only when the article has actually been revised since publishing. */
+  /** ISO date: set only when the article has been revised since publishing. */
   updated?: string;
   author: string;
   tags: string[];
   /** Category label shown on the homepage Insights teaser and the listing page. */
   category: string;
-  /** Set by hand per article — rendering to static markup to compute this at request time
-   * isn't available from a shared Server Component module in this Next.js version. */
   readingMinutes: number;
-  /** Unpublished: never built or served in production; shown under `next dev` for review. */
-  draft?: boolean;
+  /** Service pages the article supports, with the reason it is worth reading there. */
+  relatedServices: { path: string; reason: string }[];
 }
-
-/** Drafts appear only in `next dev`, so they can be read in place before they are published. */
-const SHOW_DRAFTS = process.env.NODE_ENV === "development";
 
 export interface Post {
   meta: PostMeta;
-  Content: ComponentType;
 }
+
+export interface Article extends Post {
+  content: ArticleContent;
+  related: Post[];
+}
+
+export type ArticleResult = { kind: "article"; article: Article } | { kind: "redirect"; slug: string } | { kind: "missing" };
+
+function toMeta(s: ArticleSummary): PostMeta {
+  return {
+    slug: s.slug,
+    title: s.title,
+    ...(s.seoTitle ? { seoTitle: s.seoTitle } : {}),
+    description: s.description,
+    date: s.publishedOn,
+    ...(s.updatedOn ? { updated: s.updatedOn } : {}),
+    author: s.author,
+    tags: s.tags,
+    category: s.category,
+    readingMinutes: s.readingMinutes,
+    relatedServices: s.relatedServices,
+  };
+}
+
+/** Published articles, newest first. The cached list is shared by every caller; a failure throws. */
+export const getPublishedPosts = cache(async (): Promise<Post[]> => (await getPublishedArticles()).map((s) => ({ meta: toMeta(s) })));
 
 /**
- * Every article the current build serves, newest first: published ones, plus drafts under
- * `next dev`. Articles published the same day keep their order in the registry.
+ * One published article (with related reading picked from the cached list, not a second query), a
+ * permanent redirect from a former slug, or nothing.
  */
-export function getAllPosts(): Post[] {
-  return ALL_POSTS.filter((post) => SHOW_DRAFTS || !post.meta.draft).sort(
-    (a, b) => new Date(b.meta.date).getTime() - new Date(a.meta.date).getTime()
-  );
-}
+export const getArticle = cache(async (slug: string): Promise<ArticleResult> => {
+  const article = await getPublishedArticle(slug);
+  if (!article) {
+    const to = await getArticleRedirect(slug);
+    return to ? { kind: "redirect", slug: to } : { kind: "missing" };
+  }
+  const related = pickRelated(article, await getPublishedArticles()).map((s) => ({ meta: toMeta(s) }));
+  return { kind: "article", article: { meta: toMeta(article), content: article.content, related } };
+});
 
-/**
- * Published articles only, newest first — drafts are left out even under `next dev`. For lists
- * that stand in for the public site, such as the homepage teaser, where reviewing a draft in
- * place must not change what the page shows.
- */
-export function getPublishedPosts(): Post[] {
-  return getAllPosts().filter((post) => !post.meta.draft);
-}
-
-export function getPostBySlug(slug: string): Post | undefined {
-  return getAllPosts().find((post) => post.meta.slug === slug);
-}
-
-export function getRelatedPosts(post: Post, limit = 2): Post[] {
-  const others = getAllPosts().filter((candidate) => candidate.meta.slug !== post.meta.slug);
-  const shareTag = (candidate: Post) => candidate.meta.tags.some((tag) => post.meta.tags.includes(tag));
-
-  const related = others.filter(shareTag);
-  const rest = others.filter((candidate) => !shareTag(candidate));
-  return [...related, ...rest].slice(0, limit);
+/** Slugs of published articles: what conditional content and related links may point to. */
+export async function getPublishedSlugs(): Promise<Set<string>> {
+  return new Set((await getPublishedArticles()).map((p) => p.slug));
 }
 
 export function formatPostDate(value: string): string {

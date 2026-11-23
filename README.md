@@ -81,7 +81,7 @@ It is a single **Next.js 16 App Router** application written in TypeScript. **Su
 | :-- | :-- | :-- |
 | **Homepage** | Hero, services, work, approach, capabilities, about, an Insights teaser and a contact conversation, with WebGL scenes that fall back to static images | Live |
 | **Service pages** | Pages for AI integration, workflow automation, custom software and SEO, each with schema.org `Service` and `BreadcrumbList` data | Live |
-| **Insights** | Articles written as React components, with a draft workflow, related reading, `Article` structured data and sitemap entries | Live (some articles are still drafts) |
+| **Insights** | Articles from a separate editorial service, refreshed on publication, with related reading, `Article` structured data and sitemap entries | Live |
 | **Contact conversation** | A step-by-step enquiry form, sent by email by a Server Action, with spam guards | Live |
 | **SEO pricing and checkout** | Plans read from Supabase, a business-details step, and a Stripe Checkout subscription | Implemented |
 | **Account provisioning** | A Stripe webhook creates the client's Supabase account and customer record, and keeps subscription status in sync | Implemented |
@@ -184,7 +184,6 @@ Later billing events (`invoice.payment_failed`, `customer.subscription.deleted`)
 │   │   ├── site/                # Header, footer, navigation, mobile menu
 │   │   ├── organisms/ portal/   # Pricing, checkout, dashboard and admin UI
 │   │   └── ui/                  # Radix-based primitives
-│   ├── content/blog/posts/      # Insights articles (one .tsx per article) and registry
 │   ├── data/                    # Typed content: services, service pages, process, pricing
 │   ├── lib/                     # Supabase clients, Stripe, metadata, blog helpers, curves
 │   ├── styles/                  # Tokens, base, prose, motion CSS and self-hosted fonts
@@ -240,53 +239,34 @@ Two **route groups** share the root layout. They organise the code without chang
 
 ## Insights: articles and content
 
-Articles live in the repository as typed React modules. There is no CMS.
+Articles are not stored in this repository. They are written, reviewed and published in a separate
+editorial service, and the site reads the **published** articles from it on the server.
 
 ```mermaid
 flowchart LR
-    post["src/content/blog/posts/*.tsx<br/>exports meta + Content"] --> registry["posts/index.ts<br/>ALL_POSTS registry"]
-    registry --> lib["src/lib/blog.ts<br/>getAllPosts · getPublishedPosts<br/>getPostBySlug · getRelatedPosts"]
-    lib --> index["/insights"]
-    lib --> article["/insights/[slug]"]
-    lib --> teaser["Homepage teaser"]
-    lib --> sitemap["sitemap.xml"]
-    lib --> related["Service-page<br/>related reading"]
+    api["Editorial service<br/>(published articles only)"] --> lib["src/lib/editorial/api.ts<br/>tagged, cached fetches"]
+    lib --> blog["src/lib/blog.ts<br/>getPublishedPosts · getArticle"]
+    blog --> index["/insights"]
+    blog --> article["/insights/[slug]"]
+    blog --> teaser["Homepage teaser"]
+    blog --> sitemap["sitemap.xml"]
+    blog --> related["Service-page<br/>related reading"]
+    hook["/api/editorial/revalidate<br/>(signed events)"] -.refreshes.-> lib
 ```
 
-Each article exports a `meta` object (`PostMeta`) and a `Content` component:
+- **Content format.** Each article body is structured, versioned JSON (paragraphs, headings, lists,
+  tables, quotes, emphasis, code, links), validated on arrival (`src/lib/editorial/content.ts`) and
+  rendered by `ArticleBody` without raw HTML. A sentence that points to another article can be marked
+  conditional, so it only appears while that article is published.
+- **Publishing.** When an article is published, updated or unpublished, the editorial service sends a
+  signed event to `/api/editorial/revalidate`; the site refreshes the archive, the article, the sitemap
+  and related pages on demand, with no new deployment. A new article's page is rendered on its first visit.
+- **Drafts** never reach the site: they are previewed in the editorial service.
+- **Configuration.** `EDITORIAL_API_URL` (server-only) and `EDITORIAL_REVALIDATE_SECRET`; see `.env.example`.
+  Without a reachable editorial service, article pages and the sitemap fail rather than render empty.
 
-```tsx
-import type { PostMeta } from "@/lib/blog";
-
-export const meta: PostMeta = {
-  slug: "example-article",
-  title: "Example article heading",
-  seoTitle: "Shorter search title",   // optional
-  description: "One-sentence summary used for meta description and listings.",
-  date: "2026-01-01",                 // first published (YYYY-MM-DD)
-  updated: "2026-02-01",              // optional: only when actually revised
-  author: "Chinvat Bridge",
-  category: "AI & Workflows",
-  tags: ["ai"],
-  readingMinutes: 6,
-  draft: true,                        // optional: hidden in production
-};
-
-export function Content() {
-  return <p>Article body…</p>;
-}
-```
-
-**Adding an article.** Create the file in `src/content/blog/posts/`, then add one import and one entry to `ALL_POSTS` in `posts/index.ts`. The registry is an explicit import list rather than a directory scan, so the bundler always includes exactly the articles that exist.
-
-**Drafts.** Articles with `draft: true` are:
-
-- left out of production builds, the sitemap and static params;
-- readable under `next dev` at their own URL, labelled as drafts, for review in place;
-- never listed in `/insights` or the homepage teaser, even in development;
-- marked `noindex, nofollow` as an extra safeguard.
-
-To publish, remove `draft` and set `date` to the publishing day. Service pages link to related articles by slug, and unpublished slugs are skipped automatically, so an article appears on its service page the day it goes live.
+Service pages list related articles by slug; unpublished slugs are skipped, so an article appears on its
+service page the day it goes live.
 
 **Per-article output.** Each article page generates canonical and Open Graph `article` metadata, plus `Article` and `BreadcrumbList` JSON-LD tied to the site's `Organization` node.
 

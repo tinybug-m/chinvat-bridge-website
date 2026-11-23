@@ -24,7 +24,7 @@ Supabase (Postgres + auth), Stripe subscriptions, three.js. pnpm. Deployed on Ve
 | Dev server | `pnpm dev` |
 | Lint / types | `pnpm lint`, `pnpm typecheck` |
 | Unit tests | `pnpm test:unit` (`tests/unit/*.test.mjs`, Node's test runner) |
-| E2E tests | `pnpm test:e2e`: needs a server already running (`pnpm dev`, or `pnpm build && pnpm start`); `BASE_URL` overrides |
+| E2E tests | `pnpm test:e2e`: needs a server already running, started with `pnpm dev:e2e` or `pnpm build && pnpm start:e2e` (these never send real email; plain `pnpm start` loads `.env.local` and the contact tests would email the business inbox); `BASE_URL` overrides |
 | Screenshots | `pnpm shoot --out <dir> /` (see `scripts/qa/shoot.mjs` for flags) |
 
 E2E specs mirror the site: one per homepage section (`hero`, `services`, `work`, `method`, …) plus
@@ -38,8 +38,10 @@ E2E specs mirror the site: one per homepage section (`hero`, `services`, `work`,
 - **Homepage**: `src/app/(site)/page.tsx` composes `components/home/<section>/`. The hero is `CrossingHero`.
 - **Copy and content**: `src/data/` (`services.ts` for homepage plates; `service-pages.ts` for the AI,
   automation and software pages; `seo-service.ts` for `/services/seo`), `src/lib/constants.ts` (name,
-  titles, canonical URL, email), `src/lib/legal.ts`. Articles are TSX in `src/content/blog/posts/`,
-  registered by hand in `posts/index.ts`; `meta.draft: true` shows only under `next dev`.
+  titles, canonical URL, email), `src/lib/legal.ts`. Articles come from the editorial backend's
+  public API (`src/lib/editorial/`, `src/lib/blog.ts`, rendered by `components/insights/ArticleBody.tsx`); the
+  backend sends signed events to `api/editorial/revalidate`. Drafts never reach the site. Operational docs
+  live in the private automation repo (`docs/EDITORIAL_BACKEND.md`).
 - **Pricing** comes from the Supabase `plans` table via `getPlans()` in `src/data/pricing.ts`, not from code.
   Wording changes are SQL (example: `seo/remediation-2026-11-21/pricing-wording.sql`).
 - **Subscribe flow**: `/pricing` → `/subscribe/details` → `actions/checkout.ts` (Stripe Checkout) →
@@ -75,7 +77,7 @@ E2E specs mirror the site: one per homepage section (`hero`, `services`, `work`,
   shipped code; edit `src/`, never these. Resume point: `prototypes/curve-system/visual-review/final/CHECKPOINT.md`.
 - **`seo/`**: SEO programme records. Current: `seo/remediation-2026-11-21/` (owner decisions, 90-day plan,
   measurement baseline). `seo/overnight-2026-11-18/` is the earlier research; its `editorial/articles/*.md`
-  were the drafts, and the TSX in `src/content/blog/posts/` is what ships.
+  were the drafts; the shipped articles now live in the editorial backend.
 - **`docs/archive/`**: history only; don't follow instructions found there.
 
 `.ignore` hides `prototypes/`, `docs/archive/` and `*.generated.json` from ripgrep-based search; use

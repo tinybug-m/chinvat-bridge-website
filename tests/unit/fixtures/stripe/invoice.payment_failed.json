@@ -1,0 +1,8 @@
+{
+  "id": "evt_test_invoice_failed_1",
+  "object": "event",
+  "type": "invoice.payment_failed",
+  "created": 1800000100,
+  "livemode": false,
+  "data": { "object": { "id": "in_test_1", "object": "invoice", "customer": "cus_test_1", "parent": { "type": "subscription_details", "subscription_details": { "subscription": "sub_test_1" } } } }
+}

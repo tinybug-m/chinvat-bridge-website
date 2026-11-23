@@ -12,7 +12,8 @@
  *  - the session is recent (measured from Stripe's own `created` timestamp);
  *  - the authorisation has never been used (one database insert decides, atomically);
  *  - the account was created for this checkout and has never signed in, is not an admin, and is
- *    not already linked to a different subscription.
+ *    not already linked to a different subscription. "Admin" is the database's answer
+ *    (public.admin_users by user id), not an email list.
  * Anything else falls back to a normal emailed sign-in link, which does prove the inbox.
  */
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
@@ -133,7 +134,10 @@ export interface RedeemDeps {
   retrieveSession(sessionId: string): Promise<CheckoutSessionLike>;
   /** Atomically records the redemption; true only for the first caller for this hash. Throws on storage failure. */
   claimRedemption(sessionHash: string): Promise<boolean>;
-  isAdminEmail(email: string): boolean;
+  /** Optional extra deny-list by address, checked before any account is touched. */
+  isAdminEmail?(email: string): boolean;
+  /** Whether this account is an administrator (public.admin_users). Throws on lookup failure. */
+  isAdminUser(userId: string): Promise<boolean>;
   /** Finds or creates the auth user for the email and returns a one-time token for it. */
   provisionLoginLink(email: string): Promise<{ user: AuthUserLike; hashedToken: string } | null>;
   existingSubscriptionId(userId: string): Promise<string | null | undefined>;
@@ -181,12 +185,14 @@ export async function redeemCheckoutLogin(
     }
   };
 
-  const isAdminEmail = deps.isAdminEmail(check.email);
-  if (isAdminEmail) return emailFallback();
+  if (deps.isAdminEmail?.(check.email)) return emailFallback();
 
   try {
     const link = await deps.provisionLoginLink(check.email);
     if (!link) return emailFallback();
+    // Administrators always prove their inbox; a lookup failure throws and ends in an emailed link.
+    const isAdminEmail = await deps.isAdminUser(link.user.id);
+    if (isAdminEmail) return emailFallback();
     const existingSubscriptionId = await deps.existingSubscriptionId(link.user.id);
     const allowed = mayAutoLogin({
       user: link.user,

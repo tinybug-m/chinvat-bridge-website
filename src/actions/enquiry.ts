@@ -78,6 +78,13 @@ export async function sendEnquiry(input: EnquiryInput): Promise<EnquiryResult> {
     `Sent from the contact conversation on ${new URL(SITE_URL).hostname.replace(/^www\./, "")}. Reply to this email to answer them directly.`,
   ].join("\n");
 
+  // Test runs (pnpm start:e2e) log instead of emailing, even on a production build with real mail
+  // credentials loaded from .env.local. Never honoured on Vercel's production deployment.
+  if (process.env.ENQUIRY_DELIVERY === "log" && process.env.VERCEL_ENV !== "production") {
+    console.info(`[enquiry] ENQUIRY_DELIVERY=log; not sending.\nSubject: ${subject}`);
+    return { status: "sent" };
+  }
+
   const user = process.env.GMAIL_USER;
   const pass = process.env.GMAIL_APP_PASSWORD;
   if (!user || !pass) {

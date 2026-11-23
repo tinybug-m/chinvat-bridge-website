@@ -1,0 +1,195 @@
+{
+  "key": "page:/terms",
+  "kind": "page",
+  "schemaVersion": 1,
+  "data": {
+    "template": "legal",
+    "seo": {
+      "title": "Terms of Service",
+      "description": "The terms that govern your subscription to Chinvat Bridge's SEO and content services — billing, cancellation, scope of work and responsibilities.",
+      "robots": "index",
+      "sitemap": {
+        "changeFrequency": "yearly",
+        "priority": 0.3
+      }
+    },
+    "updatedOn": "2026-11-19",
+    "header": {
+      "kicker": "Legal",
+      "title": "Terms of service"
+    },
+    "lastUpdatedLabel": "Last updated:",
+    "lede": [
+      {
+        "type": "text",
+        "text": "These terms govern your use of subscription services provided by Chinvat Bridge (“we”, “us”), a UK-based technology consultancy. By subscribing to a plan, you agree to these terms."
+      }
+    ],
+    "body": {
+      "schemaVersion": 1,
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 2,
+          "children": [
+            {
+              "type": "text",
+              "text": "Subscriptions & billing"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "Subscriptions are billed monthly in advance via our payment processor, Stripe. Your subscription renews automatically each month until cancelled. Prices are shown exclusive of any applicable tax, which will be added at checkout where relevant."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "children": [
+            {
+              "type": "text",
+              "text": "Cancellation"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "There is no long-term lock-in contract. You may cancel your subscription at any time; we ask for 30 days’ notice so we can wind down active work in an orderly way. Cancellation requests should be sent to "
+            },
+            {
+              "type": "contact_email"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "children": [
+            {
+              "type": "text",
+              "text": "Scope of service"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "The specific deliverables included in your plan are described on our "
+            },
+            {
+              "type": "link",
+              "href": "/pricing",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "pricing page"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": " at the time you subscribe. Work outside that scope — including AI, automation or custom software projects — is quoted and agreed separately."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "children": [
+            {
+              "type": "text",
+              "text": "Client responsibilities"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "You’re responsible for providing accurate business information and timely access to any systems (such as analytics or search console) needed for us to deliver the service."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "children": [
+            {
+              "type": "text",
+              "text": "Limitation of liability"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "We work to a high professional standard, but we do not guarantee specific search rankings, traffic, or revenue outcomes, as these depend on factors outside our control. Our liability in connection with the services is limited to the fees paid in the preceding three months."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "children": [
+            {
+              "type": "text",
+              "text": "Governing law"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "These terms are governed by the laws of England and Wales."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "children": [
+            {
+              "type": "text",
+              "text": "Contact"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "Questions about these terms can be sent to "
+            },
+            {
+              "type": "contact_email"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

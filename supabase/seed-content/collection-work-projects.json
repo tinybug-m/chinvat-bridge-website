@@ -1,0 +1,48 @@
+{
+  "key": "collection:work_projects",
+  "kind": "collection",
+  "schemaVersion": 1,
+  "data": {
+    "items": [
+      {
+        "key": "scornik",
+        "name": "Scornik Gerstein LLP",
+        "context": "London law firm. We designed and built their website.",
+        "kind": "client",
+        "href": "https://www.scornik.com/",
+        "image": {
+          "src": "/work/scornik.jpg",
+          "width": 2000,
+          "height": 1250,
+          "alt": "Home page of the Scornik Gerstein LLP website: an aerial view of the Thames, Tower Bridge and the Shard under the headline Your London Solicitors for Individuals, with Request a consultation and Call buttons."
+        }
+      },
+      {
+        "key": "benedict",
+        "name": "Benedict Funeral Directors",
+        "context": "Funeral directors, Henlow Camp, Bedfordshire.",
+        "kind": "concept",
+        "href": "https://benedict-funeral.vercel.app/",
+        "image": {
+          "src": "/work/benedict.jpg",
+          "width": 2000,
+          "height": 1250,
+          "alt": "Home page of the Benedict Funeral Directors concept on a dark green background with a copper address bar, with the headline Caring for your family, and the person you love, and a banner saying it is a design concept and not the live website."
+        }
+      },
+      {
+        "key": "naturaglow",
+        "name": "NATURAGLOW",
+        "context": "Skincare and wellness clinic, Beverly Hills.",
+        "kind": "concept",
+        "href": "https://beauty-blue-sigma.vercel.app/",
+        "image": {
+          "src": "/work/naturaglow.jpg",
+          "width": 2000,
+          "height": 1250,
+          "alt": "Home page of the NATURAGLOW concept on a brown background, with the headline Natural Beauty, Expert Care, Book your treatment and Explore Services buttons, and an arched photo of a woman applying a serum with a dropper."
+        }
+      }
+    ]
+  }
+}

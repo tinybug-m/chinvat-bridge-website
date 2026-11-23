@@ -31,7 +31,6 @@ const REDIRECTS: [string, string][] = [
 ];
 
 test.describe("routes", () => {
-  test.skip(({ viewport }) => (viewport?.width ?? 0) < 1440, "route checks run once, on desktop");
 
   for (const path of PAGES) {
     test(`${path} renders`, async ({ page }) => {
@@ -111,9 +110,9 @@ test.describe("routes", () => {
     expect(lastmodOf("/insights")).toBe("2026-11-20");
   });
 
-  // Drafts live in the post registry with `draft: true`; a production build must never expose them.
+  // Drafts live in the editorial backend, unpublished; the website must never expose them.
   test("draft articles are not served, listed or in the sitemap", async ({ page, request }) => {
-    // Remove a slug from this list when its article is published.
+    // Remove a slug from this list when its article is published in the editorial backend.
     const drafts = [
       // Published 20 Nov, back to draft 21 Nov until /pricing defines its content unit.
       "how-much-does-seo-cost-uk",

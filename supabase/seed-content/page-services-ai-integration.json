@@ -1,0 +1,323 @@
+{
+  "key": "page:/services/ai-integration",
+  "kind": "page",
+  "schemaVersion": 1,
+  "data": {
+    "template": "service",
+    "seo": {
+      "title": "AI Consultancy & Integration for Small Businesses",
+      "description": "AI consultancy and integration for small businesses, from a UK-based team: we find where AI reliably saves time, choose tools and connect them to your systems.",
+      "robots": "index",
+      "sitemap": {
+        "changeFrequency": "monthly",
+        "priority": 0.8
+      }
+    },
+    "updatedOn": "2026-11-21",
+    "service": {
+      "name": "AI Integration",
+      "serviceType": "Artificial intelligence integration and consultancy"
+    },
+    "blocks": [
+      {
+        "type": "page_header",
+        "kicker": "AI Integration",
+        "title": "AI integration that earns its place in your business",
+        "lede": "We help small and growing businesses find the work AI can genuinely take on, choose tools that fit, and connect them to the systems and data you already use, with a person checking the output wherever it matters.",
+        "diagram": "ai",
+        "ctas": [
+          {
+            "label": "Discuss an AI project",
+            "href": "/#contact",
+            "variant": "primary",
+            "arrow": "right"
+          },
+          {
+            "label": "See what we do",
+            "href": "#what-we-do",
+            "variant": "secondary",
+            "arrow": "down"
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "problem",
+        "title": "Why AI often changes so little.",
+        "intro": "You may well have tried an AI tool already. When it changes little, the gap is rarely the technology; it is everything around it.",
+        "ruled": false,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "text_grid",
+            "columns": 2,
+            "items": [
+              {
+                "title": "Subscriptions, but no change in the work",
+                "body": "Licences get bought, a few people use them for drafting, and the way the business runs stays the same. A tool that isn’t connected to where the work happens can only ever help at the edges."
+              },
+              {
+                "title": "It doesn’t know your business",
+                "body": "Out of the box, a general assistant doesn’t know your services, prices, policies or customers. Every answer needs checking and rewriting, and the time it was meant to save goes into editing."
+              },
+              {
+                "title": "Nobody trusts the output",
+                "body": "Language models can state wrong things confidently. Without review steps and clear limits, one bad answer is enough for a team to stop using the tool, and the money is quietly written off."
+              },
+              {
+                "title": "Data goes where it shouldn’t",
+                "body": "Pasting customer or financial information into a consumer tool raises data-protection questions under UK GDPR, or the law that applies where you are, that many small businesses haven’t had time to answer."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "what-we-do",
+        "title": "What we do.",
+        "intro": "From deciding whether AI is the right answer at all to the integration work that makes it useful day to day.",
+        "ruled": true,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "offering_list",
+            "items": [
+              {
+                "title": "Finding the opportunities worth doing",
+                "body": "We start from your week, not from the technology: the tasks that are repeated often, involve reading, writing or sorting information, and where getting most of the way there and having a person finish the job is still a clear win. You get our honest view of each, including the ones where AI isn’t the answer."
+              },
+              {
+                "title": "Choosing tools and models",
+                "body": "Often the AI features already built into software you pay for are enough. Where they aren’t, we compare general-purpose assistants and language models on your real examples, weighing reliability, running costs and where your data is processed."
+              },
+              {
+                "title": "Connecting AI to your systems",
+                "body": "Most of the value comes from the wiring. An enquiry arrives, its details are extracted, a reply is drafted, your CRM is updated and a person approves before anything is sent. We build those integrations into the email, CRM, helpdesk and document tools you already use."
+              },
+              {
+                "title": "Assistants that work from your own information",
+                "body": "Internal assistants that answer from your documents, policies and records rather than from general knowledge, and can point to the source each answer drew on, so it can be checked."
+              },
+              {
+                "title": "Guardrails and human review",
+                "body": "Where output reaches a customer or informs a decision, we recommend review steps, limits on what the system may do on its own and a record of what it did, and agree them with you before anything goes live."
+              },
+              {
+                "title": "Measuring whether it works",
+                "body": "Before anything is built we agree what “working” means in numbers, such as minutes per task, first-response time or errors caught, so the result can be checked against it after launch and the approach changed if it isn’t delivering."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "examples",
+        "title": "Where small businesses usually start.",
+        "intro": "Typical first projects, described as patterns rather than client results. Each one is narrow, frequent and easy to check.",
+        "ruled": true,
+        "background": "raised",
+        "stacked": false,
+        "content": [
+          {
+            "type": "text_grid",
+            "columns": 2,
+            "items": [
+              {
+                "title": "Sorting and answering enquiries",
+                "body": "Incoming emails and form submissions are categorised, the key details pulled out, and a first reply drafted for someone to review and send."
+              },
+              {
+                "title": "Summarising and extracting from documents",
+                "body": "Contracts, supplier terms and long email threads turned into short summaries, or into the specific fields your team would otherwise retype."
+              },
+              {
+                "title": "First drafts from your own material",
+                "body": "Proposals, job adverts, product descriptions and reports drafted from your templates and data, so the hardest part of the job becomes editing rather than starting."
+              },
+              {
+                "title": "Answering the questions you get every day",
+                "body": "An assistant that handles repeat questions from your own policies and hands anything unusual to a person, for staff or for customers."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "approach-principles",
+        "title": "Practical before clever.",
+        "intro": "Three rules shape every AI project we take on.",
+        "ruled": true,
+        "background": "paper",
+        "stacked": true,
+        "content": [
+          {
+            "type": "text_grid",
+            "columns": 3,
+            "items": [
+              {
+                "title": "Start from the task",
+                "body": "The useful question isn’t “what can AI do?” but “which task is costing us hours each week, and could a tool do most of it reliably?”"
+              },
+              {
+                "title": "Try the simplest option first",
+                "body": "If an off-the-shelf tool or a feature you already pay for will do, we’ll tell you, even when it means there is little for us to build."
+              },
+              {
+                "title": "Keep a person where it matters",
+                "body": "Anything involving prices, legal terms, money or a customer’s trust gets a human check. Automation handles the volume; people keep the judgement."
+              }
+            ]
+          },
+          {
+            "type": "note",
+            "size": "lede",
+            "text": "AI tools make mistakes, and their behaviour changes as vendors update them. We don’t promise accuracy or savings we haven’t measured. We agree what success looks like before building, so the result can be checked against it."
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "how-we-work",
+        "title": "How we work.",
+        "intro": "The same four steps as all our work, applied to this service.",
+        "ruled": true,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "process_steps",
+            "notes": {
+              "discover": "For AI: the tasks that eat your team’s time, the systems they touch, and the data involved.",
+              "define": "Which task to start with, what “working” means in numbers, and which tool or model fits.",
+              "build": "The integration, with the review steps and limits agreed with you.",
+              "improve": "Measured against the agreed numbers, then extended to the next task if it earns it."
+            }
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "engagement",
+        "title": "How projects start.",
+        "ruled": true,
+        "background": "haze",
+        "stacked": false,
+        "content": [
+          {
+            "type": "paragraphs",
+            "paragraphs": [
+              "AI work is scoped per project rather than sold as a plan. It starts with a conversation about the task you want to improve and the systems involved. If AI is the right answer, we propose a defined first version, and its scope and cost are agreed before any work starts. If it isn’t, we’ll say so.",
+              "If the work spans several areas, such as AI alongside automation, software or SEO, we can combine it into a custom package."
+            ],
+            "ctas": [
+              {
+                "label": "Discuss an AI project",
+                "href": "/#contact",
+                "variant": "primary",
+                "arrow": "right"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "faq",
+        "title": "Questions we’re asked.",
+        "ruled": false,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "faq_list",
+            "items": [
+              {
+                "question": "Do we need custom AI, or will an off-the-shelf assistant do?",
+                "answer": "Often an off-the-shelf assistant, or the AI built into tools you already use, covers a large share of the job, and it is the right place to start. Custom integration makes sense when the tool needs to work with your own data, terminology or systems to be trustworthy, or when the same task has to run many times a day without someone copying text in and out."
+              },
+              {
+                "question": "Is it safe to use AI with our customers’ data?",
+                "answer": "It can be, but it depends on the tool, its settings and the agreement behind it. The questions to settle are where data is processed and stored, how long it is kept, and whether it is used to train models; personal data should be kept out of AI steps that don’t need it. Your obligations under UK GDPR, or the data-protection law that applies to you, stay with you, so we raise these questions before anything is built."
+              },
+              {
+                "question": "How much does AI integration cost?",
+                "answer": "It depends on the task, the systems involved and how much review the output needs. Connecting a feature you already pay for is a small job; an assistant built on your own documents is a larger one. Running costs matter as much as the build, since many AI services charge by use, so we estimate both before you commit."
+              },
+              {
+                "question": "What happens when the AI gets something wrong?",
+                "answer": "We assume it sometimes will, and plan for it before anything goes live: we recommend review steps before anything reaches a customer, limits on what the system can do on its own and a record of its outputs, and agree them with you. Where a task can’t tolerate errors, we’ll recommend keeping it manual."
+              },
+              {
+                "question": "Do you work with businesses outside the UK?",
+                "answer": "Yes. We’re based in the UK and work remotely with businesses elsewhere. The approach is the same; the data-protection questions may differ, and we’ll raise them early."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "related_insights",
+        "anchor": "related-insights",
+        "title": "Related insights.",
+        "curated": [
+          {
+            "slug": "where-ai-can-save-your-business-time",
+            "reason": "Which tasks AI handles reliably today, where it still isn’t worth the effort, and a three-question test for your first project."
+          },
+          {
+            "slug": "what-should-you-automate-first",
+            "reason": "Many tasks people bring to AI are better solved by plain automation. This is how to tell, and where to start."
+          },
+          {
+            "slug": "ai-subscriptions-vs-ai-integration",
+            "reason": "Why buying AI licences often changes little, and how to tell when one task is worth integrating."
+          },
+          {
+            "slug": "how-to-choose-an-ai-consultant",
+            "reason": "The questions that separate practical help from hype, to ask of anyone you speak to, including us."
+          },
+          {
+            "slug": "uk-small-business-ai-adoption-2026",
+            "reason": "What the official UK figures on AI adoption do and don’t say about businesses of your size."
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "anchor": "related-services",
+        "title": "Related services.",
+        "ruled": true,
+        "background": "paper",
+        "stacked": false,
+        "content": [
+          {
+            "type": "link_list",
+            "items": [
+              {
+                "title": "Workflow automation and integration",
+                "href": "/services/workflow-automation",
+                "reason": "AI is usually one step in a larger workflow; this is the work of connecting the rest."
+              },
+              {
+                "title": "Custom software",
+                "href": "/services/custom-software",
+                "reason": "When the task needs a tool of its own, such as an internal dashboard or portal with AI inside it."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "closing",
+        "title": "Tell us which task you’d like to take off your team.",
+        "lede": "Describe the work and the tools involved, and we’ll tell you whether AI is the right answer, and what we’d try first.",
+        "ctaLabel": "Discuss an AI project"
+      }
+    ]
+  }
+}

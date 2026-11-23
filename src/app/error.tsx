@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { EmailLink } from "@/components/atoms/EmailLink";
 import { BodyFontScope } from "@/components/site/BodyFontScope";
 import { Button, ButtonLink } from "@/components/system/Button";
-import { SiteShell } from "@/components/templates/SiteShell";
+import { ClientSiteShell as SiteShell } from "@/components/site/ShellChromeProvider";
 import { StatusPage } from "@/components/templates/StatusPage";
 import { archivo, martianMono } from "@/styles/fonts";
 

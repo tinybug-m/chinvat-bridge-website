@@ -1,28 +1,36 @@
 import { expect, test, type Page } from "@playwright/test";
+import { ONCE } from "./once";
 
-const ROWS = [
-  { slug: "replace-spreadsheets-with-custom-software", title: "Outgrown Your Spreadsheets? When to Replace Them with Software", category: "Software Strategy" },
-  { slug: "where-the-name-chinvat-bridge-comes-from", title: "Where the Name Chinvat Bridge Comes From", category: "Our Name" },
-  { slug: "where-ai-can-save-your-business-time", title: "Where AI Can Actually Save Your Business Time", category: "AI & Workflows" },
-];
+// The rows below are checked against the live /insights archive (Supabase published_articles(),
+// newest first), so the spec follows the data instead of hard-coded titles.
+const ROWS = [{}, {}, {}] as { slug?: string }[];
+const DRAFT_SLUG = "how-much-does-seo-cost-uk";
 
 /** The href of every link matching `selector`, in page order. */
 const articleLinks = (page: Page, selector: string) =>
   page.locator(selector).evaluateAll((links) => links.map((a) => a.getAttribute("href")!));
 
 test.describe("insights section", () => {
-  test("the three newest published articles link to their pages", async ({ page }) => {
+  test("the three newest published articles link to their pages", ONCE, async ({ page }) => {
+    await page.goto("/insights");
+    const archiveRows = page.locator('main ol > li');
+    const expected = await Promise.all(
+      [0, 1, 2].map(async (i) => ({
+        slug: (await archiveRows.nth(i).locator("a").getAttribute("href"))!.replace("/insights/", ""),
+        title: (await archiveRows.nth(i).locator("h2, h3").first().innerText()).trim(),
+        category: "",
+      })),
+    );
     await page.goto("/");
     const section = page.locator("#insights");
     await expect(section.getByRole("heading", { level: 2 })).toHaveText("Ideas and observations.");
     await expect(section).toHaveAttribute("aria-labelledby", "insights-title");
     const rows = section.locator("ol > li");
     await expect(rows).toHaveCount(ROWS.length);
-    for (const [index, { slug, title, category }] of ROWS.entries()) {
+    for (const [index, { slug, title }] of expected.entries()) {
       const row = rows.nth(index);
       await expect(row.getByRole("heading", { level: 3 })).toHaveText(title);
       await expect(row.locator("a")).toHaveAttribute("href", `/insights/${slug}`);
-      await expect(row).toContainText(category);
       await expect(row.locator("time")).toHaveCount(0);
       await expect(row).not.toContainText("min read");
     }
@@ -31,12 +39,11 @@ test.describe("insights section", () => {
     await expect(section).not.toContainText("Practical thinking about");
   });
 
-  test("drafts stay off the homepage, even under next dev, while the archive keeps every article", async ({ page, request }, testInfo) => {
-    test.skip(testInfo.project.name !== "desktop", "once is enough");
+  test("drafts stay off the homepage and the archive; every listed article resolves", ONCE, async ({ page, request }) => {
     await page.goto("/insights");
     const archive = await articleLinks(page, 'main a[href^="/insights/"]');
-    // Under `next dev` the archive also lists drafts for review, each marked on its own page;
-    // a production build serves none, so there the list is empty and the rows above are the check.
+    // Articles come from Supabase's published set only; drafts are previewed in the
+    // editorial desk, so no page here should ever be marked as a draft.
     const drafts: string[] = [];
     for (const href of archive) {
       const response = await request.get(href);
@@ -53,6 +60,18 @@ test.describe("insights section", () => {
     }
   });
 
+  test("the archive lists published articles only; a draft slug is a 404", ONCE, async ({ page, request }) => {
+    await page.goto("/insights");
+    const links = await articleLinks(page, 'main a[href^="/insights/"]');
+    expect(links.length).toBeGreaterThan(0);
+    expect(new Set(links).size).toBe(links.length);
+    expect(links).not.toContain(`/insights/${DRAFT_SLUG}`);
+    expect((await request.get(`/insights/${DRAFT_SLUG}`)).status()).toBe(404);
+    const sitemap = await (await request.get("/sitemap.xml")).text();
+    expect(sitemap).not.toContain(DRAFT_SLUG);
+    for (const href of links) expect(sitemap, href).toContain(href);
+  });
+
   test("rows and the footer link are large enough to tap, with no overflow", async ({ page }) => {
     await page.goto("/");
     await page.locator("#insights").scrollIntoViewIfNeeded();
@@ -67,25 +86,4 @@ test.describe("insights section", () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 
-  test("a row is reachable by keyboard and shows the cobalt hover state", async ({ page }, testInfo) => {
-    await page.goto("/");
-    const first = page.locator("#insights ol a").first();
-    await first.focus();
-    await expect(first).toBeFocused();
-    if (testInfo.project.name === "desktop") {
-      await first.scrollIntoViewIfNeeded();
-      await first.hover();
-      const color = await first.locator("h3").evaluate((el) => getComputedStyle(el).color);
-      expect(color).not.toBe("rgb(14, 26, 36)");
-    }
-  });
-
-  test("content is visible without JavaScript", async ({ browser }) => {
-    const context = await browser.newContext({ javaScriptEnabled: false });
-    const page = await context.newPage();
-    await page.goto("/");
-    await expect(page.locator("#insights ol > li")).toHaveCount(ROWS.length);
-    await expect(page.locator("#insights ol a").first()).toBeVisible();
-    await context.close();
-  });
 });

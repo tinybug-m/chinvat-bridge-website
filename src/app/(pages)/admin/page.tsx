@@ -5,7 +5,6 @@ import { SiteShell } from "@/components/templates/SiteShell";
 import { Container } from "@/components/system/Container";
 import { PageHeader } from "@/components/system/PageHeader";
 import { requireAdmin } from "@/lib/admin";
-import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -16,6 +15,8 @@ const STATUS_LABELS: Record<string, string> = {
   active: "Active",
   past_due: "Past due",
   cancelled: "Cancelled",
+  pending: "Awaiting payment",
+  paused: "Paused",
 };
 
 export default async function AdminPage() {
@@ -23,8 +24,9 @@ export default async function AdminPage() {
   if (!admin) {
     redirect("/login");
   }
+  // The admin's own session: RLS (public.is_admin()) grants the reads below, not the service role.
+  const { supabase } = admin;
 
-  const supabase = createAdminClient();
   const { data: customers } = await supabase
     .from("customers")
     .select("id, email, company_name, plan_id, status, created_at")

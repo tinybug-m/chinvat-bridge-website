@@ -1,4 +1,4 @@
-import { getPostBySlug } from "@/lib/blog";
+import { getPublishedArticles } from "@/lib/content/read";
 import { SITE_URL } from "@/lib/constants";
 
 /*
@@ -47,12 +47,25 @@ export function serviceJsonLd({ path, name, serviceType, description }: ServiceS
   ];
 }
 
-/** Article links with the reason each is worth reading; slugs that no longer resolve are skipped. */
-export function relatedInsightLinks(items: { slug: string; reason: string }[]) {
-  return items.flatMap(({ slug, reason }) => {
-    const post = getPostBySlug(slug);
-    return post ? [{ href: `/insights/${slug}`, title: post.meta.title, reason }] : [];
+/**
+ * A service page's "Related insights": its curated list first (articles not published are skipped
+ * until they are), then any other published article the editorial backend lists for this page.
+ */
+export async function relatedInsightLinks(items: { slug: string; reason: string }[], servicePath?: string) {
+  const posts = await getPublishedArticles();
+  const bySlug = new Map(posts.map((post) => [post.slug, post]));
+  const curated = items.flatMap(({ slug, reason }) => {
+    const post = bySlug.get(slug);
+    return post ? [{ href: `/insights/${slug}`, title: post.title, reason }] : [];
   });
+  const listed = new Set(items.map((i) => i.slug));
+  const fromBackend = servicePath
+    ? posts.flatMap((post) => {
+        const link = post.relatedServices.find((s) => s.path === servicePath);
+        return link && !listed.has(post.slug) ? [{ href: `/insights/${post.slug}`, title: post.title, reason: link.reason }] : [];
+      })
+    : [];
+  return [...curated, ...fromBackend];
 }
 
 /** One JSON-LD script per block. */

@@ -1,0 +1,23 @@
+{
+  "key": "page:/insights",
+  "kind": "page",
+  "schemaVersion": 1,
+  "data": {
+    "template": "insights_index",
+    "seo": {
+      "title": "Insights: AI, Automation, Software & SEO for SMEs",
+      "description": "Practical thinking on AI, automation, software and SEO for small businesses — written to help you make better, faster operational decisions.",
+      "robots": "index",
+      "sitemap": {
+        "changeFrequency": "weekly",
+        "priority": 0.7
+      }
+    },
+    "header": {
+      "kicker": "Insights",
+      "title": "Ideas & observations",
+      "lede": "Practical thinking about AI, software, automation and digital growth."
+    },
+    "collectionName": "Insights"
+  }
+}

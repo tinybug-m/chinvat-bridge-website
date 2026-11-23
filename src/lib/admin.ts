@@ -1,35 +1,37 @@
 import "server-only";
+import { cache } from "react";
+import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@/lib/supabase/database.types";
 
-function adminEmails(): string[] {
-  return (process.env.ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((email) => email.trim().toLowerCase())
-    .filter(Boolean);
-}
-
-export function isAdminEmail(email: string): boolean {
-  return adminEmails().includes(email.trim().toLowerCase());
+export interface AdminContext {
+  user: User;
+  /** The admin's own session client: Row Level Security (public.is_admin()) decides what it may do. */
+  supabase: SupabaseClient<Database>;
 }
 
 /**
- * Returns the current signed-in user if — and only if — their email is on the
- * admin allow-list. Every admin Server Action must call this itself (not just
- * gate the page), since an action can be invoked directly regardless of what
- * page rendered the form that calls it.
+ * Returns the signed-in user and their session client if — and only if — the database says they
+ * are an administrator (public.admin_users, checked by public.is_admin() under their own session).
+ * ADMIN_EMAILS is not read here: it only seeds admin_users (scripts/db/seed-admins.mjs).
+ *
+ * Every admin Server Action must call this itself (not just gate the page), since an action can be
+ * invoked directly regardless of what page rendered the form that calls it. RLS enforces the same
+ * rule again on every read and write the returned client makes.
  */
-export async function requireAdmin() {
+export const requireAdmin = cache(async (): Promise<AdminContext | null> => {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const email = user?.email?.toLowerCase();
-
   // A confirmed address only: an account whose email nobody has proven never gets admin.
-  if (!email || !user?.email_confirmed_at || !adminEmails().includes(email)) {
+  if (!user || !user.email_confirmed_at) return null;
+
+  const { data: isAdmin, error } = await supabase.rpc("is_admin");
+  if (error) {
+    console.error(`[admin] is_admin check failed (code=${error.code ?? "unknown"})`);
     return null;
   }
-
-  return user;
-}
+  return isAdmin === true ? { user, supabase } : null;
+});

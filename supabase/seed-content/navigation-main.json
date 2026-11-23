@@ -1,0 +1,68 @@
+{
+  "key": "navigation:main",
+  "kind": "navigation",
+  "schemaVersion": 1,
+  "data": {
+    "sections": [
+      {
+        "key": "services",
+        "label": "Services",
+        "href": "/#services"
+      },
+      {
+        "key": "work",
+        "label": "Work",
+        "href": "/#work"
+      },
+      {
+        "key": "approach",
+        "label": "Approach",
+        "href": "/#approach"
+      },
+      {
+        "key": "about",
+        "label": "About",
+        "href": "/#about"
+      },
+      {
+        "key": "insights",
+        "label": "Insights",
+        "href": "/insights"
+      }
+    ],
+    "pricing": {
+      "label": "Pricing",
+      "href": "/pricing"
+    },
+    "login": {
+      "label": "Client login",
+      "href": "/login"
+    },
+    "contact": {
+      "label": "Start a conversation",
+      "href": "/#contact"
+    },
+    "disciplines": [
+      {
+        "key": "ai",
+        "label": "AI Integration",
+        "href": "/services/ai-integration"
+      },
+      {
+        "key": "automation",
+        "label": "Workflow Automation",
+        "href": "/services/workflow-automation"
+      },
+      {
+        "key": "software",
+        "label": "Custom Software",
+        "href": "/services/custom-software"
+      },
+      {
+        "key": "seo",
+        "label": "SEO & Growth",
+        "href": "/services/seo"
+      }
+    ]
+  }
+}

@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { ServicePage, serviceMetadata } from "@/components/services/ServicePage";
-import { SOFTWARE_SERVICE } from "@/data/service-pages";
 
-export const metadata: Metadata = serviceMetadata(SOFTWARE_SERVICE);
+const PATH = "/services/custom-software";
 
-export default function CustomSoftwarePage() {
-  return <ServicePage content={SOFTWARE_SERVICE} />;
+export function generateMetadata(): Promise<Metadata> {
+  return serviceMetadata(PATH);
+}
+
+export default function Page() {
+  return <ServicePage path={PATH} />;
 }

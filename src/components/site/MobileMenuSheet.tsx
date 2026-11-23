@@ -6,18 +6,19 @@ import { useRef, type CSSProperties, type MouseEvent, type RefObject } from "rea
 import { Lockup } from "@/components/brand/Lockup";
 import { ButtonLink } from "@/components/system/Button";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
-import { CONTACT_EMAIL } from "@/lib/constants";
-import { CONTACT_LINK, LOGIN_LINK, PRICING_LINK, SECTION_LINKS, prefetchFor } from "./nav";
+import { prefetchFor, type ShellChrome } from "./nav";
 
 interface MobileMenuSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** The Menu button, which lives outside the dialog and takes focus back when it closes. */
   triggerRef: RefObject<HTMLButtonElement | null>;
+  chrome: ShellChrome;
 }
 
 /** The sheet itself. Loaded on demand by MobileMenu: Radix Dialog and its scroll lock stay out of the first bundle. */
-export default function MobileMenuSheet({ open, onOpenChange, triggerRef }: MobileMenuSheetProps) {
+export default function MobileMenuSheet({ open, onOpenChange, triggerRef, chrome }: MobileMenuSheetProps) {
+  const { sections: SECTION_LINKS, pricing: PRICING_LINK, login: LOGIN_LINK, contact: CONTACT_LINK, contactEmail: CONTACT_EMAIL } = chrome;
   const pendingTarget = useRef<string | null>(null);
   const pathname = usePathname();
 

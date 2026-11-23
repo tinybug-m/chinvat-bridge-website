@@ -1,0 +1,21 @@
+{
+  "id": "evt_test_checkout_1",
+  "object": "event",
+  "type": "checkout.session.completed",
+  "created": 1800000000,
+  "livemode": false,
+  "data": {
+    "object": {
+      "id": "cs_test_a1B2c3D4e5F6g7H8i9J0",
+      "object": "checkout.session",
+      "mode": "subscription",
+      "status": "complete",
+      "payment_status": "paid",
+      "customer": "cus_test_1",
+      "subscription": "sub_test_1",
+      "customer_email": "New.Client@example.test",
+      "customer_details": { "email": "New.Client@example.test" },
+      "metadata": { "planId": "growth", "fullName": "Test Client", "companyName": "Example Co", "phone": "000", "website": "https://example.test", "country": "UK", "targetMarket": "", "improvements": "", "bindingHash": "x" }
+    }
+  }
+}

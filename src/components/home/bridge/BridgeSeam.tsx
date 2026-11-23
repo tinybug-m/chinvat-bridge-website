@@ -8,7 +8,7 @@ import { ThreeStage } from "@/components/three/core/ThreeStage";
 import type { StageHandle } from "@/components/three/core/types";
 import { BRIDGE_POSTERS, BRIDGE_SEAM } from "@/components/three/scenes/bridge/config";
 import { bridgeLayout, type DeckTrace, deckTrace } from "@/components/three/scenes/bridge/path";
-import { CURRENT_STATE_ITEMS, FUTURE_STATE_ITEMS } from "@/data/transition";
+import type { HomePage } from "@/lib/content/schema";
 import { cn } from "@/lib/utils";
 import { SeamSlider } from "./SeamSlider";
 import { SWEEP_FROM, SWEEP_MIN_PX, SWEEP_TO, sweepValue } from "./sweep";
@@ -47,12 +47,14 @@ import "../services/energy/energy.css";
 
 const loadBridgeScene = () => import("@/components/three/scenes/bridge");
 
-const ROW_COUNT = CURRENT_STATE_ITEMS.length;
+/** The Approach copy the seam needs (the homepage's bridge_seam block). */
+export type SeamContent = Pick<HomePage["blocks"][3], "pairs" | "leftLabel" | "rightLabel" | "controlLabel">;
+type Pair = SeamContent["pairs"][number];
 
-/** Pair i is built once the seam has passed (i + 0.5) / 5. */
-export function modernisedCount(value: number) {
+/** Pair i is built once the seam has passed (i + 0.5) / rows. */
+export function modernisedCount(value: number, rows: number) {
   let count = 0;
-  for (let i = 0; i < ROW_COUNT; i++) if (value / 100 + 1e-6 >= (i + 0.5) / ROW_COUNT) count++;
+  for (let i = 0; i < rows; i++) if (value / 100 + 1e-6 >= (i + 0.5) / rows) count++;
   return count;
 }
 
@@ -63,9 +65,9 @@ export function modernisedCount(value: number) {
  * comes in as it is today, and so on to 100, where the last pair is built. Every pair is seen in
  * both states on the way across, and scrolling back plays it in reverse.
  */
-export function crossing(value: number) {
-  const index = Math.min(ROW_COUNT - 1, Math.floor((value * ROW_COUNT) / 100));
-  return { index, built: modernisedCount(value) > index };
+export function crossing(value: number, rows: number) {
+  const index = Math.min(rows - 1, Math.floor((value * rows) / 100));
+  return { index, built: modernisedCount(value, rows) > index };
 }
 
 const posterLayer = cn(
@@ -155,10 +157,10 @@ const Posters = memo(function Posters() {
  * ink. A change of pair is a short crossfade, the old line leaving upwards as the seam builds (and
  * downwards on the way back); under reduced motion it simply swaps.
  */
-const PairLine = memo(function PairLine({ index, built }: { index: number; built: boolean }) {
+const PairLine = memo(function PairLine({ pairs, index, built }: { pairs: readonly Pair[]; index: number; built: boolean }) {
   return (
     <p data-testid="approach-pair" data-pair={index} data-state={built ? "built" : "drawn"} className="mt-3 grid">
-      {CURRENT_STATE_ITEMS.map((today, i) => {
+      {pairs.map(({ current: today, future }, i) => {
         const done = i < index || (i === index && built);
         return (
           <span
@@ -192,7 +194,7 @@ const PairLine = memo(function PairLine({ index, built }: { index: number; built
                   done ? "font-medium text-ink" : "text-ink-soft",
                 )}
               >
-                {FUTURE_STATE_ITEMS[i].label}
+                {future.label}
               </span>
             </span>
           </span>
@@ -209,7 +211,7 @@ const deckPath = ({ width, height, trace }: { width: number; height: number; tra
 /** Server render; constant, so React never rewrites what drive() sets. */
 const INITIAL_STYLE = { "--seam": seamOffset(BRIDGE_SEAM.initial) } as CSSProperties;
 
-export function BridgeSeam({ className }: { className?: string }) {
+export function BridgeSeam({ className, content }: { className?: string; content: SeamContent }) {
   const [value, setValue] = useState<number>(BRIDGE_SEAM.initial);
   /** The deck's line at the stage's measured size, in its pixels. */
   const [deck, setDeck] = useState<{ width: number; height: number; trace: DeckTrace } | null>(null);
@@ -387,17 +389,19 @@ export function BridgeSeam({ className }: { className?: string }) {
     };
   }, [drive]);
 
-  const count = modernisedCount(value);
-  const pair = crossing(value);
-  const valueText = `${value}% modernised: ${CURRENT_STATE_ITEMS[pair.index].label} to ${FUTURE_STATE_ITEMS[pair.index].label}`;
+  const rows = content.pairs.length;
+  const count = modernisedCount(value, rows);
+  const pair = crossing(value, rows);
+  const crossed = content.pairs[pair.index];
+  const valueText = `${value}% modernised: ${crossed.current.label} to ${crossed.future.label}`;
 
   return (
     <div ref={rootRef} className={className}>
       <figure className="m-0">
         <div aria-hidden="true" className="mb-4">
           <Container className="flex justify-between gap-4 text-small text-ink-muted">
-            <span data-energy-text="">Current state</span>
-            <span data-energy-text="" className="text-right">Future direction</span>
+            <span data-energy-text="">{content.leftLabel}</span>
+            <span data-energy-text="" className="text-right">{content.rightLabel}</span>
           </Container>
         </div>
         <div ref={frameRef} className="relative mx-auto max-w-[90rem] overflow-x-clip" data-seam-value={value} data-energy-ports={deck ? deckPorts(deck.trace) : FIRST_PORTS} data-energy-sweep="" style={INITIAL_STYLE} suppressHydrationWarning>
@@ -461,10 +465,10 @@ export function BridgeSeam({ className }: { className?: string }) {
         <Container as="figcaption" className="mt-5 md:mt-6">
           <div className="flex items-center justify-between gap-6 text-small">
             <span id="approach-seam-label" className="font-medium text-ink">
-              Move the seam
+              {content.controlLabel}
             </span>
             <span aria-hidden="true" className="flex gap-1.5">
-              {CURRENT_STATE_ITEMS.map((item, i) => (
+              {content.pairs.map(({ current: item }, i) => (
                 <span
                   key={item.label}
                   className={cn("h-0.5 w-5 transition-colors duration-200", i < count ? "bg-ink" : "bg-line-strong")}
@@ -472,7 +476,7 @@ export function BridgeSeam({ className }: { className?: string }) {
               ))}
             </span>
           </div>
-          <PairLine index={pair.index} built={pair.built} />
+          <PairLine pairs={content.pairs} index={pair.index} built={pair.built} />
         </Container>
       </figure>
     </div>

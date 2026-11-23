@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 import { getStripeClient } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { isAdminEmail } from "@/lib/admin";
 import { getSiteOrigin } from "@/lib/site-origin";
 import { checkoutBindingCookieName, redeemCheckoutLogin, type RedeemOutcome } from "@/lib/checkout-login";
 
@@ -75,7 +74,11 @@ export async function POST(request: Request) {
         if (error.code === "23505") return false; // unique violation: already redeemed
         throw new Error(`checkout redemption store failed (${error.code ?? "unknown"})`);
       },
-      isAdminEmail,
+      async isAdminUser(userId) {
+        const { data, error } = await createAdminClient().from("admin_users").select("user_id").eq("user_id", userId).maybeSingle();
+        if (error) throw new Error("admin lookup failed");
+        return data !== null;
+      },
       async provisionLoginLink(email) {
         const { data, error } = await createAdminClient().auth.admin.generateLink({ type: "magiclink", email });
         if (error || !data.user || !data.properties?.hashed_token) return null;

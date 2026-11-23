@@ -12,6 +12,7 @@ import { RealSprintLog } from "@/components/organisms/dashboard/RealSprintLog";
 import { RealUpdatesArchive } from "@/components/organisms/dashboard/RealUpdatesArchive";
 import { AdvisoryChannel } from "@/components/organisms/dashboard/AdvisoryChannel";
 import { createClient } from "@/lib/supabase/server";
+import { getPlanById } from "@/data/pricing";
 import { signOut } from "@/actions/auth";
 
 export const metadata: Metadata = {
@@ -30,6 +31,8 @@ export default async function DashboardPage() {
   }
 
   const { data: customer } = await supabase.from("customers").select("*").eq("id", user.id).maybeSingle();
+  // One plan read for the whole page; both panels below receive it.
+  const plan = customer ? await getPlanById(customer.plan_id) : undefined;
 
   return (
     <SiteShell>
@@ -58,13 +61,14 @@ export default async function DashboardPage() {
               companyName={customer.company_name}
               website={customer.website}
               planId={customer.plan_id}
+              plan={plan}
               status={customer.status}
               nextBillingDate={customer.next_billing_date}
               practiceLead={customer.practice_lead}
             />
             <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-8">
               <div className="space-y-6 lg:col-span-8 lg:space-y-8">
-                <RealProjectProgress customerId={customer.id} planId={customer.plan_id} />
+                <RealProjectProgress customerId={customer.id} plan={plan} />
                 <RealSprintLog customerId={customer.id} />
               </div>
               <div className="space-y-6 lg:col-span-4 lg:space-y-8">

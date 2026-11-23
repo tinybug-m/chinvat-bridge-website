@@ -11,14 +11,16 @@ const VARIANT_CLASSES: Record<EmailLinkVariant, string> = {
 };
 
 interface EmailLinkProps {
+  /** The address to show (settings:site contactEmail); defaults to the constant for app pages. */
+  email?: string;
   variant?: EmailLinkVariant;
   className?: string;
 }
 
-export function EmailLink({ variant = "subtle", className = "" }: EmailLinkProps) {
+export function EmailLink({ email, variant = "subtle", className = "" }: EmailLinkProps) {
   return (
-    <a className={cn(VARIANT_CLASSES[variant], className)} href={CONTACT_MAILTO}>
-      {CONTACT_EMAIL}
+    <a className={cn(VARIANT_CLASSES[variant], className)} href={email ? `mailto:${email}` : CONTACT_MAILTO}>
+      {email ?? CONTACT_EMAIL}
     </a>
   );
 }

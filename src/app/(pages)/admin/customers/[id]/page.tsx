@@ -15,7 +15,6 @@ import {
   RECORD_CARD,
 } from "@/components/portal/AdminFields";
 import { requireAdmin } from "@/lib/admin";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { getPlanById } from "@/data/pricing";
 import { cn } from "@/lib/utils";
 import {
@@ -42,9 +41,10 @@ export default async function AdminCustomerPage({ params }: PageProps) {
   if (!admin) {
     redirect("/login");
   }
+  // The admin's own session: RLS (public.is_admin()) grants the reads below, not the service role.
+  const { supabase } = admin;
 
   const { id } = await params;
-  const supabase = createAdminClient();
 
   const { data: customer } = await supabase.from("customers").select("*").eq("id", id).maybeSingle();
   if (!customer) {
@@ -86,6 +86,8 @@ export default async function AdminCustomerPage({ params }: PageProps) {
                 <option value="active">Active</option>
                 <option value="past_due">Past due</option>
                 <option value="cancelled">Cancelled</option>
+                <option value="pending">Awaiting payment</option>
+                <option value="paused">Paused</option>
               </AdminSelect>
               <div className="sm:col-span-3">
                 <Button type="submit">Save</Button>

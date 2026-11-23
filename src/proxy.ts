@@ -7,13 +7,11 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except static assets, image optimization files, and
-     * /api routes — no API route in this app reads the user's session cookie (the
-     * Stripe webhook uses the service-role admin client instead), so running the
-     * cookie-refresh auth check on every webhook delivery would just add latency.
-     */
-    "/((?!_next/static|_next/image|favicon.ico|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  /*
+   * Only the routes that read the signed-in user's session. Marketing pages, /pricing, /insights,
+   * /client-portal (static example data) and /api/* never do, so they skip the Supabase Auth round
+   * trip entirely. Authorisation never depends on this: each page and Server Action checks the user
+   * itself (requireAdmin(), auth.getUser()).
+   */
+  matcher: ["/dashboard/:path*", "/admin/:path*", "/subscribe/:path*", "/auth/:path*", "/login"],
 };

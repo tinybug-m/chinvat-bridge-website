@@ -1,0 +1,189 @@
+{
+  "key": "page:/",
+  "kind": "page",
+  "schemaVersion": 1,
+  "data": {
+    "template": "home",
+    "seo": {
+      "robots": "index",
+      "sitemap": {
+        "changeFrequency": "monthly",
+        "priority": 1
+      }
+    },
+    "blocks": [
+      {
+        "type": "hero",
+        "titleLines": [
+          "Cross the bridge.",
+          "Enter the future."
+        ],
+        "lede": "We bridge the gap between complex challenges and intelligent technology: AI and automation, custom software, SEO, and data analytics.",
+        "primaryCta": {
+          "label": "Start a conversation",
+          "href": "/#contact"
+        },
+        "secondaryCta": {
+          "label": "Explore services",
+          "href": "/#services"
+        },
+        "chart": {
+          "above": "Complex challenges",
+          "below": "Intelligent technology"
+        },
+        "disciplines": [
+          {
+            "key": "ai",
+            "label": "AI integration",
+            "short": "AI",
+            "href": "/services/ai-integration"
+          },
+          {
+            "key": "automation",
+            "label": "Automation & workflows",
+            "short": "Automation",
+            "href": "/services/workflow-automation"
+          },
+          {
+            "key": "software",
+            "label": "Software & web",
+            "short": "Software",
+            "href": "/services/custom-software"
+          },
+          {
+            "key": "seo",
+            "label": "SEO & growth",
+            "short": "SEO",
+            "href": "/services/seo"
+          }
+        ]
+      },
+      {
+        "type": "service_plates",
+        "heading": "Four disciplines, one way of working."
+      },
+      {
+        "type": "work_index",
+        "heading": "Recent work.",
+        "labels": {
+          "client": "Client project",
+          "concept": "Concept"
+        }
+      },
+      {
+        "type": "bridge_seam",
+        "heading": "From today to what’s next.",
+        "lede": "Technology creates the most value when it solves a real constraint.",
+        "leftLabel": "Current state",
+        "rightLabel": "Future direction",
+        "controlLabel": "Move the seam",
+        "pairs": [
+          {
+            "current": {
+              "label": "Repetitive manual work",
+              "status": "High human overhead"
+            },
+            "future": {
+              "label": "Automated workflows",
+              "status": "Reliable & fast"
+            }
+          },
+          {
+            "current": {
+              "label": "Disconnected tools",
+              "status": "Fragmented data"
+            },
+            "future": {
+              "label": "Connected systems",
+              "status": "Single source of truth"
+            }
+          },
+          {
+            "current": {
+              "label": "Poor search visibility",
+              "status": "Lost inbound demand"
+            },
+            "future": {
+              "label": "Stronger organic visibility",
+              "status": "Consistent inbound trust"
+            }
+          },
+          {
+            "current": {
+              "label": "Outdated processes",
+              "status": "Slow iteration speed"
+            },
+            "future": {
+              "label": "Better digital experiences",
+              "status": "Clear conversion"
+            }
+          },
+          {
+            "current": {
+              "label": "Too much operational friction",
+              "status": "Compounding cost"
+            },
+            "future": {
+              "label": "Software built around the business",
+              "status": "Enduring advantage"
+            }
+          }
+        ]
+      },
+      {
+        "type": "method",
+        "heading": "How we work.",
+        "cta": {
+          "label": "Start a conversation",
+          "href": "/#contact"
+        }
+      },
+      {
+        "type": "capabilities",
+        "heading": "What we build with.",
+        "lede": "Modern businesses have more tools than ever. The challenge is knowing which ones actually create value."
+      },
+      {
+        "type": "about",
+        "heading": "The right technology connects the pieces.",
+        "quote": "“Most businesses don’t need more software. They need their people, processes and systems to work better together.”",
+        "originTitle": "The Name & Origin",
+        "originBody": "Chinvat Bridge is inspired by the ancient Persian concept of a bridge — a passage between one state and another. For us, it represents the transition from how a business works today to how it could work tomorrow.",
+        "link": {
+          "label": "Where the name comes from",
+          "href": "/insights/where-the-name-chinvat-bridge-comes-from"
+        }
+      },
+      {
+        "type": "insights_teaser",
+        "heading": "Ideas and observations.",
+        "link": {
+          "label": "All insights",
+          "href": "/insights"
+        },
+        "count": 3
+      },
+      {
+        "type": "contact",
+        "heading": "Build a better way forward.",
+        "lede": "Tell us what’s slowing your business down, where you’re trying to grow, or what you’d like to build.",
+        "noscriptLead": "The conversation needs JavaScript. Please write to",
+        "chat": {
+          "greeting": "Hi, thanks for stopping by. What can we help you with?",
+          "followUps": {
+            "AI & Automation": "Good. What would you like to automate, or hand over to AI?",
+            "Workflows": "Good. Which process feels slow or messy right now?",
+            "Software & Web": "Good. What would you like built?",
+            "SEO & Growth": "Good. What would you like to grow, and where are you now?",
+            "Not sure yet": "That’s fine. What’s slowing your business down at the moment?"
+          },
+          "askContact": "Thanks, that’s clear. Where should we send our reply?",
+          "placeholders": {
+            "start": "Or tell us in your own words",
+            "details": "A sentence or two is plenty"
+          }
+        }
+      }
+    ]
+  }
+}

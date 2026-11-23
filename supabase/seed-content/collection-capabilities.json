@@ -1,0 +1,45 @@
+{
+  "key": "collection:capabilities",
+  "kind": "collection",
+  "schemaVersion": 1,
+  "data": {
+    "items": [
+      {
+        "key": "ai",
+        "category": "AI",
+        "title": "LLMs & Models",
+        "description": "Large language models, AI integrations, knowledge systems and intelligent workflows."
+      },
+      {
+        "key": "automation",
+        "category": "Automation",
+        "title": "Workflows & APIs",
+        "description": "Workflow automation, API integrations and business process orchestration."
+      },
+      {
+        "key": "software",
+        "category": "Software",
+        "title": "Custom Apps",
+        "description": "Modern web applications, internal tools and custom digital products."
+      },
+      {
+        "key": "data",
+        "category": "Data",
+        "title": "Pipelines & BI",
+        "description": "Data integration, structured information and actionable business intelligence."
+      },
+      {
+        "key": "web",
+        "category": "Web",
+        "title": "Digital Platforms",
+        "description": "Websites and digital experiences designed for performance, usability and growth."
+      },
+      {
+        "key": "seo",
+        "category": "SEO",
+        "title": "Technical SEO",
+        "description": "Technical SEO, site architecture, content structure and search visibility."
+      }
+    ]
+  }
+}

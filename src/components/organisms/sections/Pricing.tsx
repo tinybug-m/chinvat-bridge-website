@@ -8,39 +8,18 @@ import { EmailLink } from "@/components/atoms/EmailLink";
 import { LinkList, ServiceSection, TextGrid } from "@/components/services/ServiceBlocks";
 import { Reveal } from "@/components/motion/Reveal";
 import { getPlans } from "@/data/pricing";
-import { SERVICE_PAGES } from "@/data/service-pages";
+import type { PricingPage, ServicesCollection } from "@/lib/content/schema";
 import "./pricing.css";
 
-/*
- * What the terms already say about billing, tax, cancellation and results, in brief. Each line is
- * the terms page's own position (app/(pages)/terms/page.tsx); change both together. The plans'
- * own wording lives in the database and is not repeated here.
- */
-const TERMS_SUMMARY = [
-  {
-    title: "Billed monthly",
-    body: "Plans are billed monthly in advance through Stripe, our payment processor, and renew each month until cancelled.",
-  },
-  {
-    title: "Prices exclude tax",
-    body: "Prices are shown exclusive of any applicable tax, which is added at checkout where relevant.",
-  },
-  {
-    title: "No long-term contract",
-    body: "You can cancel at any time. We ask for 30 days’ notice, so active work can be wound down in an orderly way.",
-  },
-  {
-    title: "No ranking guarantees",
-    body: "Rankings, traffic and revenue depend on factors outside anyone’s control, so we commit to the work in your plan, not to a position in search results.",
-  },
-];
-
-/** The services quoted per project rather than sold as plans, each with its own page. */
-const QUOTED_SERVICES = SERVICE_PAGES.map((service) => ({
-  href: service.path,
-  title: service.name,
-  reason: service.description,
-}));
+/** The page copy (page:/pricing) and what it lists; the plans themselves come from public.plans. */
+export interface PricingContent {
+  page: PricingPage;
+  /** collection:services, for the custom package's "Ask us about" list. */
+  services: ServicesCollection["items"];
+  /** The services quoted per project, each from its page document (service name and meta description). */
+  otherServices: { href: string; title: string; reason: string }[];
+  contactEmail: string;
+}
 
 /**
  * /pricing: the page header, then the plans as cards, each with its own tier
@@ -50,19 +29,20 @@ const QUOTED_SERVICES = SERVICE_PAGES.map((service) => ({
  * a subgrid spanning five of the row tracks repeated here, so the plate, price
  * block, spec rows, capability list and button line up across the plans.
  */
-export async function Pricing() {
+export async function Pricing({ content }: { content: PricingContent }) {
   const plans = await getPlans();
+  const { page } = content;
 
   return (
     <>
       <PageHeader
         ruled={false}
-        kicker="SEO & content retainers"
-        title="SEO & content plans"
-        lede="Ongoing content, technical SEO and link building — delivered on a predictable monthly retainer. For AI, automation or custom software work, get in touch for a scoped quote."
+        kicker={page.header.kicker}
+        title={page.header.title}
+        lede={page.header.lede}
       >
-        <TextLink href="/services/seo" className="inline-flex min-h-11 items-center gap-2 text-body">
-          <span>How our SEO service works</span>
+        <TextLink href={page.header.link.href} className="inline-flex min-h-11 items-center gap-2 text-body">
+          <span>{page.header.link.label}</span>
           <ArrowIcon />
         </TextLink>
       </PageHeader>
@@ -73,41 +53,35 @@ export async function Pricing() {
             // No plans came back (none published, or the database could not be reached): say so
             // plainly rather than show prices from anywhere else. The custom package still stands.
             <p role="status" className="mb-4 max-w-[40rem] text-body text-pretty text-ink-soft lg:mb-5">
-              Our plan details can&rsquo;t be shown right now. Please try again shortly, or email <EmailLink /> and
-              we&rsquo;ll send you current pricing.
+              {page.plans.emptyState.beforeEmail} <EmailLink email={content.contactEmail} /> {page.plans.emptyState.afterEmail}
             </p>
           ) : null}
           <ul className="grid grid-cols-1 gap-4 lg:gap-5 xl:auto-rows-[auto_auto_auto_1fr_auto] xl:grid-cols-3">
             {plans.map((plan, index) => (
               <PricingCard key={plan.id} plan={plan} index={index} />
             ))}
-            <CustomPlanCard />
+            <CustomPlanCard content={page.plans.custom} services={content.services} />
           </ul>
         </Container>
       </section>
 
-      <ServiceSection id="billing" ruled={false} title="Billing and terms." intro="The short version of our terms for SEO plans.">
-        <TextGrid items={TERMS_SUMMARY} />
+      <ServiceSection id={page.billing.anchor} ruled={false} title={page.billing.title} intro={page.billing.intro}>
+        {/* The short version of the terms page's own positions (page:/terms); change both together. */}
+        <TextGrid items={page.billing.items} />
         <Reveal>
           <p className="mt-8 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-x-8">
-            <TextLink href="/terms" className="inline-flex min-h-11 items-center gap-2 text-body">
-              <span>Read the full terms</span>
-              <ArrowIcon />
-            </TextLink>
-            <TextLink href="/client-portal" className="inline-flex min-h-11 items-center gap-2 text-body">
-              <span>See what your client portal will look like</span>
-              <ArrowIcon />
-            </TextLink>
+            {page.billing.links.map((link) => (
+              <TextLink key={link.href} href={link.href} className="inline-flex min-h-11 items-center gap-2 text-body">
+                <span>{link.label}</span>
+                <ArrowIcon />
+              </TextLink>
+            ))}
           </p>
         </Reveal>
       </ServiceSection>
 
-      <ServiceSection
-        id="other-services"
-        title="Other services."
-        intro="AI integration, workflow automation and custom software are quoted per project rather than sold as plans. Each starts with a conversation about the work, and scope and cost are agreed before it begins."
-      >
-        <LinkList items={QUOTED_SERVICES} />
+      <ServiceSection id={page.otherServices.anchor} title={page.otherServices.title} intro={page.otherServices.intro}>
+        <LinkList items={content.otherServices} />
       </ServiceSection>
     </>
   );

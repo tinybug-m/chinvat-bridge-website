@@ -1,24 +1,22 @@
 import { Chip } from "@/components/atoms/Chip";
 import { Panel } from "@/components/portal/Panel";
 import { ProgressRow } from "@/components/portal/ProgressRow";
-import { getPlanById } from "@/data/pricing";
+import type { PricingPlan } from "@/data/pricing";
 import { createClient } from "@/lib/supabase/server";
 
 interface RealProjectProgressProps {
   customerId: string;
-  planId: string;
+  /** Read once by the dashboard page and shared with RealEngagementSummary. */
+  plan: PricingPlan | undefined;
 }
 
-export async function RealProjectProgress({ customerId, planId }: RealProjectProgressProps) {
+export async function RealProjectProgress({ customerId, plan }: RealProjectProgressProps) {
   const supabase = await createClient();
-  const [{ data: progressItems }, plan] = await Promise.all([
-    supabase
-      .from("customer_progress_items")
-      .select("*")
-      .eq("customer_id", customerId)
-      .order("sort_order"),
-    getPlanById(planId),
-  ]);
+  const { data: progressItems } = await supabase
+    .from("customer_progress_items")
+    .select("*")
+    .eq("customer_id", customerId)
+    .order("sort_order");
 
   if (progressItems && progressItems.length > 0) {
     return (

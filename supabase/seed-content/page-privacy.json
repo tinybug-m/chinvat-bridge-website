@@ -1,0 +1,261 @@
+{
+  "key": "page:/privacy",
+  "kind": "page",
+  "schemaVersion": 1,
+  "data": {
+    "template": "legal",
+    "seo": {
+      "title": "Privacy Policy",
+      "description": "How Chinvat Bridge collects, uses and protects your information when you visit our site or subscribe to a plan, and your rights under UK data protection law.",
+      "robots": "index",
+      "sitemap": {
+        "changeFrequency": "yearly",
+        "priority": 0.3
+      }
+    },
+    "updatedOn": "2026-11-21",
+    "header": {
+      "kicker": "Legal",
+      "title": "Privacy policy"
+    },
+    "lastUpdatedLabel": "Last updated:",
+    "lede": [
+      {
+        "type": "text",
+        "text": "Chinvat Bridge (“we”, “us”) is a UK-based technology consultancy. This policy explains what information we collect when you enquire about or subscribe to our services, and how we use it."
+      }
+    ],
+    "body": {
+      "schemaVersion": 1,
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 2,
+          "children": [
+            {
+              "type": "text",
+              "text": "Information we collect"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "When you contact us, request a plan, or subscribe to a service, we may collect:"
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "ordered": false,
+          "items": [
+            {
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Your name, company name, business email address and phone number"
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Your website URL and, optionally, your target market and project notes"
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "type": "text",
+                  "text": "With a message you send us, the page you were reading, the first page of your visit (including the source, medium and campaign name from the link you followed, if it had them), and the name of the website that referred you, if any, so we know what prompted it. The page keeps this in memory while you browse; nothing is saved to your device."
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Billing information processed directly by our payment provider, Stripe (we do not store your card details ourselves)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "children": [
+            {
+              "type": "text",
+              "text": "How we use it"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "We use this information only to:"
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "ordered": false,
+          "items": [
+            {
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Set up and deliver the service you’ve subscribed to or enquired about"
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Correspond with you about your account, project or enquiry"
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Process payments and manage your subscription, via Stripe"
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Meet our legal and accounting obligations"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "We do not sell your data, and we do not use it for advertising or share it with third parties except the service providers strictly necessary to run our business (such as Stripe for payment processing)."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "children": [
+            {
+              "type": "text",
+              "text": "Payment processing"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "Subscription payments are handled entirely by "
+            },
+            {
+              "type": "link",
+              "href": "https://stripe.com/gb/privacy",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Stripe"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": ". We never see or store your full card details. Stripe’s own privacy policy governs how it handles your payment data."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "children": [
+            {
+              "type": "text",
+              "text": "Data retention"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "We retain your information for as long as needed to provide our services and meet our legal and accounting obligations, after which it is deleted or anonymised."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "children": [
+            {
+              "type": "text",
+              "text": "Your rights"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "Under UK GDPR, you have the right to access, correct, or request deletion of your personal data. To exercise any of these rights, contact us at "
+            },
+            {
+              "type": "contact_email"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "children": [
+            {
+              "type": "text",
+              "text": "Contact"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "Questions about this policy or your data can be sent to "
+            },
+            {
+              "type": "contact_email"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

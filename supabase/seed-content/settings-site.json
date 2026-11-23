@@ -1,0 +1,95 @@
+{
+  "key": "settings:site",
+  "kind": "settings",
+  "schemaVersion": 1,
+  "data": {
+    "siteName": "Chinvat Bridge",
+    "siteTitle": "AI, Automation & Software for Small Businesses — Chinvat Bridge",
+    "siteDescription": "UK-based technology consultancy for small businesses worldwide: AI integration, workflow automation, custom software and technical SEO, built around your work.",
+    "siteOrigin": "The name comes from the Chinvat Bridge of ancient Persian tradition, the crossing where a person's own conscience meets them, and stands for the move from how a business works today to how it could work tomorrow.",
+    "contactEmail": "artin@chinvatbridge.com",
+    "eyebrow": "UK Based // Working Globally",
+    "ogImageAlt": "Chinvat Bridge: AI, automation, software and SEO. The mark is split down its axis, flat ink on one side and iridescent glass on the other.",
+    "organization": {
+      "areaServed": "Worldwide",
+      "addressCountry": "GB",
+      "knowsAbout": [
+        "Artificial intelligence",
+        "Business automation",
+        "Custom software",
+        "Technical SEO"
+      ]
+    },
+    "header": {
+      "contactShortLabel": "Contact"
+    },
+    "footer": {
+      "blurb": "Chinvat Bridge is a UK-based technology consultancy helping businesses use AI, automation, software and SEO to work better and grow.",
+      "columnTitles": {
+        "explore": "Explore",
+        "disciplines": "Disciplines",
+        "clients": "Clients"
+      },
+      "contactLinkLabel": "Contact",
+      "copyrightHolder": "Chinvat Bridge",
+      "rightsNotice": "All rights reserved.",
+      "legalLinks": [
+        {
+          "label": "Privacy Policy",
+          "href": "/privacy"
+        },
+        {
+          "label": "Terms of Service",
+          "href": "/terms"
+        }
+      ]
+    },
+    "notFound": {
+      "metaTitle": "Page Not Found",
+      "eyebrow": "Error 404",
+      "title": "The bridge breaks here.",
+      "lede": "The page you’re looking for may have moved, or the link may be out of date.",
+      "primaryCta": {
+        "label": "Back to home",
+        "href": "/"
+      },
+      "secondaryCta": {
+        "label": "Read insights",
+        "href": "/insights"
+      },
+      "routes": [
+        {
+          "label": "Services",
+          "href": "/#services"
+        },
+        {
+          "label": "Work",
+          "href": "/#work"
+        },
+        {
+          "label": "Approach",
+          "href": "/#approach"
+        },
+        {
+          "label": "Pricing",
+          "href": "/pricing"
+        }
+      ],
+      "contactPrompt": "Still stuck?",
+      "figureDescription": "A stone bridge whose middle span has fallen away, the missing slabs left as a dashed drawing."
+    },
+    "articles": {
+      "publishedLabel": "Published",
+      "updatedLabel": "Updated",
+      "readingTimeLabel": "Reading time",
+      "readingTimeUnit": "min read",
+      "allInsightsLabel": "All insights",
+      "relatedTitle": "Related reading",
+      "close": {
+        "title": "Build a better way forward.",
+        "lede": "Tell us what’s slowing your business down, where you’re trying to grow, or what you’d like to build.",
+        "ctaLabel": "Start a conversation"
+      }
+    }
+  }
+}

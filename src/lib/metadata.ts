@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { SiteSettings } from "./content/schema";
 import { SITE_NAME } from "./constants";
 
 /**
@@ -20,6 +21,15 @@ export const SHARED_OPEN_GRAPH = {
   ],
 } satisfies NonNullable<Metadata["openGraph"]>;
 
+/** SHARED_OPEN_GRAPH with the site name and image alt from settings:site. */
+export function sharedOpenGraph(settings: Pick<SiteSettings, "siteName" | "ogImageAlt">) {
+  return {
+    ...SHARED_OPEN_GRAPH,
+    siteName: settings.siteName,
+    images: [{ ...SHARED_OPEN_GRAPH.images[0], alt: settings.ogImageAlt }],
+  } satisfies NonNullable<Metadata["openGraph"]>;
+}
+
 interface PageMetadataInput {
   /** The page's own title; the layout's template adds the site name in <title>. */
   title: string;
@@ -33,13 +43,13 @@ interface PageMetadataInput {
  * are set in full, since a page that leaves one out inherits the root layout's, which describes
  * the homepage. The Twitter card takes its image from openGraph (Next fills it in).
  */
-export function pageMetadata({ title, description, path }: PageMetadataInput): Metadata {
-  const socialTitle = `${title} — ${SITE_NAME}`;
+export function pageMetadata({ title, description, path }: PageMetadataInput, settings?: Pick<SiteSettings, "siteName" | "ogImageAlt">): Metadata {
+  const socialTitle = `${title} — ${settings?.siteName ?? SITE_NAME}`;
   return {
     title,
     description,
     alternates: { canonical: path },
-    openGraph: { ...SHARED_OPEN_GRAPH, type: "website", url: path, title: socialTitle, description },
+    openGraph: { ...(settings ? sharedOpenGraph(settings) : SHARED_OPEN_GRAPH), type: "website", url: path, title: socialTitle, description },
     twitter: { card: "summary_large_image", title: socialTitle, description },
   };
 }

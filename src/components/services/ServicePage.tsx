@@ -1,141 +1,175 @@
 import type { ComponentType } from "react";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { PLATE_VIEWBOX } from "@/components/home/services/crops";
-import { AiDiagram, AutomationDiagram, SoftwareDiagram } from "@/components/home/services/diagrams";
+import { AiDiagram, AutomationDiagram, SeoDiagram, SoftwareDiagram } from "@/components/home/services/diagrams";
 import { PlateDiagram } from "@/components/home/services/PlateDiagram";
 import { ArticleEnd } from "@/components/insights/ArticleEnd";
 import { Reveal } from "@/components/motion/Reveal";
-import { FaqList, LinkList, OfferingList, ServiceSection, TextGrid } from "@/components/services/ServiceBlocks";
+import { FaqList, LinkList, ListPair, OfferingList, ServiceSection, TextGrid } from "@/components/services/ServiceBlocks";
 import { JsonLdScripts, relatedInsightLinks, serviceJsonLd } from "@/components/services/structured-data";
 import { ButtonLink } from "@/components/system/Button";
 import { PageHeader } from "@/components/system/PageHeader";
 import { SiteShell } from "@/components/templates/SiteShell";
-import { PROCESS_STEPS } from "@/data/process";
-import type { ServiceDiagram, ServicePageContent } from "@/data/service-pages";
+import { getPage, getSiteChrome } from "@/lib/content/read";
+import type { DIAGRAMS as DIAGRAM_KEYS, ProcessStepsCollection, SectionContent, ServiceBlock } from "@/lib/content/schema";
 import { pageMetadata } from "@/lib/metadata";
+import { cn } from "@/lib/utils";
 
 /*
- * The AI, automation and software service pages: the same order of blocks as /services/seo
- * (problem, what we do, examples, approach, process, engagement, questions, related reading),
- * filled from data/service-pages.ts. The header figure is the service's own homepage diagram,
- * cropped as on its plate. These services are quoted per project, so every call to action opens
- * the homepage conversation; only SEO has plans on /pricing.
+ * The service pages (AI, automation, software, SEO), rendered from their page documents
+ * (template "service"): an ordered list of blocks, each mapped to the existing components below.
+ * The header figure is the service's own homepage diagram, keyed by `diagram`; the crops, diagrams
+ * and layout stay in code. Copy, calls to action and section order are content.
  */
 
-const DIAGRAMS: Record<ServiceDiagram, ComponentType> = {
+const DIAGRAMS: Record<(typeof DIAGRAM_KEYS)[number], ComponentType> = {
   ai: AiDiagram,
   automation: AutomationDiagram,
   software: SoftwareDiagram,
+  seo: SeoDiagram,
 };
+/** The header crop: the plate's own, except SEO, whose plate bleeds off the page edge. */
+const HEADER_VIEWBOX: Record<keyof typeof DIAGRAMS, string> = {
+  ai: PLATE_VIEWBOX.ai,
+  automation: PLATE_VIEWBOX.automation,
+  software: PLATE_VIEWBOX.software,
+  seo: "16 40 384 240",
+};
+const BACKGROUND = { paper: undefined, raised: "bg-paper-raised", haze: "bg-haze" } as const;
 
-export function serviceMetadata(content: ServicePageContent): Metadata {
-  return pageMetadata({ title: content.title, description: content.description, path: content.path });
+/** The published (or verified-preview) service page at `path`, or a 404. */
+async function servicePage(path: string) {
+  const page = await getPage(path);
+  if (!page || page.data.template !== "service") notFound();
+  return page.data;
 }
 
-export function ServicePage({ content }: { content: ServicePageContent }) {
-  const Diagram = DIAGRAMS[content.diagram];
-  const relatedInsights = relatedInsightLinks(content.relatedInsights);
+export async function serviceMetadata(path: string): Promise<Metadata> {
+  const [page, { settings }] = await Promise.all([servicePage(path), getSiteChrome()]);
+  return {
+    ...pageMetadata({ title: page.seo.title, description: page.seo.description, path }, settings),
+    ...(page.seo.robots === "noindex" && { robots: { index: false, follow: true } }),
+  };
+}
 
+type Cta = Extract<ServiceBlock, { type: "page_header" }>["ctas"][number];
+
+function CtaButton({ cta }: { cta: Cta }) {
   return (
-    <SiteShell>
-      <PageHeader
-        kicker={content.name}
-        title={content.h1}
-        lede={content.lede}
-        aside={
-          <PlateDiagram viewBox={PLATE_VIEWBOX[content.diagram]} loop className="w-full max-w-[28rem] lg:max-w-none">
-            <Diagram />
-          </PlateDiagram>
-        }
-      >
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <ButtonLink href="/#contact" size="lg" arrow="right" className="w-full sm:w-auto">
-            {content.primaryCta}
-          </ButtonLink>
-          <ButtonLink href="#what-we-do" size="lg" variant="secondary" arrow="down" className="w-full sm:w-auto">
-            See what we do
-          </ButtonLink>
-        </div>
-      </PageHeader>
+    <ButtonLink href={cta.href} size="lg" variant={cta.variant === "secondary" ? "secondary" : undefined} arrow={cta.arrow} className="w-full sm:w-auto">
+      {cta.label}
+    </ButtonLink>
+  );
+}
 
-      <ServiceSection id="problem" ruled={false} title={content.problems.title} intro={content.problems.intro}>
-        <TextGrid items={content.problems.items} />
-      </ServiceSection>
+function CtaRow({ ctas, className }: { ctas: Cta[]; className?: string }) {
+  if (ctas.length === 0) return null;
+  // One button sits alone; two or more wrap as a row from sm.
+  if (ctas.length === 1) return <div className={className}><CtaButton cta={ctas[0]} /></div>;
+  return (
+    <div className={cn(className, "flex flex-col gap-3 sm:flex-row sm:flex-wrap")}>
+      {ctas.map((cta) => (
+        <CtaButton key={cta.href + cta.label} cta={cta} />
+      ))}
+    </div>
+  );
+}
 
-      <ServiceSection id="what-we-do" title={content.offerings.title} intro={content.offerings.intro}>
-        <OfferingList items={content.offerings.items} />
-      </ServiceSection>
-
-      <ServiceSection id="examples" title={content.examples.title} intro={content.examples.intro} className="bg-paper-raised">
-        <TextGrid items={content.examples.items} />
-        {content.examples.note ? (
-          <Reveal>
-            <p className="mt-10 max-w-measure text-body text-pretty text-ink">{content.examples.note}</p>
-          </Reveal>
-        ) : null}
-      </ServiceSection>
-
-      {content.detail ? (
-        <ServiceSection id={content.detail.id} ruled={false} title={content.detail.title}>
-          <Reveal>
-            {content.detail.paragraphs.map((paragraph) => (
-              <p key={paragraph} className="mb-5 max-w-measure text-body text-pretty text-ink-soft">
-                {paragraph}
-              </p>
-            ))}
-          </Reveal>
-        </ServiceSection>
-      ) : null}
-
-      <ServiceSection id="approach-principles" title={content.approach.title} intro={content.approach.intro} stacked>
-        <TextGrid items={content.approach.parts} columns={3} />
+function SectionContentBlock({ block, steps }: { block: SectionContent; steps: ProcessStepsCollection["items"] }) {
+  switch (block.type) {
+    case "text_grid":
+      return <TextGrid items={block.items} columns={block.columns} />;
+    case "offering_list":
+      return <OfferingList items={block.items} />;
+    case "list_pair":
+      return <ListPair lists={block.lists} note={block.note} />;
+    case "faq_list":
+      return <FaqList items={block.items} />;
+    case "link_list":
+      return <LinkList items={block.items} />;
+    case "note":
+      return (
         <Reveal>
-          <p className="mt-10 max-w-measure text-lede text-pretty text-ink">{content.approach.note}</p>
+          <p className={cn("mt-10 max-w-measure text-pretty text-ink", block.size === "lede" ? "text-lede" : "text-body")}>{block.text}</p>
         </Reveal>
-      </ServiceSection>
-
-      <ServiceSection id="how-we-work" title="How we work." intro="The same four steps as all our work, applied to this service.">
-        <TextGrid
-          items={PROCESS_STEPS.map((step) => ({
-            title: step.title,
-            body: `${step.description} ${content.process[step.title] ?? ""}`.trim(),
-          }))}
-        />
-      </ServiceSection>
-
-      <ServiceSection id="engagement" title="How projects start." className="bg-haze">
+      );
+    case "paragraphs":
+      return (
         <Reveal>
-          {content.engagement.map((paragraph) => (
+          {block.paragraphs.map((paragraph) => (
             <p key={paragraph} className="mb-5 max-w-measure text-body text-pretty text-ink-soft">
               {paragraph}
             </p>
           ))}
-          <div className="mt-8">
-            <ButtonLink href="/#contact" size="lg" arrow="right" className="w-full sm:w-auto">
-              {content.primaryCta}
-            </ButtonLink>
-          </div>
+          <CtaRow ctas={block.ctas} className="mt-8" />
         </Reveal>
-      </ServiceSection>
+      );
+    case "process_steps":
+      // The shared four steps (collection:process_steps), each followed by this page's note for it.
+      return <TextGrid items={steps.map((step) => ({ title: step.title, body: `${step.description} ${block.notes[step.key] ?? ""}`.trim() }))} />;
+  }
+}
 
-      <ServiceSection id="faq" ruled={false} title="Questions we’re asked.">
-        <FaqList items={content.faqs} />
-      </ServiceSection>
-
-      {relatedInsights.length > 0 ? (
-        // Not "insights": the header lights its Insights link for any #insights on a page.
-        <ServiceSection id="related-insights" title="Related insights.">
-          <LinkList items={relatedInsights} />
+async function Block({ block, path, steps }: { block: ServiceBlock; path: string; steps: ProcessStepsCollection["items"] }) {
+  switch (block.type) {
+    case "page_header": {
+      const Diagram = DIAGRAMS[block.diagram];
+      return (
+        <PageHeader
+          kicker={block.kicker}
+          title={block.title}
+          lede={block.lede}
+          aside={
+            <PlateDiagram viewBox={HEADER_VIEWBOX[block.diagram]} loop className="w-full max-w-[28rem] lg:max-w-none">
+              <Diagram />
+            </PlateDiagram>
+          }
+        >
+          <CtaRow ctas={block.ctas} />
+        </PageHeader>
+      );
+    }
+    case "section":
+      return (
+        <ServiceSection
+          id={block.anchor}
+          title={block.title}
+          intro={block.intro}
+          ruled={block.ruled}
+          stacked={block.stacked}
+          className={BACKGROUND[block.background]}
+        >
+          {block.content.map((content, i) => (
+            <SectionContentBlock key={i} block={content} steps={steps} />
+          ))}
         </ServiceSection>
-      ) : null}
+      );
+    case "related_insights": {
+      const links = await relatedInsightLinks(block.curated, path);
+      // Left out while empty. Not "insights" as an id: the header lights its Insights link for any #insights.
+      return links.length > 0 ? (
+        <ServiceSection id={block.anchor} title={block.title}>
+          <LinkList items={links} />
+        </ServiceSection>
+      ) : null;
+    }
+    case "closing":
+      return <ArticleEnd related={[]} title={block.title} lede={block.lede} cta={block.ctaLabel} />;
+  }
+}
 
-      <ServiceSection id="related-services" title="Related services.">
-        <LinkList items={content.relatedServices} />
-      </ServiceSection>
+export async function ServicePage({ path }: { path: string }) {
+  const [page, chrome] = await Promise.all([servicePage(path), getSiteChrome()]);
+  const steps = chrome.processSteps.items;
 
-      <ArticleEnd related={[]} title={content.close.title} lede={content.close.lede} cta={content.close.cta} />
-
-      <JsonLdScripts data={serviceJsonLd(content)} />
+  return (
+    <SiteShell>
+      {page.blocks.map((block, i) => (
+        <Block key={i} block={block} path={path} steps={steps} />
+      ))}
+      {/* Service and BreadcrumbList; no offers (prices live on /pricing or are quoted). */}
+      <JsonLdScripts data={serviceJsonLd({ path, name: page.service.name, serviceType: page.service.serviceType, description: page.seo.description })} />
     </SiteShell>
   );
 }
