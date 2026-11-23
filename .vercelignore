@@ -15,3 +15,4 @@ seo
 docs/archive
 test-results
 playwright-report
+.sentry-native
