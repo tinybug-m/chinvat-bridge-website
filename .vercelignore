@@ -1,0 +1,17 @@
+# Never upload local secrets or tooling state to Vercel
+.env
+.env.*
+!.env.example
+.claude
+.playwright-mcp
+supabase/.temp
+supabase/.branches
+*.dump
+*.pem
+*.key
+# Not needed to build the site
+prototypes
+seo
+docs/archive
+test-results
+playwright-report
