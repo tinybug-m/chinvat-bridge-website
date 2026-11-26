@@ -9,8 +9,8 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // The logo's liquid chrome; hover slides the sheen across.
-        primary: "bg-material hover:[background-position:100%_50%]",
+        // The logo's liquid chrome, drifting slowly; still under reduced motion.
+        primary: "bg-material animate-chrome-drift motion-reduce:animate-none",
         secondary: "text-ink shadow-[inset_0_0_0_1px_var(--color-line-strong)] hover:shadow-[inset_0_0_0_1px_var(--color-ink)]",
         quiet: "px-0! text-ink hover:text-cobalt-700",
       },

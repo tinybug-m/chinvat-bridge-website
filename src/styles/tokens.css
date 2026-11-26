@@ -114,8 +114,8 @@
   /*
    * The primary fill is the logo's material, the mark's liquid chrome:
    * gunmetal with oil-slick blue, cyan, amber and a trace of violet, layered
-   * as soft pools. Drawn at 180% width: rest shows the left part, hover
-   * slides the pools across. The pools stay deep enough for paper text.
+   * as soft pools. Drawn at 180% width; buttons drift the pools slowly
+   * across (animate-chrome-drift). The pools stay deep enough for paper text.
    */
   --material-fill:
     radial-gradient(16% 85% at 9% 100%, rgb(30 130 255 / 0.95), transparent 70%),
@@ -142,6 +142,14 @@
   --material-edge:
     inset 0 1px 0 rgb(255 255 255 / 0.28),
     inset 0 -1px 0 rgb(0 0 0 / 0.5);
+}
+
+@theme {
+  --animate-chrome-drift: chrome-drift 10s ease-in-out infinite alternate;
+  @keyframes chrome-drift {
+    from { background-position: 0% 50%; }
+    to { background-position: 100% 50%; }
+  }
 }
 
 @utility bg-material {

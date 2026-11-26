@@ -15,7 +15,7 @@ export function ProgressRow({ label, percentLabel, totalSteps, completedSteps, n
         <span className="text-body font-medium text-ink">{label}</span>
         <span className="shrink-0 text-small text-ink-soft tabular-nums">{percentLabel}</span>
       </div>
-      <SteppedProgressBar totalSteps={totalSteps} completedSteps={completedSteps} />
+      <SteppedProgressBar totalSteps={totalSteps} completedSteps={completedSteps} label={label} />
       {note ? <p className="text-small text-pretty text-ink-muted">{note}</p> : null}
     </li>
   );
