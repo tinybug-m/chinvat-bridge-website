@@ -29,6 +29,8 @@ export interface StageOptions {
   releaseMargin?: string;
   /** Under prefers-reduced-motion: show the poster ("fallback", default) or render one still frame ("static"). */
   reducedMotion?: "fallback" | "static";
+  /** Mount without waiting for the page to load and go idle: for a scene that is the page's opening. */
+  eager?: boolean;
 }
 
 type Listener = () => void;
@@ -169,7 +171,7 @@ export class StageController implements BudgetMember, StageHandle {
       this.near = true;
       this.maybeMount();
     } else {
-      void whenLoadedAndIdle(signal).then(() => {
+      void (this.options.eager ? Promise.resolve() : whenLoadedAndIdle(signal)).then(() => {
         if (signal.aborted) return;
         this.ready = true;
         this.maybeMount();

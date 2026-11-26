@@ -47,6 +47,8 @@ export interface ThreeStageProps {
   mountMargin?: string;
   releaseMargin?: string;
   reducedMotion?: "fallback" | "static";
+  /** Mount at once instead of after load and idle. Read once. */
+  eager?: boolean;
 }
 
 const serverState = (): StageState => "idle";
@@ -64,9 +66,10 @@ export function ThreeStage({
   mountMargin,
   releaseMargin,
   reducedMotion,
+  eager,
 }: ThreeStageProps) {
   // Options are read once; a stage keeps its scene for its whole life.
-  const [controller] = useState(() => new StageController({ id, load, mountMargin, releaseMargin, reducedMotion }));
+  const [controller] = useState(() => new StageController({ id, load, mountMargin, releaseMargin, reducedMotion, eager }));
   const state = useSyncExternalStore(controller.subscribe, controller.getState, serverState);
   const rootRef = useRef<HTMLDivElement>(null);
   const hostRef = useRef<HTMLDivElement>(null);
