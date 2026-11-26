@@ -16,3 +16,5 @@ supabase/.branches
 /test-results
 /playwright-report
 /.sentry-native
+/.overnight
+/maybe-ideas
