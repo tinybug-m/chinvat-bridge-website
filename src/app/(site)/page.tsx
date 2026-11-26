@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { HomeSections } from "@/components/home/HomeSections";
+import { HomeContact } from "@/components/windy-pop/variants/contact/HomeContact";
 import { getPage } from "@/lib/content/read";
 
 /**
@@ -15,5 +16,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Home() {
-  return <HomeSections />;
+  return <HomeSections contact={<HomeContact />} />;
 }

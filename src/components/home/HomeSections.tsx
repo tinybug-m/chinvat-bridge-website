@@ -15,9 +15,9 @@ import { getPage, getSiteChrome } from "@/lib/content/read";
 /*
  * The homepage, from page:/ (a fixed sequence of nine blocks, which the energy wire is routed through)
  * and the shared collections. Diagrams, plates and geometry stay in the components, keyed by the
- * collections' stable keys. `hero` replaces the hero for the dev-only hero studies.
+ * collections' stable keys. `hero` and `contact` replace those sections.
  */
-export async function HomeSections({ hero }: { hero?: ReactNode }) {
+export async function HomeSections({ hero, contact: contactSection }: { hero?: ReactNode; contact?: ReactNode }) {
   const [page, chrome] = await Promise.all([getPage("/"), getSiteChrome()]);
   if (!page || page.data.template !== "home") notFound();
   const [heroBlock, services, work, approach, method, capabilities, about, , contact] = page.data.blocks;
@@ -33,7 +33,7 @@ export async function HomeSections({ hero }: { hero?: ReactNode }) {
       <About content={about} />
       {/* The teaser belongs to the insights stream; its block (insights_teaser) is in page:/ for it to adopt. */}
       <Insights />
-      <Contact content={contact} email={chrome.settings.contactEmail} />
+      {contactSection ?? <Contact content={contact} email={chrome.settings.contactEmail} />}
     </SiteShell>
   );
 }
