@@ -1,0 +1,744 @@
+/*
+ * Variation D, "Duo": light paper throughout; the dog in its own colours inside the hero's window and
+ * drawn in ink everywhere else. Everything is scoped under .root (DuoHome); the contact section's own chat is
+ * hidden here and the Windy Pup chat takes its place (DuoContact).
+ */
+
+.root {
+  --duo-header: 4rem;
+  --duo-ease: var(--ease-out-quart);
+}
+
+@media (min-width: 64rem) {
+  .root {
+    --duo-header: 4.5rem;
+  }
+}
+
+/* --- Hero ------------------------------------------------------------------------------------- */
+
+.hero {
+  position: relative;
+  overflow-x: clip;
+}
+
+.heroContainer {
+  padding-top: calc(var(--duo-header) + 1.25rem);
+  padding-bottom: 2.5rem;
+}
+
+.heroGrid {
+  /* Phones: the headline, the window, then the lede and the actions; all in the first screen. */
+  --win-h: clamp(15.5rem, 37svh, 22rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "head" "window" "below";
+}
+
+.heroHead {
+  grid-area: head;
+}
+
+.title {
+  margin-top: 0.75rem;
+  font-size: clamp(2.375rem, 1.2rem + 5.6vw, 4.5rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+}
+
+.heroBelow {
+  grid-area: below;
+}
+
+.lede {
+  max-width: 34rem;
+  font-size: var(--text-lede);
+  line-height: 1.5;
+}
+
+.actions {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 40rem) {
+  .actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+.heroHead,
+.heroBelow {
+  transition:
+    opacity 260ms var(--duo-ease),
+    translate 420ms var(--ease-out-expo);
+}
+
+/* The chat that takes the copy's place. */
+.heroChat {
+  grid-area: chat;
+  display: none;
+  min-height: 0;
+  flex-direction: column;
+  opacity: 0;
+  translate: 0 0.75rem;
+  transition:
+    opacity 320ms var(--duo-ease),
+    translate 520ms var(--ease-out-expo);
+}
+
+.heroChatBody {
+  --wp-chat-height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Phones, chat open: the window shrinks and the chat fills the rest of the screen under it. */
+.hero[data-chat] .heroGrid {
+  --win-h: clamp(11rem, 27svh, 15rem);
+  grid-template-areas: "window" "chat";
+}
+
+.hero[data-chat] .heroHead,
+.hero[data-chat] .heroBelow {
+  display: none;
+}
+
+.hero[data-chat] .heroChat {
+  display: flex;
+  /* Less the header, the window and the spaces above it, around it and under the chat. */
+  height: calc(100svh - var(--duo-header) - var(--win-h) - 5.25rem);
+  min-height: 20rem;
+  margin-top: 0.75rem;
+  opacity: 1;
+  translate: 0 0;
+}
+
+@starting-style {
+  .hero[data-chat] .heroChat {
+    opacity: 0;
+    translate: 0 0.75rem;
+  }
+}
+
+.origin {
+  justify-self: center;
+  width: 1px;
+  height: 0;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 64rem) {
+  .heroContainer {
+    padding-top: calc(var(--duo-header) + 2rem);
+    padding-bottom: 3rem;
+  }
+
+  .heroGrid {
+    --H: clamp(34rem, calc(100svh - var(--duo-header) - 5rem), 50rem);
+    --win-h: var(--H);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+    grid-template-rows: 1fr auto auto 1fr;
+    grid-template-areas: ". window" "head window" "below window" ". window";
+    column-gap: clamp(3rem, 1rem + 4vw, 6rem);
+    height: var(--H);
+  }
+
+  .heroHead,
+  .heroBelow {
+    grid-column: 1;
+    container-type: inline-size;
+  }
+
+  .heroHead {
+    padding-bottom: 1.75rem;
+    border-bottom: 1px solid var(--color-ink);
+  }
+
+  .heroBelow {
+    padding-top: 1.75rem;
+  }
+
+  .title {
+    font-size: min(var(--H) * 0.105, 12.4cqi);
+    letter-spacing: -0.03em;
+  }
+
+  .lede {
+    font-size: max(var(--text-lede), min(var(--H) * 0.03, 1.4rem));
+  }
+
+  .actions {
+    margin-top: 2rem;
+  }
+
+  /* Wide, chat open: the copy steps back and the chat takes the whole column; nothing else moves. */
+  .hero[data-chat] .heroGrid {
+    --win-h: var(--H);
+    grid-template-areas: ". window" "head window" "below window" ". window";
+  }
+
+  .hero[data-chat] .heroHead,
+  .hero[data-chat] .heroBelow {
+    display: block;
+    opacity: 0;
+    translate: 0 -0.5rem;
+    visibility: hidden;
+    transition:
+      opacity 200ms var(--duo-ease),
+      translate 300ms var(--duo-ease),
+      visibility 0s 300ms;
+  }
+
+  .heroChat {
+    grid-area: 1 / 1 / 5 / 2;
+  }
+
+  .hero[data-chat] .heroChat {
+    height: auto;
+    min-height: 0;
+    margin-top: 0;
+    transition-delay: 120ms;
+  }
+
+  .origin {
+    grid-area: window;
+    align-self: end;
+    margin: 0 0 -3rem;
+  }
+}
+
+/* --- The window ----------------------------------------------------------------------------------- */
+
+.window {
+  grid-area: window;
+  position: relative;
+  container-type: size;
+  height: var(--win-h);
+  margin: 1.25rem 0 1.5rem;
+  border: 1px solid var(--color-line-strong);
+  background: white;
+  transition:
+    height 420ms var(--ease-out-expo),
+    border-color 200ms;
+}
+
+.window[data-home] {
+  cursor: pointer;
+}
+
+.hero[data-chat] .window {
+  cursor: default;
+}
+
+@media (min-width: 64rem) {
+  .window {
+    margin: 0;
+  }
+}
+
+/* Crop marks just outside the frame, in ink. */
+.corner {
+  position: absolute;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 0 solid var(--color-ink);
+  transition:
+    width 260ms var(--ease-out-expo),
+    height 260ms var(--ease-out-expo);
+  pointer-events: none;
+}
+
+.corner[data-at="tl"] {
+  top: -0.4rem;
+  left: -0.4rem;
+  border-width: 1px 0 0 1px;
+}
+
+.corner[data-at="tr"] {
+  top: -0.4rem;
+  right: -0.4rem;
+  border-width: 1px 1px 0 0;
+}
+
+.corner[data-at="bl"] {
+  bottom: -0.4rem;
+  left: -0.4rem;
+  border-width: 0 0 1px 1px;
+}
+
+.corner[data-at="br"] {
+  bottom: -0.4rem;
+  right: -0.4rem;
+  border-width: 0 1px 1px 0;
+}
+
+.window[data-home]:hover {
+  border-color: var(--color-ink-muted);
+}
+
+.window[data-home]:hover .corner {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.hero[data-chat] .window:hover .corner {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.caption {
+  position: absolute;
+  top: 0.85rem;
+  margin: 0;
+  font-family: var(--font-label);
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  pointer-events: none;
+}
+
+.caption[data-at="left"] {
+  left: 1rem;
+}
+
+.caption[data-at="right"] {
+  right: 1rem;
+  color: var(--color-ink-muted);
+}
+
+/* The ground the dog stands on: a hairline with a fine scale under it. */
+.windowGround {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 84%;
+  height: 0.45rem;
+  border-top: 1px solid color-mix(in oklab, var(--color-ink) 45%, transparent);
+  background: repeating-linear-gradient(90deg, color-mix(in oklab, var(--color-ink) 35%, transparent) 0 1px, transparent 1px 0.625rem) top / 100% 0.25rem no-repeat;
+  pointer-events: none;
+}
+
+/*
+ * The still (before the stage is live, and without WebGL) is a capture of the stage around the dog's
+ * place: 1.8 by 1.3 of its height, its feet 1.2 of its height from the top. Placed with the same
+ * fractions as DuoHome's HERO_SPOT, so the live dog appears exactly where the still was.
+ */
+.windowPoster {
+  --h: min(70cqh, 70cqw);
+  position: absolute;
+  left: calc(56cqw - var(--h) * 0.9);
+  top: calc(82.2cqh - var(--h) * 1.2);
+  width: calc(var(--h) * 1.8);
+  height: calc(var(--h) * 1.3);
+  max-width: none;
+  pointer-events: none;
+  transition: opacity 400ms var(--duo-ease);
+}
+
+.window[data-live] .windowPoster,
+.window:not([data-home]) .windowPoster {
+  opacity: 0;
+}
+
+/* "Need anything?": a speech bubble left of the mouth, its tail pointing at it. */
+.bubble {
+  --mx: 38.5%;
+  --my: 44%;
+  position: absolute;
+  /* Over the stage (z-index 40): the line is said in front of the dog. */
+  z-index: 42;
+  top: var(--my);
+  right: min(calc(100% - var(--mx) + 0.75rem), calc(100% - 9.75rem));
+  padding: 0.55rem 0.95rem 0.6rem;
+  border: 1px solid var(--color-ink);
+  border-radius: 1.25rem;
+  background: var(--color-paper-raised);
+  box-shadow: 0 0.5rem 1.5rem -0.75rem color-mix(in oklab, var(--color-ink) 35%, transparent);
+  font-size: var(--text-small);
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--color-ink);
+  cursor: pointer;
+  opacity: 0;
+  translate: 0.4rem -50%;
+  scale: 0.92;
+  transform-origin: 100% 50%;
+  pointer-events: none;
+  transition:
+    opacity 260ms var(--duo-ease),
+    translate 520ms var(--ease-out-expo),
+    scale 520ms var(--ease-out-expo),
+    background-color 160ms,
+    color 160ms;
+}
+
+.bubble::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -0.36rem;
+  width: 0.65rem;
+  height: 0.65rem;
+  border: solid var(--color-ink);
+  border-width: 1px 1px 0 0;
+  background: inherit;
+  translate: 0 -50%;
+  rotate: 45deg;
+  transition: background-color 160ms;
+}
+
+.bubble[data-show] {
+  opacity: 1;
+  translate: 0 -50%;
+  scale: 1;
+  pointer-events: auto;
+}
+
+.bubble:hover,
+.bubble:focus-visible,
+.window[data-home]:hover .bubble[data-show] {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.bubble:focus-visible {
+  outline: 2px solid var(--color-cobalt-700);
+  outline-offset: 3px;
+}
+
+.bubbleText::before {
+  content: "";
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-azure-400);
+  vertical-align: 0.08em;
+  box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-azure-400) 50%, transparent);
+  animation: duo-ping 2.4s var(--duo-ease) 1.2s infinite;
+}
+
+@keyframes duo-ping {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-azure-400) 45%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 0.45rem transparent;
+  }
+}
+
+/* --- The stage and the dog's button ----------------------------------------------------------- */
+
+.stageLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+}
+
+.hitWrap {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 41;
+  width: var(--w);
+  height: var(--h);
+  translate: var(--x) var(--y);
+}
+
+.hit {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 1.25rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.hit:focus-visible {
+  outline: 2px solid var(--color-cobalt-700);
+  outline-offset: 4px;
+}
+
+/* Without WebGL the corner dog is the still, around the place the box was estimated from (DuoDog). */
+.hitPoster {
+  position: absolute;
+  left: calc(var(--h) * -0.28);
+  top: calc(var(--h) * -0.2);
+  width: calc(var(--h) * 1.8);
+  height: calc(var(--h) * 1.3);
+  max-width: none;
+}
+
+/*
+ * The corner dog's line: the hero's speech bubble, small. Left of the mouth with its tail at it, riding
+ * with the head (--mx/--my, set in DuoDog). At rest it is three soft "typing" dots; when the dog arrives
+ * and on hover it opens into "Need anything?".
+ */
+.hitWrap {
+  /* Until the scene reports the mouth: about where the corner dog's mouth is. */
+  --mx: 30%;
+  --my: 24%;
+}
+
+.badge {
+  position: absolute;
+  top: var(--my);
+  right: calc(100% - var(--mx) + 0.7rem);
+  /* Anchored by its right edge inside a dog-sized button: without this it shrinks to the gap left of the mouth. */
+  width: max-content;
+  display: inline-flex;
+  align-items: center;
+  height: 2.125rem;
+  padding: 0 0.8rem;
+  border: 1px solid var(--color-ink);
+  border-radius: 1.0625rem;
+  background: var(--color-paper-raised);
+  box-shadow: 0 0.5rem 1.5rem -0.75rem color-mix(in oklab, var(--color-ink) 35%, transparent);
+  color: var(--color-ink);
+  white-space: nowrap;
+  translate: 0 -50%;
+  transform-origin: 100% 50%;
+  pointer-events: auto;
+  cursor: pointer;
+  animation: duo-badge-in 520ms var(--ease-out-expo) both;
+  transition:
+    background-color 160ms,
+    color 160ms,
+    opacity 200ms;
+}
+
+/* The tail, as on the hero's bubble: a turned square pointing at the mouth. */
+.badge::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -0.33rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  border: solid var(--color-ink);
+  border-width: 1px 1px 0 0;
+  background: inherit;
+  translate: 0 -50%;
+  rotate: 45deg;
+  transition: background-color 160ms;
+}
+
+@keyframes duo-badge-in {
+  from {
+    opacity: 0;
+    scale: 0.85;
+  }
+}
+
+.badgeDots {
+  display: inline-flex;
+  gap: 0.22rem;
+  width: 1.32rem;
+  overflow: hidden;
+  transition:
+    width 360ms var(--ease-out-expo),
+    opacity 200ms;
+}
+
+.badgeDots i {
+  width: 0.3rem;
+  height: 0.3rem;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.35;
+  animation: duo-typing 1.4s var(--duo-ease) infinite;
+}
+
+.badgeDots i:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.badgeDots i:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+@keyframes duo-typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    translate: 0 0;
+  }
+  30% {
+    opacity: 1;
+    translate: 0 -0.12rem;
+  }
+}
+
+.badgeText {
+  display: grid;
+  grid-template-columns: 0fr;
+  font-size: 0.875rem;
+  line-height: 1;
+  transition: grid-template-columns 420ms var(--ease-out-expo);
+}
+
+.badgeText > span {
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Same dot as the hero bubble, pinging. */
+.badgeLine {
+  display: inline-block;
+  opacity: 0;
+  transition: opacity 200ms;
+}
+
+.badgeLine::before {
+  content: "";
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-right: 0.45rem;
+  border-radius: 50%;
+  background: var(--color-azure-400);
+  vertical-align: 0.06em;
+  animation: duo-ping 2.4s var(--duo-ease) 0.6s infinite;
+}
+
+.badge[data-open] .badgeText,
+.hit:hover .badgeText,
+.hit:focus-visible .badgeText {
+  grid-template-columns: 1fr;
+}
+
+.badge[data-open] .badgeLine,
+.hit:hover .badgeLine,
+.hit:focus-visible .badgeLine {
+  opacity: 1;
+  transition-delay: 120ms;
+}
+
+/* Open, the dots give way to the words. */
+.badge[data-open] .badgeDots,
+.hit:hover .badgeDots,
+.hit:focus-visible .badgeDots {
+  width: 0;
+  opacity: 0;
+}
+
+.hit:hover .badge,
+.hit:focus-visible .badge {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.hitWrap[data-moving] .badge {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge,
+  .badgeDots i {
+    animation: none;
+  }
+}
+
+/* --- The corner panel ---------------------------------------------------------------------------- */
+
+.panel {
+  --wp-chat-height: 100%;
+  position: fixed;
+  z-index: 45;
+  left: 0.5rem;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  height: min(68svh, 34rem);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  translate: 0 1rem;
+  visibility: hidden;
+  transition:
+    opacity 220ms var(--duo-ease),
+    translate 420ms var(--ease-out-expo),
+    visibility 0s 420ms;
+}
+
+.panel[data-open] {
+  opacity: 1;
+  translate: 0 0;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.panel:focus {
+  outline: none;
+}
+
+@media (min-width: 64rem) {
+  .panel {
+    left: auto;
+    right: calc(1.25rem + 9rem);
+    bottom: 1.25rem;
+    width: 23.5rem;
+    height: min(36rem, calc(100svh - var(--duo-header) - 3rem));
+    translate: 1rem 0;
+    transform-origin: 100% 100%;
+  }
+}
+
+/* --- Contact -------------------------------------------------------------------------------------- */
+
+/* ContactChat gives way to the Windy Pup chat; its noscript note stays. */
+.root :global(#contact [data-reveal]:has(> noscript)) > :not([data-duo-contact-chat], noscript) {
+  display: none;
+}
+
+/* --- Reduced motion: fades only. ----------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .heroHead,
+  .heroBelow,
+  .heroChat,
+  .bubble,
+  .panel,
+  .window,
+  .corner {
+    translate: none !important;
+    scale: none !important;
+    transition-property: opacity, visibility, background-color, color, border-color !important;
+  }
+
+  .bubbleText::before {
+    animation: none;
+  }
+}
+
+/* A stage in the page's flow (the hero's window, the contact slot): it scrolls with its section. */
+/* The stage covers its whole section, so the dog can walk in from beyond the edge. */
+.dogIn {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.root :global(#contact) {
+  position: relative;
+  overflow-x: clip;
+}

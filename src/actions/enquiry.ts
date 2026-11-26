@@ -9,7 +9,7 @@ import { clientAddress } from "@/lib/client-address";
 import { isRateLimited } from "@/lib/rate-limit";
 
 /*
- * Sends the contact conversation straight to the team's inbox through Gmail
+ * Sends a message from the website straight to the team's inbox through Gmail
  * (Google Workspace) SMTP, so the visitor never leaves the page. Reply-To is
  * the visitor, so answering is one click in Gmail.
  *
@@ -75,7 +75,7 @@ export async function sendEnquiry(input: EnquiryInput): Promise<EnquiryResult> {
     "",
     "—",
     ...journeyLines(input.journey),
-    `Sent from the contact conversation on ${new URL(SITE_URL).hostname.replace(/^www\./, "")}. Reply to this email to answer them directly.`,
+    `Sent from the website, ${new URL(SITE_URL).hostname.replace(/^www\./, "")}. Reply to this email to answer them directly.`,
   ].join("\n");
 
   // Test runs (pnpm start:e2e) log instead of emailing, even on a production build with real mail

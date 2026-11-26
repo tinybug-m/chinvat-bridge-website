@@ -1,0 +1,619 @@
+/*
+ * The chat, with no background. Nothing paints behind the
+ * conversation: only the bubbles, the buttons and the composer have a surface.
+ */
+
+/* ---------- shared structure ---------- */
+
+.root {
+  /* Read by the shared hand-off form (chat.module.css). */
+  --text: var(--color-ink);
+  --muted: var(--color-ink-muted);
+  --accent: #0f557d;
+  --edge: #d6d9db;
+  --field: #fff;
+  --field-edge: #b9c0c4;
+  --error: #b42318;
+  --ring: 0 0 0 3px rgb(15 85 125 / 0.14);
+
+  --in: #fff;
+  --out: #d8ebf7;
+  --out-text: var(--color-ink);
+  --meta-out: #1d6c96;
+  --radius: 1.1rem;
+
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  height: var(--wp-chat-height, 36rem);
+  min-height: 0;
+  color: var(--text);
+  line-height: 1.4;
+  text-align: left;
+  container-type: inline-size;
+}
+
+/* Over the page (the corner dog's chat): a plain sheet, so the page does not show through the words. */
+.root[data-floating] {
+  margin-bottom: var(--wp-covered, 0px);
+  padding: 0.75rem 1rem;
+  border-radius: 1.25rem;
+  background: var(--color-paper);
+  box-shadow:
+    0 0 0 1px rgb(11 26 38 / 0.08),
+    0 24px 60px -24px rgb(11 26 38 / 0.4);
+}
+
+.root :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.root .input:focus-visible,
+.root form input:focus-visible,
+.root form textarea:focus-visible {
+  outline: none;
+}
+
+.head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.7rem;
+  padding-bottom: 0.5rem;
+}
+
+.who {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.status {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.status[data-live] {
+  color: var(--color-azure-500);
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.textButton,
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.textButton {
+  padding: 0 0.75rem;
+  white-space: nowrap;
+}
+
+.iconButton {
+  width: 2.5rem;
+}
+
+.textButton:hover:not(:disabled),
+.iconButton:hover:not(:disabled) {
+  background: rgb(11 26 38 / 0.06);
+  color: var(--text);
+}
+
+.textButton:disabled,
+.iconButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+@container (max-width: 24rem) {
+  .tools .textButton {
+    width: 2.5rem;
+    padding: 0;
+  }
+  .tools .textButton span {
+    display: none;
+  }
+}
+
+.threadWrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Room at the sides for tails and shadows, taken back with the margin so bubbles line up with the column. */
+.thread {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin-inline: -0.75rem;
+  padding: 1.25rem 0.75rem 0.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(11 26 38 / 0.18) transparent;
+  font-size: 0.9688rem;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 1.75rem);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 1.75rem);
+}
+
+/* Messages rest on the composer, as in Telegram. */
+.thread > :first-child {
+  margin-top: auto;
+}
+
+.day {
+  flex: none;
+  align-self: center;
+  margin-bottom: 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.row {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  margin-top: 0.2rem;
+}
+
+.row[data-first] {
+  margin-top: 0.75rem;
+}
+
+.row[data-side="out"] {
+  justify-content: flex-end;
+}
+
+.bubble {
+  position: relative;
+  max-width: min(84%, 28rem);
+  padding: 0.5rem 0.8rem 0.45rem;
+  border-radius: var(--radius);
+  background: var(--in);
+  overflow-wrap: anywhere;
+}
+
+.row[data-side="out"] .bubble {
+  background: var(--out);
+  color: var(--out-text);
+}
+
+.row[data-side="in"][data-last] .bubble {
+  border-bottom-left-radius: 0;
+}
+
+.row[data-side="out"][data-last] .bubble {
+  border-bottom-right-radius: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .row {
+    animation: arrive 0.32s var(--ease-out-quart, ease-out) both;
+  }
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    translate: 0 0.5rem;
+  }
+}
+
+.bubble p,
+.bubble ul,
+.bubble ol {
+  margin: 0;
+}
+
+.bubble p + p,
+.bubble p + ul,
+.bubble ul + p,
+.bubble p + ol,
+.bubble ol + p {
+  margin-top: 0.4rem;
+}
+
+.bubble ul {
+  padding-left: 1.1rem;
+  list-style: disc;
+}
+
+.bubble ol {
+  padding-left: 1.2rem;
+  list-style: decimal;
+}
+
+.bubble a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.bubble code {
+  padding: 0 0.25rem;
+  border-radius: 0.25rem;
+  background: rgb(11 26 38 / 0.07);
+  font-size: 0.875em;
+}
+
+.pad {
+  display: inline-block;
+  width: 2.8rem;
+  height: 1px;
+}
+
+.pad[data-own] {
+  width: 4.2rem;
+}
+
+/* After a list the time gets a short line of its own, not an empty paragraph. */
+.bubble[data-list-end] > p:last-of-type {
+  height: 0.7rem;
+  margin: 0;
+}
+
+.meta {
+  position: absolute;
+  right: 0.65rem;
+  bottom: 0.3rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.6875rem;
+  line-height: 1;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+.row[data-side="out"] .meta {
+  color: var(--meta-out);
+}
+
+.row[data-side="out"] .meta[data-failed] {
+  color: var(--error);
+}
+
+.meta[data-failed] svg {
+  width: 0.8125rem;
+  height: 0.8125rem;
+}
+
+.tail {
+  position: absolute;
+  bottom: 0;
+  left: -8px;
+  overflow: visible;
+}
+
+.row[data-side="out"] .tail {
+  right: -8px;
+  left: auto;
+  scale: -1 1;
+}
+
+.tailFill {
+  fill: var(--in);
+}
+
+.row[data-side="out"] .tailFill {
+  fill: var(--out);
+}
+
+.tailLine {
+  display: none;
+}
+
+.bubble[data-typing] {
+  padding: 0.75rem 0.9rem;
+}
+
+.dots {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.dots i {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--color-azure-400);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dots i {
+    animation: dot 1.1s ease-in-out infinite;
+  }
+  .dots i:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .dots i:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+}
+
+@keyframes dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+  }
+  30% {
+    opacity: 1;
+    translate: 0 -0.2rem;
+  }
+}
+
+.chips {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.chip {
+  min-height: 2.4rem;
+  padding: 0.35rem 0.9rem;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8438rem;
+  font-weight: 500;
+  line-height: 1.25;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.chip:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.notice {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.5rem;
+  align-self: center;
+  margin: 0.8rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.problem {
+  display: flex;
+  flex: none;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+  font-size: 0.8438rem;
+  color: var(--error);
+}
+
+.problem p {
+  margin: 0;
+}
+
+.problem svg {
+  flex: none;
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.down {
+  position: absolute;
+  right: 0;
+  bottom: 0.5rem;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--muted);
+  box-shadow: 0 2px 10px rgb(11 26 38 / 0.18);
+  cursor: pointer;
+}
+
+.badge {
+  position: absolute;
+  top: -0.3rem;
+  right: -0.15rem;
+  min-width: 1.15rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--color-azure-500);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.15rem;
+}
+
+.dock {
+  flex: none;
+  padding-top: 0.5rem;
+}
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.field {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.input {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 1.15rem;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  caret-color: var(--accent);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  resize: none;
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--muted);
+}
+
+.send {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    background 0.18s,
+    color 0.18s,
+    scale 0.18s var(--ease-out-quart, ease-out);
+}
+
+.send:disabled {
+  cursor: default;
+}
+
+.send:active:not(:disabled) {
+  scale: 0.92;
+}
+
+.note {
+  margin: 0.55rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.note a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ====================================================================
+ * Bubbles: the classic app
+ * ==================================================================== */
+
+.root[data-look="bubbles"] .avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(11 26 38 / 0.14);
+}
+
+.root[data-look="bubbles"] .bubble {
+  filter: drop-shadow(0 1px 1.5px rgb(11 26 38 / 0.16));
+}
+
+/* The bot keyboard: a tidy block of keys under the greeting. */
+.root[data-look="bubbles"] .chips {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem;
+  width: min(84%, 28rem);
+}
+
+.root[data-look="bubbles"] .chips > :first-child {
+  grid-column: 1 / -1;
+}
+
+.root[data-look="bubbles"] .chip {
+  border-radius: 0.6rem;
+  background: rgb(11 26 38 / 0.065);
+}
+
+.root[data-look="bubbles"] .chip:hover:not(:disabled) {
+  background: var(--out);
+}
+
+.root[data-look="bubbles"] .chips[data-after] {
+  grid-template-columns: 1fr;
+}
+
+.root[data-look="bubbles"] .field {
+  border-radius: 1.5rem;
+  background: #fff;
+  box-shadow: 0 1px 4px rgb(11 26 38 / 0.14);
+  transition: box-shadow 0.18s;
+}
+
+.root[data-look="bubbles"] .field:focus-within {
+  box-shadow:
+    0 0 0 1.5px var(--color-azure-400),
+    0 1px 4px rgb(11 26 38 / 0.14);
+}
+
+.root[data-look="bubbles"] .send {
+  background: var(--color-azure-500);
+  color: #fff;
+}
+
+.root[data-look="bubbles"] .send:disabled {
+  background: rgb(11 26 38 / 0.14);
+}
+
+.root[data-look="bubbles"] .note {
+  text-align: center;
+}

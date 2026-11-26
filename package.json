@@ -20,6 +20,7 @@
     "dev:e2e": "ENQUIRY_DELIVERY=log RATE_LIMIT_TRUST_FORWARDED_FOR=1 GMAIL_USER= GMAIL_APP_PASSWORD= next dev"
   },
   "dependencies": {
+    "@google/genai": "^3.6.1",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.116.0",
     "class-variance-authority": "0.7.1",

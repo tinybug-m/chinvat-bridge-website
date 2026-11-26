@@ -1,0 +1,124 @@
+/*
+ * Variation F, "Open" (OpenHero.tsx): DuoHero without its box, on CrossingHero's orbits.
+ */
+
+.wrap {
+  position: relative;
+  overflow-x: clip;
+}
+
+/* --- No box: the window keeps its place and its ground line, loses its frame, marks and captions. */
+
+/* The second selector outranks the box's own hover border. */
+.wrap [data-duo-frame],
+.wrap [data-duo-frame][data-home]:hover {
+  border-color: transparent;
+  background: transparent;
+}
+
+.wrap [data-duo-frame] > [data-at] {
+  display: none;
+}
+
+/* --- The orbits ------------------------------------------------------------------------------ */
+
+/*
+ * Sized as the main hero's chart (its height H, width H x 0.5782) and placed so the chart's centre
+ * (x 320 of 540, y 405 + 34 of 934) lands on --ox / --oy. Large screens only, behind the hero.
+ */
+.orbits {
+  --H: clamp(36rem, calc(100svh - 9rem), 54rem);
+  --W: calc(var(--H) * 0.5782);
+  position: absolute;
+  left: var(--ox);
+  top: calc(var(--oy) - var(--H) * 439 / 934);
+  width: var(--W);
+  height: var(--H);
+  display: none;
+  overflow: visible;
+  pointer-events: none;
+}
+
+@media (min-width: 64rem) {
+  .orbits {
+    display: block;
+  }
+}
+
+/* A point on its orbit, turning about the centre. At rest it holds its place, open above the line and solid below. */
+.point {
+  transform-origin: 320px 405px;
+  rotate: var(--rest);
+}
+
+.point:not([data-crossed]) .solid,
+.point[data-crossed] .open {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .in {
+    animation: in 900ms var(--ease-out-expo) 600ms both;
+  }
+
+  .point {
+    rotate: none;
+    animation: orbit var(--period) linear var(--at) infinite;
+  }
+
+  .point .open {
+    animation: open var(--period) linear var(--at) infinite;
+  }
+
+  .point .solid {
+    animation: solid var(--period) linear var(--at) infinite;
+  }
+}
+
+.wrap[data-paused] .point,
+.wrap[data-paused] .point * {
+  animation-play-state: paused;
+}
+
+@keyframes in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes orbit {
+  from {
+    rotate: -75deg;
+    opacity: 0;
+  }
+  12%,
+  88% {
+    opacity: 1;
+  }
+  to {
+    rotate: 75deg;
+    opacity: 0;
+  }
+}
+
+@keyframes open {
+  0%,
+  48% {
+    opacity: 1;
+  }
+  52%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes solid {
+  0%,
+  48% {
+    opacity: 0;
+  }
+  52%,
+  100% {
+    opacity: 1;
+  }
+}
