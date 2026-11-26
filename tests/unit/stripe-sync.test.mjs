@@ -155,6 +155,26 @@ test("checkout for an email that already holds a different active subscription i
   assert.equal(onlyCustomer(w).plan_id, "growth");
 });
 
+for (const stripeStatus of ["past_due", "paused"]) {
+  test(`checkout for an email whose subscription is ${stripeStatus} is left unchanged`, async () => {
+    const w = world();
+    await handleStripeEvent(fixture("checkout.session.completed"), w.deps);
+    w.subscriptions.get("sub_test_1").status = stripeStatus;
+    const updated = fixture("customer.subscription.updated");
+    updated.data.object.status = stripeStatus;
+    await handleStripeEvent(updated, w.deps);
+    assert.notEqual(onlyCustomer(w).status, "active");
+    w.subscriptions.set("sub_test_2", { id: "sub_test_2", status: "active", cancel_at_period_end: false, metadata: { planId: "scale" } });
+    const other = fixture("checkout.session.completed");
+    other.id = "evt_test_checkout_3";
+    other.data.object.subscription = "sub_test_2";
+    other.data.object.metadata.planId = "scale";
+    assert.equal(await handleStripeEvent(other, w.deps), "conflict_left_unchanged");
+    assert.equal(onlyCustomer(w).stripe_subscription_id, "sub_test_1");
+    assert.equal(onlyCustomer(w).plan_id, "growth");
+  });
+}
+
 test("a cancelled customer may start a new subscription", async () => {
   const w = world();
   await handleStripeEvent(fixture("checkout.session.completed"), w.deps);

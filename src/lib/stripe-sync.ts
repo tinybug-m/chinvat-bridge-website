@@ -32,6 +32,8 @@ export function isHandledEvent(type: string): boolean {
 }
 
 const ENDED = new Set(["canceled", "incomplete_expired"]);
+/** Portal statuses whose subscription a new checkout for the same account may replace. */
+const REPLACEABLE_STATUSES: ReadonlySet<string> = new Set(["cancelled", "pending"]);
 
 /** Portal status for a Stripe subscription status. Unknown statuses are treated as a payment issue. */
 export function customerStatusFor(stripeStatus: string): CustomerStatus {
@@ -186,8 +188,10 @@ async function onCheckoutCompleted(session: Stripe.Checkout.Session, deps: SyncD
     return await deps.applyState(state);
   }
   // The checkout email is unverified: never let one checkout overwrite an account that already
-  // holds a different active subscription (someone else typing an existing customer's address).
-  if (existing && existing.status === "active" && existing.stripe_subscription_id) {
+  // holds a different live subscription (someone else typing an existing customer's address). Only
+  // an ended subscription, or a first payment that never completed, may be replaced; past due and
+  // paused customers are still customers.
+  if (existing && existing.stripe_subscription_id && !REPLACEABLE_STATUSES.has(existing.status)) {
     return "conflict_left_unchanged";
   }
 
